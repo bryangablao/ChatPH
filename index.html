@@ -459,7 +459,11 @@ getAuth,
 createUserWithEmailAndPassword,
 signInWithEmailAndPassword,
 GoogleAuthProvider,
-signInWithPopup
+signInWithPopup,
+sendEmailVerification,
+sendPasswordResetEmail,
+updatePassword,
+updateProfile
 } from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
@@ -477,12 +481,12 @@ from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 /* FIREBASE CONFIG */
 const firebaseConfig = {
-apiKey: "AIzaSyB2C1VvkBqicJ_O1iPzG5EjIqeID7NEl4M",
-authDomain: "chatph-8590f.firebaseapp.com",
-projectId: "chatph-8590f",
-storageBucket: "chatph-8590f.firebasestorage.app",
-messagingSenderId: "1071554034111",
-appId: "1:1071554034111:web:397cba69bc980f0fd5490a"
+  apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
+  authDomain: "chatph-cc187.firebaseapp.com",
+  projectId: "chatph-cc187",
+  storageBucket: "chatph-cc187.firebasestorage.app",
+  messagingSenderId: "324012163441",
+  appId: "1:324012163441:web:7a54be2231ad2cae71f6d0"
 };
 
 /* INITIALIZE FIREBASE */
@@ -545,18 +549,26 @@ try{
 const userCredential = await createUserWithEmailAndPassword(auth,email,password)
 const user = userCredential.user
 
+await sendEmailVerification(user)
+
+await updateProfile(user,{
+displayName:firstName + " " + lastName,
+photoURL:"https://i.imgur.com/6VBx3io.png"
+})
+
 await setDoc(doc(db,"users",user.uid),{
 firstName:firstName,
 lastName:lastName,
 phone:phone,
 pin:pin,
 email:email,
+photo:"https://i.imgur.com/6VBx3io.png",
 createdAt:new Date()
 })
 
 regStatus.style.display="block"
 regStatus.style.color="#22c55e"
-regStatus.textContent="Account created successfully"
+regStatus.textContent="Account created. Please verify your email before login."
 
 }catch(error){
 
@@ -597,9 +609,16 @@ status.textContent="Account does not exist"
 return
 }
 
-await signInWithEmailAndPassword(auth,email,password)
+const userCredential = await signInWithEmailAndPassword(auth,email,password)
+const user = userCredential.user
 
-status.textContent="Account verified. Redirecting..."
+if(!user.emailVerified){
+status.style.color="#ef4444"
+status.textContent="Please verify your email before logging in."
+return
+}
+
+status.textContent="Login successful. Redirecting..."
 
 setTimeout(()=>{
 window.location.href="home.html"
@@ -616,25 +635,25 @@ status.textContent="Invalid email or password"
 
 /* GOOGLE LOGIN */
 document.getElementById("googleLogin").addEventListener("click", async () => {
-
 try{
 
 const result = await signInWithPopup(auth, provider)
 const user = result.user
 
-/* check if user already exists */
 const userRef = doc(db,"users",user.uid)
 const userSnap = await getDoc(userRef)
 
 if(!userSnap.exists()){
 
+const nameParts = (user.displayName || "").split(" ")
+
 await setDoc(userRef,{
-firstName:user.displayName || "",
-lastName:"",
+firstName:nameParts[0] || "",
+lastName:nameParts.slice(1).join(" ") || "",
 phone:"",
 pin:"",
 email:user.email,
-photo:user.photoURL,
+photo:user.photoURL || "https://i.imgur.com/6VBx3io.png",
 loginType:"google",
 createdAt:new Date()
 })
@@ -651,7 +670,6 @@ status.style.color="#ef4444"
 status.textContent=error.message
 
 }
-
 });
 
 /* RESET PASSWORD */
@@ -690,7 +708,11 @@ return
 
 status.style.display="block"
 status.style.color="#22c55e"
-status.textContent="PIN verified. You can now login and change password."
+await sendPasswordResetEmail(auth,email)
+
+status.style.display="block"
+status.style.color="#22c55e"
+status.textContent="Password reset email sent. Check your inbox."
 
 }catch(error){
 
