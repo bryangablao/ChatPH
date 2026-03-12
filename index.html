@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChatPH</title>
+<link rel="icon" type="image/png" href="image/chatph-logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+background:linear-gradient(135deg,#0f0f0f,#181818);
+color:white;
+}
+
+/* MAIN CONTAINER */
+
+.container{
+display:flex;
+width:900px;
+height:600px;
+border-radius:18px;
+overflow:hidden;
+box-shadow:0 20px 50px rgba(0,0,0,.6);
+}
+
+/* LEFT SIDE */
+
+.left{
+flex:1;
+padding:60px;
+background:linear-gradient(160deg,#1f1f1f,#101010);
+display:flex;
+flex-direction:column;
+justify-content:center;
+}
+  
+.left h1{
+font-size:48px;
+margin-bottom:20px;
+}
+
+.left p{
+color:#aaa;
+line-height:1.6;
+}
+
+.ph-time{
+margin-top:15px;
+font-size:14px;
+color:#9ca3ff;
+font-weight:500;
+display:flex;
+align-items:center;
+gap:8px;
+white-space:nowrap;
+}
+
+.ph-flag{
+width:22px;
+border-radius:3px;
+box-shadow:0 0 6px rgba(0,0,0,0.4);
+}
+
+.greeting{
+margin-top:10px;
+font-size:16px;
+color:#c7c9ff;
+font-weight:500;
+}
+
+.title-row{
+display:flex;
+align-items:flex-start;
+gap:16px;
+margin-bottom:15px;
+}
+
+.title-row h1{
+font-size:48px;
+margin-top:8px;
+}
+  
+.logo{
+width:95px;
+filter:drop-shadow(0 0 10px rgba(124,130,255,0.4));
+}
+  
+/* RIGHT SIDE */
+
+.right{
+flex:1;
+background:#0e0e0e;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:40px;
+}
+
+/* FORM CARD */
+
+.card{
+width:100%;
+max-width:360px;
+background:#151515;
+border-radius:14px;
+padding:35px;
+border:1px solid rgba(255,255,255,0.05);
+box-shadow:0 10px 25px rgba(0,0,0,0.6);
+}
+
+/* FORMS */
+
+form{
+display:none;
+flex-direction:column;
+gap:15px;
+}
+
+form.active{
+display:flex;
+}
+
+h2{
+text-align:center;
+margin-bottom:10px;
+}
+
+/* INPUT */
+
+.input{
+position:relative;
+}
+
+.input input{
+width:100%;
+padding:12px 15px 12px 40px;
+border-radius:10px;
+border:none;
+background:#1c1c1c;
+color:white;
+outline:none;
+}
+
+.input i{
+position:absolute;
+left:12px;
+top:50%;
+transform:translateY(-50%);
+color:#888;
+}
+
+/* BUTTON */
+
+button{
+padding:12px;
+border:none;
+border-radius:10px;
+background:linear-gradient(135deg,#6366f1,#4f46e5);
+color:white;
+font-weight:500;
+cursor:pointer;
+transition:.3s;
+}
+
+button:hover{
+opacity:.85;
+}
+
+/* GOOGLE LOGIN BUTTON */
+.google-btn{
+width:100%;
+background:#fff;
+color:#444;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+border-radius:10px;
+padding:10px;
+font-weight:600;
+border:none;
+cursor:pointer;
+}
+
+.google-btn img{
+width:18px;
+}
+  
+/* LINKS */
+
+.links{
+display:flex;
+justify-content:space-between;
+font-size:13px;
+margin-top:5px;
+}
+
+.link{
+color:#7c82ff;
+cursor:pointer;
+text-decoration:underline;
+}
+
+/* STATUS MESSAGE */
+
+.status{
+text-align:center;
+font-size:13px;
+color:#22c55e;
+margin-top:5px;
+display:none;
+}
+
+.warning{
+position:absolute;
+right:12px;
+top:50%;
+transform:translateY(-50%);
+color:#ef4444;
+font-size:14px;
+cursor:pointer;
+display:none;
+}
+
+.warning::after{
+content:attr(data-tip);
+position:absolute;
+bottom:28px;
+right:0;
+background:#111;
+color:#fff;
+padding:6px 8px;
+border-radius:6px;
+font-size:11px;
+white-space:nowrap;
+opacity:0;
+pointer-events:none;
+transition:.2s;
+border:1px solid rgba(255,255,255,0.1);
+}
+
+.warning:hover::after{
+opacity:1;
+}
+
+@media (max-width:768px){
+
+.container{
+flex-direction:column;
+height:auto;
+width:95%;
+}
+
+.left{
+padding:30px;
+text-align:center;
+}
+
+.right{
+padding:20px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="left">
+
+<div class="title-row">
+<img src="image/chatph-logo.png" class="logo">
+<h1>ChatPH</h1>
+</div>
+
+<p>
+ChatPH is a place where Filipinos everywhere can connect, share stories,
+and build friendships in one vibrant community. Whether you're at home
+in the Philippines or across the globe, ChatPH brings people together
+in a simple and meaningful way.
+</p>
+
+<div id="greeting" class="greeting"></div>
+
+<div class="ph-time">
+<span id="phTime"></span>
+<img src="image/philipines.png" class="ph-flag">
+<span>Philippines</span>
+</div>
+
+</div>
+
+<div class="right">
+<div class="card">
+
+<!-- LOGIN -->
+
+<form id="login" class="active">
+
+<h2>Login</h2>
+
+<div class="input">
+<i class="fa fa-envelope"></i>
+<input type="email" placeholder="Email">
+</div>
+
+<div class="input">
+<i class="fa fa-lock"></i>
+<input type="password" placeholder="Password">
+</div>
+
+<button type="submit">Login</button>
+
+<div style="text-align:center;margin:10px 0;color:#aaa;">or</div>
+
+<button type="button" id="googleLogin" class="google-btn">
+<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">
+Sign in with Google
+</button>
+
+<div class="links">
+<span class="link" onclick="showForm('register')">Register</span>
+<span class="link" onclick="showForm('forgot')">Forgot Password</span>
+</div>
+
+</form>
+
+
+<!-- REGISTER -->
+
+<form id="register" novalidate>
+
+<h2>Create Account</h2>
+
+<div class="input">
+<i class="fa fa-envelope"></i>
+<input type="email" id="registerEmail" placeholder="Email">
+</div>
+  
+<div class="input">
+<i class="fa fa-user"></i>
+<input type="text" id="firstName" placeholder="First Name">
+</div>
+
+<div class="input">
+<i class="fa fa-user"></i>
+<input type="text" id="lastName" placeholder="Last Name">
+</div>
+
+<div class="input">
+<i class="fa fa-phone"></i>
+<input type="text"
+id="mobileNumber"
+placeholder="Mobile Number"
+maxlength="11"
+inputmode="numeric"
+pattern="09[0-9]{9}"
+oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+<i class="fa-solid fa-circle-exclamation warning" id="mobileWarn"
+data-tip="Mobile number must be 11 digits and start with 09"></i>
+</div>
+
+<div class="input">
+<i class="fa fa-key"></i>
+<input type="text"
+id="pinInput"
+placeholder="6 digit PIN"
+maxlength="6"
+inputmode="numeric"
+pattern="[0-9]{6}"
+oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+<i class="fa-solid fa-circle-exclamation warning" id="pinWarn"
+data-tip="PIN must contain exactly 6 numbers"></i>
+</div>
+
+<div class="input">
+<i class="fa fa-lock"></i>
+<input type="password" placeholder="Password">
+</div>
+
+<button>Create Account</button>
+
+<div class="links">
+<span class="link" onclick="showForm('login')">Back to Login</span>
+<span class="status" id="regStatus"></span>
+</div>
+
+</form>
+
+
+<!-- FORGOT PASSWORD -->
+
+<form id="forgot" novalidate>
+
+<h2>Reset Password</h2>
+
+<div class="input">
+<i class="fa fa-envelope"></i>
+<input type="email" id="forgotEmail" placeholder="Email">
+</div>
+
+<div class="input">
+<i class="fa fa-key"></i>
+<input type="text"
+id="forgotPin"
+placeholder="6 digit PIN"
+maxlength="6"
+inputmode="numeric"
+pattern="[0-9]{6}"
+oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+</div>
+<div class="status" id="forgotPinError" style="color:#ef4444;">
+PIN must be exactly 6 numbers
+</div>
+
+<div class="input">
+<i class="fa fa-lock"></i>
+<input type="password" id="newPassword" placeholder="New Password">
+</div>
+
+<button>Confirm</button>
+
+<div class="links">
+<span class="link" onclick="showForm('login')">Back to Login</span>
+<span class="status" id="resetStatus"></span>
+</div>
+</form>
+
+</div>
+</div>
+</div>
+</body>
+
+<script type="module">
+
+/* FIREBASE IMPORTS */
+import { initializeApp } from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getAuth,
+createUserWithEmailAndPassword,
+signInWithEmailAndPassword,
+GoogleAuthProvider,
+signInWithPopup
+} from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+getFirestore,
+doc,
+setDoc,
+getDoc,
+collection,
+query,
+where,
+getDocs
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* FIREBASE CONFIG */
+const firebaseConfig = {
+apiKey: "AIzaSyB2C1VvkBqicJ_O1iPzG5EjIqeID7NEl4M",
+authDomain: "chatph-8590f.firebaseapp.com",
+projectId: "chatph-8590f",
+storageBucket: "chatph-8590f.firebasestorage.app",
+messagingSenderId: "1071554034111",
+appId: "1:1071554034111:web:397cba69bc980f0fd5490a"
+};
+
+/* INITIALIZE FIREBASE */
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
+
+/* FORM SWITCHER */
+window.showForm = function(form){
+
+document.querySelectorAll("form").forEach(f=>{
+f.classList.remove("active")
+
+/* clear inputs */
+f.querySelectorAll("input").forEach(input=>{
+input.value=""
+})
+
+})
+
+document.querySelectorAll(".status").forEach(s=>{
+s.style.display="none"
+s.textContent=""
+})
+
+document.getElementById(form).classList.add("active")
+
+}
+
+/* REGISTER USER */
+document.getElementById("register").addEventListener("submit", async function(e){
+e.preventDefault()
+
+const email = document.getElementById("registerEmail").value
+const password = this.querySelector('input[type="password"]').value
+const firstName = document.getElementById("firstName").value
+const lastName = document.getElementById("lastName").value
+const phone = document.getElementById("mobileNumber").value
+const pin = document.getElementById("pinInput").value
+const regStatus = document.getElementById("regStatus")
+
+/* VALIDATION */
+if(!/^09\d{9}$/.test(phone)){
+regStatus.style.display="block"
+regStatus.style.color="#ef4444"
+regStatus.textContent="Invalid Philippine mobile number"
+return
+}
+
+if(!/^\d{6}$/.test(pin)){
+regStatus.style.display="block"
+regStatus.style.color="#ef4444"
+regStatus.textContent="PIN must be 6 digits"
+return
+}
+
+try{
+
+const userCredential = await createUserWithEmailAndPassword(auth,email,password)
+const user = userCredential.user
+
+await setDoc(doc(db,"users",user.uid),{
+firstName:firstName,
+lastName:lastName,
+phone:phone,
+pin:pin,
+email:email,
+createdAt:new Date()
+})
+
+regStatus.style.display="block"
+regStatus.style.color="#22c55e"
+regStatus.textContent="Account created successfully"
+
+}catch(error){
+
+regStatus.style.display="block"
+regStatus.style.color="#ef4444"
+regStatus.textContent=error.message
+
+}
+})
+
+/* LOGIN USER */
+document.getElementById("login").addEventListener("submit", async function(e){
+
+e.preventDefault()
+
+const email = this.querySelector('input[type="email"]').value
+const password = this.querySelector('input[type="password"]').value
+
+let status = this.querySelector(".loginStatus")
+
+if(!status){
+status = document.createElement("div")
+status.className="status loginStatus"
+this.appendChild(status)
+}
+
+status.style.display="block"
+status.style.color="#22c55e"
+
+try{
+
+const q = query(collection(db,"users"), where("email","==",email))
+const snap = await getDocs(q)
+
+if(snap.empty){
+status.style.color="#ef4444"
+status.textContent="Account does not exist"
+return
+}
+
+await signInWithEmailAndPassword(auth,email,password)
+
+status.textContent="Account verified. Redirecting..."
+
+setTimeout(()=>{
+window.location.href="home.html"
+},5000)
+
+}catch(error){
+
+status.style.color="#ef4444"
+status.textContent="Invalid email or password"
+
+}
+
+})
+
+/* GOOGLE LOGIN */
+document.getElementById("googleLogin").addEventListener("click", async () => {
+
+try{
+
+const result = await signInWithPopup(auth, provider)
+const user = result.user
+
+/* check if user already exists */
+const userRef = doc(db,"users",user.uid)
+const userSnap = await getDoc(userRef)
+
+if(!userSnap.exists()){
+
+await setDoc(userRef,{
+firstName:user.displayName || "",
+lastName:"",
+phone:"",
+pin:"",
+email:user.email,
+photo:user.photoURL,
+loginType:"google",
+createdAt:new Date()
+})
+
+}
+
+window.location.href="home.html"
+
+}catch(error){
+
+const status = document.getElementById("regStatus")
+status.style.display="block"
+status.style.color="#ef4444"
+status.textContent=error.message
+
+}
+
+});
+
+/* RESET PASSWORD */
+document.getElementById("forgot").addEventListener("submit", async function(e){
+e.preventDefault()
+
+const email = document.getElementById("forgotEmail").value
+const pin = document.getElementById("forgotPin").value
+const newPassword = document.getElementById("newPassword").value
+
+const status = document.getElementById("resetStatus")
+
+try{
+
+const q = query(collection(db,"users"), where("email","==",email))
+const querySnapshot = await getDocs(q)
+
+if(querySnapshot.empty){
+status.style.display="block"
+status.style.color="#ef4444"
+status.textContent="Account not found"
+return
+}
+
+let userData
+querySnapshot.forEach((doc)=>{
+userData = doc.data()
+})
+
+if(userData.pin !== pin){
+status.style.display="block"
+status.style.color="#ef4444"
+status.textContent="PIN does not match"
+return
+}
+
+status.style.display="block"
+status.style.color="#22c55e"
+status.textContent="PIN verified. You can now login and change password."
+
+}catch(error){
+
+status.style.display="block"
+status.style.color="#ef4444"
+status.textContent=error.message
+
+}
+
+})
+
+/* PHILIPPINE REALTIME CLOCK */
+
+function updatePHTime(){
+
+const now = new Date()
+
+const optionsDate = {
+timeZone: "Asia/Manila",
+year: "numeric",
+month: "long",
+day: "numeric"
+}
+
+const optionsTime = {
+timeZone: "Asia/Manila",
+hour: "numeric",
+minute: "2-digit",
+hour12: true
+}
+
+const optionsDay = {
+timeZone: "Asia/Manila",
+weekday: "long"
+}
+
+const date = new Intl.DateTimeFormat("en-US", optionsDate).format(now)
+const time = new Intl.DateTimeFormat("en-US", optionsTime).format(now)
+const day = new Intl.DateTimeFormat("en-US", optionsDay).format(now)
+
+document.getElementById("phTime").textContent =
+`${date} [ ${time} ] ${day} ||`
+
+/* PH Greeting */
+
+const phHour = new Date(
+now.toLocaleString("en-US",{timeZone:"Asia/Manila"})
+).getHours()
+
+let greeting=""
+
+if(phHour>=5 && phHour<12){
+greeting="Good Morning ☀️"
+}
+else if(phHour>=12 && phHour<18){
+greeting="Good Afternoon 🌤"
+}
+else{
+greeting="Good Evening 🌙"
+}
+
+document.getElementById("greeting").textContent=greeting
+
+}
+
+updatePHTime()
+
+setInterval(updatePHTime,1000)
+
+document.querySelectorAll("form").forEach(form=>{
+form.addEventListener("keypress",function(e){
+if(e.key==="Enter"){
+e.preventDefault()
+form.querySelector("button[type='submit']").click()
+}
+})
+})
+  
+</script>
+</html>
+
+
