@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChatPH</title>
+<link rel="icon" type="image/png" href="image/chatph-logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+    --bg:#0f1115;
+    --card:#171a21;
+    --border:#23262f;
+    --text:#ffffff;
+    --accent:#4da3ff;
+}
+/* LIGHT MODE AUTO */
+@media (prefers-color-scheme: light){
+    :root{
+        --bg:#f4f6fb;
+        --card:#ffffff;
+        --border:#d9dde7;
+        --text:#111827;
+        --accent:#2563eb;
+    }
+}
+    
+body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    transition:.4s;
+    min-height:100vh;
+}
+
+/* NEW HEADER LAYOUT */
+.main-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:15px 20px;
+    background:#12141a;
+    border-bottom:1px solid #23262f;
+    position:sticky;
+    top:0;
+    z-index:1000;
+}
+
+.header-title{
+    margin:0;
+    text-align:center;
+    flex:1;
+}
+
+#authArea{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+#profileWrapper{
+    display:flex;
+    align-items:center;
+    gap:14px; /* space between name and logout */
+}
+    
+.back-btn{
+    color:white;
+    text-decoration:none;
+    padding:8px 18px;
+    border-radius:30px;
+    border:1px solid #3a3f4b;
+}
+.back-btn:hover{background:#4da3ff}
+.admin-badge{
+    margin-left:2px;
+    font-size:12px;
+    padding:3px 8px;
+    position:relative;
+    top:-2px;
+    border-radius:20px;
+    background:linear-gradient(90deg,#ffd700,#ffae00);
+    color:#000;
+    font-weight:700;
+    animation:adminAura 2.5s ease-in-out infinite;
+}
+
+@keyframes adminAura{
+    0%{
+        box-shadow:0 0 5px rgba(255,215,0,.5);
+    }
+    50%{
+        box-shadow:0 0 20px rgba(255,215,0,1),
+                   0 0 35px rgba(255,174,0,.8);
+    }
+    100%{
+        box-shadow:0 0 5px rgba(255,215,0,.5);
+    }
+}
+
+.vip-badge{
+    margin-left:2px;
+    font-size:12px;
+    padding:3px 8px;
+    position:relative;
+    top:-2px;
+    border-radius:20px;
+    background:linear-gradient(90deg,#ff00cc,#ff66ff,#ff00cc);
+    background-size:200% 100%;
+    color:#fff;
+    font-weight:700;
+    animation:vipGlow 3s linear infinite;
+    box-shadow:0 0 10px rgba(255,0,204,.6);
+}
+
+@keyframes vipGlow{
+    0%{
+        background-position:0% 50%;
+        box-shadow:0 0 8px rgba(255,0,204,.6);
+    }
+    50%{
+        background-position:100% 50%;
+        box-shadow:0 0 18px rgba(255,0,204,1);
+    }
+    100%{
+        background-position:0% 50%;
+        box-shadow:0 0 8px rgba(255,0,204,.6);
+    }
+}
+
+.mod-badge{
+    margin-left:2px;
+    font-size:12px;
+    padding:3px 8px;
+    position:relative;
+    top:4px;
+    border-radius:20px;
+    background:linear-gradient(90deg,#a855f7,#7e22ce);
+    color:#fff;
+    font-weight:700;
+    overflow:hidden;
+    display:inline-block;
+}
+
+.mod-badge::after{
+    content:"";
+    position:absolute;
+    top:0;
+    left:-100%;
+    width:50%;
+    height:100%;
+    background:linear-gradient(
+        120deg,
+        transparent,
+        rgba(255,255,255,.6),
+        transparent
+    );
+    transform:skewX(-25deg);
+    animation:modShine 3s linear infinite;
+}
+
+@keyframes modShine{
+    0%{
+        left:-60%;
+    }
+    100%{
+        left:120%;
+    }
+}
+
+.verified-icon{
+    width:16px;
+    height:16px;
+    position:relative;
+    top:-2px;
+    margin-right:-2px;
+    vertical-align:-2px;
+    vertical-align:middle;
+    animation:badgePulse 2s infinite alternate;
+}
+    
+/* ================= DASHBOARD LAYOUT ================= */
+
+.main-container{
+    max-width:1000px;
+    margin:20px auto;
+    padding:0 16px;
+}
+    
+.dashboard{
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    gap:40px;
+    padding:20px 20px;
+    width:100%;
+    box-sizing:border-box;
+}
+
+/* SIDE PANELS */
+.left-side,
+.right-side{
+    width:250px;
+    min-height:200px;
+}
+
+/* CENTER POSTS */
+.posts-grid{
+    width:100%;
+    max-width:100%;
+}
+    
+/* POST CARD */
+.post-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:20px;
+    transition:.35s cubic-bezier(.22,1,.36,1);
+    position:relative;
+    word-wrap:break-word;
+    display:inline-block;
+    width:100%;
+    margin-bottom:22px;
+}
+
+.post-text{
+    white-space:pre-line;
+    display:-webkit-box;
+    -webkit-line-clamp:5;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+    transition:all .3s ease;
+}
+
+.post-text.expanded{
+    -webkit-line-clamp:unset;
+    display:block;
+}
+.read-more{
+    color:var(--accent);
+    font-size:13px;
+    cursor:pointer;
+    margin-top:5px;
+    display:inline-block;
+}
+    
+.post-card::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:linear-gradient(
+        120deg,
+        transparent,
+        rgba(77,163,255,.15),
+        transparent
+    );
+    opacity:0;
+    transition:.4s;
+}
+.post-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 25px 55px rgba(0,0,0,.6);
+}
+.post-card:hover::after{
+    opacity:1;
+}
+.post-top{
+    display:flex;
+    gap:12px;
+    align-items:center;
+}
+.avatar{
+    width:45px;
+    height:45px;
+    border-radius:50%;
+}
+.username{font-weight:600}
+.time{font-size:12px;color:#9aa0aa}
+/* MODAL */
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.75);
+    backdrop-filter:blur(6px);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    animation:fadeIn .3s ease;
+}
+/* animated glowing border */
+.modal-content{
+    width:92%;
+    max-width:420px;
+    padding:30px;
+    border-radius:20px;
+    position:relative;
+    animation: modalPop .35s cubic-bezier(.22,1,.36,1);
+    background:
+        linear-gradient(var(--card),var(--card)) padding-box,
+        linear-gradient(120deg,#4da3ff,#00ffd5,#4da3ff) border-box;
+    border:2px solid transparent;
+    backdrop-filter:blur(18px);
+    box-shadow:
+        0 0 40px rgba(77,163,255,.25),
+        0 20px 70px rgba(0,0,0,.6);
+}
+@keyframes modalPop{
+    from{
+        opacity:0;
+        transform:scale(.85) translateY(20px);
+    }
+    to{
+        opacity:1;
+        transform:scale(1);
+    }
+}
+.modal-content::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:20px;
+    background:radial-gradient(
+        circle at top,
+        rgba(77,163,255,.25),
+        transparent 60%
+    );
+    pointer-events:none;
+    animation:glowPulse 4s ease-in-out infinite;
+}
+@keyframes glowPulse{
+    0%,100%{opacity:.4;}
+    50%{opacity:.9;}
+}
+input,
+textarea{
+    display:block;
+    width:100%;
+    box-sizing:border-box;
+    margin:10px 0;
+    padding:12px 14px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:rgba(0,0,0,.25);
+    color:var(--text);
+    font-size:14px;
+}
+textarea{
+    width:100%;
+    min-height:85px;
+    max-height:120px;
+    resize:none;
+    overflow:auto;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid #2b2f38;
+    background:#0f1115;
+    color:white;
+    font-size:14px;
+}
+button{
+    border:none;
+    padding:12px;
+    border-radius:30px;
+    background:#4da3ff;
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+}
+.delete-btn{
+    background:#ff4d4d;
+    margin-top:8px;
+}
+@keyframes fadeUp{
+from{opacity:0;transform:translateY(25px)}
+to{opacity:1;transform:translateY(0)}
+}
+.primary-btn{
+    width:100%;
+    background:linear-gradient(135deg,#4da3ff,#2563eb);
+    border:none;
+    padding:13px;
+    border-radius:12px;
+    font-weight:600;
+    letter-spacing:.3px;
+    transition:.25s;
+}
+.primary-btn:hover{
+    transform:translateY(-1px);
+    box-shadow:0 8px 20px rgba(77,163,255,.35);
+}
+.link-action{
+    color:var(--accent);
+    cursor:pointer;
+    text-decoration:underline;
+    font-weight:500;
+    transition:.2s;
+}
+.link-action:hover{
+    opacity:.7;
+}
+.post-actions{
+    margin-top:10px;
+}
+.like-btn{
+    background:#1f2937;
+    border-radius:20px;
+    padding:6px 14px;
+    font-size:14px;
+    transition:.2s;
+    position:relative;
+
+}
+.like-tooltip{
+    position:absolute;
+    bottom:130%;
+    left:0;
+    background:#111827;
+    padding:8px 12px;
+    border-radius:8px;
+    font-size:12px;
+    white-space:normal;
+    min-width:140px;
+    text-align:left;
+    opacity:0;
+    pointer-events:none;
+    transition:.2s;
+}
+.like-btn:hover .like-tooltip{
+    opacity:1;
+}
+.like-btn:hover{
+    background:#ef4444;
+}
+.like-btn:active{
+    transform:scale(1.25);
+}
+.google-btn{
+    width:100%;
+    background:#fff;
+    color:#444;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    border-radius:10px;
+    padding:10px;
+    font-weight:600;
+}
+.google-btn img{
+    width:18px;
+}
+.post-status{
+    font-size:13px;
+    margin-bottom:8px;
+    min-height:18px;
+    color:#ffb020;
+    font-weight:500;
+}
+.post-status.success{
+    color:#22c55e;
+}
+.post-status.error{
+    color:#ff4d4d;
+}
+.delete-icon{
+    position:absolute;
+    top:12px;
+    right:12px;
+    cursor:pointer;
+    font-size:18px;
+    opacity:.7;
+    transition:.2s;
+}
+    
+.delete-icon:hover{
+    opacity:1;
+    transform:scale(1.2);
+}
+.auth-link{
+    cursor:pointer;
+    text-decoration:underline;
+    font-weight:500;
+    transition:.2s;
+}
+.auth-link:hover{
+    color:var(--accent);
+}
+
+/* REPLY SLIDE ANIMATION */
+.reply-item{
+    margin-top:12px;
+    padding:10px;
+    background:#0f172a;
+    border-left:3px solid #4da3ff;
+    border-radius:6px;
+
+    animation:slideDown .35s ease forwards;
+}
+
+@keyframes slideDown{
+    from{
+        opacity:0;
+        transform:translateY(-10px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.marquee{
+    position:relative;
+    width:100%;
+    overflow:hidden;
+    background:#0f1115;
+    padding:14px 0;
+    z-index:1;
+}
+
+/* top neon border */
+.marquee::before,
+.marquee::after{
+    content:"";
+    position:absolute;
+    left:0;
+    width:100%;
+    height:2px;
+    background:linear-gradient(
+        90deg,
+        transparent,
+        #4da3ff,
+        #00ffd5,
+        #4da3ff,
+        transparent
+    );
+    background-size:200% 100%;
+    animation:borderFlow 4s linear infinite;
+}
+
+.marquee::before{ top:0; }
+.marquee::after{ bottom:0; }
+
+@keyframes borderFlow{
+    from{ background-position:0% 0; }
+    to{ background-position:200% 0; }
+}
+
+@keyframes badgePulse{
+    from{
+        transform:scale(1);
+        opacity:.8;
+    }
+    to{
+        transform:scale(1.08);
+        opacity:1;
+    }
+}
+
+/* ====== MARQUEE ====== */
+.marquee{
+    mask-image: linear-gradient(
+        to right,
+        transparent,
+        black 10%,
+        black 90%,
+        transparent
+    );
+}
+
+/* parallax track */
+.marquee-track{
+    display:inline-block;
+    white-space:nowrap;
+    font-weight:600;
+    color:#4da3ff;
+    animation:scrollMarquee 35s linear infinite;
+}
+
+@keyframes scrollMarquee{
+    from{ transform:translateX(0); }
+    to{ transform:translateX(-50%); }
+}
+
+@media (max-width:768px){
+
+.main-header{
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.header-title{
+    order:2;
+    width:100%;
+    text-align:center;
+}
+
+.back-btn{
+    order:1;
+}
+
+#authArea{
+    order:3;
+}
+
+.dashboard{
+    flex-direction:column;
+    align-items:center;
+    padding:20px 16px;
+}
+
+.left-side,
+.right-side{
+    width:100%;
+}
+
+.posts-grid{
+    width:100%;
+    max-width:600px;
+    margin:0 auto;
+}
+
+/* ✅ Add side breathing room */
+.post-card{
+    padding:16px;
+    margin-bottom:18px;
+}
+
+#createPostBtn{
+    width:100%;
+}
+
+}
+    
+.back-btn{
+    position:static !important;
+}
+}
+
+body.modal-open > *:not(.modal){
+    filter:blur(6px);
+    pointer-events:none;
+    user-select:none;
+}
+
+.confirm-btn{
+    flex:1;
+    padding:12px 0;
+    border-radius:12px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+    min-width:120px;
+}
+
+.yes-btn{
+    background:#ef4444;
+    color:white;
+}
+
+.no-btn{
+    background:#1f2937;
+    color:white;
+}
+
+.confirm-btn:hover{
+    box-shadow:0 0 15px rgba(255,255,255,.4);
+    transform:translateY(-2px);
+}
+
+.yes-btn:hover{
+    box-shadow:0 0 20px rgba(239,68,68,.9);
+}
+
+.no-btn:hover{
+    box-shadow:0 0 20px rgba(77,163,255,.9);
+}
+    
+</style>
+</head>
+<body>
+<header class="main-header">
+    <a href="index.html" class="back-btn">← Back</a>
+
+    <h2 class="header-title">ChatPH</h2>
+
+    <div id="authArea">
+        <div id="profileWrapper">
+            <span id="userDisplay"></span>
+            <span id="logoutBtn" class="auth-link" onclick="logout()">Log Out</span>
+        </div>
+        <span id="loginBtn" class="auth-link" onclick="openLogin()">Login</span>
+    </div>
+</header>
+    
+<div class="marquee">
+    <div class="marquee-track" id="marqueeTrack"></div>
+</div>
+    
+<div style="
+    padding:20px;
+    width:100%;
+    box-sizing:border-box;
+    display:flex;
+    justify-content:flex-start;
+">
+    <button id="createPostBtn"
+    onclick="openModal()"
+    style="
+    display:none;
+    padding:10px 18px;
+    border-radius:30px;
+    background:#4da3ff;
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+    position:relative;
+    z-index:20;">
+        ✏️ Create Post
+    </button>
+</div>
+<div class="main-container">
+ <div class="dashboard">
+    <!-- LEFT SIDE PANEL -->
+    <div class="left-side">
+        <!-- You can put widgets here later -->
+    </div>
+    <!-- CENTER POSTS -->
+    <div class="posts-grid" id="posts"></div>
+    <!-- RIGHT SIDE PANEL -->
+    <div class="right-side">
+        <!-- Future content -->
+    </div>
+  </div>
+</div>
+    
+<!-- MODAL -->
+<div class="modal" id="modal">
+<div class="modal-content">
+<div id="authBox">
+<h3>Login</h3>
+<input id="loginEmail" placeholder="Email">
+<input id="loginPassword" type="password" placeholder="Password">
+<button class="primary-btn" onclick="emailLogin()">Login</button>
+    
+<p style="text-align:center;margin:10px 0;">— or —</p>
+<p style="text-align:center;margin-top:12px;">
+    <span class="link-action" onclick="showRegister()">
+        Create an account
+    </span>
+</p>
+    
+<button class="google-btn" onclick="googleLogin()">
+<img src="https://developers.google.com/identity/images/g-logo.png">
+Continue with Google
+</button>
+</div>
+<div id="registerBox" style="display:none;">
+<h3>Create Account</h3>
+<p class="link-action" onclick="openLogin()">← Back to Login</p>
+<input id="fname" placeholder="First Name">
+<input id="mname" placeholder="Middle Name">
+<input id="lname" placeholder="Last Name">
+<input id="registerEmail" placeholder="Email">
+<input id="registerPassword" type="password" placeholder="Password">
+<button class="primary-btn" onclick="register()">Create Account</button>
+</div>
+<div id="postBox" style="display:none;">
+<h3>What’s on Your Mind?</h3>
+<div id="postStatus" class="post-status"></div>
+<textarea id="commentText"
+placeholder="Say something..."></textarea>
+<button id="sendBtn" onclick="addPost()">Send</button>
+</div>
+<div id="replyBox" style="display:none;">
+<h3>Write a Reply</h3>
+<textarea id="replyTextArea" placeholder="Type your reply..."></textarea>
+<button class="primary-btn" onclick="submitReply()">Send Reply</button>
+</div>
+
+</div>
+</div>
+<!-- ✅ FIREBASE SCRIPT -->
+<script type="module">
+/* ================= FIREBASE IMPORT ================= */
+import { initializeApp } from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+getFirestore,
+collection,
+addDoc,
+query,
+orderBy,
+onSnapshot,
+serverTimestamp,
+doc,
+getDoc, 
+updateDoc,
+deleteDoc,
+arrayUnion,
+arrayRemove
+} from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+getAuth,
+GoogleAuthProvider,
+signInWithPopup,
+signInWithEmailAndPassword,
+createUserWithEmailAndPassword,
+onAuthStateChanged,
+signOut
+} from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+/* ================= FIREBASE CONFIG ================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyAuYZ68uU9Iw8rN-0Kfm3Wzul2vpJMD6XE",
+  authDomain: "kent-da153.firebaseapp.com",
+  projectId: "kent-da153",
+  storageBucket: "kent-da153.firebasestorage.app",
+  messagingSenderId: "386160813839",
+  appId: "1:386160813839:web:b3f6e6ca211e9b742b007a"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
+let currentUser = null;
+let lastPostTime = 0; // anti‑spam timer
+const loginBtn = document.getElementById("loginBtn");
+const profileWrapper = document.getElementById("profileWrapper");
+const userDisplay = document.getElementById("userDisplay");
+const logoutBtn = document.getElementById("logoutBtn");
+
+window.openLogin = () => {
+    modal.style.display="flex";
+    document.body.classList.add("modal-open");
+
+    authBox.style.display="block";
+    registerBox.style.display="none";
+    postBox.style.display="none";
+    replyBox.style.display="none";
+};
+window.showRegister = ()=>{
+    authBox.style.display="none";
+    registerBox.style.display="block";
+};
+    
+/* MODAL */
+const modal = document.getElementById("modal");
+
+window.openModal = () => {
+    if(!currentUser){
+        openLogin();
+        return;
+    }
+
+    modal.style.display="flex";
+    document.body.classList.add("modal-open");
+    authBox.style.display="none";
+    registerBox.style.display="none";
+    replyBox.style.display="none";
+    postBox.style.display="block";
+};
+/* ADD POST */
+window.addPost = async () => {
+ const status = document.getElementById("postStatus");
+ const sendBtn = document.getElementById("sendBtn");
+ if(!currentUser){
+    status.className="post-status error";
+    status.textContent="⚠ Please login first.";
+    return;
+ }
+ const now = Date.now();
+ let wait = 10000 - (now - lastPostTime);
+ /* ===== COOLDOWN TIMER ===== */
+ if(wait > 0){
+    sendBtn.disabled = true;
+    const timer = setInterval(()=>{
+        wait -= 1000;
+        status.textContent =
+        `⏳ Wait ${Math.ceil(wait/1000)}s`;
+        if(wait <= 0){
+            clearInterval(timer);
+            sendBtn.disabled = false;
+            status.textContent="";
+        }
+    },1000);
+    return;
+ }
+ const text = commentText.value.trim();
+ if(!text){
+    status.className="post-status error";
+    status.textContent="Write something first.";
+    return;
+ }
+await addDoc(collection(db,"posts"),{
+   uid: currentUser.uid,          // ✅ ADD
+   edited: false,                 // ✅ ADD
+   name: currentUser.displayName || currentUser.email,
+   username: currentUser.email,
+   userPhoto: currentUser.photoURL ||
+   "https://cdn-icons-png.flaticon.com/512/7175/7175408.png",
+   text:text,
+   likedBy: [],
+   replies: [],
+   time:serverTimestamp()
+});
+ lastPostTime = now;
+ commentText.value="";
+ status.className="post-status success";
+ status.textContent="✅ Posted successfully!";
+ setTimeout(()=>{
+     modal.style.display="none";
+     document.body.classList.remove("modal-open");
+     status.textContent="";
+ },900);
+};
+/* ================= REALTIME POSTS ================= */
+const postsContainer = document.getElementById("posts");
+const q = query(collection(db,"posts"), orderBy("time","desc"));
+let cachedSnapshot = null;
+onSnapshot(q,(snapshot)=>{
+    cachedSnapshot = snapshot;
+    renderPosts(snapshot);
+});
+window.addEventListener("refreshPosts",()=>{
+    if(cachedSnapshot){
+        renderPosts(cachedSnapshot);
+    }
+});
+function renderPosts(snapshot){
+    postsContainer.innerHTML="";
+    snapshot.forEach(docSnap=>{
+        const p = docSnap.data();
+        const id = docSnap.id;
+        const card = document.createElement("div");
+        card.className = "post-card";
+        const liked =
+        (p.likedBy || []).some(l => l.uid === currentUser?.uid);
+        card.innerHTML = `
+<div class="post-top">
+  <img class="avatar"
+  src="${p.userPhoto || 'https://cdn-icons-png.flaticon.com/512/7175/7175408.png'}">
+  <div>
+<div class="username">
+
+  ${p.userPhoto ? 
+  `<img src="image/verified.png" class="verified-icon">`
+  : ""}
+
+  ${p.name}
+
+  ${
+  p.username === "ablaobryan4400@gmail.com"
+  ? `<span class="admin-badge">💠 Admin</span>`
+      
+  : p.username === "masanegrakentvinces@gmail.com" ||
+    p.username === "ba.roiph08@gmail.com" ||
+    p.username === "ablaomaryan@gmail.com"
+  ? `<span class="vip-badge">💎 VIP</span>`
+      
+  : p.username === "ablaobryan1008@gmail.com"
+  ? `<span class="mod-badge">Ⓜ️ Moderator</span>`
+  : ""
+  }
+
+</div>
+    <div class="time">
+      ${p.time?.toDate().toLocaleString() || ""}
+    </div>
+  </div>
+</div>
+
+<p class="post-text" id="text-${id}">
+${p.text}
+${p.edited ? '<span style="color:gray;font-size:12px;"> (edited)</span>' : ''}
+</p>
+
+<div class="post-actions">
+<button class="like-btn"
+onclick="toggleLike('${id}')">
+${liked ? "❤️" : "🤍"} ${(p.likedBy || []).length}
+<div class="like-tooltip">
+${
+(() => {
+   const likes = p.likedBy || [];
+   const firstTen = likes.slice(0,10);
+   const remaining = likes.length - 10;
+
+   let names = firstTen.map(l => l.name).join("<br>");
+   if(remaining > 0){
+       names += `<br>+${remaining} other${remaining>1?'s':''}`;
+   }
+   return names;
+})()
+}
+</div>
+</button>
+
+   ${currentUser ? `
+   <div style="
+        margin-top:8px;
+        font-size:14px;
+        color:var(--accent);
+        cursor:pointer;"
+        onclick="replyPost('${id}')">
+        Reply
+   </div>
+   ` : ""}
+</div>
+
+${(p.replies && p.replies.length > 0) ? 
+   p.replies.map(r => `
+      <div class="reply-item">
+
+         <b>
+         ${r.name}
+
+${
+r.username === "ablaobryan4400@gmail.com"
+? `<span class="admin-badge">💠 Admin</span>`
+
+: r.username === "masanegrakentvinces@gmail.com" ||
+  r.username === "ba.roiph08@gmail.com" ||
+  r.username === "ablaomaryan@gmail.com"
+? `<span class="vip-badge">💎 VIP</span>`
+
+: r.username === "ablaobryan1008@gmail.com"
+? `<span class="mod-badge">Ⓜ️ Moderator</span>`
+
+: ""
+}
+         </b>: ${r.text}
+
+      </div>
+   `).join("")
+: ""}
+`;
+        postsContainer.appendChild(card);
+        const textEl = card.querySelector(".post-text");
+
+        if(textEl.scrollHeight > textEl.clientHeight){
+            const btn = document.createElement("div");
+            btn.className = "read-more";
+            btn.textContent = "... Read more";
+            btn.onclick = () => toggleRead(id);
+            textEl.after(btn);
+        }
+    });
+}
+    
+/* ================= POST REPLIES ================= */
+let activeReplyPostId = null;
+
+window.replyPost = (postId)=>{
+    if(!currentUser) return;
+    activeReplyPostId = postId;
+
+    modal.style.display="flex";
+    document.body.classList.add("modal-open");
+    authBox.style.display="none";
+    registerBox.style.display="none";
+    postBox.style.display="none";
+    replyBox.style.display="block";
+};
+
+window.submitReply = async ()=>{
+    const text = document.getElementById("replyTextArea").value.trim();
+    if(!text) return;
+
+    const ref = doc(db,"posts",activeReplyPostId);
+
+    await updateDoc(ref,{
+        replies: arrayUnion({
+            uid: currentUser.uid,
+            name: currentUser.displayName || currentUser.email,
+            username: currentUser.email,
+            text: text,
+            time: new Date()
+        })
+    });
+
+    document.getElementById("replyTextArea").value="";
+    modal.style.display="none";
+    document.body.classList.remove("modal-open");
+};
+    
+/* ================= TOOGLE LIKE ================= */
+window.toggleLike = async (postId) => {
+    if(!currentUser) return;
+
+    const ref = doc(db,"posts",postId);
+    const snap = await getDoc(ref);
+    if(!snap.exists()) return;
+
+    const data = snap.data();
+    const likedBy = data.likedBy || [];
+
+    const alreadyLiked = likedBy.find(l => l.uid === currentUser.uid);
+
+    if(alreadyLiked){
+        await updateDoc(ref,{
+            likedBy: likedBy.filter(l => l.uid !== currentUser.uid)
+        });
+    } else {
+        await updateDoc(ref,{
+            likedBy: arrayUnion({
+                uid: currentUser.uid,
+                name: currentUser.displayName || currentUser.email,
+                email: currentUser.email
+            })
+        });
+    }
+};
+    
+const modalContent = document.querySelector(".modal-content");
+modal.addEventListener("click",(e)=>{
+    if(!modalContent.contains(e.target)){
+        modal.style.display="none";
+        document.body.classList.remove("modal-open");
+    }
+});
+/* ================= GOOGLE LOGIN ================= */
+window.googleLogin = async () => {
+    googleProvider.setCustomParameters({
+        prompt: "select_account"
+    });
+    await signInWithPopup(auth, googleProvider);
+};
+onAuthStateChanged(auth,(user)=>{
+    currentUser = user;
+
+    modal.style.display="none";
+    document.body.classList.remove("modal-open");
+
+    if(user){
+        profileWrapper.style.display = "flex";
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline";
+        userDisplay.textContent = user.displayName || user.email;
+        document.getElementById("createPostBtn").style.display = "inline-block";
+    }else{
+        profileWrapper.style.display = "none";
+        loginBtn.style.display = "inline";
+        logoutBtn.style.display = "none";
+        userDisplay.textContent = "";
+        document.getElementById("createPostBtn").style.display = "none";
+    }
+
+    if(cachedSnapshot){
+        renderPosts(cachedSnapshot);
+    }
+});
+
+const marqueeTrack = document.getElementById("marqueeTrack");
+
+function fillMarquee() {
+    if(!marqueeTrack) return;
+
+    const baseText =
+    "🇵🇭 Welcome to ChatPH    ||      " +
+    "💬 Connect with Filipinos worldwide    ||      " +
+    "📱 Share your thoughts and start conversations    ||      " +
+    "🔥 Join the growing ChatPH community    ||        ";
+
+    marqueeTrack.innerHTML = baseText + baseText;
+}
+
+fillMarquee();
+    
+/* ================= EMAIL LOGIN ================= */
+window.emailLogin = async () => {
+    const email = document.getElementById("loginEmail").value.trim();
+    const pass = document.getElementById("loginPassword").value.trim();
+    const postStatus = document.getElementById("postStatus");
+    try{
+        await signInWithEmailAndPassword(auth,email,pass);
+        postStatus.className="post-status success";
+        postStatus.textContent="✅ Login successful";
+        setTimeout(()=>{
+            modal.style.display="none";
+            document.body.classList.remove("modal-open");
+            postStatus.textContent="";
+        },800);
+    }catch(error){
+        postStatus.className="post-status error";
+        postStatus.textContent = error.message;
+    }
+};
+/* ================= REGISTER ================= */
+window.register = async ()=>{
+    const email = document.getElementById("registerEmail").value.trim();
+    const pass = document.getElementById("registerPassword").value.trim();
+    try{
+        await createUserWithEmailAndPassword(auth,email,pass);
+        alert("Account created successfully ✅");
+    }catch(err){
+        alert(err.message);
+    }
+};
+
+/* ================= Read More ================= */
+window.toggleRead = (id)=>{
+    const textEl = document.getElementById(`text-${id}`);
+    const btn = textEl.nextElementSibling;
+
+    if(textEl.classList.contains("expanded")){
+        textEl.classList.remove("expanded");
+        btn.textContent="... Read more";
+    }else{
+        textEl.classList.add("expanded");
+        btn.textContent="Show less";
+    }
+};
+    
+/* ================= LOGOUT ================= */
+const logoutModal = document.getElementById("logoutModal");
+
+window.logout = ()=>{
+    logoutModal.style.display = "flex";
+    document.body.classList.add("modal-open");
+};
+
+window.closeLogoutModal = ()=>{
+    logoutModal.style.display = "none";
+    document.body.classList.remove("modal-open");
+};
+
+window.confirmLogout = async ()=>{
+    await signOut(auth);
+    logoutModal.style.display = "none";
+    document.body.classList.remove("modal-open");
+};
+    
+</script>
+    
+<footer style="
+text-align:center;
+padding:20px;
+margin-top:40px;
+opacity:.7;
+font-size:14px;">
+©2026 ChatPH || All Rights Reserved
+</footer>
+<!-- LOGOUT CONFIRM MODAL -->
+<div class="modal" id="logoutModal">
+  <div class="modal-content" style="text-align:center;">
+    <h3>Are you sure you want to log out?</h3>
+
+    <div style="display:flex; gap:15px; margin-top:25px; justify-content:center;">
+      <button class="confirm-btn yes-btn" onclick="confirmLogout()">Yes</button>
+      <button class="confirm-btn no-btn" onclick="closeLogoutModal()">No</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
+
+
