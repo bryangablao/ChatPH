@@ -43,9 +43,27 @@ overflow:hidden;
 display:flex;
 width:900px;
 height:600px;
+
 border-radius:18px;
 overflow:hidden;
-box-shadow:0 20px 50px rgba(0,0,0,.6);
+
+box-shadow:0 25px 60px rgba(0,0,0,.7);
+
+animation:fadeSlide .8s ease;
+}
+
+@keyframes fadeSlide{
+
+0%{
+opacity:0;
+transform:translateY(40px) scale(.98);
+}
+
+100%{
+opacity:1;
+transform:translateY(0) scale(1);
+}
+
 }
 
 /* LEFT SIDE */
@@ -126,11 +144,28 @@ padding:40px;
 .card{
 width:100%;
 max-width:360px;
-background:#151515;
-border-radius:14px;
+
+background:rgba(20,20,20,0.45);
+backdrop-filter:blur(18px);
+-webkit-backdrop-filter:blur(18px);
+
+border-radius:16px;
 padding:35px;
-border:1px solid rgba(255,255,255,0.05);
-box-shadow:0 10px 25px rgba(0,0,0,0.6);
+
+border:1px solid rgba(255,255,255,0.08);
+
+box-shadow:
+0 20px 50px rgba(0,0,0,.7),
+inset 0 1px rgba(255,255,255,0.05);
+
+transition:all .35s ease;
+}
+
+.card:hover{
+transform:translateY(-3px);
+box-shadow:
+0 30px 70px rgba(0,0,0,.8),
+0 0 25px rgba(99,102,241,0.15);
 }
 
 /* FORMS */
@@ -268,24 +303,94 @@ border:1px solid rgba(255,255,255,0.1);
 opacity:1;
 }
 
+/* MOBILE OPTIMIZATION */
 @media (max-width:768px){
+
+body{
+overflow:auto;
+padding:20px 0;
+}
 
 .container{
 flex-direction:column;
+width:92%;
 height:auto;
-width:95%;
+border-radius:14px;
 }
 
+/* LEFT PANEL */
 .left{
-padding:30px;
+padding:25px 20px;
 text-align:center;
+align-items:center;
 }
 
+.title-row{
+justify-content:center;
+gap:10px;
+}
+
+.logo{
+width:60px;
+}
+
+.title-row h1{
+font-size:32px;
+}
+
+.left p{
+font-size:14px;
+line-height:1.5;
+margin-top:8px;
+}
+
+/* CLOCK + GREETING */
+.greeting{
+font-size:14px;
+margin-top:8px;
+}
+
+.ph-time{
+font-size:12px;
+flex-wrap:wrap;
+justify-content:center;
+}
+
+/* RIGHT SIDE */
 .right{
 padding:20px;
 }
 
+.card{
+padding:25px 20px;
+max-width:100%;
 }
+
+/* INPUTS */
+.input input{
+padding:11px 14px 11px 38px;
+font-size:14px;
+}
+
+/* BUTTONS */
+button{
+padding:11px;
+font-size:14px;
+}
+
+/* LINKS */
+.links{
+font-size:12px;
+}
+
+/* GOOGLE BUTTON */
+.google-btn{
+font-size:14px;
+padding:9px;
+}
+
+}
+  
 </style>
 </head>
 
@@ -844,14 +949,109 @@ drops[i]++
 
 }
 
-setInterval(drawMatrix,33)
+function animate(){
+drawMatrix()
+drawParticles()
+requestAnimationFrame(animate)
+}
+
+animate()
 
 window.addEventListener("resize",()=>{
 canvas.width = window.innerWidth
 canvas.height = window.innerHeight
 })
+
+/* GPU OPTIMIZED CURSOR PARTICLES */
+
+const particles = []
+const maxParticles = 250
+
+document.addEventListener("mousemove",(e)=>{
+
+for(let i=0;i<4;i++){
+
+particles.push({
+x:e.clientX,
+y:e.clientY,
+vx:(Math.random()-0.5)*6,
+vy:(Math.random()-0.5)*6,
+life:80,
+size:14,
+char:Math.random()>0.5?"0":"1",
+color:Math.random()>0.5?"#00e5ff":"#ff3b3b"
+})
+
+}
+
+if(particles.length > maxParticles){
+particles.splice(0, particles.length-maxParticles)
+}
+
+})
+
+function drawParticles(){
+
+for(let i = particles.length-1; i>=0; i--){
+
+const p = particles[i]
+
+/* neon glow */
+
+ctx.shadowColor = p.color
+ctx.shadowBlur = 18
+ctx.fillStyle = p.color
+ctx.font = p.size+"px monospace"
+
+ctx.fillText(p.char,p.x,p.y)
+
+/* movement */
+
+p.x += p.vx
+p.y += p.vy
+
+p.vx *= 0.94
+p.vy *= 0.94
+
+p.life--
+
+if(p.life<=0){
+particles.splice(i,1)
+}
+
+}
+
+/* NETWORK CONNECTIONS */
+
+for(let a=0;a<particles.length;a++){
+
+for(let b=a+1;b<particles.length;b++){
+
+const dx = particles[a].x - particles[b].x
+const dy = particles[a].y - particles[b].y
+const dist = Math.sqrt(dx*dx + dy*dy)
+
+if(dist < 80){
+
+ctx.beginPath()
+
+ctx.strokeStyle = "rgba(0,180,255,0.15)"
+ctx.lineWidth = 1
+
+ctx.moveTo(particles[a].x,particles[a].y)
+ctx.lineTo(particles[b].x,particles[b].y)
+
+ctx.stroke()
+
+}
+
+}
+
+}
+
+ctx.shadowBlur = 0
+
+}
   
 </script>
 </html>
-
-
