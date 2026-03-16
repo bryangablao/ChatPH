@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ChatPH</title>
 <link rel="icon" type="image/png" href="image/chatph-logo.png">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
@@ -28,27 +28,34 @@ background:#0f0f0f;
 }
 
 body{
-height:100vh;
+min-height:100vh;
 display:flex;
 align-items:center;
 justify-content:center;
-background:transparent;
+background:linear-gradient(-45deg,#0f0f0f,#141414,#1a1a1a,#101010);
+background-size:400% 400%;
+animation:bgMove 18s ease infinite;
 color:white;
-overflow:hidden;
+overflow-x:hidden;
+padding:20px;
+}
+
+/* smooth animated background */
+@keyframes bgMove{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
 }
 
 /* MAIN CONTAINER */
 
 .container{
 display:flex;
-width:900px;
-height:600px;
-
+width:min(900px,95vw);
+min-height:520px;
 border-radius:18px;
 overflow:hidden;
-
 box-shadow:0 25px 60px rgba(0,0,0,.7);
-
 animation:fadeSlide .8s ease;
 }
 
@@ -307,14 +314,15 @@ opacity:1;
 @media (max-width:768px){
 
 body{
-overflow:auto;
-padding:20px 0;
+padding:20px;
+align-items:flex-start;
 }
 
 .container{
 flex-direction:column;
-width:92%;
+width:100%;
 height:auto;
+margin-top:10px;
 border-radius:14px;
 }
 
@@ -335,7 +343,7 @@ width:60px;
 }
 
 .title-row h1{
-font-size:32px;
+font-size:30px;
 }
 
 .left p{
@@ -345,6 +353,7 @@ margin-top:8px;
 }
 
 /* CLOCK + GREETING */
+
 .greeting{
 font-size:14px;
 margin-top:8px;
@@ -357,6 +366,7 @@ justify-content:center;
 }
 
 /* RIGHT SIDE */
+
 .right{
 padding:20px;
 }
@@ -367,23 +377,27 @@ max-width:100%;
 }
 
 /* INPUTS */
+
 .input input{
 padding:11px 14px 11px 38px;
 font-size:14px;
 }
 
 /* BUTTONS */
+
 button{
 padding:11px;
 font-size:14px;
 }
 
 /* LINKS */
+
 .links{
 font-size:12px;
 }
 
 /* GOOGLE BUTTON */
+
 .google-btn{
 font-size:14px;
 padding:9px;
@@ -395,8 +409,6 @@ padding:9px;
 </head>
 
 <body>
-
-<canvas id="matrix"></canvas>
 
 <div class="container">
 
@@ -414,10 +426,10 @@ in the Philippines or across the globe, ChatPH brings people together
 in a simple and meaningful way.
 </p>
 
-<div id="greeting" class="greeting"></div>
+<div id="greeting" class="greeting">Good Evening 🌙</div>
 
 <div class="ph-time">
-<span id="phTime"></span>
+<span id="phTime">March 15, 2026 [ 8:50 PM ] Sunday ||</span>
 <img src="image/philipines.png" class="ph-flag">
 <span>Philippines</span>
 </div>
@@ -457,12 +469,13 @@ Sign in with Google
 <span class="link" onclick="showForm('forgot')">Forgot Password</span>
 </div>
 
+<div class="status loginStatus"></div>
 </form>
 
 
 <!-- REGISTER -->
 
-<form id="register" novalidate>
+<form id="register" novalidate="" class="">
 
 <h2>Create Account</h2>
 
@@ -483,28 +496,14 @@ Sign in with Google
 
 <div class="input">
 <i class="fa fa-phone"></i>
-<input type="text"
-id="mobileNumber"
-placeholder="Mobile Number"
-maxlength="11"
-inputmode="numeric"
-pattern="09[0-9]{9}"
-oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-<i class="fa-solid fa-circle-exclamation warning" id="mobileWarn"
-data-tip="Mobile number must be 11 digits and start with 09"></i>
+<input type="text" id="mobileNumber" placeholder="Mobile Number" maxlength="11" inputmode="numeric" pattern="09[0-9]{9}" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+<i class="fa-solid fa-circle-exclamation warning" id="mobileWarn" data-tip="Mobile number must be 11 digits and start with 09"></i>
 </div>
 
 <div class="input">
 <i class="fa fa-key"></i>
-<input type="text"
-id="pinInput"
-placeholder="6 digit PIN"
-maxlength="6"
-inputmode="numeric"
-pattern="[0-9]{6}"
-oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-<i class="fa-solid fa-circle-exclamation warning" id="pinWarn"
-data-tip="PIN must contain exactly 6 numbers"></i>
+<input type="text" id="pinInput" placeholder="6 digit PIN" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+<i class="fa-solid fa-circle-exclamation warning" id="pinWarn" data-tip="PIN must contain exactly 6 numbers"></i>
 </div>
 
 <div class="input">
@@ -516,7 +515,7 @@ data-tip="PIN must contain exactly 6 numbers"></i>
 
 <div class="links">
 <span class="link" onclick="showForm('login')">Back to Login</span>
-<span class="status" id="regStatus"></span>
+<span class="status" id="regStatus" style="display: none;"></span>
 </div>
 
 </form>
@@ -524,7 +523,7 @@ data-tip="PIN must contain exactly 6 numbers"></i>
 
 <!-- FORGOT PASSWORD -->
 
-<form id="forgot" novalidate>
+<form id="forgot" novalidate="" class="">
 
 <h2>Reset Password</h2>
 
@@ -535,17 +534,9 @@ data-tip="PIN must contain exactly 6 numbers"></i>
 
 <div class="input">
 <i class="fa fa-key"></i>
-<input type="text"
-id="forgotPin"
-placeholder="6 digit PIN"
-maxlength="6"
-inputmode="numeric"
-pattern="[0-9]{6}"
-oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+<input type="text" id="forgotPin" placeholder="6 digit PIN" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
 </div>
-<div class="status" id="forgotPinError" style="color:#ef4444;">
-PIN must be exactly 6 numbers
-</div>
+<div class="status" id="forgotPinError" style="color: rgb(239, 68, 68); display: none;"></div>
 
 <div class="input">
 <i class="fa fa-lock"></i>
@@ -556,14 +547,14 @@ PIN must be exactly 6 numbers
 
 <div class="links">
 <span class="link" onclick="showForm('login')">Back to Login</span>
-<span class="status" id="resetStatus"></span>
+<span class="status" id="resetStatus" style="display: none;"></span>
 </div>
 </form>
 
 </div>
 </div>
 </div>
-</body>
+
 
 <script type="module">
 
@@ -900,158 +891,15 @@ updatePHTime()
 setInterval(updatePHTime,1000)
 
 document.querySelectorAll("form").forEach(form=>{
-form.addEventListener("keypress",function(e){
-if(e.key==="Enter"){
+form.addEventListener("keydown",function(e){
+if(e.key === "Enter"){
 e.preventDefault()
-form.querySelector("button[type='submit']").click()
+const btn = form.querySelector("button[type='submit']")
+if(btn) btn.click()
 }
 })
 })
-
-/* MATRIX BACKGROUND */
-
-const canvas = document.getElementById("matrix")
-const ctx = canvas.getContext("2d")
-
-canvas.width = window.innerWidth
-canvas.height = window.innerHeight
-
-const letters = "01"
-const fontSize = 14
-const columns = canvas.width / fontSize
-
-const drops = []
-
-for(let x = 0; x < columns; x++){
-drops[x] = 1
-}
-
-function drawMatrix(){
-
-ctx.fillStyle = "rgba(15,15,15,0.08)"
-ctx.fillRect(0,0,canvas.width,canvas.height)
-
-ctx.fillStyle = "#1c1c1c"
-ctx.font = fontSize + "px monospace"
-
-for(let i = 0; i < drops.length; i++){
-
-const text = letters.charAt(Math.floor(Math.random()*letters.length))
-
-ctx.fillText(text,i*fontSize,drops[i]*fontSize)
-
-if(drops[i]*fontSize > canvas.height && Math.random() > 0.975){
-drops[i] = 0
-}
-
-drops[i]++
-}
-
-}
-
-function animate(){
-drawMatrix()
-drawParticles()
-requestAnimationFrame(animate)
-}
-
-animate()
-
-window.addEventListener("resize",()=>{
-canvas.width = window.innerWidth
-canvas.height = window.innerHeight
-})
-
-/* GPU OPTIMIZED CURSOR PARTICLES */
-
-const particles = []
-const maxParticles = 250
-
-document.addEventListener("mousemove",(e)=>{
-
-for(let i=0;i<4;i++){
-
-particles.push({
-x:e.clientX,
-y:e.clientY,
-vx:(Math.random()-0.5)*6,
-vy:(Math.random()-0.5)*6,
-life:80,
-size:14,
-char:Math.random()>0.5?"0":"1",
-color:Math.random()>0.5?"#00e5ff":"#ff3b3b"
-})
-
-}
-
-if(particles.length > maxParticles){
-particles.splice(0, particles.length-maxParticles)
-}
-
-})
-
-function drawParticles(){
-
-for(let i = particles.length-1; i>=0; i--){
-
-const p = particles[i]
-
-/* neon glow */
-
-ctx.shadowColor = p.color
-ctx.shadowBlur = 18
-ctx.fillStyle = p.color
-ctx.font = p.size+"px monospace"
-
-ctx.fillText(p.char,p.x,p.y)
-
-/* movement */
-
-p.x += p.vx
-p.y += p.vy
-
-p.vx *= 0.94
-p.vy *= 0.94
-
-p.life--
-
-if(p.life<=0){
-particles.splice(i,1)
-}
-
-}
-
-/* NETWORK CONNECTIONS */
-
-for(let a=0;a<particles.length;a++){
-
-for(let b=a+1;b<particles.length;b++){
-
-const dx = particles[a].x - particles[b].x
-const dy = particles[a].y - particles[b].y
-const dist = Math.sqrt(dx*dx + dy*dy)
-
-if(dist < 80){
-
-ctx.beginPath()
-
-ctx.strokeStyle = "rgba(0,180,255,0.15)"
-ctx.lineWidth = 1
-
-ctx.moveTo(particles[a].x,particles[a].y)
-ctx.lineTo(particles[b].x,particles[b].y)
-
-ctx.stroke()
-
-}
-
-}
-
-}
-
-ctx.shadowBlur = 0
-
-}
   
 </script>
-</html>
+
+</body></html>
