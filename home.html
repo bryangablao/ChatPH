@@ -375,6 +375,27 @@ border-radius:18px;
 color:white;
 cursor:pointer;
 }
+
+.like-btn{
+font-weight:normal;
+transition:.2s;
+}
+
+.like-btn.react-like,
+.like-btn.react-love,
+.like-btn.react-haha,
+.like-btn.react-wow,
+.like-btn.react-sad,
+.like-btn.react-angry{
+font-weight:bold;
+}
+
+.like-btn{
+transition:all .2s ease;
+}
+.like-btn:hover{
+transform:scale(1.05);
+}
   
 .avatar{
 width:42px;
@@ -704,22 +725,40 @@ color:transparent;
 font-weight:700;
 }
 
+/* LIKE */
+.react-like{
+background:linear-gradient(90deg,#4da3ff,#2563eb);
+-webkit-background-clip:text;
+color:transparent;
+font-weight:bold;
+}
+
+/* LOVE */
+.react-love{
+background:linear-gradient(90deg,#ff3b3b,#ff0000);
+-webkit-background-clip:text;
+color:transparent;
+font-weight:bold;
+}
+
+/* HAHA WOW SAD */
 .react-haha,
 .react-wow,
 .react-sad{
 background:linear-gradient(90deg,#ffd000,#ff9f00);
 -webkit-background-clip:text;
 color:transparent;
-font-weight:700;
+font-weight:bold;
 }
 
+/* ANGRY */
 .react-angry{
 background:linear-gradient(90deg,#ff5e00,#ff0000);
 -webkit-background-clip:text;
 color:transparent;
-font-weight:700;
+font-weight:bold;
 }
-  
+
 </style>
 </head>
 
