@@ -393,9 +393,13 @@ opacity:.6;
 font-size:12px;
 margin-top:4px;
 }
+
+.like-btn.liked{
+color:#4da3ff;
+font-weight:600;
+}
   
 /* FOOTER */
-
 footer{
 text-align:center;
 padding:20px;
@@ -403,9 +407,16 @@ opacity:.6;
 font-size:14px;
 }
 
+footer a:hover{
+text-decoration:underline;
+}
+
+/* BADGES */
 .admin-badge{
-margin-left:6px;
+margin-left:2px;
+position:relative;    
 font-size:11px;
+top:-2px;
 padding:3px 8px;
 border-radius:20px;
 background:linear-gradient(90deg,#ffd700,#ffae00);
@@ -414,8 +425,10 @@ font-weight:700;
 }
 
 .mod-badge{
-margin-left:6px;
+margin-left:2px;
+position:relative;    
 font-size:11px;
+top:-2px;
 padding:3px 8px;
 border-radius:20px;
 background:linear-gradient(90deg,#a855f7,#7e22ce);
@@ -424,8 +437,10 @@ font-weight:600;
 }
 
 .vip-badge{
-margin-left:6px;
+margin-left:2px;
+position:relative;    
 font-size:11px;
+top:-2px;
 padding:3px 8px;
 border-radius:20px;
 background:linear-gradient(90deg,#ff00cc,#ff66ff);
@@ -433,6 +448,7 @@ color:white;
 font-weight:700;
 }
 
+/* ICON LOGOUT */
 .logout-icon{
 width:22px;
 cursor:pointer;
@@ -457,6 +473,72 @@ opacity:.8;
 .action-btn:hover{
 text-decoration:underline;
 opacity:1;
+}
+
+.comment-input{
+display:flex;
+align-items:center;
+gap:10px;
+margin-top:10px;
+background:#0f141c;
+border:1px solid #2a2f3b;
+border-radius:20px;
+padding:6px 10px;
+}
+
+.comment-avatar{
+width:28px;
+height:28px;
+border-radius:50%;
+}
+
+.comment-field{
+flex:1;
+background:transparent;
+border:none;
+color:white;
+font-size:14px;
+outline:none;
+}
+
+.comment-item{
+display:flex;
+gap:8px;
+margin-top:8px;
+font-size:14px;
+}
+
+.comment-name{
+font-weight:600;
+}
+
+.verified-badge{
+width:14px;
+margin-left:2px;
+position:relative;
+top:-2px;
+}
+
+.post-image{
+width:100%;
+border-radius:12px;
+margin-top:10px;
+}
+
+.reaction-bar{
+display:flex;
+gap:10px;
+margin-top:8px;
+font-size:18px;
+}
+
+.reaction-bar span{
+cursor:pointer;
+transition:0.2s;
+}
+
+.reaction-bar span:hover{
+transform:scale(1.3);
 }
   
 </style>
@@ -566,8 +648,8 @@ placeholder="What's on your mind?"></div>
 </div>
 
 <div class="editor-bar">
-
 <button class="post-btn" onclick="createPost()" title="Post (Ctrl + Enter)">Post</button>
+<input type="file" id="postImage" accept="image/*">
 <button onclick="format('bold')" title="Bold (Ctrl + B)"><b>B</b></button>
 <button onclick="format('italic')" title="Italic (Ctrl + I)"><i>I</i></button>
 <button onclick="format('underline')" title="Underline (Ctrl + U)"><u>U</u></button>
@@ -597,9 +679,21 @@ placeholder="What's on your mind?"></div>
 
 
 <footer>
+<div>© 2026 ChatPH • All Rights Reserved</div>
 
-© 2026 ChatPH
+<div style="margin-top:6px;font-size:13px;">
+<a href="#" style="color:#4da3ff;text-decoration:none;">About</a>
+&nbsp;|&nbsp;
+<a href="#" style="color:#4da3ff;text-decoration:none;">Privacy</a>
+&nbsp;|&nbsp;
+<a href="#" style="color:#4da3ff;text-decoration:none;">Terms</a>
+&nbsp;|&nbsp;
+<a href="#" style="color:#4da3ff;text-decoration:none;">Contact</a>
+</div>
 
+<div style="margin-top:6px;font-size:12px;opacity:.7;">
+Made with ❤️ in the Philippines
+</div>
 </footer>
 
 
@@ -628,6 +722,12 @@ signOut
 } from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+import {
+getStorage,
+ref,
+uploadBytes,
+getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 /* FIREBASE CONFIG */
 const firebaseConfig = {
@@ -642,7 +742,7 @@ appId: "1:324012163441:web:7a54be2231ad2cae71f6d0"
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-
+const storage = getStorage(app);
 
 function getBadge(email){
 if(email === "ablaobryan4400@gmail.com"){
@@ -703,6 +803,13 @@ span.textContent=e;
 span.onclick=()=>insertEmoji(e);
 emojiList.appendChild(span);
 });
+}
+
+function getVerified(email){
+if(email === "ablaobryan4400@gmail.com"){
+return `<img src="image/verified.png" class="verified-badge">`;
+}
+return "";
 }
 
 function showCategory(cat){
@@ -814,70 +921,78 @@ window.createPost = async ()=>{
 
 const editor = document.getElementById("postText");
 const text = editor.innerHTML.trim();
+const imageFile = document.getElementById("postImage").files[0];
 
-if(!text){
-alert("Write something first.");
+if(!text && !imageFile){
+alert("Write something or upload an image.");
 return;
 }
 
 const user = auth.currentUser;
-
 if(!user){
 alert("You must be logged in.");
 return;
 }
 
+let imageURL = "";
+
 try{
 
+if(imageFile){
+
+const storageRef = ref(storage,"posts/"+Date.now()+"_"+imageFile.name);
+
+await uploadBytes(storageRef,imageFile);
+
+imageURL = await getDownloadURL(storageRef);
+
+}
+
 await addDoc(collection(db,"posts"),{
+
 text:text,
+image:imageURL,
 name:user.displayName || "User",
 email:user.email,
 photo:user.photoURL ||
 "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
 time:serverTimestamp()
+
 });
 
 editor.innerHTML="";
+document.getElementById("postImage").value="";
 
 }catch(err){
+
 console.error(err);
 alert("Post failed.");
-}
 
 }
-
-window.showAllComments = (postId)=>{
-
-const list = document.getElementById("comments-"+postId);
-
-list.dataset.open = "true";
 
 }
   
+window.showAllComments = (postId)=>{
+const list = document.getElementById("comments-"+postId);
+list.dataset.open = "true";
+}
+  
 window.toggleComment = (id)=>{
-
 const box = document.getElementById("comment-"+id);
-
 box.style.display =
 box.style.display === "none" ? "block" : "none";
-
 }
 
 window.addComment = async (postId,input)=>{
-
 const text = input.value.trim();
-
 if(!text) return;
-
 const user = auth.currentUser;
-
 await addDoc(collection(db,"posts",postId,"comments"),{
-
 text:text,
 name:user.displayName || "User",
+email:user.email,
+photo:user.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
 time:serverTimestamp()
-
 });
 
 input.value="";
@@ -887,7 +1002,6 @@ input.value="";
 window.toggleLike = async (postId)=>{
 const user = auth.currentUser;
 if(!user) return;
-
 const likeRef = doc(db,"posts",postId,"likes",user.uid);
 
 try{
@@ -940,6 +1054,22 @@ window.hideLikes = (postId)=>{
 const box = document.getElementById("likes-"+postId);
 if(box) box.style.display="none";
 }
+
+window.react = async (postId,type)=>{
+const user = auth.currentUser;
+
+await setDoc(
+doc(db,"posts",postId,"reactions",user.uid),
+{
+type:type,
+user:user.uid
+});
+}
+
+window.sharePost = (id)=>{
+navigator.clipboard.writeText(location.href+"?post="+id);
+alert("Post link copied!");
+}
   
 /* LOAD POSTS */
 
@@ -973,23 +1103,47 @@ ${p.time?.toDate().toLocaleString() || ""}
 
 <div class="post-text">${p.text}</div>
 
+<div class="reaction-bar">
+<span onclick="react('${doc.id}','like')">👍</span>
+<span onclick="react('${doc.id}','love')">❤️</span>
+<span onclick="react('${doc.id}','haha')">😂</span>
+<span onclick="react('${doc.id}','wow')">😮</span>
+<span onclick="react('${doc.id}','sad')">😢</span>
+<span onclick="react('${doc.id}','angry')">😡</span>
+</div>
+
+${p.image ? `<img class="post-image" src="${p.image}">` : ""}
+
 <div class="post-actions">
+
 <span class="action-btn like-btn"
 onmouseenter="showLikes('${doc.id}',this)"
 onmouseleave="hideLikes('${doc.id}')"
 onclick="toggleLike('${doc.id}')">
-
 👍 <span id="like-count-${doc.id}">0</span>
-
 <div class="like-hover" id="likes-${doc.id}"></div>
-
 </span>
-<span class="action-btn comment-btn" onclick="toggleComment('${doc.id}')">Comment</span>
+
+<span class="action-btn comment-btn"
+onclick="toggleComment('${doc.id}')">
+Comment
+</span>
+
+<span class="action-btn"
+onclick="sharePost('${doc.id}')">
+Share
+</span>
+
 </div>
 
 <div class="comment-box" id="comment-${doc.id}" style="display:none">
-<input type="text" placeholder="Write a comment..."
+<div class="comment-input">
+<img class="comment-avatar" src="${p.photo}">
+<input type="text"
+class="comment-field"
+placeholder="Write a comment..."
 onkeydown="if(event.key==='Enter'){addComment('${doc.id}',this)}">
+</div>
 <div class="comments-list" id="comments-${doc.id}"></div>
 </div>
 `;
@@ -1042,8 +1196,16 @@ return;
 const data = c.data();
 
 list.innerHTML += `
-<div style="font-size:14px;margin-top:5px;">
-<b>${data.name}</b>: ${data.text}
+<div class="comment-item">
+<img class="comment-avatar" src="${data.photo}">
+<div>
+<span class="comment-name">
+${data.name}
+${getBadge(data.email)}
+${getVerified(data.email)}
+</span>
+<span class="comment-text">${data.text}</span>
+</div>
 </div>
 `;
 
