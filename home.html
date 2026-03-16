@@ -391,7 +391,18 @@ color:white;
 font-weight:700;
 }
 
+.logout-icon{
+width:22px;
+cursor:pointer;
+display:none;
+transition:0.2s;
+}
 
+.logout-icon:hover{
+transform:scale(1.1);
+opacity:0.8;
+}
+  
 </style>
 </head>
 
@@ -411,7 +422,9 @@ font-weight:700;
 
 <span id="userDisplay">Guest</span>
 
-<span id="logoutBtn" style="cursor:pointer;display:none;">🚪</span>
+<img id="logoutBtn"
+src="image/icon/logout.png"
+class="logout-icon">
 
 </div>
 
