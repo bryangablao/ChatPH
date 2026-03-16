@@ -632,6 +632,33 @@ margin-bottom:4px;
 .reaction-user img{
 width:16px;
 }
+
+.upload-btn{
+display:flex;
+align-items:center;
+justify-content:center;
+width:36px;
+height:36px;
+background:#1f2937;
+border-radius:10px;
+cursor:pointer;
+transition:.2s;
+}
+
+.upload-btn:hover{
+background:#2a2e38;
+transform:translateY(-1px);
+box-shadow:0 3px 8px rgba(0,0,0,.4);
+}
+
+.upload-btn img{
+width:20px;
+pointer-events:none;
+}
+
+.upload-btn input{
+display:none;
+}
   
 </style>
 </head>
@@ -741,7 +768,10 @@ placeholder="What's on your mind?"></div>
 
 <div class="editor-bar">
 <button class="post-btn" onclick="createPost()" title="Post (Ctrl + Enter)">Post</button>
-<input type="file" id="postImage" accept="image/*">
+<label class="upload-btn">
+<img src="image/icon/uploadimage.png">
+<input type="file" id="postImage" accept="image/*" multiple>
+</label>
 <button onclick="format('bold')" title="Bold (Ctrl + B)"><b>B</b></button>
 <button onclick="format('italic')" title="Italic (Ctrl + I)"><i>I</i></button>
 <button onclick="format('underline')" title="Underline (Ctrl + U)"><u>U</u></button>
