@@ -803,12 +803,6 @@ alert("Post failed.");
 
 }
 
-import {
-collection,
-addDoc,
-onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
 window.toggleComment = (id)=>{
 
 const box = document.getElementById("comment-"+id);
@@ -906,7 +900,7 @@ snap.forEach(c=>{
 
 count++;
 
-if(count > 1){
+if(count === 2){
 list.innerHTML += `<div style="opacity:.6;font-size:13px;">See more comments...</div>`;
 return;
 }
