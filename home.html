@@ -123,9 +123,9 @@ transform:translateX(-50%);
 /* MAIN */
 
 .main{
-max-width:900px;
+max-width:640px;
 margin:auto;
-padding:20px;
+padding:20px 16px;
 }
 
 /* CREATE POST */
@@ -185,29 +185,27 @@ overflow:hidden;
 }
 
 .editor-bar button{
-background:#1f2937;
-border:none;
+background:#1a1f29;
+border:1px solid #2a2f3b;
 color:white;
-padding:4px 7px;
-border-radius:6px;
+padding:6px 9px;
+border-radius:8px;
 cursor:pointer;
-font-size:12px;
+font-size:13px;
 flex-shrink:0;
 transition:.2s;
 }
-
 .editor-bar button:hover{
-background:#2a2e38;
+background:#2a3140;
 transform:translateY(-1px);
-box-shadow:0 2px 6px rgba(0,0,0,.4);
 }
 
 .editor-bar select{
-background:#1f2937;
+background:#1a1f29;
 color:white;
-border:none;
-padding:4px 6px;
-border-radius:6px;
+border:1px solid #2a2f3b;
+padding:6px 8px;
+border-radius:8px;
 font-size:12px;
 flex-shrink:0;
 }
@@ -270,12 +268,12 @@ transform:scale(1.25);
 }
 
 .color-box{
-width:26px;
-height:26px;
-padding:0;
-border:none;
-border-radius:6px;
+width:32px;
+height:32px;
+border:1px solid #2a2f3b;
+border-radius:8px;
 cursor:pointer;
+background:#1a1f29;
 }
 
 .editor-container{
@@ -299,20 +297,23 @@ transform:scale(1.15);
 
 .reaction-counts{
 display:flex;
-gap:12px;
-margin-top:8px;
-font-size:14px;
-opacity:.9;
+gap:6px;
+margin-top:10px;
+margin-bottom:6px;
+font-size:13px;
+align-items:center;
 }
-
 .reaction-counts span{
 display:flex;
 align-items:center;
 gap:4px;
 background:#0f141c;
 border:1px solid #2a2f3b;
-border-radius:20px;
-padding:2px 8px;
+border-radius:14px;
+padding:2px 6px;
+}
+.reaction-counts img{
+width:14px;
 }
 
 .editor-bar::-webkit-scrollbar{
@@ -329,16 +330,16 @@ border-radius:10px;
 .post{
 background:linear-gradient(180deg,#1a1f29,#141821);
 border:1px solid #2b3240;
-border-radius:16px;
-padding:18px;
-margin-bottom:20px;
-box-shadow:0 6px 20px rgba(0,0,0,.35);
-transition:.25s;
+border-radius:14px;
+padding:16px;
+margin-bottom:18px;
+box-shadow:0 4px 14px rgba(0,0,0,.35);
+transition:.2s;
 position:relative;
 }
 
 .post:hover{
-transform:translateY(-3px);
+transform:none;
 box-shadow:0 10px 30px rgba(0,0,0,.5);
 }
 
@@ -795,26 +796,17 @@ placeholder="What's on your mind?"></div>
 </div>
 
 <div class="editor-bar">
-<button class="post-btn" onclick="createPost()">Post</button>
 
-<label class="upload-btn">
-<img src="image/icon/uploadimage.png">
-<input type="file" id="postImage" accept="image/*" multiple>
-</label>
+<button onclick="format('bold')" title="Bold"><b>B</b></button>
+<button onclick="format('italic')" title="Italic"><i>I</i></button>
+<button onclick="format('underline')" title="Underline"><u>U</u></button>
+<button onclick="format('strikeThrough')" title="Strike"><s>S</s></button>
 
-</div>
+<button onclick="format('justifyLeft')">⬅</button>
+<button onclick="format('justifyCenter')">⬌</button>
+<button onclick="format('justifyRight')">➡</button>
 
-<div id="imagePreview" class="image-preview"></div>
-  
-<button onclick="format('bold')" title="Bold (Ctrl + B)"><b>B</b></button>
-<button onclick="format('italic')" title="Italic (Ctrl + I)"><i>I</i></button>
-<button onclick="format('underline')" title="Underline (Ctrl + U)"><u>U</u></button>
-<button onclick="format('strikeThrough')" title="Strikethrough (Ctrl + Shift + X)"><s>S</s></button>
-<button onclick="format('justifyLeft')" title="Left Align (Ctrl + Shift + L)">⬅</button>
-<button onclick="format('justifyCenter')" title="Center Align (Ctrl + Shift + E)">⬌</button>
-<button onclick="format('justifyRight')" title="Right Align (Ctrl + Shift + R)">➡</button>
-
-<select onchange="setFont(this.value)" title="Font (Ctrl + Shift + F)">
+<select onchange="setFont(this.value)">
 <option value="">Font</option>
 <option value="Arial">Arial</option>
 <option value="Impact">Impact</option>
@@ -825,8 +817,14 @@ placeholder="What's on your mind?"></div>
 
 <input type="color" class="color-box" onchange="setColor(this.value)">
 
-</div>
+<label class="upload-btn">
+<img src="image/icon/uploadimage.png">
+<input type="file" id="postImage" accept="image/*" multiple>
+</label>
 
+<button class="post-btn" onclick="createPost()">Post</button>
+
+</div>
 </div> <!-- end create-post -->
 
 <div class="posts-container">
@@ -1240,7 +1238,9 @@ const snap = await getDoc(ref);
 if(snap.exists() && snap.data().type === type){
 await deleteDoc(ref);
 
-document.getElementById("like-btn-"+postId).innerText="Like";
+const btn = document.getElementById("like-btn-"+postId);
+btn.innerText = "Like";
+btn.style.fontWeight = "normal";
 }else{
 
 await setDoc(ref,{
@@ -1267,8 +1267,10 @@ sad:"Sad",
 angry:"Angry"
 };
 
-document.getElementById("like-btn-"+postId).innerHTML =
-`<img src="image/icon/${icons[type]}" style="width:18px"> ${names[type]}`;
+const btn = document.getElementById("like-btn-"+postId);
+
+btn.innerText = names[type];
+btn.style.fontWeight = "600";
 }
 
 document.getElementById("react-"+postId).style.display="none";
@@ -1316,8 +1318,9 @@ ${p.images.map(img=>`<img src="${img}">`).join("")}
 </div>
 ` : ""}
 
-<div class="post-actions">
 <div class="reaction-counts" id="react-count-${doc.id}"></div>
+
+<div class="post-actions">
 
 <div class="like-container">
 
