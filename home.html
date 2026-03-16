@@ -490,7 +490,7 @@ class="logout-icon">
 <div id="postText" class="editor" contenteditable="true"
 placeholder="What's on your mind?"></div>
 
-<button class="emoji-btn" onclick="toggleEmoji()">😀</button>
+<button class="emoji-btn" onclick="toggleEmoji()" title="Emoji (Windows + ;)">😀</button>
 
 <div id="emojiPanel" class="emoji-panel">
 
@@ -511,16 +511,16 @@ placeholder="What's on your mind?"></div>
 
 <div class="editor-bar">
 
-<button class="post-btn" onclick="createPost()">Post</button>
+<button class="post-btn" onclick="createPost()" title="Post (Ctrl + Enter)">Post</button>
+<button onclick="format('bold')" title="Bold (Ctrl + B)"><b>B</b></button>
+<button onclick="format('italic')" title="Italic (Ctrl + I)"><i>I</i></button>
+<button onclick="format('underline')" title="Underline (Ctrl + U)"><u>U</u></button>
+<button onclick="format('strikeThrough')" title="Strikethrough (Ctrl + Shift + X)"><s>S</s></button>
+<button onclick="format('justifyLeft')" title="Left Align (Ctrl + Shift + L)">⬅</button>
+<button onclick="format('justifyCenter')" title="Center Align (Ctrl + Shift + E)">⬌</button>
+<button onclick="format('justifyRight')" title="Right Align (Ctrl + Shift + R)">➡</button>
 
-<button onclick="format('bold')"><b>B</b></button>
-<button onclick="format('italic')"><i>I</i></button>
-<button onclick="format('underline')"><u>U</u></button>
-<button onclick="format('strikeThrough')"><s>S</s></button>
-
-<button onclick="format('justifyLeft')">⬅</button>
-<button onclick="format('justifyCenter')">⬌</button>
-<button onclick="format('justifyRight')">➡</button>
+<select onchange="setFont(this.value)" title="Font (Ctrl + Shift + F)">
 
 <select onchange="setFont(this.value)">
 <option value="">Font</option>
@@ -671,6 +671,7 @@ document.getElementById("sidebar").classList.toggle("open");
 }
 
 function format(command){
+document.getElementById("postText").focus();
 document.execCommand(command,false,null);
 }
 
@@ -700,6 +701,55 @@ emojiPanel.style.display="none";
 
 });
 
+document.addEventListener("keydown", function(e){
+
+if(e.ctrlKey && e.key === "b"){
+e.preventDefault();
+format("bold");
+}
+
+if(e.ctrlKey && e.key === "i"){
+e.preventDefault();
+format("italic");
+}
+
+if(e.ctrlKey && e.key === "u"){
+e.preventDefault();
+format("underline");
+}
+
+if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "x"){
+e.preventDefault();
+format("strikeThrough");
+}
+
+if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "l"){
+e.preventDefault();
+format("justifyLeft");
+}
+
+if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "e"){
+e.preventDefault();
+format("justifyCenter");
+}
+
+if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "r"){
+e.preventDefault();
+format("justifyRight");
+}
+
+if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "f"){
+e.preventDefault();
+document.querySelector("select").focus();
+}
+
+if(e.ctrlKey && e.key === "Enter"){
+e.preventDefault();
+createPost();
+}
+
+});
+  
 /* CREATE POST */
 
 window.createPost = async ()=>{
