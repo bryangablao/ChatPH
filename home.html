@@ -797,14 +797,14 @@ placeholder="What's on your mind?"></div>
 
 <div class="editor-bar">
 
-<button onclick="format('bold')" title="Bold"><b>B</b></button>
-<button onclick="format('italic')" title="Italic"><i>I</i></button>
-<button onclick="format('underline')" title="Underline"><u>U</u></button>
-<button onclick="format('strikeThrough')" title="Strike"><s>S</s></button>
+<button onclick="format('bold')" title="Bold(Ctrl + B)"><b>B</b></button>
+<button onclick="format('italic')" title="Italic(Ctrl + I)"><i>I</i></button>
+<button onclick="format('underline')" title="Underline(Ctrl + U)"><u>U</u></button>
+<button onclick="format('strikeThrough')" title="StrikeThrough(Ctrl + Shift + X)"><s>S</s></button>
 
-<button onclick="format('justifyLeft')">⬅</button>
-<button onclick="format('justifyCenter')">⬌</button>
-<button onclick="format('justifyRight')">➡</button>
+<button onclick="format('justifyLeft')" title="Allign Left(Ctrl + Shift + X)">⬅</button>
+<button onclick="format('justifyCenter')" title="Allign Center(Ctrl + Shift + X)">⬌</button>
+<button onclick="format('justifyRight')" title="Allign Right(Ctrl + Shift + X)">➡</button>
 
 <select onchange="setFont(this.value)">
 <option value="">Font</option>
