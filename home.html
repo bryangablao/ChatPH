@@ -154,14 +154,20 @@ font-size:14px;
 .editor{
 width:100%;
 min-height:90px;
-background:#0f1115;
-border:1px solid var(--border);
-border-radius:12px;
-padding:12px 40px 12px 12px;
+background:#0c0f14;
+border:1px solid #2a2f3b;
+border-radius:14px;
+padding:14px 40px 14px 14px;
 outline:none;
 box-sizing:border-box;
 word-break:break-word;
-overflow-wrap:break-word;
+font-size:15px;
+transition:.2s;
+}
+
+.editor:focus{
+border-color:#4da3ff;
+box-shadow:0 0 0 2px rgba(77,163,255,.25);
 }
 
 .editor:empty:before{
@@ -303,19 +309,53 @@ border-radius:10px;
 /* POSTS */
 
 .post{
-background:var(--card);
-border:1px solid var(--border);
-border-radius:14px;
-padding:16px;
+background:linear-gradient(180deg,#1a1f29,#141821);
+border:1px solid #2b3240;
+border-radius:16px;
+padding:18px;
 margin-bottom:20px;
+box-shadow:0 6px 20px rgba(0,0,0,.35);
+transition:.25s;
+position:relative;
+}
+
+.post:hover{
+transform:translateY(-3px);
+box-shadow:0 10px 30px rgba(0,0,0,.5);
 }
 
 .post-top{
 display:flex;
 align-items:center;
 gap:12px;
+padding-bottom:10px;
+border-bottom:1px solid #2a2f3b;
 }
 
+.post-text{
+margin-top:14px;
+line-height:1.6;
+font-size:15px;
+color:#e5e7eb;
+}
+
+.post-actions{
+margin-top:14px;
+display:flex;
+gap:18px;
+padding-top:10px;
+border-top:1px solid #2a2f3b;
+}
+
+.post-actions button{
+background:#1f2937;
+border:none;
+padding:6px 14px;
+border-radius:18px;
+color:white;
+cursor:pointer;
+}
+  
 .avatar{
 width:42px;
 height:42px;
@@ -331,27 +371,29 @@ font-size:12px;
 opacity:.6;
 }
 
-.post-text{
-margin-top:10px;
-line-height:1.5;
-word-wrap:break-word;
+.like-hover{
+position:absolute;
+background:#0f141c;
+border:1px solid #2a2f3b;
+border-radius:10px;
+padding:10px;
+font-size:13px;
+width:180px;
+box-shadow:0 6px 20px rgba(0,0,0,.5);
+display:none;
+z-index:20;
 }
 
-.post-actions{
-margin-top:10px;
-display:flex;
-gap:15px;
+.like-hover div{
+padding:3px 0;
 }
 
-.post-actions button{
-background:#1f2937;
-border:none;
-padding:6px 14px;
-border-radius:18px;
-color:white;
-cursor:pointer;
+.like-hover .more{
+opacity:.6;
+font-size:12px;
+margin-top:4px;
 }
-
+  
 /* FOOTER */
 
 footer{
@@ -573,9 +615,11 @@ addDoc,
 query,
 orderBy,
 onSnapshot,
-serverTimestamp
-} from
-"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+serverTimestamp,
+doc,
+setDoc,
+deleteDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import {
 getAuth,
@@ -803,6 +847,14 @@ alert("Post failed.");
 
 }
 
+window.showAllComments = (postId)=>{
+
+const list = document.getElementById("comments-"+postId);
+
+list.dataset.open = "true";
+
+}
+  
 window.toggleComment = (id)=>{
 
 const box = document.getElementById("comment-"+id);
@@ -830,6 +882,63 @@ time:serverTimestamp()
 
 input.value="";
 
+}
+
+window.toggleLike = async (postId)=>{
+const user = auth.currentUser;
+if(!user) return;
+
+const likeRef = doc(db,"posts",postId,"likes",user.uid);
+
+try{
+
+await setDoc(likeRef,{
+user:user.uid,
+name:user.displayName || "User"
+});
+
+}catch(err){
+
+await deleteDoc(likeRef);
+
+}
+
+}
+
+window.showLikes = (postId,el)=>{
+
+const box = document.getElementById("likes-"+postId);
+box.style.display="block";
+
+const likesRef = collection(db,"posts",postId,"likes");
+
+onSnapshot(likesRef,(snap)=>{
+
+let html="";
+let count=0;
+
+snap.forEach(doc=>{
+count++;
+
+if(count<=9){
+html+=`<div>${doc.data().name || "User"}</div>`;
+}
+
+});
+
+if(count>9){
+html+=`<div class="more">+${count-9} Others...</div>`;
+}
+
+box.innerHTML=html;
+
+});
+
+}
+
+window.hideLikes = (postId)=>{
+const box = document.getElementById("likes-"+postId);
+if(box) box.style.display="none";
 }
   
 /* LOAD POSTS */
@@ -865,7 +974,16 @@ ${p.time?.toDate().toLocaleString() || ""}
 <div class="post-text">${p.text}</div>
 
 <div class="post-actions">
-<span class="action-btn like-btn">Like</span>
+<span class="action-btn like-btn"
+onmouseenter="showLikes('${doc.id}',this)"
+onmouseleave="hideLikes('${doc.id}')"
+onclick="toggleLike('${doc.id}')">
+
+👍 <span id="like-count-${doc.id}">0</span>
+
+<div class="like-hover" id="likes-${doc.id}"></div>
+
+</span>
 <span class="action-btn comment-btn" onclick="toggleComment('${doc.id}')">Comment</span>
 </div>
 
@@ -878,7 +996,15 @@ onkeydown="if(event.key==='Enter'){addComment('${doc.id}',this)}">
 
 feed.appendChild(post);
 
+const likesRef = collection(db,"posts",doc.id,"likes");
 
+onSnapshot(likesRef,(snap)=>{
+const likeCount = document.getElementById("like-count-"+doc.id);
+if(likeCount){
+likeCount.innerText = snap.size;
+}
+});
+  
 /* LOAD COMMENTS FOR THIS POST */
 
 const commentsRef = query(
@@ -900,9 +1026,17 @@ snap.forEach(c=>{
 
 count++;
 
-if(count === 2){
-list.innerHTML += `<div style="opacity:.6;font-size:13px;">See more comments...</div>`;
+if(count > 1 && !list.dataset.open){
+
+list.innerHTML += `
+<div onclick="showAllComments('${doc.id}')"
+style="opacity:.6;font-size:13px;cursor:pointer;">
+See more comments...
+</div>
+`;
+
 return;
+
 }
 
 const data = c.data();
