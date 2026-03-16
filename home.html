@@ -402,6 +402,20 @@ transition:0.2s;
 transform:scale(1.1);
 opacity:0.8;
 }
+
+.posts-container{
+margin-top:20px;
+}
+
+.action-btn{
+cursor:pointer;
+opacity:.8;
+}
+
+.action-btn:hover{
+text-decoration:underline;
+opacity:1;
+}
   
 </style>
 </head>
@@ -521,8 +535,6 @@ placeholder="What's on your mind?"></div>
 <button onclick="format('justifyRight')" title="Right Align (Ctrl + Shift + R)">➡</button>
 
 <select onchange="setFont(this.value)" title="Font (Ctrl + Shift + F)">
-
-<select onchange="setFont(this.value)">
 <option value="">Font</option>
 <option value="Arial">Arial</option>
 <option value="Impact">Impact</option>
@@ -535,10 +547,10 @@ placeholder="What's on your mind?"></div>
 
 </div>
 
-<!-- POSTS FEED -->
+</div> <!-- end create-post -->
 
+<div class="posts-container">
 <div id="postsFeed"></div>
-
 </div>
 
 
@@ -671,15 +683,18 @@ document.getElementById("sidebar").classList.toggle("open");
 }
 
 function format(command){
-document.getElementById("postText").focus();
+const editor = document.getElementById("postText");
+editor.focus();
 document.execCommand(command,false,null);
 }
 
 function setFont(font){
+document.getElementById("postText").focus();
 document.execCommand("fontName",false,font);
 }
 
 function setColor(color){
+document.getElementById("postText").focus();
 document.execCommand("foreColor",false,color);
 }
 
@@ -751,35 +766,78 @@ createPost();
 });
   
 /* CREATE POST */
-
 window.createPost = async ()=>{
 
-const text = document.getElementById("postText").innerHTML.trim();
+const editor = document.getElementById("postText");
+const text = editor.innerHTML.trim();
+
+if(!text){
+alert("Write something first.");
+return;
+}
+
+const user = auth.currentUser;
+
+if(!user){
+alert("You must be logged in.");
+return;
+}
+
+try{
+
+await addDoc(collection(db,"posts"),{
+text:text,
+name:user.displayName || "User",
+email:user.email,
+photo:user.photoURL ||
+"https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
+time:serverTimestamp()
+});
+
+editor.innerHTML="";
+
+}catch(err){
+console.error(err);
+alert("Post failed.");
+}
+
+}
+
+import {
+collection,
+addDoc,
+onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+window.toggleComment = (id)=>{
+
+const box = document.getElementById("comment-"+id);
+
+box.style.display =
+box.style.display === "none" ? "block" : "none";
+
+}
+
+window.addComment = async (postId,input)=>{
+
+const text = input.value.trim();
 
 if(!text) return;
 
 const user = auth.currentUser;
 
-await addDoc(collection(db,"posts"),{
+await addDoc(collection(db,"posts",postId,"comments"),{
 
 text:text,
-
 name:user.displayName || "User",
-
-email:user.email,
-
-photo:user.photoURL ||
-"https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
-
 time:serverTimestamp()
 
 });
 
-document.getElementById("postText").innerHTML="";
+input.value="";
 
 }
-
-
+  
 /* LOAD POSTS */
 
 const feed = document.getElementById("postsFeed");
@@ -791,55 +849,79 @@ onSnapshot(q,(snapshot)=>{
 feed.innerHTML="";
 
 snapshot.forEach(doc=>{
-
 const p = doc.data();
 
 const post = document.createElement("div");
-
 post.className="post";
 
 post.innerHTML=`
-
 <div class="post-top">
-
 <img class="avatar" src="${p.photo}">
-
 <div>
-
 <div class="username">
-
 ${p.name || "User"}
-
 ${getBadge(p.email)}
-
 </div>
-
 <div class="time">
-
 ${p.time?.toDate().toLocaleString() || ""}
-
 </div>
-
 </div>
-
 </div>
 
 <div class="post-text">${p.text}</div>
 
 <div class="post-actions">
-
-<button>❤️</button>
-
-<button>Comment</button>
-
+<span class="action-btn like-btn">Like</span>
+<span class="action-btn comment-btn" onclick="toggleComment('${doc.id}')">Comment</span>
 </div>
 
+<div class="comment-box" id="comment-${doc.id}" style="display:none">
+<input type="text" placeholder="Write a comment..."
+onkeydown="if(event.key==='Enter'){addComment('${doc.id}',this)}">
+<div class="comments-list" id="comments-${doc.id}"></div>
+</div>
 `;
 
 feed.appendChild(post);
 
-});
 
+/* LOAD COMMENTS FOR THIS POST */
+
+const commentsRef = query(
+collection(db,"posts",doc.id,"comments"),
+orderBy("time","desc")
+);
+
+onSnapshot(commentsRef,(snap)=>{
+
+const list = document.getElementById("comments-"+doc.id);
+
+if(!list) return;
+
+list.innerHTML="";
+
+let count = 0;
+
+snap.forEach(c=>{
+
+count++;
+
+if(count > 1){
+list.innerHTML += `<div style="opacity:.6;font-size:13px;">See more comments...</div>`;
+return;
+}
+
+const data = c.data();
+
+list.innerHTML += `
+<div style="font-size:14px;margin-top:5px;">
+<b>${data.name}</b>: ${data.text}
+</div>
+`;
+
+});
+});
+});
 });
 
 /* AUTH USER */
