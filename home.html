@@ -1310,7 +1310,7 @@ ${p.time?.toDate().toLocaleString() || ""}
 </div>
 
 <div class="post-text">${p.text}</div>
-${p.images ? `
+${p.images && p.images.length ? `
 <div class="post-images">
 ${p.images.map(img=>`<img src="${img}">`).join("")}
 </div>
@@ -1402,15 +1402,6 @@ html += `<span><img src="${map[type]}" style="width:16px"> ${counts[type]}</span
 const box = document.getElementById("react-count-"+doc.id);
 if(box) box.innerHTML = html;
 });
-
-const likesRef = collection(db,"posts",doc.id,"likes");
-
-onSnapshot(likesRef,(snap)=>{
-const likeCount = document.getElementById("like-count-"+doc.id);
-if(likeCount){
-likeCount.innerText = snap.size;
-}
-});
   
 /* LOAD COMMENTS FOR THIS POST */
 
@@ -1454,7 +1445,7 @@ list.innerHTML += `
 <span class="comment-name">
 ${data.name}
 ${getBadge(data.email)}
-${getVerified(auth.currentUser)}
+${getVerified({providerData:[{providerId:"google.com"}]})}
 </span>
 <span class="comment-text">${data.text}</span>
 </div>
