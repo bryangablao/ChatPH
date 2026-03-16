@@ -123,9 +123,9 @@ transform:translateX(-50%);
 /* MAIN */
 
 .main{
-max-width:640px;
+max-width:520px;
 margin:auto;
-padding:20px 16px;
+padding:16px;
 }
 
 /* CREATE POST */
@@ -185,19 +185,20 @@ overflow:hidden;
 }
 
 .editor-bar button{
-background:#1a1f29;
-border:1px solid #2a2f3b;
-color:white;
-padding:6px 9px;
-border-radius:8px;
-cursor:pointer;
+background:#1c2230;
+border:1px solid #2e3445;
+color:#fff;
+padding:6px 10px;
+border-radius:10px;
 font-size:13px;
-flex-shrink:0;
-transition:.2s;
+cursor:pointer;
+transition:all .15s;
 }
+
 .editor-bar button:hover{
-background:#2a3140;
+background:#2c3447;
 transform:translateY(-1px);
+box-shadow:0 4px 8px rgba(0,0,0,.4);
 }
 
 .editor-bar select{
@@ -687,6 +688,36 @@ margin-top:10px;
 width:100%;
 border-radius:10px;
 object-fit:cover;
+}
+
+.react-like{
+background:linear-gradient(90deg,#4da3ff,#2563eb);
+-webkit-background-clip:text;
+color:transparent;
+font-weight:700;
+}
+
+.react-love{
+background:linear-gradient(90deg,#ff3b3b,#ff0000);
+-webkit-background-clip:text;
+color:transparent;
+font-weight:700;
+}
+
+.react-haha,
+.react-wow,
+.react-sad{
+background:linear-gradient(90deg,#ffd000,#ff9f00);
+-webkit-background-clip:text;
+color:transparent;
+font-weight:700;
+}
+
+.react-angry{
+background:linear-gradient(90deg,#ff5e00,#ff0000);
+-webkit-background-clip:text;
+color:transparent;
+font-weight:700;
 }
   
 </style>
@@ -1270,7 +1301,7 @@ angry:"Angry"
 const btn = document.getElementById("like-btn-"+postId);
 
 btn.innerText = names[type];
-btn.style.fontWeight = "600";
+btn.className = "action-btn like-btn react-"+type;
 }
 
 document.getElementById("react-"+postId).style.display="none";
@@ -1312,13 +1343,20 @@ ${p.time?.toDate().toLocaleString() || ""}
 </div>
 
 <div class="post-text">${p.text}</div>
+
 ${p.images && p.images.length ? `
 <div class="post-images">
 ${p.images.map(img=>`<img src="${img}">`).join("")}
 </div>
 ` : ""}
 
-<div class="reaction-counts" id="react-count-${doc.id}"></div>
+<div class="reaction-counts"
+onmouseenter="showReactionUsers('${doc.id}')"
+onmouseleave="document.getElementById('hover-${doc.id}').style.display='none'"
+id="react-count-${doc.id}">
+</div>
+
+<div class="reaction-hover" id="hover-${doc.id}"></div>
 
 <div class="post-actions">
 
@@ -1521,6 +1559,44 @@ p.style.display="none";
 }
 });
 });
+
+window.showReactionUsers = (postId)=>{
+
+const box = document.getElementById("hover-"+postId);
+box.style.display="block";
+
+const ref = collection(db,"posts",postId,"reactions");
+
+onSnapshot(ref,(snap)=>{
+
+let html="";
+let count=0;
+
+snap.forEach(doc=>{
+
+const d = doc.data();
+
+count++;
+
+if(count <= 5){
+html += `
+<div class="reaction-user">
+<img src="image/icon/${d.type.charAt(0).toUpperCase()+d.type.slice(1)}.png">
+${d.name}
+</div>`;
+}
+
+});
+
+if(count > 5){
+html += `<div class="more">+${count-5} others</div>`;
+}
+
+box.innerHTML = html;
+
+});
+
+}
   
 </script>
 
