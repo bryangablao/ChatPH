@@ -113,6 +113,8 @@ padding:18px;
 border-radius:14px;
 border:1px solid var(--border);
 margin-bottom:20px;
+padding-bottom:60px;
+position:relative;
 }
 .create-post textarea{
 width:100%;
@@ -157,6 +159,9 @@ overflow:hidden;
 }
 
 .post-btn{
+position:absolute;
+bottom:15px;
+right:15px;
 background:linear-gradient(135deg,#3b82f6,#2563eb);
 border:none;
 color:white;
@@ -643,16 +648,15 @@ placeholder="What's on your mind?"></div>
 </div>
   
 <div class="editor-bar">
-  
-<label class="upload-btn">
-<img src="image/icon/uploadimage.png">
-<input type="file" id="postImage" accept="image/*" multiple>
-</label>
+  <label class="upload-btn">
+    <img src="image/icon/uploadimage.png">
+    <input type="file" id="postImage" accept="image/*" multiple>
+  </label>
 
-<div id="imagePreview" class="image-preview"></div>
-  
-<button class="post-btn" onclick="createPost()">Post</button>
+  <div id="imagePreview" class="image-preview"></div>
 </div>
+
+<button class="post-btn" onclick="createPost()">Post</button>
   
 </div> <!-- end create-post -->
   
