@@ -587,6 +587,30 @@ background:linear-gradient(90deg,#ff5e00,#ff0000);
 color:transparent;
 font-weight:bold;
 }
+
+.comments-list{
+max-height:120px;
+overflow:hidden;
+transition:max-height .4s ease;
+}
+
+.comments-list.open{
+max-height:500px; /* big enough for all comments */
+}
+
+.more-comments{
+opacity:.7;
+font-size:13px;
+cursor:pointer;
+margin-top:6px;
+transition:.2s;
+}
+
+.more-comments:hover{
+opacity:1;
+text-decoration:underline;
+}
+  
 </style>
 </head>
 <body>
@@ -844,9 +868,14 @@ alert("Post failed.");
   
 window.showAllComments = (postId)=>{
 const list = document.getElementById("comments-"+postId);
-list.dataset.open = "true";
 
-list.innerHTML = "";
+if(list.classList.contains("open")){
+list.classList.remove("open");
+list.dataset.open = "false";
+}else{
+list.classList.add("open");
+list.dataset.open = "true";
+}
 }
   
 window.toggleComment = (id)=>{
