@@ -155,30 +155,7 @@ margin-top:10px;
 flex-wrap:nowrap;
 overflow:hidden;
 }
-.editor-bar button{
-background:#1c2230;
-border:1px solid #2e3445;
-color:#fff;
-padding:6px 10px;
-border-radius:10px;
-font-size:13px;
-cursor:pointer;
-transition:all .15s;
-}
-.editor-bar button:hover{
-background:#2c3447;
-transform:translateY(-1px);
-box-shadow:0 4px 8px rgba(0,0,0,.4);
-}
-.editor-bar select{
-background:#1a1f29;
-color:white;
-border:1px solid #2a2f3b;
-padding:6px 8px;
-border-radius:8px;
-font-size:12px;
-flex-shrink:0;
-}
+
 .post-btn{
 background:linear-gradient(135deg,#3b82f6,#2563eb);
 border:none;
@@ -202,56 +179,8 @@ transform:translateY(-1px);
 .post-btn:active{
 transform:scale(.97);
 }
-.emoji-panel{
-display:none;
-position:absolute;
-right:0;
-bottom:40px;
-width:260px;
-background:#171a21;
-border:1px solid var(--border);
-border-radius:12px;
-box-shadow:0 8px 20px rgba(0,0,0,.4);
-padding:10px;
-z-index:20;
-}
-.emoji-list{
-max-height:160px;
-overflow-y:auto;
-display:flex;
-flex-wrap:wrap;
-gap:6px;
-}
-.emoji-panel span{
-cursor:pointer;
-font-size:18px;
-}
-.emoji-panel span:hover{
-transform:scale(1.25);
-}
-.color-box{
-width:32px;
-height:32px;
-border:1px solid #2a2f3b;
-border-radius:8px;
-cursor:pointer;
-background:#1a1f29;
-}
 .editor-container{
 position:relative;
-}
-.emoji-btn{
-position:absolute;
-right:10px;
-bottom:8px;
-background:transparent;
-border:none;
-cursor:pointer;
-font-size:20px;
-padding:0;
-}
-.emoji-btn:hover{
-transform:scale(1.15);
 }
 .reaction-counts{
 display:flex;
@@ -711,45 +640,24 @@ class="logout-icon">
 <div class="editor-container">
 <div id="postText" class="editor" contenteditable="true"
 placeholder="What's on your mind?"></div>
-<button class="emoji-btn" onclick="toggleEmoji()" title="Emoji (Windows + ;)">😀</button>
-<div id="emojiPanel" class="emoji-panel">
-<input type="text" id="emojiSearch" placeholder="Search emoji...">
-<div class="emoji-categories">
-<button onclick="showCategory('smile')">😀</button>
-<button onclick="showCategory('fire')">🔥</button>
-<button onclick="showCategory('heart')">❤️</button>
-<button onclick="showCategory('sports')">⚽</button>
 </div>
-<div id="emojiList" class="emoji-list"></div>
-</div>
-</div>
+  
 <div class="editor-bar">
-<button onclick="format('bold')" title="Bold(Ctrl + B)"><b>B</b></button>
-<button onclick="format('italic')" title="Italic(Ctrl + I)"><i>I</i></button>
-<button onclick="format('underline')" title="Underline(Ctrl + U)"><u>U</u></button>
-<button onclick="format('strikeThrough')" title="StrikeThrough(Ctrl + Shift + X)"><s>S</s></button>
-<button onclick="format('justifyLeft')" title="Allign Left(Ctrl + Shift + X)">⬅</button>
-<button onclick="format('justifyCenter')" title="Allign Center(Ctrl + Shift + X)">⬌</button>
-<button onclick="format('justifyRight')" title="Allign Right(Ctrl + Shift + X)">➡</button>
-<select onchange="setFont(this.value)">
-<option value="">Font</option>
-<option value="Arial">Arial</option>
-<option value="Impact">Impact</option>
-<option value="Georgia">Georgia</option>
-<option value="Comic Sans MS">Comic Sans</option>
-<option value="Courier New">Courier</option>
-</select>
-<input type="color" class="color-box" onchange="setColor(this.value)">
+  
 <label class="upload-btn">
 <img src="image/icon/uploadimage.png">
 <input type="file" id="postImage" accept="image/*" multiple>
 </label>
+  
 <button class="post-btn" onclick="createPost()">Post</button>
 </div>
+  
 </div> <!-- end create-post -->
+  
 <div class="posts-container">
 <div id="postsFeed"></div>
 </div>
+  
 <footer>
 <div>© 2026 ChatPH • All Rights Reserved</div>
 <div style="margin-top:6px;font-size:13px;">
@@ -826,50 +734,14 @@ return `<span class="vip-badge">💎 VIP</span>`;
 }
 return "";
 }
-const emojiPanel = document.getElementById("emojiPanel");
-const emojiList = document.getElementById("emojiList");
-const emojiSearch = document.getElementById("emojiSearch");
-const emojiCategories = {
-smile:[
-"😀","😁","😂","🤣","😃","😄","😅","😆","😉","😊",
-"😍","😘","😜","🤩","🤔","😎","😢","😭","😡","😱",
-"🥳","😇","🤯","🤗","🤭"
-],
-fire:[
-"🔥","⚡","💥","🌟","✨","⭐","☄️"
-],
-heart:[
-"❤️","💙","💚","💛","💜","🖤","🤍","💔","💕","💞","💓"
-],
-sports:[
-"⚽","🏀","🏈","⚾","🎾","🏐","🏓","🎮"
-]
-};
-function loadEmojis(list){
-emojiList.innerHTML="";
-list.forEach(e=>{
-const span=document.createElement("span");
-span.textContent=e;
-span.onclick=()=>insertEmoji(e);
-emojiList.appendChild(span);
-});
-}
+
 function getVerified(user){
 if(user?.providerData?.some(p=>p.providerId==="google.com")){
 return `<img src="image/verified.png" class="verified-badge">`;
 }
 return "";
 }
-function showCategory(cat){
-loadEmojis(emojiCategories[cat]);
-}
-emojiSearch.addEventListener("input",()=>{
-const search = emojiSearch.value.toLowerCase();
-const all = Object.values(emojiCategories).flat();
-const filtered = all.filter(e => e.includes(search));
-loadEmojis(filtered);
-});
-loadEmojis(emojiCategories.smile);
+
 /* SIDEBAR */
 window.toggleMenu = () =>{
 document.getElementById("sidebar").classList.toggle("open");
@@ -883,23 +755,6 @@ function setFont(font){
 document.getElementById("postText").focus();
 document.execCommand("fontName",false,font);
 }
-function setColor(color){
-document.getElementById("postText").focus();
-document.execCommand("foreColor",false,color);
-}
-function insertEmoji(emoji){
-document.execCommand("insertText",false,emoji);
-document.getElementById("postText").focus();
-}
-function toggleEmoji(){
-emojiPanel.style.display =
-emojiPanel.style.display === "block" ? "none" : "block";
-}
-document.addEventListener("click",(e)=>{
-if(!emojiPanel.contains(e.target) && !e.target.classList.contains("emoji-btn")){
-emojiPanel.style.display="none";
-}
-});
 document.addEventListener("keydown", function(e){
 if(e.ctrlKey && e.key === "b"){
 e.preventDefault();
