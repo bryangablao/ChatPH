@@ -1105,7 +1105,6 @@ ${getVerified({providerData:[{providerId:"google.com"}]})}
 });
 });
 });
-});
 const imageInput = document.getElementById("postImage");
 const preview = document.getElementById("imagePreview");
 imageInput.addEventListener("change",()=>{
@@ -1127,13 +1126,10 @@ onAuthStateChanged(auth,(user)=>{
     if(user){
         document.getElementById("userDisplay").innerText =
         user.displayName || user.email;
-
         document.getElementById("logoutBtn").style.display="inline";
-
     }else{
         window.location.href="index.html";
     }
-}, 1000); // wait 1 second
 });
 document.getElementById("logoutBtn").onclick = async ()=>{
 await signOut(auth);
