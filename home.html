@@ -138,79 +138,6 @@ border:1px solid var(--border);
 margin-bottom:20px;
 }
 
-.create-post textarea{
-width:100%;
-box-sizing:border-box;
-background:#0f1115;
-border:1px solid var(--border);
-border-radius:12px;
-color:white;
-padding:12px;
-resize:none;
-min-height:80px;
-font-size:14px;
-}
-
-.editor{
-width:100%;
-min-height:90px;
-background:#0c0f14;
-border:1px solid #2a2f3b;
-border-radius:14px;
-padding:14px 40px 14px 14px;
-outline:none;
-box-sizing:border-box;
-word-break:break-word;
-font-size:15px;
-transition:.2s;
-}
-
-.editor:focus{
-border-color:#4da3ff;
-box-shadow:0 0 0 2px rgba(77,163,255,.25);
-}
-
-.editor:empty:before{
-content:attr(placeholder);
-color:#777;
-}
-
-.editor-bar{
-display:flex;
-align-items:center;
-gap:4px;
-margin-top:10px;
-flex-wrap:nowrap;
-overflow:hidden;
-}
-
-.editor-bar button{
-background:#1c2230;
-border:1px solid #2e3445;
-color:#fff;
-padding:6px 10px;
-border-radius:10px;
-font-size:13px;
-cursor:pointer;
-transition:all .15s;
-}
-
-.editor-bar button:hover{
-background:#2c3447;
-transform:translateY(-1px);
-box-shadow:0 4px 8px rgba(0,0,0,.4);
-}
-
-.editor-bar select{
-background:#1a1f29;
-color:white;
-border:1px solid #2a2f3b;
-padding:6px 8px;
-border-radius:8px;
-font-size:12px;
-flex-shrink:0;
-}
-
 .post-btn{
 background:linear-gradient(135deg,#3b82f6,#2563eb);
 border:none;
@@ -225,6 +152,10 @@ align-items:center;
 justify-content:center;
 transition:.2s ease;
 box-shadow:0 2px 6px rgba(0,0,0,.25);
+
+position:absolute;
+bottom:15px;
+right:15px;
 }
 
 .post-btn:hover{
@@ -235,65 +166,6 @@ transform:translateY(-1px);
 
 .post-btn:active{
 transform:scale(.97);
-}
-
-.emoji-panel{
-display:none;
-position:absolute;
-right:0;
-bottom:40px;
-width:260px;
-background:#171a21;
-border:1px solid var(--border);
-border-radius:12px;
-box-shadow:0 8px 20px rgba(0,0,0,.4);
-padding:10px;
-z-index:20;
-}
-
-.emoji-list{
-max-height:160px;
-overflow-y:auto;
-display:flex;
-flex-wrap:wrap;
-gap:6px;
-}
-
-.emoji-panel span{
-cursor:pointer;
-font-size:18px;
-}
-
-.emoji-panel span:hover{
-transform:scale(1.25);
-}
-
-.color-box{
-width:32px;
-height:32px;
-border:1px solid #2a2f3b;
-border-radius:8px;
-cursor:pointer;
-background:#1a1f29;
-}
-
-.editor-container{
-position:relative;
-}
-
-.emoji-btn{
-position:absolute;
-right:10px;
-bottom:8px;
-background:transparent;
-border:none;
-cursor:pointer;
-font-size:20px;
-padding:0;
-}
-
-.emoji-btn:hover{
-transform:scale(1.15);
 }
 
 .reaction-counts{
@@ -317,17 +189,7 @@ padding:2px 6px;
 width:14px;
 }
 
-.editor-bar::-webkit-scrollbar{
-height:4px;
-}
-
-.editor-bar::-webkit-scrollbar-thumb{
-background:#2a2e38;
-border-radius:10px;
-}
-
 /* POSTS */
-
 .post{
 background:linear-gradient(180deg,#1a1f29,#141821);
 border:1px solid #2b3240;
@@ -410,34 +272,6 @@ font-weight:600;
 .time{
 font-size:12px;
 opacity:.6;
-}
-
-.like-hover{
-position:absolute;
-background:#0f141c;
-border:1px solid #2a2f3b;
-border-radius:10px;
-padding:10px;
-font-size:13px;
-width:180px;
-box-shadow:0 6px 20px rgba(0,0,0,.5);
-display:none;
-z-index:20;
-}
-
-.like-hover div{
-padding:3px 0;
-}
-
-.like-hover .more{
-opacity:.6;
-font-size:12px;
-margin-top:4px;
-}
-
-.like-btn.liked{
-color:#4da3ff;
-font-weight:600;
 }
   
 /* FOOTER */
@@ -656,33 +490,6 @@ margin-bottom:4px;
 width:16px;
 }
 
-.upload-btn{
-display:flex;
-align-items:center;
-justify-content:center;
-width:36px;
-height:36px;
-background:#1f2937;
-border-radius:10px;
-cursor:pointer;
-transition:.2s;
-}
-
-.upload-btn:hover{
-background:#2a2e38;
-transform:translateY(-1px);
-box-shadow:0 3px 8px rgba(0,0,0,.4);
-}
-
-.upload-btn img{
-width:20px;
-pointer-events:none;
-}
-
-.upload-btn input{
-display:none;
-}
-
 .image-preview{
 display:grid;
 grid-template-columns:repeat(auto-fill,minmax(90px,1fr));
@@ -709,20 +516,6 @@ margin-top:10px;
 width:100%;
 border-radius:10px;
 object-fit:cover;
-}
-
-.react-like{
-background:linear-gradient(90deg,#4da3ff,#2563eb);
--webkit-background-clip:text;
-color:transparent;
-font-weight:700;
-}
-
-.react-love{
-background:linear-gradient(90deg,#ff3b3b,#ff0000);
--webkit-background-clip:text;
-color:transparent;
-font-weight:700;
 }
 
 /* LIKE */
@@ -759,6 +552,49 @@ color:transparent;
 font-weight:bold;
 }
 
+.create-post{
+position:relative;
+padding-bottom:60px;
+}
+
+.create-post textarea{
+width:100%;
+background:#0f1115;
+border:1px solid var(--border);
+border-radius:12px;
+color:white;
+padding:12px;
+min-height:100px;
+font-size:14px;
+resize:none;
+}
+
+.help-btn{
+position:absolute;
+top:15px;
+right:15px;
+width:28px;
+height:28px;
+border-radius:50%;
+border:none;
+background:#2a2f3b;
+color:white;
+cursor:pointer;
+}
+
+.shortcut-box{
+display:none;
+position:absolute;
+top:45px;
+right:10px;
+background:#171a21;
+border:1px solid var(--border);
+border-radius:10px;
+padding:10px;
+font-size:12px;
+width:220px;
+}
+  
 </style>
 </head>
 
@@ -841,69 +677,31 @@ class="logout-icon">
 <!-- CREATE POST -->
 <div class="create-post">
 
-<div class="editor-container">
+<h3 style="margin:0 0 10px 0;">Create Post</h3>
 
-<div id="postText" class="editor" contenteditable="true"
-placeholder="What's on your mind?"></div>
+<textarea id="postText" placeholder="What's on your mind? Share your thoughts..."></textarea>
+<input type="file" id="postImage" multiple accept="image/*">
+<button class="help-btn" onclick="toggleHelp()">?</button>
 
-<button class="emoji-btn" onmousedown="toggleEmoji(); return false;" title="Emoji (Windows + ;)">😀</button>
-  
-<div id="emojiPanel" class="emoji-panel">
-
-<input type="text" id="emojiSearch" placeholder="Search emoji...">
-
-<div class="emoji-categories">
-<button onclick="showCategory('smile')">😀</button>
-<button onclick="showCategory('fire')">🔥</button>
-<button onclick="showCategory('heart')">❤️</button>
-<button onclick="showCategory('sports')">⚽</button>
+<div id="shortcutBox" class="shortcut-box">
+<b>Keyboard Shortcuts:</b><br>
+Ctrl + B = Bold<br>
+Ctrl + I = Italic<br>
+Ctrl + U = Underline<br>
+Ctrl + Shift + X = Strikethrough<br>
+Shift + Enter = New line<br>
+Ctrl + C = Copy<br>
+Ctrl + X = Cut<br>
+Windows + ; = Emoji<br>
 </div>
-
-<div id="emojiList" class="emoji-list"></div>
-
-</div>
-
-</div>
-
-<div class="editor-bar">
-
-<button onmousedown="format('bold'); return false;" title="Bold(Ctrl + B)"><b>B</b></button>
-<button onmousedown="format('italic'); return false;" title="Italic(Ctrl + I)"><i>I</i></button>
-<button onmousedown="format('underline'); return false;" title="Underline(Ctrl + U)"><u>U</u></button>
-<button onmousedown="format('strikeThrough'); return false;" title="StrikeThrough(Ctrl + Shift + X)"><s>S</s></button>
-
-<button onmousedown="format('justifyLeft'); return false;" title="Allign Left(Ctrl + Shift + L)">⬅</button>
-<button onmousedown="format('justifyCenter'); return false;" title="Allign Center(Ctrl + Shift + E)">⬌</button>
-<button onmousedown="format('justifyRight'); return false;" title="Allign Right(Ctrl + Shift + R)">➡</button>
-
-<select onmousedown="event.preventDefault()" onchange="setFont(this.value)">
-<option value="">Font</option>
-<option value="Arial">Arial</option>
-<option value="Impact">Impact</option>
-<option value="Georgia">Georgia</option>
-<option value="Comic Sans MS">Comic Sans</option>
-<option value="Courier New">Courier</option>
-</select>
-
-<input type="color" class="color-box"
-onmousedown="event.preventDefault()"
-onchange="setColor(this.value)">
-  
-<label class="upload-btn">
-<img src="image/icon/uploadimage.png">
-<input type="file" id="postImage" accept="image/*" multiple>
-</label>
 
 <button class="post-btn" onclick="createPost()">Post</button>
 
 </div>
-  <div id="imagePreview" class="image-preview"></div>
-</div> <!-- end create-post -->
 
 <div class="posts-container">
 <div id="postsFeed"></div>
 </div>
-
 
 <footer>
 <div>© 2026 ChatPH • All Rights Reserved</div>
@@ -996,42 +794,6 @@ return `<span class="vip-badge">💎 VIP</span>`;
 return "";
 }
 
-const emojiPanel = document.getElementById("emojiPanel");
-const emojiList = document.getElementById("emojiList");
-const emojiSearch = document.getElementById("emojiSearch");
-
-const emojiCategories = {
-
-smile:[
-"😀","😁","😂","🤣","😃","😄","😅","😆","😉","😊",
-"😍","😘","😜","🤩","🤔","😎","😢","😭","😡","😱",
-"🥳","😇","🤯","🤗","🤭"
-],
-
-fire:[
-"🔥","⚡","💥","🌟","✨","⭐","☄️"
-],
-
-heart:[
-"❤️","💙","💚","💛","💜","🖤","🤍","💔","💕","💞","💓"
-],
-
-sports:[
-"⚽","🏀","🏈","⚾","🎾","🏐","🏓","🎮"
-]
-
-};
-
-function loadEmojis(list){
-emojiList.innerHTML="";
-list.forEach(e=>{
-const span=document.createElement("span");
-span.textContent=e;
-span.onclick=()=>insertEmoji(e);
-emojiList.appendChild(span);
-});
-}
-
 function getVerified(user){
 if(user?.providerData?.some(p=>p.providerId==="google.com")){
 return `<img src="image/verified.png" class="verified-badge">`;
@@ -1039,109 +801,10 @@ return `<img src="image/verified.png" class="verified-badge">`;
 return "";
 }
 
-function showCategory(cat){
-loadEmojis(emojiCategories[cat]);
-}
-
-emojiSearch.addEventListener("input",()=>{
-const search = emojiSearch.value.toLowerCase();
-const all = Object.values(emojiCategories).flat();
-const filtered = all.filter(e => e.includes(search));
-loadEmojis(filtered);
-});
-
-loadEmojis(emojiCategories.smile);
-
 /* SIDEBAR */
-
 window.toggleMenu = () =>{
-
 document.getElementById("sidebar").classList.toggle("open");
-
 }
-
-function format(command){
-const editor = document.getElementById("postText");
-editor.focus();
-document.execCommand(command,false,null);
-}
-
-function setFont(font){
-document.getElementById("postText").focus();
-document.execCommand("fontName",false,font);
-}
-
-function setColor(color){
-document.getElementById("postText").focus();
-document.execCommand("foreColor",false,color);
-}
-
-function insertEmoji(emoji){
-document.execCommand("insertText",false,emoji);
-document.getElementById("postText").focus();
-}
-
-function toggleEmoji(){
-emojiPanel.style.display =
-emojiPanel.style.display === "block" ? "none" : "block";
-}
-
-document.addEventListener("click",(e)=>{
-
-if(!emojiPanel.contains(e.target) && !e.target.classList.contains("emoji-btn")){
-emojiPanel.style.display="none";
-}
-
-});
-
-document.addEventListener("keydown", function(e){
-
-if(e.ctrlKey && e.key === "b"){
-e.preventDefault();
-format("bold");
-}
-
-if(e.ctrlKey && e.key === "i"){
-e.preventDefault();
-format("italic");
-}
-
-if(e.ctrlKey && e.key === "u"){
-e.preventDefault();
-format("underline");
-}
-
-if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "x"){
-e.preventDefault();
-format("strikeThrough");
-}
-
-if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "l"){
-e.preventDefault();
-format("justifyLeft");
-}
-
-if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "e"){
-e.preventDefault();
-format("justifyCenter");
-}
-
-if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "r"){
-e.preventDefault();
-format("justifyRight");
-}
-
-if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "f"){
-e.preventDefault();
-document.querySelector("select").focus();
-}
-
-if(e.ctrlKey && e.key === "Enter"){
-e.preventDefault();
-createPost();
-}
-
-});
 
 import { getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   
@@ -1149,11 +812,12 @@ import { getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-fire
 window.createPost = async ()=>{
 
 const editor = document.getElementById("postText");
-const text = editor.innerHTML.trim();
-const imageFiles = document.getElementById("postImage").files;
+const text = editor.value.trim();
+const imageInput = document.getElementById("postImage");
+const imageFiles = imageInput.files;
 
 if(!text && imageFiles.length === 0){
-alert("Write something or upload an image.");
+alert("Write something or upload an image...");
 return;
 }
 
@@ -1193,10 +857,9 @@ photo:user.photoURL ||
 time:serverTimestamp()
 });
 
-editor.innerHTML="";
-document.getElementById("postImage").value="";
-preview.innerHTML="";
-
+editor.value = "";
+imageInput.value = "";
+  
 }catch(err){
 console.error(err);
 alert("Post failed.");
@@ -1366,10 +1029,8 @@ feed.innerHTML="";
 
 snapshot.forEach(doc=>{
 const p = doc.data();
-
 const post = document.createElement("div");
 post.className="post";
-
 post.innerHTML=`
 <div class="post-top">
 <img class="avatar" src="${p.photo}">
@@ -1446,6 +1107,26 @@ onkeydown="if(event.key==='Enter'){addComment('${doc.id}',this)}">
 
 feed.appendChild(post);
 
+const user = auth.currentUser;
+if(user){
+const userReactRef = doc(db,"posts",doc.id,"reactions",user.uid);
+
+onSnapshot(userReactRef,(snap)=>{
+const btn = document.getElementById("like-btn-"+doc.id);
+
+if(!btn) return;
+
+if(snap.exists()){
+const type = snap.data().type;
+btn.innerText = type.charAt(0).toUpperCase() + type.slice(1);
+btn.className = "action-btn like-btn react-"+type;
+}else{
+btn.innerText = "Like";
+btn.className = "action-btn like-btn";
+}
+});
+}
+  
 /* REACTION COUNT SYSTEM */
 const reactRef = collection(db,"posts",doc.id,"reactions");
 onSnapshot(reactRef,(snap)=>{
@@ -1539,34 +1220,6 @@ ${getVerified({providerData:[{providerId:"google.com"}]})}
 });
 });
 });
-
-const imageInput = document.getElementById("postImage");
-const preview = document.getElementById("imagePreview");
-
-imageInput.addEventListener("change",()=>{
-
-preview.innerHTML="";
-
-const files = imageInput.files;
-
-for(let i=0;i<files.length;i++){
-
-const reader = new FileReader();
-
-reader.onload = function(e){
-
-const img = document.createElement("img");
-img.src = e.target.result;
-
-preview.appendChild(img);
-
-};
-
-reader.readAsDataURL(files[i]);
-
-}
-
-});
   
 /* AUTH USER */
 
@@ -1639,8 +1292,21 @@ box.innerHTML = html;
 });
 
 }
+
+window.toggleHelp = () => {
+const box = document.getElementById("shortcutBox");
+box.style.display = box.style.display === "block" ? "none" : "block";
+};
+
+document.addEventListener("click",(e)=>{
+const box = document.getElementById("shortcutBox");
+const btn = document.querySelector(".help-btn");
+
+if(!box.contains(e.target) && !btn.contains(e.target)){
+box.style.display = "none";
+}
+});
   
 </script>
-
 </body>
 </html>
