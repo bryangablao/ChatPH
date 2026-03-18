@@ -846,8 +846,8 @@ class="logout-icon">
 <div id="postText" class="editor" contenteditable="true"
 placeholder="What's on your mind?"></div>
 
-<button class="emoji-btn" onclick="toggleEmoji()" title="Emoji (Windows + ;)">😀</button>
-
+<button class="emoji-btn" onmousedown="toggleEmoji(); return false;" title="Emoji (Windows + ;)">😀</button>
+  
 <div id="emojiPanel" class="emoji-panel">
 
 <input type="text" id="emojiSearch" placeholder="Search emoji...">
@@ -867,16 +867,16 @@ placeholder="What's on your mind?"></div>
 
 <div class="editor-bar">
 
-<button onclick="format('bold')" title="Bold(Ctrl + B)"><b>B</b></button>
-<button onclick="format('italic')" title="Italic(Ctrl + I)"><i>I</i></button>
-<button onclick="format('underline')" title="Underline(Ctrl + U)"><u>U</u></button>
-<button onclick="format('strikeThrough')" title="StrikeThrough(Ctrl + Shift + X)"><s>S</s></button>
+<button onmousedown="format('bold'); return false;" title="Bold(Ctrl + B)"><b>B</b></button>
+<button onmousedown="format('italic'); return false;" title="Italic(Ctrl + I)"><i>I</i></button>
+<button onmousedown="format('underline'); return false;" title="Underline(Ctrl + U)"><u>U</u></button>
+<button onmousedown="format('strikeThrough'); return false;" title="StrikeThrough(Ctrl + Shift + X)"><s>S</s></button>
 
-<button onclick="format('justifyLeft')" title="Allign Left(Ctrl + Shift + X)">⬅</button>
-<button onclick="format('justifyCenter')" title="Allign Center(Ctrl + Shift + X)">⬌</button>
-<button onclick="format('justifyRight')" title="Allign Right(Ctrl + Shift + X)">➡</button>
+<button onmousedown="format('justifyLeft'); return false;" title="Allign Left(Ctrl + Shift + L)">⬅</button>
+<button onmousedown="format('justifyCenter'); return false;" title="Allign Center(Ctrl + Shift + E)">⬌</button>
+<button onmousedown="format('justifyRight'); return false;" title="Allign Right(Ctrl + Shift + R)">➡</button>
 
-<select onchange="setFont(this.value)">
+<select onmousedown="event.preventDefault()" onchange="setFont(this.value)">
 <option value="">Font</option>
 <option value="Arial">Arial</option>
 <option value="Impact">Impact</option>
@@ -885,8 +885,10 @@ placeholder="What's on your mind?"></div>
 <option value="Courier New">Courier</option>
 </select>
 
-<input type="color" class="color-box" onchange="setColor(this.value)">
-
+<input type="color" class="color-box"
+onmousedown="event.preventDefault()"
+onchange="setColor(this.value)">
+  
 <label class="upload-btn">
 <img src="image/icon/uploadimage.png">
 <input type="file" id="postImage" accept="image/*" multiple>
@@ -895,6 +897,7 @@ placeholder="What's on your mind?"></div>
 <button class="post-btn" onclick="createPost()">Post</button>
 
 </div>
+  <div id="imagePreview" class="image-preview"></div>
 </div> <!-- end create-post -->
 
 <div class="posts-container">
