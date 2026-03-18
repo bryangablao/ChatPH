@@ -1063,14 +1063,15 @@ const commentsRef = query(
 collection(db,"posts",doc.id,"comments"),
 orderBy("time","desc")
 );
+
 onSnapshot(commentsRef,(snap)=>{
 const list = document.getElementById("comments-"+doc.id);
 if(!list) return;
 list.innerHTML="";
 let count = 0;
+
 snap.forEach(c=>{
 count++;
-
 if(count > 1 && list.dataset.open !== "true"){
     if(!list.querySelector(".more-comments")){
         list.innerHTML += `
@@ -1088,7 +1089,6 @@ if(count > 1 && list.dataset.open !== "true"){
 }
 
 const data = c.data();
-
 list.innerHTML += `
 <div class="comment-item">
 <img class="comment-avatar" src="${data.photo}">
@@ -1103,8 +1103,11 @@ ${getVerified({providerData:[{providerId:"google.com"}]})}
 </div>
 `;
 });
+
 });
 });
+});
+
 const imageInput = document.getElementById("postImage");
 const preview = document.getElementById("imagePreview");
 imageInput.addEventListener("change",()=>{
