@@ -874,15 +874,17 @@ alert("Post failed.");
 }
   
 window.showAllComments = (postId)=>{
-const list = document.getElementById("comments-"+postId);
+    const list = document.getElementById("comments-"+postId);
 
-if(list.classList.contains("open")){
-list.classList.remove("open");
-list.dataset.open = "false";
-}else{
-list.classList.add("open");
-list.dataset.open = "true";
-}
+    if(list.classList.contains("open")){
+        list.classList.remove("open");
+        list.dataset.open = "false";
+    }else{
+        list.classList.add("open");
+        list.dataset.open = "true";
+    }
+
+    list.innerHTML = list.innerHTML;
 }
   
 window.toggleComment = (id)=>{
