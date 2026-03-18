@@ -607,15 +607,13 @@ text-decoration:underline;
 }
 
 .comments-list{
-max-height:0;
+max-height:80px;
 overflow:hidden;
-transition:max-height .4s ease, opacity .3s ease;
-opacity:.8;
+transition:max-height .4s ease;
 }
 
 .comments-list.open{
 max-height:1000px;
-opacity:1;
 }
   
 </style>
@@ -1122,11 +1120,6 @@ const total = snap.size;
 snap.forEach(c=>{
     count++;
     const isOpen = list.dataset.open === "true";
-
-    if(count > 1 && !isOpen){
-        return; // show only 1 comment when closed
-    }
-
     const data = c.data();
 
     list.innerHTML += `
