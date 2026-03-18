@@ -139,9 +139,6 @@ margin-bottom:20px;
 }
 
 .post-btn{
-position:absolute;
-bottom:15px;
-right:15px;
 background:linear-gradient(135deg,#4da3ff,#2563eb);
 border:none;
 color:white;
@@ -177,6 +174,13 @@ transform:translateY(-1px);
 transform:scale(.97);
 }
 
+.post-actions-row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-top:12px;
+}
+  
 .reaction-counts{
 display:flex;
 gap:6px;
@@ -728,11 +732,15 @@ class="logout-icon">
 
 <input type="file" id="postImage" multiple accept="image/*">
 
+<div id="imagePreview"></div>
+
+<div class="post-actions-row">
 <label for="postImage" class="upload-btn">
 <img src="image/icon/uploadimage.png">
 </label>
 
-<div id="imagePreview"></div>
+<button class="post-btn" onclick="createPost()">Post</button>
+</div>
 <button class="help-btn" onclick="toggleHelp()">?</button>
 
 <div id="shortcutBox" class="shortcut-box">
@@ -741,13 +749,14 @@ Ctrl + B = Bold<br>
 Ctrl + I = Italic<br>
 Ctrl + U = Underline<br>
 Ctrl + Shift + X = Strikethrough<br>
+Ctrl + Shift + L = Allign Left<br>
+Ctrl + Shift + E = Allign Center<br>
+Ctrl + Shift + R = Allign Right<br>
 Shift + Enter = New line<br>
 Ctrl + C = Copy<br>
 Ctrl + X = Cut<br>
 Windows + ; = Emoji<br>
 </div>
-
-<button class="post-btn" onclick="createPost()">Post</button>
 
 </div>
 
@@ -1236,7 +1245,7 @@ ${p.time?.toDate().toLocaleString() || ""}
 </div>
 </div>
 
-<div class="post-text">${p.text}</div>
+<div class="post-text">${formatText(p.text)}</div>
 
 ${p.images && p.images.length ? `
 <div class="post-images">
@@ -1489,6 +1498,50 @@ const box = document.getElementById("shortcutBox");
 box.style.display = box.style.display === "block" ? "none" : "block";
 };
 
+document.getElementById("postText").addEventListener("keydown", function(e){
+
+// BOLD
+if(e.ctrlKey && e.key.toLowerCase() === "b"){
+e.preventDefault();
+wrapText("**","**");
+}
+
+// ITALIC
+if(e.ctrlKey && e.key.toLowerCase() === "i"){
+e.preventDefault();
+wrapText("*","*");
+}
+
+// UNDERLINE
+if(e.ctrlKey && e.key.toLowerCase() === "u"){
+e.preventDefault();
+wrapText("<u>","</u>");
+}
+
+// STRIKE
+if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "x"){
+e.preventDefault();
+wrapText("<s>","</s>");
+}
+
+});
+
+function wrapText(before, after){
+const textarea = document.getElementById("postText");
+const start = textarea.selectionStart;
+const end = textarea.selectionEnd;
+const selected = textarea.value.substring(start, end);
+
+textarea.value =
+textarea.value.substring(0, start) +
+before + selected + after +
+textarea.value.substring(end);
+
+textarea.focus();
+textarea.selectionStart = start + before.length;
+textarea.selectionEnd = end + before.length;
+}
+
 document.addEventListener("click",(e)=>{
 const box = document.getElementById("shortcutBox");
 const btn = document.querySelector(".help-btn");
@@ -1497,6 +1550,15 @@ if(!box.contains(e.target) && !btn.contains(e.target)){
 box.style.display = "none";
 }
 });
+
+function formatText(text){
+return text
+.replace(/\n/g,"<br>")
+.replace(/\*\*(.*?)\*\*/g,"<b>$1</b>")
+.replace(/\*(.*?)\*/g,"<i>$1</i>")
+.replace(/<u>(.*?)<\/u>/g,"<u>$1</u>")
+.replace(/<s>(.*?)<\/s>/g,"<s>$1</s>");
+}
   
 </script>
 </body>
