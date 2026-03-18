@@ -840,7 +840,6 @@ alert("Post failed.");
 window.showAllComments = (postId)=>{
 const list = document.getElementById("comments-"+postId);
 list.dataset.open = "true";
-list.innerHTML="";
 }
   
 window.toggleComment = (id)=>{
@@ -1069,7 +1068,7 @@ list.innerHTML="";
 let count = 0;
 snap.forEach(c=>{
 count++;
-if(count > 1 && !list.dataset.open){
+if(count > 1 && list.dataset.open !== "true")
 if(!list.querySelector(".more-comments")){
 list.innerHTML += `
 <div class="more-comments"
