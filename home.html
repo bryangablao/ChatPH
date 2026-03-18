@@ -6,9 +6,7 @@
 <title>ChatPH</title>
 <link rel="icon" type="image/png" href="image/chatph-logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-
 <style>
-
 :root{
 --bg:#0f1115;
 --card:#171a21;
@@ -16,16 +14,13 @@
 --text:#ffffff;
 --accent:#4da3ff;
 }
-
 body{
 margin:0;
 font-family:'Inter',sans-serif;
 background:var(--bg);
 color:var(--text);
 }
-
 /* HEADER */
-
 header{
 display:flex;
 align-items:center;
@@ -37,31 +32,24 @@ position:sticky;
 top:0;
 z-index:1000;
 }
-
 .logo{
 display:flex;
 align-items:center;
 gap:10px;
 }
-
 .logo img{
 width:32px;
 }
-
 .logo span{
 font-weight:700;
 font-size:18px;
 }
-
 /* HAMBURGER */
-
 .hamburger{
 font-size:22px;
 cursor:pointer;
 }
-
 /* SIDEBAR */
-
 .sidebar{
 position:fixed;
 top:0;
@@ -74,11 +62,9 @@ padding-top:70px;
 transition:.3s;
 z-index:1001;
 }
-
 .sidebar.open{
 left:0;
 }
-
 .sidebar a{
 display:flex;
 align-items:center;
@@ -89,20 +75,16 @@ color:white;
 font-weight:500;
 transition:.2s;
 }
-
 .sidebar a:hover{
 background:#1e222b;
 }
-
 /* MARQUEE AD */
-
 .marquee{
 overflow:hidden;
 background:#0f1115;
 padding:10px 0;
 border-bottom:1px solid var(--border);
 }
-
 .marquee-track{
 display:inline-block;
 white-space:nowrap;
@@ -110,7 +92,6 @@ animation:scrollAds 30s linear infinite;
 color:var(--accent);
 font-weight:600;
 }
-
 @keyframes scrollAds{
 0%{
 transform:translateX(0);
@@ -119,17 +100,13 @@ transform:translateX(0);
 transform:translateX(-50%);
 }
 }
-
 /* MAIN */
-
 .main{
 max-width:520px;
 margin:auto;
 padding:16px;
 }
-
 /* CREATE POST */
-
 .create-post{
 background:var(--card);
 padding:18px;
@@ -137,50 +114,145 @@ border-radius:14px;
 border:1px solid var(--border);
 margin-bottom:20px;
 }
-
+.create-post textarea{
+width:100%;
+box-sizing:border-box;
+background:#0f1115;
+border:1px solid var(--border);
+border-radius:12px;
+color:white;
+padding:12px;
+resize:none;
+min-height:80px;
+font-size:14px;
+}
+.editor{
+width:100%;
+min-height:90px;
+background:#0c0f14;
+border:1px solid #2a2f3b;
+border-radius:14px;
+padding:14px 40px 14px 14px;
+outline:none;
+box-sizing:border-box;
+word-break:break-word;
+font-size:15px;
+transition:.2s;
+}
+.editor:focus{
+border-color:#4da3ff;
+box-shadow:0 0 0 2px rgba(77,163,255,.25);
+}
+.editor:empty:before{
+content:attr(placeholder);
+color:#777;
+}
+.editor-bar{
+display:flex;
+align-items:center;
+gap:4px;
+margin-top:10px;
+flex-wrap:nowrap;
+overflow:hidden;
+}
+.editor-bar button{
+background:#1c2230;
+border:1px solid #2e3445;
+color:#fff;
+padding:6px 10px;
+border-radius:10px;
+font-size:13px;
+cursor:pointer;
+transition:all .15s;
+}
+.editor-bar button:hover{
+background:#2c3447;
+transform:translateY(-1px);
+box-shadow:0 4px 8px rgba(0,0,0,.4);
+}
+.editor-bar select{
+background:#1a1f29;
+color:white;
+border:1px solid #2a2f3b;
+padding:6px 8px;
+border-radius:8px;
+font-size:12px;
+flex-shrink:0;
+}
 .post-btn{
-background:linear-gradient(135deg,#4da3ff,#2563eb);
+background:linear-gradient(135deg,#3b82f6,#2563eb);
 border:none;
 color:white;
-padding:10px 22px;
-border-radius:999px;
+padding:8px 20px;
+border-radius:18px;
 font-weight:600;
-font-size:14px;
+font-size:13px;
 cursor:pointer;
 display:flex;
 align-items:center;
-gap:6px;
-transition:.25s;
-box-shadow:0 4px 14px rgba(0,0,0,.4);
+justify-content:center;
+transition:.2s ease;
+box-shadow:0 2px 6px rgba(0,0,0,.25);
 }
-
-.post-btn:hover{
-transform:translateY(-2px);
-box-shadow:0 8px 22px rgba(0,0,0,.6);
-background:linear-gradient(135deg,#5ab0ff,#2563eb);
-}
-
-.post-btn:active{
-transform:scale(.95);
-}
-
 .post-btn:hover{
 background:linear-gradient(135deg,#4da3ff,#2563eb);
 box-shadow:0 4px 10px rgba(0,0,0,.35);
 transform:translateY(-1px);
 }
-
 .post-btn:active{
 transform:scale(.97);
 }
-
-.post-actions-row{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-top:12px;
+.emoji-panel{
+display:none;
+position:absolute;
+right:0;
+bottom:40px;
+width:260px;
+background:#171a21;
+border:1px solid var(--border);
+border-radius:12px;
+box-shadow:0 8px 20px rgba(0,0,0,.4);
+padding:10px;
+z-index:20;
 }
-  
+.emoji-list{
+max-height:160px;
+overflow-y:auto;
+display:flex;
+flex-wrap:wrap;
+gap:6px;
+}
+.emoji-panel span{
+cursor:pointer;
+font-size:18px;
+}
+.emoji-panel span:hover{
+transform:scale(1.25);
+}
+.color-box{
+width:32px;
+height:32px;
+border:1px solid #2a2f3b;
+border-radius:8px;
+cursor:pointer;
+background:#1a1f29;
+}
+.editor-container{
+position:relative;
+}
+.emoji-btn{
+position:absolute;
+right:10px;
+bottom:8px;
+background:transparent;
+border:none;
+cursor:pointer;
+font-size:20px;
+padding:0;
+}
+.emoji-btn:hover{
+transform:scale(1.15);
+}
 .reaction-counts{
 display:flex;
 gap:6px;
@@ -201,7 +273,13 @@ padding:2px 6px;
 .reaction-counts img{
 width:14px;
 }
-
+.editor-bar::-webkit-scrollbar{
+height:4px;
+}
+.editor-bar::-webkit-scrollbar-thumb{
+background:#2a2e38;
+border-radius:10px;
+}
 /* POSTS */
 .post{
 background:linear-gradient(180deg,#1a1f29,#141821);
@@ -213,12 +291,10 @@ box-shadow:0 4px 14px rgba(0,0,0,.35);
 transition:.2s;
 position:relative;
 }
-
 .post:hover{
 transform:none;
 box-shadow:0 10px 30px rgba(0,0,0,.5);
 }
-
 .post-top{
 display:flex;
 align-items:center;
@@ -226,14 +302,12 @@ gap:12px;
 padding-bottom:10px;
 border-bottom:1px solid #2a2f3b;
 }
-
 .post-text{
 margin-top:14px;
 line-height:1.6;
 font-size:15px;
 color:#e5e7eb;
 }
-
 .post-actions{
 margin-top:14px;
 display:flex;
@@ -241,7 +315,6 @@ gap:18px;
 padding-top:10px;
 border-top:1px solid #2a2f3b;
 }
-
 .post-actions button{
 background:#1f2937;
 border:none;
@@ -250,12 +323,10 @@ border-radius:18px;
 color:white;
 cursor:pointer;
 }
-
 .like-btn{
 font-weight:normal;
 transition:.2s;
 }
-
 .like-btn.react-like,
 .like-btn.react-love,
 .like-btn.react-haha,
@@ -264,7 +335,6 @@ transition:.2s;
 .like-btn.react-angry{
 font-weight:bold;
 }
-
 .like-btn{
 transition:all .2s ease;
 }
@@ -277,14 +347,36 @@ width:42px;
 height:42px;
 border-radius:50%;
 }
-
 .username{
 font-weight:600;
 }
-
 .time{
 font-size:12px;
 opacity:.6;
+}
+.like-hover{
+position:absolute;
+background:#0f141c;
+border:1px solid #2a2f3b;
+border-radius:10px;
+padding:10px;
+font-size:13px;
+width:180px;
+box-shadow:0 6px 20px rgba(0,0,0,.5);
+display:none;
+z-index:20;
+}
+.like-hover div{
+padding:3px 0;
+}
+.like-hover .more{
+opacity:.6;
+font-size:12px;
+margin-top:4px;
+}
+.like-btn.liked{
+color:#4da3ff;
+font-weight:600;
 }
   
 /* FOOTER */
@@ -294,11 +386,9 @@ padding:20px;
 opacity:.6;
 font-size:14px;
 }
-
 footer a:hover{
 text-decoration:underline;
 }
-
 /* BADGES */
 .admin-badge{
 margin-left:2px;
@@ -311,7 +401,6 @@ background:linear-gradient(90deg,#ffd700,#ffae00);
 color:#000;
 font-weight:700;
 }
-
 .mod-badge{
 margin-left:2px;
 position:relative;    
@@ -323,7 +412,6 @@ background:linear-gradient(90deg,#a855f7,#7e22ce);
 color:white;
 font-weight:600;
 }
-
 .vip-badge{
 margin-left:2px;
 position:relative;    
@@ -335,7 +423,6 @@ background:linear-gradient(90deg,#ff00cc,#ff66ff);
 color:white;
 font-weight:700;
 }
-
 /* ICON LOGOUT */
 .logout-icon{
 width:22px;
@@ -343,26 +430,21 @@ cursor:pointer;
 display:none;
 transition:0.2s;
 }
-
 .logout-icon:hover{
 transform:scale(1.1);
 opacity:0.8;
 }
-
 .posts-container{
 margin-top:20px;
 }
-
 .action-btn{
 cursor:pointer;
 opacity:.8;
 }
-
 .action-btn:hover{
 text-decoration:underline;
 opacity:1;
 }
-
 .comment-input{
 display:flex;
 align-items:center;
@@ -373,13 +455,11 @@ border:1px solid #2a2f3b;
 border-radius:20px;
 padding:6px 10px;
 }
-
 .comment-avatar{
 width:28px;
 height:28px;
 border-radius:50%;
 }
-
 .comment-field{
 flex:1;
 background:transparent;
@@ -388,7 +468,6 @@ color:white;
 font-size:14px;
 outline:none;
 }
-
 .comment-item{
 display:flex;
 align-items:center;
@@ -396,55 +475,46 @@ gap:8px;
 margin-top:8px;
 font-size:14px;
 }
-
 .comment-item div{
 display:flex;
 align-items:center;
 flex-wrap:wrap;
 gap:4px;
 }
-
 .comment-name{
 font-weight:600;
 display:flex;
 align-items:center;
 gap:4px;
 }
-
 .verified-badge{
 width:14px;
 margin-left:2px;
 position:relative;
 top:-2px;
 }
-
 .post-image{
 width:100%;
 border-radius:12px;
 margin-top:10px;
 }
-
 .reaction-bar{
 display:flex;
 gap:10px;
 margin-top:8px;
 font-size:18px;
 }
-
 .reaction-bar span{
 cursor:pointer;
 transition:0.2s;
 }
-
 .reaction-bar span:hover{
 transform:scale(1.3);
 }
-
 .like-container{
 position:relative;
 display:inline-block;
 }
-
 .reaction-picker{
 position:absolute;
 bottom:35px;
@@ -458,27 +528,22 @@ gap:8px;
 box-shadow:0 8px 20px rgba(0,0,0,.5);
 display:none;
 }
-
 .reaction-picker span{
 font-size:20px;
 cursor:pointer;
 transition:.15s;
 }
-
 .reaction-picker span:hover{
 transform:scale(1.3);
 }
-
 .reaction-picker img{
 width:26px;
 cursor:pointer;
 transition:.15s;
 }
-
 .reaction-picker img:hover{
 transform:scale(1.3);
 }
-
 .reaction-hover{
 position:absolute;
 background:#0f141c;
@@ -491,25 +556,44 @@ box-shadow:0 6px 20px rgba(0,0,0,.5);
 display:none;
 z-index:20;
 }
-
 .reaction-user{
 display:flex;
 align-items:center;
 gap:6px;
 margin-bottom:4px;
 }
-
 .reaction-user img{
 width:16px;
 }
-
+.upload-btn{
+display:flex;
+align-items:center;
+justify-content:center;
+width:36px;
+height:36px;
+background:#1f2937;
+border-radius:10px;
+cursor:pointer;
+transition:.2s;
+}
+.upload-btn:hover{
+background:#2a2e38;
+transform:translateY(-1px);
+box-shadow:0 3px 8px rgba(0,0,0,.4);
+}
+.upload-btn img{
+width:20px;
+pointer-events:none;
+}
+.upload-btn input{
+display:none;
+}
 .image-preview{
 display:grid;
 grid-template-columns:repeat(auto-fill,minmax(90px,1fr));
 gap:8px;
 margin-top:10px;
 }
-
 .image-preview img{
 width:100%;
 height:90px;
@@ -517,20 +601,29 @@ object-fit:cover;
 border-radius:8px;
 border:1px solid #2a2f3b;
 }
-
 .post-images{
 display:grid;
 grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
 gap:8px;
 margin-top:10px;
 }
-
 .post-images img{
 width:100%;
 border-radius:10px;
 object-fit:cover;
 }
-
+.react-like{
+background:linear-gradient(90deg,#4da3ff,#2563eb);
+-webkit-background-clip:text;
+color:transparent;
+font-weight:700;
+}
+.react-love{
+background:linear-gradient(90deg,#ff3b3b,#ff0000);
+-webkit-background-clip:text;
+color:transparent;
+font-weight:700;
+}
 /* LIKE */
 .react-like{
 background:linear-gradient(90deg,#4da3ff,#2563eb);
@@ -538,7 +631,6 @@ background:linear-gradient(90deg,#4da3ff,#2563eb);
 color:transparent;
 font-weight:bold;
 }
-
 /* LOVE */
 .react-love{
 background:linear-gradient(90deg,#ff3b3b,#ff0000);
@@ -546,7 +638,6 @@ background:linear-gradient(90deg,#ff3b3b,#ff0000);
 color:transparent;
 font-weight:bold;
 }
-
 /* HAHA WOW SAD */
 .react-haha,
 .react-wow,
@@ -556,7 +647,6 @@ background:linear-gradient(90deg,#ffd000,#ff9f00);
 color:transparent;
 font-weight:bold;
 }
-
 /* ANGRY */
 .react-angry{
 background:linear-gradient(90deg,#ff5e00,#ff0000);
@@ -564,136 +654,34 @@ background:linear-gradient(90deg,#ff5e00,#ff0000);
 color:transparent;
 font-weight:bold;
 }
-
-.create-post{
-position:relative;
-padding-bottom:60px;
-}
-
-.create-post textarea{
-width:100%;
-box-sizing:border-box;
-background:#0f1115;
-border:1px solid var(--border);
-border-radius:12px;
-color:white;
-padding:12px;
-min-height:110px;
-font-size:14px;
-resize:none;
-outline:none;
-transition:.2s;
-}
-
-.create-post textarea:focus{
-border-color:#4da3ff;
-box-shadow:0 0 0 2px rgba(77,163,255,0.15);
-}
-
-.help-btn{
-position:absolute;
-top:15px;
-right:15px;
-width:28px;
-height:28px;
-border-radius:50%;
-border:none;
-background:#2a2f3b;
-color:white;
-cursor:pointer;
-}
-
-.shortcut-box{
-display:none;
-position:absolute;
-top:45px;
-right:10px;
-background:#171a21;
-border:1px solid var(--border);
-border-radius:10px;
-padding:10px;
-font-size:12px;
-width:220px;
-}
-
-.upload-btn{
-display:inline-flex;
-align-items:center;
-justify-content:center;
-width:42px;
-height:42px;
-border-radius:50%;
-background:#1f2937;
-cursor:pointer;
-margin-top:10px;
-transition:.2s;
-border:1px solid #2a2f3b;
-}
-
-.upload-btn img{
-width:20px;
-opacity:.8;
-}
-
-.upload-btn:hover{
-background:#2a3442;
-transform:scale(1.05);
-}
-
-#postImage{
-display:none;
-}
-  
 </style>
 </head>
-
 <body>
-
 <!-- HEADER -->
-
 <header>
-
 <div class="logo">
 <div class="hamburger" onclick="toggleMenu()">☰</div>
 <img src="image/chatph-logo.png">
 <span>ChatPH</span>
 </div>
-
 <div style="display:flex;align-items:center;gap:10px;">
-
 <span id="userDisplay">Guest</span>
-
 <img id="logoutBtn"
 src="image/icon/logout.png"
 class="logout-icon">
-
 </div>
-
 </header>
-
-
 <!-- SIDEBAR -->
-
 <div class="sidebar" id="sidebar">
-
 <a href="home.html"><span>🏠</span> Home</a>
-
 <a href="msg.html"><span>💬</span> Messages</a>
-
 <a href="frnd.html"><span>👥</span> Friends</a>
-
 <a href="srch.html"><span>🔎</span> Search User</a>
-
 <a href="prfl.html"><span>👤</span> Profile</a>
-
 </div>
-
-
 <!-- ADVERTISEMENT MARQUEE -->
-
 <div class="marquee">
 <div class="marquee-track">
-
 🚀 Advertise your business on ChatPH today!
 &nbsp;&nbsp;|&nbsp;&nbsp;
 🔥 New features coming soon to ChatPH
@@ -704,7 +692,6 @@ class="logout-icon">
 &nbsp;&nbsp;|&nbsp;&nbsp;
 🎇 WELCOME 2026
 &nbsp;&nbsp;|&nbsp;&nbsp;
-
 🚀 Advertise your business on ChatPH today!
 &nbsp;&nbsp;|&nbsp;&nbsp;
 🔥 New features coming soon to ChatPH
@@ -715,58 +702,56 @@ class="logout-icon">
 &nbsp;&nbsp;|&nbsp;&nbsp;
 🎇 WELCOME 2026
 &nbsp;&nbsp;|&nbsp;&nbsp;
-
 </div>
 </div>
-
 <!-- MAIN -->
-
 <div class="main">
-
 <!-- CREATE POST -->
 <div class="create-post">
-
-<h3 style="margin:0 0 10px 0;">Create Post</h3>
-
-<textarea id="postText"></textarea>
-
-<input type="file" id="postImage" multiple accept="image/*">
-
-<div id="imagePreview"></div>
-
-<div class="post-actions-row">
-<label for="postImage" class="upload-btn">
+<div class="editor-container">
+<div id="postText" class="editor" contenteditable="true"
+placeholder="What's on your mind?"></div>
+<button class="emoji-btn" onclick="toggleEmoji()" title="Emoji (Windows + ;)">😀</button>
+<div id="emojiPanel" class="emoji-panel">
+<input type="text" id="emojiSearch" placeholder="Search emoji...">
+<div class="emoji-categories">
+<button onclick="showCategory('smile')">😀</button>
+<button onclick="showCategory('fire')">🔥</button>
+<button onclick="showCategory('heart')">❤️</button>
+<button onclick="showCategory('sports')">⚽</button>
+</div>
+<div id="emojiList" class="emoji-list"></div>
+</div>
+</div>
+<div class="editor-bar">
+<button onclick="format('bold')" title="Bold(Ctrl + B)"><b>B</b></button>
+<button onclick="format('italic')" title="Italic(Ctrl + I)"><i>I</i></button>
+<button onclick="format('underline')" title="Underline(Ctrl + U)"><u>U</u></button>
+<button onclick="format('strikeThrough')" title="StrikeThrough(Ctrl + Shift + X)"><s>S</s></button>
+<button onclick="format('justifyLeft')" title="Allign Left(Ctrl + Shift + X)">⬅</button>
+<button onclick="format('justifyCenter')" title="Allign Center(Ctrl + Shift + X)">⬌</button>
+<button onclick="format('justifyRight')" title="Allign Right(Ctrl + Shift + X)">➡</button>
+<select onchange="setFont(this.value)">
+<option value="">Font</option>
+<option value="Arial">Arial</option>
+<option value="Impact">Impact</option>
+<option value="Georgia">Georgia</option>
+<option value="Comic Sans MS">Comic Sans</option>
+<option value="Courier New">Courier</option>
+</select>
+<input type="color" class="color-box" onchange="setColor(this.value)">
+<label class="upload-btn">
 <img src="image/icon/uploadimage.png">
+<input type="file" id="postImage" accept="image/*" multiple>
 </label>
-
 <button class="post-btn" onclick="createPost()">Post</button>
 </div>
-<button class="help-btn" onclick="toggleHelp()">?</button>
-
-<div id="shortcutBox" class="shortcut-box">
-<b>Keyboard Shortcuts:</b><br>
-Ctrl + B = Bold<br>
-Ctrl + I = Italic<br>
-Ctrl + U = Underline<br>
-Ctrl + Shift + X = Strikethrough<br>
-Ctrl + Shift + L = Allign Left<br>
-Ctrl + Shift + E = Allign Center<br>
-Ctrl + Shift + R = Allign Right<br>
-Shift + Enter = New line<br>
-Ctrl + C = Copy<br>
-Ctrl + X = Cut<br>
-Windows + ; = Emoji<br>
-</div>
-
-</div>
-
+</div> <!-- end create-post -->
 <div class="posts-container">
 <div id="postsFeed"></div>
 </div>
-
 <footer>
 <div>© 2026 ChatPH • All Rights Reserved</div>
-
 <div style="margin-top:6px;font-size:13px;">
 <a href="#" style="color:#4da3ff;text-decoration:none;">About</a>
 &nbsp;|&nbsp;
@@ -776,18 +761,13 @@ Windows + ; = Emoji<br>
 &nbsp;|&nbsp;
 <a href="#" style="color:#4da3ff;text-decoration:none;">Contact</a>
 </div>
-
 <div style="margin-top:6px;font-size:12px;opacity:.7;">
 Made with ❤️ in the Philippines
 </div>
 </footer>
-
-
 <script type="module">
-
 import { initializeApp } from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
 import {
 getFirestore,
 collection,
@@ -800,21 +780,18 @@ doc,
 setDoc,
 deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
 import {
 getAuth,
 onAuthStateChanged,
 signOut
 } from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
 import {
 getStorage,
 ref,
 uploadBytes,
 getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-
 /* FIREBASE CONFIG */
 const firebaseConfig = {
 apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
@@ -824,17 +801,14 @@ storageBucket: "chatph-cc187.firebasestorage.app",
 messagingSenderId: "324012163441",
 appId: "1:324012163441:web:7a54be2231ad2cae71f6d0"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);  
 const storage = getStorage(app);
-
 function getBadge(email){
 if(email === "ablaobryan4400@gmail.com"){
 return `<span class="admin-badge">💠 Admin</span>`;
 }
-
 if([
 "ablaomaryan@gmail.com",
 "ablaozion@gmail.com",
@@ -842,7 +816,6 @@ if([
 ].includes(email)){
 return `<span class="mod-badge">🛡 Moderator</span>`;
 }
-
 if([
 "ba.roiph08@gmail.com",
 "ablaozen02@gmail.com",
@@ -851,63 +824,146 @@ if([
 ].includes(email)){
 return `<span class="vip-badge">💎 VIP</span>`;
 }
-
 return "";
 }
-
+const emojiPanel = document.getElementById("emojiPanel");
+const emojiList = document.getElementById("emojiList");
+const emojiSearch = document.getElementById("emojiSearch");
+const emojiCategories = {
+smile:[
+"😀","😁","😂","🤣","😃","😄","😅","😆","😉","😊",
+"😍","😘","😜","🤩","🤔","😎","😢","😭","😡","😱",
+"🥳","😇","🤯","🤗","🤭"
+],
+fire:[
+"🔥","⚡","💥","🌟","✨","⭐","☄️"
+],
+heart:[
+"❤️","💙","💚","💛","💜","🖤","🤍","💔","💕","💞","💓"
+],
+sports:[
+"⚽","🏀","🏈","⚾","🎾","🏐","🏓","🎮"
+]
+};
+function loadEmojis(list){
+emojiList.innerHTML="";
+list.forEach(e=>{
+const span=document.createElement("span");
+span.textContent=e;
+span.onclick=()=>insertEmoji(e);
+emojiList.appendChild(span);
+});
+}
 function getVerified(user){
 if(user?.providerData?.some(p=>p.providerId==="google.com")){
 return `<img src="image/verified.png" class="verified-badge">`;
 }
 return "";
 }
-
+function showCategory(cat){
+loadEmojis(emojiCategories[cat]);
+}
+emojiSearch.addEventListener("input",()=>{
+const search = emojiSearch.value.toLowerCase();
+const all = Object.values(emojiCategories).flat();
+const filtered = all.filter(e => e.includes(search));
+loadEmojis(filtered);
+});
+loadEmojis(emojiCategories.smile);
 /* SIDEBAR */
 window.toggleMenu = () =>{
 document.getElementById("sidebar").classList.toggle("open");
 }
-
+function format(command){
+const editor = document.getElementById("postText");
+editor.focus();
+document.execCommand(command,false,null);
+}
+function setFont(font){
+document.getElementById("postText").focus();
+document.execCommand("fontName",false,font);
+}
+function setColor(color){
+document.getElementById("postText").focus();
+document.execCommand("foreColor",false,color);
+}
+function insertEmoji(emoji){
+document.execCommand("insertText",false,emoji);
+document.getElementById("postText").focus();
+}
+function toggleEmoji(){
+emojiPanel.style.display =
+emojiPanel.style.display === "block" ? "none" : "block";
+}
+document.addEventListener("click",(e)=>{
+if(!emojiPanel.contains(e.target) && !e.target.classList.contains("emoji-btn")){
+emojiPanel.style.display="none";
+}
+});
+document.addEventListener("keydown", function(e){
+if(e.ctrlKey && e.key === "b"){
+e.preventDefault();
+format("bold");
+}
+if(e.ctrlKey && e.key === "i"){
+e.preventDefault();
+format("italic");
+}
+if(e.ctrlKey && e.key === "u"){
+e.preventDefault();
+format("underline");
+}
+if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "x"){
+e.preventDefault();
+format("strikeThrough");
+}
+if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "l"){
+e.preventDefault();
+format("justifyLeft");
+}
+if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "e"){
+e.preventDefault();
+format("justifyCenter");
+}
+if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "r"){
+e.preventDefault();
+format("justifyRight");
+}
+if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "f"){
+e.preventDefault();
+document.querySelector("select").focus();
+}
+if(e.ctrlKey && e.key === "Enter"){
+e.preventDefault();
+createPost();
+}
+});
 import { getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   
 /* CREATE POST */
 window.createPost = async ()=>{
-
 const editor = document.getElementById("postText");
-const text = editor.value.trim();
-const imageInput = document.getElementById("postImage");
-const imageFiles = selectedFiles;
-
+const text = editor.innerHTML.trim();
+const imageFiles = document.getElementById("postImage").files;
 if(!text && imageFiles.length === 0){
-alert("Write something or upload an image...");
+alert("Write something or upload an image.");
 return;
 }
-
 const user = auth.currentUser;
 if(!user){
 alert("You must be logged in.");
 return;
 }
-
 let imageURLs = [];
-
 try{
-
 if(imageFiles.length > 0){
-
 for(const file of imageFiles){
-const resized = await resizeImage(file);
-
 const storageRef = ref(storage,"posts/"+Date.now()+"_"+file.name);
-await uploadBytes(storageRef, resized);
+await uploadBytes(storageRef,file);
 const url = await getDownloadURL(storageRef);
 imageURLs.push(url);
-
 }
-
 }
-
-console.log("Saving post...");
-
 await addDoc(collection(db,"posts"),{
 text:text,
 images:imageURLs,
@@ -917,98 +973,13 @@ photo:user.photoURL ||
 "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
 time:serverTimestamp()
 });
-
-console.log("Post saved!");
-
-editor.value = "";
-imageInput.value = "";
-selectedFiles = [];
-previewBox.innerHTML = "";
-  
+editor.innerHTML="";
+document.getElementById("postImage").value="";
+preview.innerHTML="";
 }catch(err){
 console.error(err);
 alert("Post failed.");
 }
-
-}
-
-const imageInput = document.getElementById("postImage");
-const previewBox = document.getElementById("imagePreview");
-
-let selectedFiles = [];
-
-imageInput.addEventListener("change", (e)=>{
-previewBox.innerHTML = "";
-selectedFiles = Array.from(e.target.files);
-
-selectedFiles.forEach((file, index)=>{
-const reader = new FileReader();
-
-reader.onload = (ev)=>{
-const div = document.createElement("div");
-div.style.position = "relative";
-
-div.innerHTML = `
-<img src="${ev.target.result}">
-<button style="
-position:absolute;
-top:4px;
-right:4px;
-background:red;
-color:white;
-border:none;
-border-radius:50%;
-width:18px;
-height:18px;
-cursor:pointer;
-font-size:12px;
-" onclick="removeImage(${index})">×</button>
-`;
-
-previewBox.appendChild(div);
-};
-
-reader.readAsDataURL(file);
-});
-});
-
-window.removeImage = (index)=>{
-selectedFiles.splice(index,1);
-renderPreview();
-};
-
-function renderPreview(){
-previewBox.innerHTML = "";
-
-selectedFiles.forEach((file, index)=>{
-const reader = new FileReader();
-
-reader.onload = (ev)=>{
-const div = document.createElement("div");
-div.style.position = "relative";
-
-div.innerHTML = `
-<img src="${ev.target.result}">
-<button style="
-position:absolute;
-top:4px;
-right:4px;
-background:red;
-color:white;
-border:none;
-border-radius:50%;
-width:18px;
-height:18px;
-cursor:pointer;
-font-size:12px;
-" onclick="removeImage(${index})">×</button>
-`;
-
-previewBox.appendChild(div);
-};
-
-reader.readAsDataURL(file);
-});
 }
   
 window.showAllComments = (postId)=>{
@@ -1022,7 +993,6 @@ const box = document.getElementById("comment-"+id);
 box.style.display =
 box.style.display === "none" ? "block" : "none";
 }
-
 window.addComment = async (postId,input)=>{
 const text = input.value.trim();
 if(!text) return;
@@ -1034,101 +1004,70 @@ email:user.email,
 photo:user.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
 time:serverTimestamp()
 });
-
 input.value="";
-
 }
-
 window.toggleLike = async (postId)=>{
 const user = auth.currentUser;
 if(!user) return;
 const likeRef = doc(db,"posts",postId,"likes",user.uid);
-
 try{
-
 await setDoc(likeRef,{
 user:user.uid,
 name:user.displayName || "User"
 });
-
 }catch(err){
-
 await deleteDoc(likeRef);
-
 }
-
 }
-
 window.showLikes = (postId,el)=>{
-
 const box = document.getElementById("likes-"+postId);
 box.style.display="block";
-
 const likesRef = collection(db,"posts",postId,"likes");
-
 onSnapshot(likesRef,(snap)=>{
-
 let html="";
 let count=0;
-
 snap.forEach(doc=>{
 count++;
-
 if(count<=9){
 html+=`<div>${doc.data().name || "User"}</div>`;
 }
-
 });
-
 if(count>9){
 html+=`<div class="more">+${count-9} Others...</div>`;
 }
-
 box.innerHTML=html;
-
 });
-
 }
-
 window.hideLikes = (postId)=>{
 const box = document.getElementById("likes-"+postId);
 if(box) box.style.display="none";
 }
-
 window.toggleReactionPicker = (postId)=>{
 const picker = document.getElementById("react-"+postId);
-
 document.querySelectorAll(".reaction-picker").forEach(p=>{
 if(p.id !== "react-"+postId){
 p.style.display="none";
 }
 });
-
 picker.style.display =
 picker.style.display === "flex" ? "none" : "flex";
 }
   
 window.react = async (postId,type)=>{
-
 const user = auth.currentUser;
 const ref = doc(db,"posts",postId,"reactions",user.uid);
-
 const snap = await getDoc(ref);
-
 if(snap.exists() && snap.data().type === type){
 await deleteDoc(ref);
-
 const btn = document.getElementById("like-btn-"+postId);
 btn.innerText = "Like";
 btn.style.fontWeight = "normal";
 }else{
-
 await setDoc(ref,{
 type:type,
 user:user.uid,
 name:user.displayName || "User"
 });
-
 const icons={
 like:"Like.png",
 love:"Love.png",
@@ -1137,7 +1076,6 @@ wow:"Wow.png",
 sad:"Sad.png",
 angry:"Angry.png"
 };
-
 const names={
 like:"Like",
 love:"Love",
@@ -1146,13 +1084,10 @@ wow:"Wow",
 sad:"Sad",
 angry:"Angry"
 };
-
 const btn = document.getElementById("like-btn-"+postId);
-
 btn.innerText = names[type];
 btn.className = "action-btn like-btn react-"+type;
 }
-
 document.getElementById("react-"+postId).style.display="none";
 }
   
@@ -1160,73 +1095,12 @@ window.sharePost = (id)=>{
 navigator.clipboard.writeText(location.href+"?post="+id);
 alert("Post link copied!");
 }
-
-const createBox = document.querySelector(".create-post");
-
-createBox.addEventListener("dragover", (e)=>{
-e.preventDefault();
-createBox.style.border = "1px dashed #4da3ff";
-});
-
-createBox.addEventListener("dragleave", ()=>{
-createBox.style.border = "1px solid var(--border)";
-});
-
-createBox.addEventListener("drop", (e)=>{
-e.preventDefault();
-createBox.style.border = "1px solid var(--border)";
-
-const files = Array.from(e.dataTransfer.files);
-selectedFiles = [...selectedFiles, ...files];
-renderPreview();
-});
-
-function resizeImage(file){
-return new Promise((resolve)=>{
-const img = new Image();
-const reader = new FileReader();
-
-reader.onload = (e)=>{
-img.src = e.target.result;
-};
-
-img.onload = ()=>{
-const canvas = document.createElement("canvas");
-const maxWidth = 800;
-
-let width = img.width;
-let height = img.height;
-
-if(width > maxWidth){
-height *= maxWidth / width;
-width = maxWidth;
-}
-
-canvas.width = width;
-canvas.height = height;
-
-const ctx = canvas.getContext("2d");
-ctx.drawImage(img,0,0,width,height);
-
-canvas.toBlob((blob)=>{
-resolve(new File([blob], file.name, {type:"image/jpeg"}));
-}, "image/jpeg", 0.7);
-};
-
-reader.readAsDataURL(file);
-});
-}
   
 /* LOAD POSTS */
-
 const feed = document.getElementById("postsFeed");
-
 const q = query(collection(db,"posts"), orderBy("time","desc"));
-
 onSnapshot(q,(snapshot)=>{
-
 feed.innerHTML="";
-
 snapshot.forEach(doc=>{
 const p = doc.data();
 const post = document.createElement("div");
@@ -1244,33 +1118,25 @@ ${p.time?.toDate().toLocaleString() || ""}
 </div>
 </div>
 </div>
-
-<div class="post-text">${formatText(p.text)}</div>
-
+<div class="post-text">${p.text}</div>
 ${p.images && p.images.length ? `
 <div class="post-images">
 ${p.images.map(img=>`<img src="${img}">`).join("")}
 </div>
 ` : ""}
-
 <div class="reaction-counts"
 onmouseenter="showReactionUsers('${doc.id}')"
 onmouseleave="document.getElementById('hover-${doc.id}').style.display='none'"
 id="react-count-${doc.id}">
 </div>
-
 <div class="reaction-hover" id="hover-${doc.id}"></div>
-
 <div class="post-actions">
-
 <div class="like-container">
-
 <span class="action-btn like-btn"
 onclick="toggleReactionPicker('${doc.id}')"
 id="like-btn-${doc.id}">
 Like
 </span>
-
 <div class="reaction-picker" id="react-${doc.id}">
 <img src="image/icon/Like.png" onclick="react('${doc.id}','like')">
 <img src="image/icon/Love.png" onclick="react('${doc.id}','love')">
@@ -1280,19 +1146,15 @@ Like
 <img src="image/icon/Angry.png" onclick="react('${doc.id}','angry')">
 </div>
 </div>
-
 <span class="action-btn comment-btn"
 onclick="toggleComment('${doc.id}')">
 Comment
 </span>
-
 <span class="action-btn"
 onclick="sharePost('${doc.id}')">
 Share
 </span>
-
 </div>
-
 <div class="comment-box" id="comment-${doc.id}" style="display:none">
 <div class="comment-input">
 <img class="comment-avatar" src="${p.photo}">
@@ -1304,29 +1166,7 @@ onkeydown="if(event.key==='Enter'){addComment('${doc.id}',this)}">
 <div class="comments-list" id="comments-${doc.id}"></div>
 </div>
 `;
-
 feed.appendChild(post);
-
-const user = auth.currentUser;
-if(user){
-const userReactRef = doc(db,"posts",doc.id,"reactions",user.uid);
-
-onSnapshot(userReactRef,(snap)=>{
-const btn = document.getElementById("like-btn-"+doc.id);
-
-if(!btn) return;
-
-if(snap.exists()){
-const type = snap.data().type;
-btn.innerText = type.charAt(0).toUpperCase() + type.slice(1);
-btn.className = "action-btn like-btn react-"+type;
-}else{
-btn.innerText = "Like";
-btn.className = "action-btn like-btn";
-}
-});
-}
-  
 /* REACTION COUNT SYSTEM */
 const reactRef = collection(db,"posts",doc.id,"reactions");
 onSnapshot(reactRef,(snap)=>{
@@ -1338,16 +1178,13 @@ wow:0,
 sad:0,
 angry:0
 };
-
 snap.forEach(r=>{
 const type = r.data().type;
 if(counts[type] !== undefined){
 counts[type]++;
 }
 });
-
 let html="";
-
 const map={
 like:"image/icon/Like.png",
 love:"image/icon/Love.png",
@@ -1356,38 +1193,27 @@ wow:"image/icon/Wow.png",
 sad:"image/icon/Sad.png",
 angry:"image/icon/Angry.png"
 };
-
 for(const type in counts){
 if(counts[type] > 0){
 html += `<span><img src="${map[type]}" style="width:16px"> ${counts[type]}</span>`;
 }
 }
-
 const box = document.getElementById("react-count-"+doc.id);
 if(box) box.innerHTML = html;
 });
   
 /* LOAD COMMENTS FOR THIS POST */
-
 const commentsRef = query(
 collection(db,"posts",doc.id,"comments"),
 orderBy("time","desc")
 );
-
 onSnapshot(commentsRef,(snap)=>{
-
 const list = document.getElementById("comments-"+doc.id);
-
 if(!list) return;
-
 list.innerHTML="";
-
 let count = 0;
-
 snap.forEach(c=>{
-
 count++;
-
 if(count > 1 && !list.dataset.open){
 if(!list.querySelector(".more-comments")){
 list.innerHTML += `
@@ -1399,9 +1225,7 @@ See more comments...
 }
 return;
 }
-
 const data = c.data();
-
 list.innerHTML += `
 <div class="comment-item">
 <img class="comment-avatar" src="${data.photo}">
@@ -1415,14 +1239,27 @@ ${getVerified({providerData:[{providerId:"google.com"}]})}
 </div>
 </div>
 `;
-
 });
 });
 });
+});
+const imageInput = document.getElementById("postImage");
+const preview = document.getElementById("imagePreview");
+imageInput.addEventListener("change",()=>{
+preview.innerHTML="";
+const files = imageInput.files;
+for(let i=0;i<files.length;i++){
+const reader = new FileReader();
+reader.onload = function(e){
+const img = document.createElement("img");
+img.src = e.target.result;
+preview.appendChild(img);
+};
+reader.readAsDataURL(files[i]);
+}
 });
   
 /* AUTH USER */
-
 onAuthStateChanged(auth,(user)=>{
 if(user){
 document.getElementById("userDisplay").innerText =
@@ -1432,21 +1269,16 @@ document.getElementById("logoutBtn").style.display="inline";
 window.location.href="index.html";
 }
 });
-
 document.getElementById("logoutBtn").onclick = async ()=>{
 await signOut(auth);
 window.location.href="index.html";
 };
-
-
 const sidebar = document.getElementById("sidebar");
-
 document.addEventListener("click",(e)=>{
 if(!sidebar.contains(e.target) && !e.target.classList.contains("hamburger")){
 sidebar.classList.remove("open");
 }
 });
-
 document.addEventListener("click",(e)=>{
 document.querySelectorAll(".reaction-picker").forEach(p=>{
 if(!p.contains(e.target) && !e.target.classList.contains("like-btn")){
@@ -1454,25 +1286,16 @@ p.style.display="none";
 }
 });
 });
-
 window.showReactionUsers = (postId)=>{
-
 const box = document.getElementById("hover-"+postId);
 box.style.display="block";
-
 const ref = collection(db,"posts",postId,"reactions");
-
 onSnapshot(ref,(snap)=>{
-
 let html="";
 let count=0;
-
 snap.forEach(doc=>{
-
 const d = doc.data();
-
 count++;
-
 if(count <= 5){
 html += `
 <div class="reaction-user">
@@ -1480,84 +1303,12 @@ html += `
 ${d.name}
 </div>`;
 }
-
 });
-
 if(count > 5){
 html += `<div class="more">+${count-5} others</div>`;
 }
-
 box.innerHTML = html;
-
 });
-
-}
-
-window.toggleHelp = () => {
-const box = document.getElementById("shortcutBox");
-box.style.display = box.style.display === "block" ? "none" : "block";
-};
-
-document.getElementById("postText").addEventListener("keydown", function(e){
-
-// BOLD
-if(e.ctrlKey && e.key.toLowerCase() === "b"){
-e.preventDefault();
-wrapText("**","**");
-}
-
-// ITALIC
-if(e.ctrlKey && e.key.toLowerCase() === "i"){
-e.preventDefault();
-wrapText("*","*");
-}
-
-// UNDERLINE
-if(e.ctrlKey && e.key.toLowerCase() === "u"){
-e.preventDefault();
-wrapText("<u>","</u>");
-}
-
-// STRIKE
-if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "x"){
-e.preventDefault();
-wrapText("<s>","</s>");
-}
-
-});
-
-function wrapText(before, after){
-const textarea = document.getElementById("postText");
-const start = textarea.selectionStart;
-const end = textarea.selectionEnd;
-const selected = textarea.value.substring(start, end);
-
-textarea.value =
-textarea.value.substring(0, start) +
-before + selected + after +
-textarea.value.substring(end);
-
-textarea.focus();
-textarea.selectionStart = start + before.length;
-textarea.selectionEnd = end + before.length;
-}
-
-document.addEventListener("click",(e)=>{
-const box = document.getElementById("shortcutBox");
-const btn = document.querySelector(".help-btn");
-
-if(!box.contains(e.target) && !btn.contains(e.target)){
-box.style.display = "none";
-}
-});
-
-function formatText(text){
-return text
-.replace(/\n/g,"<br>")
-.replace(/\*\*(.*?)\*\*/g,"<b>$1</b>")
-.replace(/\*(.*?)\*/g,"<i>$1</i>")
-.replace(/<u>(.*?)<\/u>/g,"<u>$1</u>")
-.replace(/<s>(.*?)<\/s>/g,"<s>$1</s>");
 }
   
 </script>
