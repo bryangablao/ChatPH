@@ -845,6 +845,8 @@ alert("Post failed.");
 window.showAllComments = (postId)=>{
 const list = document.getElementById("comments-"+postId);
 list.dataset.open = "true";
+
+list.innerHTML = "";
 }
   
 window.toggleComment = (id)=>{
@@ -1075,14 +1077,16 @@ let count = 0;
 
 snap.forEach(c=>{
 count++;
-if(count > 1 && list.dataset.open !== "true"){
+const isOpen = list.dataset.open === "true";
+
+if(count > 1 && !isOpen){
     if(!list.querySelector(".more-comments")){
-        list.innerHTML += `
-        <div class="more-comments"
-        data-id="${doc.id}"
-        style="opacity:.6;font-size:13px;cursor:pointer;">
-        See more comments...
-        </div>`;
+list.innerHTML += `
+<div class="more-comments"
+onclick="showAllComments('${doc.id}')"
+style="opacity:.6;font-size:13px;cursor:pointer;">
+See more comments...
+</div>`;
         
         list.querySelector(".more-comments").onclick = function(){
             showAllComments(this.dataset.id);
