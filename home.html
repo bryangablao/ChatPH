@@ -139,23 +139,32 @@ margin-bottom:20px;
 }
 
 .post-btn{
-background:linear-gradient(135deg,#3b82f6,#2563eb);
-border:none;
-color:white;
-padding:8px 20px;
-border-radius:18px;
-font-weight:600;
-font-size:13px;
-cursor:pointer;
-display:flex;
-align-items:center;
-justify-content:center;
-transition:.2s ease;
-box-shadow:0 2px 6px rgba(0,0,0,.25);
-
 position:absolute;
 bottom:15px;
 right:15px;
+background:linear-gradient(135deg,#4da3ff,#2563eb);
+border:none;
+color:white;
+padding:10px 22px;
+border-radius:999px;
+font-weight:600;
+font-size:14px;
+cursor:pointer;
+display:flex;
+align-items:center;
+gap:6px;
+transition:.25s;
+box-shadow:0 4px 14px rgba(0,0,0,.4);
+}
+
+.post-btn:hover{
+transform:translateY(-2px);
+box-shadow:0 8px 22px rgba(0,0,0,.6);
+background:linear-gradient(135deg,#5ab0ff,#2563eb);
+}
+
+.post-btn:active{
+transform:scale(.95);
 }
 
 .post-btn:hover{
@@ -559,14 +568,22 @@ padding-bottom:60px;
 
 .create-post textarea{
 width:100%;
+box-sizing:border-box;
 background:#0f1115;
 border:1px solid var(--border);
 border-radius:12px;
 color:white;
 padding:12px;
-min-height:100px;
+min-height:110px;
 font-size:14px;
 resize:none;
+outline:none;
+transition:.2s;
+}
+
+.create-post textarea:focus{
+border-color:#4da3ff;
+box-shadow:0 0 0 2px rgba(77,163,255,0.15);
 }
 
 .help-btn{
@@ -593,6 +610,34 @@ border-radius:10px;
 padding:10px;
 font-size:12px;
 width:220px;
+}
+
+.upload-btn{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+width:42px;
+height:42px;
+border-radius:50%;
+background:#1f2937;
+cursor:pointer;
+margin-top:10px;
+transition:.2s;
+border:1px solid #2a2f3b;
+}
+
+.upload-btn img{
+width:20px;
+opacity:.8;
+}
+
+.upload-btn:hover{
+background:#2a3442;
+transform:scale(1.05);
+}
+
+#postImage{
+display:none;
 }
   
 </style>
@@ -679,9 +724,15 @@ class="logout-icon">
 
 <h3 style="margin:0 0 10px 0;">Create Post</h3>
 
-<textarea id="postText" placeholder="What's on your mind? Share your thoughts..."></textarea>
+<textarea id="postText"></textarea>
+
 <input type="file" id="postImage" multiple accept="image/*">
-<div id="imagePreview" class="image-preview"></div>
+
+<label for="postImage" class="upload-btn">
+<img src="image/icon/uploadimage.png">
+</label>
+
+<div id="imagePreview"></div>
 <button class="help-btn" onclick="toggleHelp()">?</button>
 
 <div id="shortcutBox" class="shortcut-box">
@@ -835,18 +886,18 @@ try{
 if(imageFiles.length > 0){
 
 for(const file of imageFiles){
+const resized = await resizeImage(file);
 
 const storageRef = ref(storage,"posts/"+Date.now()+"_"+file.name);
-
-await uploadBytes(storageRef,file);
-
+await uploadBytes(storageRef, resized);
 const url = await getDownloadURL(storageRef);
-
 imageURLs.push(url);
 
 }
 
 }
+
+console.log("Saving post...");
 
 await addDoc(collection(db,"posts"),{
 text:text,
@@ -858,8 +909,12 @@ photo:user.photoURL ||
 time:serverTimestamp()
 });
 
+console.log("Post saved!");
+
 editor.value = "";
 imageInput.value = "";
+selectedFiles = [];
+previewBox.innerHTML = "";
   
 }catch(err){
 console.error(err);
@@ -1095,6 +1150,62 @@ document.getElementById("react-"+postId).style.display="none";
 window.sharePost = (id)=>{
 navigator.clipboard.writeText(location.href+"?post="+id);
 alert("Post link copied!");
+}
+
+const createBox = document.querySelector(".create-post");
+
+createBox.addEventListener("dragover", (e)=>{
+e.preventDefault();
+createBox.style.border = "1px dashed #4da3ff";
+});
+
+createBox.addEventListener("dragleave", ()=>{
+createBox.style.border = "1px solid var(--border)";
+});
+
+createBox.addEventListener("drop", (e)=>{
+e.preventDefault();
+createBox.style.border = "1px solid var(--border)";
+
+const files = Array.from(e.dataTransfer.files);
+selectedFiles = [...selectedFiles, ...files];
+renderPreview();
+});
+
+function resizeImage(file){
+return new Promise((resolve)=>{
+const img = new Image();
+const reader = new FileReader();
+
+reader.onload = (e)=>{
+img.src = e.target.result;
+};
+
+img.onload = ()=>{
+const canvas = document.createElement("canvas");
+const maxWidth = 800;
+
+let width = img.width;
+let height = img.height;
+
+if(width > maxWidth){
+height *= maxWidth / width;
+width = maxWidth;
+}
+
+canvas.width = width;
+canvas.height = height;
+
+const ctx = canvas.getContext("2d");
+ctx.drawImage(img,0,0,width,height);
+
+canvas.toBlob((blob)=>{
+resolve(new File([blob], file.name, {type:"image/jpeg"}));
+}, "image/jpeg", 0.7);
+};
+
+reader.readAsDataURL(file);
+});
 }
   
 /* LOAD POSTS */
