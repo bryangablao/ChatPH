@@ -1070,19 +1070,25 @@ list.innerHTML="";
 let count = 0;
 snap.forEach(c=>{
 count++;
+
 if(count > 1 && list.dataset.open !== "true"){
     if(!list.querySelector(".more-comments")){
         list.innerHTML += `
         <div class="more-comments"
-        onclick="showAllComments('${doc.id}')"
+        data-id="${doc.id}"
         style="opacity:.6;font-size:13px;cursor:pointer;">
         See more comments...
         </div>`;
+        
+        list.querySelector(".more-comments").onclick = function(){
+            showAllComments(this.dataset.id);
+        };
     }
     return;
 }
-}
+
 const data = c.data();
+
 list.innerHTML += `
 <div class="comment-item">
 <img class="comment-avatar" src="${data.photo}">
@@ -1118,7 +1124,6 @@ reader.readAsDataURL(files[i]);
   
 /* AUTH USER */
 onAuthStateChanged(auth,(user)=>{
-setTimeout(()=>{
     if(user){
         document.getElementById("userDisplay").innerText =
         user.displayName || user.email;
