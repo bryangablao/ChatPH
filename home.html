@@ -588,14 +588,9 @@ color:transparent;
 font-weight:bold;
 }
 
-.comments-list{
-max-height:120px;
-overflow:hidden;
-transition:max-height .4s ease;
-}
-
-.comments-list.open{
-max-height:500px; /* big enough for all comments */
+/* closed = show only 1 comment */
+.comments-list:not(.open){
+max-height:80px;
 }
 
 .more-comments{
@@ -609,6 +604,18 @@ transition:.2s;
 .more-comments:hover{
 opacity:1;
 text-decoration:underline;
+}
+
+.comments-list{
+max-height:0;
+overflow:hidden;
+transition:max-height .4s ease, opacity .3s ease;
+opacity:.8;
+}
+
+.comments-list.open{
+max-height:1000px;
+opacity:1;
 }
   
 </style>
@@ -859,7 +866,7 @@ time:serverTimestamp()
 });
 editor.innerHTML="";
 document.getElementById("postImage").value="";
-preview.innerHTML="";
+document.getElementById("imagePreview").innerHTML="";
 }catch(err){
 console.error(err);
 alert("Post failed.");
@@ -1101,43 +1108,50 @@ orderBy("time","desc")
 onSnapshot(commentsRef,(snap)=>{
 const list = document.getElementById("comments-"+doc.id);
 if(!list) return;
+
+if(!list.dataset.open){
+    list.dataset.open = "false";
+}
+  
 list.innerHTML="";
 let count = 0;
+const total = snap.size;
 
 snap.forEach(c=>{
-count++;
+    count++;
+    const isOpen = list.dataset.open === "true";
+
+    if(count > 1 && !isOpen){
+        return; // show only 1 comment when closed
+    }
+
+    const data = c.data();
+
+    list.innerHTML += `
+    <div class="comment-item">
+        <img class="comment-avatar" src="${data.photo}">
+        <div>
+            <span class="comment-name">
+            ${data.name}
+            ${getBadge(data.email)}
+            ${getVerified({providerData:[{providerId:"google.com"}]})}
+            </span>
+            <span class="comment-text">${data.text}</span>
+        </div>
+    </div>
+    `;
+});
+
+/* ✅ ADD BUTTON HERE (OUTSIDE LOOP) */
 const isOpen = list.dataset.open === "true";
 
-if(count > 1 && !isOpen){
-    if(!list.querySelector(".more-comments")){
-list.innerHTML += `
-<div class="more-comments"
-onclick="showAllComments('${doc.id}')"
-style="opacity:.6;font-size:13px;cursor:pointer;">
-See more comments...
-</div>`;
-        
-        list.querySelector(".more-comments").onclick = function(){
-            showAllComments(this.dataset.id);
-        };
-    }
-    return;
+if(total > 1){
+    list.innerHTML += `
+    <div class="more-comments"
+    onclick="showAllComments('${doc.id}')">
+    ${isOpen ? "Hide comments" : `💬 View ${total} comments`}
+    </div>`;
 }
-
-const data = c.data();
-list.innerHTML += `
-<div class="comment-item">
-<img class="comment-avatar" src="${data.photo}">
-<div>
-<span class="comment-name">
-${data.name}
-${getBadge(data.email)}
-${getVerified({providerData:[{providerId:"google.com"}]})}
-</span>
-<span class="comment-text">${data.text}</span>
-</div>
-</div>
-`;
 });
 
 });
