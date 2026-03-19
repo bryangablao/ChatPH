@@ -1152,11 +1152,14 @@ snap.forEach(c=>{
 });
 
 if(total > 1){
-list.innerHTML += `
-<div class="more-comments"
-onclick="showAllComments('${doc.id}')">
-${isOpen ? "Hide comments" : `💬 View ${total} comments`}
-</div>`;
+list.innerHTML += ``; // leave list clean
+
+const btn = document.createElement("div");
+btn.className = "more-comments";
+btn.innerText = isOpen ? "Hide comments" : `💬 View ${total} comments`;
+btn.onclick = () => showAllComments(doc.id);
+
+list.parentElement.appendChild(btn);
 }
 });
 
