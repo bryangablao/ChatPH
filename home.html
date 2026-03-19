@@ -256,25 +256,15 @@ border-radius:18px;
 color:white;
 cursor:pointer;
 }
-.like-btn{
-font-weight:normal;
-transition:.2s;
+.like-btn {
+    font-weight: normal;
+    transition: all 0.2s ease;
+    cursor: pointer;
 }
-.like-btn.react-like,
-.like-btn.react-love,
-.like-btn.react-haha,
-.like-btn.react-wow,
-.like-btn.react-sad,
-.like-btn.react-angry{
-font-weight:bold;
+
+.like-btn:hover {
+    transform: scale(1.05);
 }
-.like-btn{
-transition:all .2s ease;
-}
-.like-btn:hover{
-transform:scale(1.05);
-}
-  
 .avatar{
 width:42px;
 height:42px;
@@ -287,31 +277,6 @@ font-weight:600;
 font-size:12px;
 opacity:.6;
 }
-.like-hover{
-position:absolute;
-background:#0f141c;
-border:1px solid #2a2f3b;
-border-radius:10px;
-padding:10px;
-font-size:13px;
-width:180px;
-box-shadow:0 6px 20px rgba(0,0,0,.5);
-display:none;
-z-index:20;
-}
-.like-hover div{
-padding:3px 0;
-}
-.like-hover .more{
-opacity:.6;
-font-size:12px;
-margin-top:4px;
-}
-.like-btn.liked{
-color:#4da3ff;
-font-weight:600;
-}
-  
 /* FOOTER */
 footer{
 text-align:center;
@@ -552,52 +517,11 @@ width:100%;
 border-radius:10px;
 object-fit:cover;
 }
-.react-like{
-background:linear-gradient(90deg,#4da3ff,#2563eb);
--webkit-background-clip:text;
-color:transparent;
-font-weight:700;
-}
-.react-love{
-background:linear-gradient(90deg,#ff3b3b,#ff0000);
--webkit-background-clip:text;
-color:transparent;
-font-weight:700;
-}
-/* LIKE */
-.react-like{
-background:linear-gradient(90deg,#4da3ff,#2563eb);
--webkit-background-clip:text;
-color:transparent;
-font-weight:bold;
-}
-/* LOVE */
-.react-love{
-background:linear-gradient(90deg,#ff3b3b,#ff0000);
--webkit-background-clip:text;
-color:transparent;
-font-weight:bold;
-}
-/* HAHA WOW SAD */
-.react-haha,
-.react-wow,
-.react-sad{
-background:linear-gradient(90deg,#ffd000,#ff9f00);
--webkit-background-clip:text;
-color:transparent;
-font-weight:bold;
-}
-/* ANGRY */
-.react-angry{
-background:linear-gradient(90deg,#ff5e00,#ff0000);
--webkit-background-clip:text;
-color:transparent;
-font-weight:bold;
-}
 
+/* SMOOTH SLIDE & REPLIES FIX */
 .comments-list {
     display: grid;
-    grid-template-rows: 0fr; /* Start collapsed */
+    grid-template-rows: 0fr;
     transition: grid-template-rows 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -613,6 +537,46 @@ font-weight:bold;
     padding-bottom: 10px;
 }
 
+/* REPLIES STYLING */
+.reply-btn {
+    font-size: 12px;
+    color: var(--accent);
+    cursor: pointer;
+    margin-left: 10px;
+    opacity: 0.8;
+    font-weight: 600;
+}
+
+.replies-container {
+    margin-left: 35px;
+    border-left: 2px solid var(--border);
+    padding-left: 10px;
+    margin-top: 5px;
+}
+
+.reply-input-box {
+    margin-left: 35px;
+    margin-top: 5px;
+    display: none; /* Hidden by default */
+}
+
+.reply-field {
+    width: 90%;
+    background: #0c0f14;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    color: white;
+    padding: 6px 12px;
+    font-size: 13px;
+    outline: none;
+}
+
+/* PERSISTENT BOLD REACTION CLASSES */
+.react-like { color: #4da3ff !important; font-weight: 800 !important; }
+.react-love { color: #ff3b3b !important; font-weight: 800 !important; }
+.react-haha, .react-wow, .react-sad { color: #ffd000 !important; font-weight: 800 !important; }
+.react-angry { color: #ff5e00 !important; font-weight: 800 !important; }
+
 .more-comments {
     color: var(--accent);
     font-size: 13px;
@@ -626,6 +590,30 @@ font-weight:bold;
     text-decoration: underline;
 }
 
+/* PERSISTENT BOLD REACTION CLASSES WITH GLOW & POP */
+.like-btn img {
+    width: 18px;
+    vertical-align: middle;
+    margin-right: 5px;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Base style for when a reaction is active */
+.like-btn[class*="react-"] {
+    transform: scale(1.05);
+    transition: all 0.2s ease;
+}
+
+/* The "Pop" animation when the icon appears */
+.like-btn img {
+    animation: popIcon 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIcon {
+    0% { transform: scale(0.5); }
+    100% { transform: scale(1); }
+}
+  
 </style>
 </head>
 <body>
@@ -954,42 +942,24 @@ picker.style.display =
 picker.style.display === "flex" ? "none" : "flex";
 }
   
-window.react = async (postId,type)=>{
-const user = auth.currentUser;
-const ref = doc(db,"posts",postId,"reactions",user.uid);
-const snap = await getDoc(ref);
-if(snap.exists() && snap.data().type === type){
-await deleteDoc(ref);
-const btn = document.getElementById("like-btn-"+postId);
-btn.innerText = "Like";
-btn.style.fontWeight = "normal";
-}else{
-await setDoc(ref,{
-type:type,
-user:user.uid,
-name:user.displayName || "User"
-});
-const icons={
-like:"Like.png",
-love:"Love.png",
-haha:"Haha.png",
-wow:"Wow.png",
-sad:"Sad.png",
-angry:"Angry.png"
-};
-const names={
-like:"Like",
-love:"Love",
-haha:"Haha",
-wow:"Wow",
-sad:"Sad",
-angry:"Angry"
-};
-const btn = document.getElementById("like-btn-"+postId);
-btn.innerText = names[type];
-btn.className = "action-btn like-btn react-"+type;
-}
-document.getElementById("react-"+postId).style.display="none";
+window.react = async (postId, type) => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const ref = doc(db, "posts", postId, "reactions", user.uid);
+    const snap = await getDoc(ref);
+
+    if (snap.exists() && snap.data().type === type) {
+        await deleteDoc(ref);
+    } else {
+        await setDoc(ref, {
+            type: type,
+            user: user.uid,
+            name: user.displayName || "User"
+        });
+    }
+
+    document.getElementById("react-" + postId).style.display = "none";
 }
   
 window.sharePost = (id)=>{
@@ -1090,6 +1060,27 @@ onkeydown="if(event.key==='Enter'){addComment('${doc.id}',this)}">
 </div>
 `;
 feed.appendChild(post);
+
+/* PERSISTENCE: Check if the current user has already reacted */
+if (auth.currentUser) {
+    const userReactRef = doc(db, "posts", doc.id, "reactions", auth.currentUser.uid);
+    onSnapshot(userReactRef, (snapshot) => {
+        const btn = document.getElementById("like-btn-" + doc.id);
+        if (!btn) return;
+
+        if (snapshot.exists()) {
+            const type = snapshot.data().type;
+            const iconName = type.charAt(0).toUpperCase() + type.slice(1);
+            
+            btn.innerHTML = `<img src="image/icon/${iconName}.png"> ${iconName}`;
+            btn.className = "action-btn like-btn react-" + type;
+        } else {
+            btn.innerText = "Like";
+            btn.className = "action-btn like-btn";
+        }
+    });
+}
+  
 /* REACTION COUNT SYSTEM */
 const reactRef = collection(db,"posts",doc.id,"reactions");
 onSnapshot(reactRef,(snap)=>{
