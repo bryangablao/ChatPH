@@ -754,6 +754,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);  
 const storage = getStorage(app);
+const commentState = {};
 function getBadge(email){
 if(email === "ablaobryan4400@gmail.com"){
 return `<span class="admin-badge">💠 Admin</span>`;
@@ -879,17 +880,7 @@ alert("Post failed.");
 }
   
 window.showAllComments = (postId)=>{
-const list = document.getElementById("comments-"+postId);
-
-const isOpen = list.dataset.open === "true";
-
-if(isOpen){
-list.dataset.open = "false";
-list.classList.remove("open");
-}else{
-list.dataset.open = "true";
-list.classList.add("open");
-}
+commentState[postId] = !commentState[postId];
 }
   
 window.toggleComment = (id)=>{
@@ -1115,24 +1106,20 @@ orderBy("time","desc")
 onSnapshot(commentsRef,(snap)=>{
 const list = document.getElementById("comments-"+doc.id);
 if(!list) return;
-
-if(!list.dataset.open){
-    list.dataset.open = "false";
-}
   
 list.innerHTML="";
 let count = 0;
 const total = snap.size;
 
+const isOpen = commentState[doc.id] === true;
+
 snap.forEach(c=>{
     count++;
-
-    const isOpen = list.dataset.open === "true";
     if(!isOpen && count > 1) return;
 
     const data = c.data();
 
-list.innerHTML += `
+    list.innerHTML += `
 <div class="comment-item">
     <img class="comment-avatar" src="${data.photo}">
     
@@ -1143,11 +1130,7 @@ list.innerHTML += `
         ${getVerified({providerData:[{providerId:"google.com"}]})}
         </span>
         <span class="comment-text">${data.text}</span>
-        <span style="margin-left:auto;font-size:11px;opacity:.6;">
-        ${data.time?.toDate().toLocaleString() || ""}
-        </span>
     </div>
-
     <div class="comment-time">
         ${data.time?.toDate().toLocaleString() || ""}
     </div>
@@ -1155,14 +1138,11 @@ list.innerHTML += `
 `;
 });
 
-/* ✅ ADD BUTTON HERE (OUTSIDE LOOP) */
-const isOpen = list.dataset.open === "true";
-
 if(total > 1){
 list.innerHTML += `
 <div class="more-comments"
 onclick="showAllComments('${doc.id}')">
-${isOpen ? "Hide comments" : `💬 View ${total} comment${total>1?'s':''}`}
+${isOpen ? "Hide comments" : `💬 View ${total} comments`}
 </div>`;
 }
 });
