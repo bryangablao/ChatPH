@@ -256,16 +256,25 @@ border-radius:18px;
 color:white;
 cursor:pointer;
 }
-.like-btn {
-    font-weight: normal;
-    transition: all 0.2s ease;
-    cursor: pointer;
+.like-btn{
+font-weight:normal;
+transition:.2s;
 }
-
-.like-btn:hover {
-    transform: scale(1.05);
-    opacity: 1;
+.like-btn.react-like,
+.like-btn.react-love,
+.like-btn.react-haha,
+.like-btn.react-wow,
+.like-btn.react-sad,
+.like-btn.react-angry{
+font-weight:bold;
 }
+.like-btn{
+transition:all .2s ease;
+}
+.like-btn:hover{
+transform:scale(1.05);
+}
+  
 .avatar{
 width:42px;
 height:42px;
@@ -543,6 +552,49 @@ width:100%;
 border-radius:10px;
 object-fit:cover;
 }
+.react-like{
+background:linear-gradient(90deg,#4da3ff,#2563eb);
+-webkit-background-clip:text;
+color:transparent;
+font-weight:700;
+}
+.react-love{
+background:linear-gradient(90deg,#ff3b3b,#ff0000);
+-webkit-background-clip:text;
+color:transparent;
+font-weight:700;
+}
+/* LIKE */
+.react-like{
+background:linear-gradient(90deg,#4da3ff,#2563eb);
+-webkit-background-clip:text;
+color:transparent;
+font-weight:bold;
+}
+/* LOVE */
+.react-love{
+background:linear-gradient(90deg,#ff3b3b,#ff0000);
+-webkit-background-clip:text;
+color:transparent;
+font-weight:bold;
+}
+/* HAHA WOW SAD */
+.react-haha,
+.react-wow,
+.react-sad{
+background:linear-gradient(90deg,#ffd000,#ff9f00);
+-webkit-background-clip:text;
+color:transparent;
+font-weight:bold;
+}
+/* ANGRY */
+.react-angry{
+background:linear-gradient(90deg,#ff5e00,#ff0000);
+-webkit-background-clip:text;
+color:transparent;
+font-weight:bold;
+}
+
 /* closed = show only 1 comment */
 .comments-list {
     display: flex;
@@ -577,43 +629,6 @@ transition:max-height .4s ease;
 
 .comments-list.open{
 max-height:1000px;
-}
-
-/* Replace your old reaction classes with these */
-.like-btn.react-like {
-    color: #4da3ff !important;
-    background: linear-gradient(90deg, #4da3ff, #2563eb);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline-block;
-    font-weight: 800 !important;
-}
-
-.like-btn.react-love {
-    color: #ff3b3b !important;
-    background: linear-gradient(90deg, #ff3b3b, #ff0000);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline-block;
-    font-weight: 800 !important;
-}
-
-.like-btn.react-haha, .like-btn.react-wow, .like-btn.react-sad {
-    color: #ffd000 !important;
-    background: linear-gradient(90deg, #ffd000, #ff9f00);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline-block;
-    font-weight: 800 !important;
-}
-
-.like-btn.react-angry {
-    color: #ff5e00 !important;
-    background: linear-gradient(90deg, #ff5e00, #ff0000);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline-block;
-    font-weight: 800 !important;
 }
   
 </style>
@@ -952,42 +967,43 @@ picker.style.display =
 picker.style.display === "flex" ? "none" : "flex";
 }
   
-window.react = async (postId, type) => {
-    const user = auth.currentUser;
-    if (!user) return;
-
-    const reactionRef = doc(db, "posts", postId, "reactions", user.uid);
-    const snap = await getDoc(reactionRef);
-    const btn = document.getElementById("like-btn-" + postId);
-
-    if (snap.exists() && snap.data().type === type) {
-        // User clicked the same reaction: REMOVE IT
-        await deleteDoc(reactionRef);
-        btn.innerText = "Like";
-        btn.className = "action-btn like-btn"; 
-    } else {
-        // User added or changed reaction: SAVE IT
-        await setDoc(reactionRef, {
-            type: type,
-            user: user.uid,
-            name: user.displayName || "User"
-        });
-
-        const names = {
-            like: "Like",
-            love: "Love",
-            haha: "Haha",
-            wow: "Wow",
-            sad: "Sad",
-            angry: "Angry"
-        };
-
-        btn.innerText = names[type];
-        // This line adds the color and bolding
-        btn.className = "action-btn like-btn react-" + type;
-    }
-    document.getElementById("react-" + postId).style.display = "none";
+window.react = async (postId,type)=>{
+const user = auth.currentUser;
+const ref = doc(db,"posts",postId,"reactions",user.uid);
+const snap = await getDoc(ref);
+if(snap.exists() && snap.data().type === type){
+await deleteDoc(ref);
+const btn = document.getElementById("like-btn-"+postId);
+btn.innerText = "Like";
+btn.style.fontWeight = "normal";
+}else{
+await setDoc(ref,{
+type:type,
+user:user.uid,
+name:user.displayName || "User"
+});
+const icons={
+like:"Like.png",
+love:"Love.png",
+haha:"Haha.png",
+wow:"Wow.png",
+sad:"Sad.png",
+angry:"Angry.png"
 };
+const names={
+like:"Like",
+love:"Love",
+haha:"Haha",
+wow:"Wow",
+sad:"Sad",
+angry:"Angry"
+};
+const btn = document.getElementById("like-btn-"+postId);
+btn.innerText = names[type];
+btn.className = "action-btn like-btn react-"+type;
+}
+document.getElementById("react-"+postId).style.display="none";
+}
   
 window.sharePost = (id)=>{
 navigator.clipboard.writeText(location.href+"?post="+id);
@@ -1065,22 +1081,6 @@ onkeydown="if(event.key==='Enter'){addComment('${doc.id}',this)}">
 </div>
 `;
 feed.appendChild(post);
-
-if (auth.currentUser) {
-    const userReactRef = doc(db, "posts", doc.id, "reactions", auth.currentUser.uid);
-
-    getDoc(userReactRef).then((uSnap) => {
-        if (uSnap.exists()) {
-            const rType = uSnap.data().type;
-            const activeBtn = document.getElementById("like-btn-" + doc.id);
-            if (activeBtn) {
-                activeBtn.className = "action-btn like-btn react-" + rType;
-                activeBtn.innerText = rType.charAt(0).toUpperCase() + rType.slice(1);
-            }
-        }
-    });
-}
-  
 /* REACTION COUNT SYSTEM */
 const reactRef = collection(db,"posts",doc.id,"reactions");
 onSnapshot(reactRef,(snap)=>{
