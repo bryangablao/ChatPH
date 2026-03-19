@@ -403,7 +403,8 @@ outline:none;
 }
 .comment-item{
 display:flex;
-align-items:flex-start;
+align-items:center;
+justify-content:space-between;
 gap:8px;
 margin-top:8px;
 font-size:14px;
@@ -1142,6 +1143,9 @@ list.innerHTML += `
         ${getVerified({providerData:[{providerId:"google.com"}]})}
         </span>
         <span class="comment-text">${data.text}</span>
+        <span style="margin-left:auto;font-size:11px;opacity:.6;">
+        ${data.time?.toDate().toLocaleString() || ""}
+        </span>
     </div>
 
     <div class="comment-time">
