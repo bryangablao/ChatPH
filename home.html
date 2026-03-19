@@ -596,23 +596,29 @@ font-weight:bold;
 }
 
 /* closed = show only 1 comment */
-.comments-list:not(.open){
-max-height:80px;
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
-.more-comments{
-opacity:.7;
-font-size:13px;
-cursor:pointer;
-margin-top:6px;
-transition:.2s;
-position: relative;
-z-index: 5;
+/* Hide every comment after the 1st one by default */
+.comments-list:not(.open) .comment-item:nth-child(n+2) {
+    display: none;
 }
 
-.more-comments:hover{
-opacity:1;
-text-decoration:underline;
+.more-comments {
+    color: var(--accent);
+    font-size: 13px;
+    cursor: pointer;
+    margin-top: 8px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.more-comments:hover {
+    text-decoration: underline;
+}xt-decoration:underline;
 }
 
 .comments-list{
@@ -881,16 +887,19 @@ alert("Post failed.");
 }
 }
   
-window.showAllComments = (postId)=>{
-const list = document.getElementById("comments-"+postId);
+window.showAllComments = (postId, total) => {
+    const list = document.getElementById("comments-" + postId);
+    const btn = document.getElementById("btn-" + postId);
+    
+    commentState[postId] = !commentState[postId];
 
-commentState[postId] = !commentState[postId];
-
-if(commentState[postId]){
-list.classList.add("open");
-}else{
-list.classList.remove("open");
-}
+    if (commentState[postId]) {
+        list.classList.add("open");
+        if (btn) btn.innerText = "Collapse comments";
+    } else {
+        list.classList.remove("open");
+        if (btn) btn.innerText = `💬 View ${total} comments`;
+    }
 }
   
 window.toggleComment = (id)=>{
@@ -1113,60 +1122,52 @@ collection(db,"posts",doc.id,"comments"),
 orderBy("time","desc")
 );
 
-onSnapshot(commentsRef,(snap)=>{
-const list = document.getElementById("comments-"+doc.id);
-if(!list) return;
+onSnapshot(commentsRef, (snap) => {
+    const list = document.getElementById("comments-" + doc.id);
+    const commentBox = document.getElementById("comment-" + doc.id);
+    if (!list) return;
 
-list.innerHTML="";
+    list.innerHTML = "";
+    const total = snap.size;
+    const isOpen = commentState[doc.id] || false;
 
-const isOpen = commentState[doc.id] || false; // ✅ MOVE HERE
+    // 1. Apply the 'open' class if it was already open
+    if (isOpen) list.classList.add("open");
 
-if(isOpen){
-list.classList.add("open");
-}else{
-list.classList.remove("open");
-}
+    // 2. Render ALL comments (CSS will handle hiding them)
+    snap.forEach(c => {
+        const data = c.data();
+        list.innerHTML += `
+            <div class="comment-item">
+                <img class="comment-avatar" src="${data.photo}">
+                <div style="flex:1;">
+                    <div class="comment-name">
+                        ${data.name} ${getBadge(data.email)}
+                    </div>
+                    <div class="comment-text">${data.text}</div>
+                </div>
+                <div class="comment-time">
+                    ${data.time?.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) || ""}
+                </div>
+            </div>`;
+    });
 
-let count = 0;
-const total = snap.size;
+    // 3. Handle the "View More" button
+    // Remove any existing button first
+    const existingBtn = commentBox.querySelector(".more-comments");
+    if (existingBtn) existingBtn.remove();
 
-snap.forEach(c=>{
-    count++;
-    if(!isOpen && count > 1) return;
-
-    const data = c.data();
-    list.innerHTML += `
-<div class="comment-item">
-    <img class="comment-avatar" src="${data.photo}">
-    <div style="flex:1;">
-        <span class="comment-name">
-        ${data.name}
-        ${getBadge(data.email)}
-        ${getVerified({providerData:[{providerId:"google.com"}]})}
-        </span>
-        <span class="comment-text">${data.text}</span>
-    </div>
-    <div class="comment-time">
-        ${data.time?.toDate().toLocaleString() || ""}
-    </div>
-</div>
-`;
-});
-
-if(total > 1){
-    const oldBtn = list.querySelector(".more-comments");
-    if(oldBtn) oldBtn.remove();
-
-    const btn = document.createElement("div");
-    btn.className = "more-comments";
-    btn.innerText = isOpen ? "Hide comments" : `💬 View ${total} comments`;
-
-    btn.onclick = function(){
-        showAllComments(doc.id);
-    };
-
-    list.appendChild(btn);
-}
+    if (total > 1) {
+        const btn = document.createElement("div");
+        btn.className = "more-comments";
+        btn.id = "btn-" + doc.id;
+        btn.innerText = isOpen ? "Collapse comments" : `💬 View ${total} comments`;
+        
+        btn.onclick = () => window.showAllComments(doc.id, total);
+        
+        // Append it to the commentBox, but AFTER the list so it's never hidden by overflow
+        commentBox.appendChild(btn);
+    }
 });
 
 });
