@@ -148,33 +148,27 @@ box-shadow:0 0 0 2px rgba(77,163,255,.25);
 content:attr(placeholder);
 color:#777;
 }
-.editor-bar{
-display:flex;
-align-items:center;
-gap:4px;
-margin-top:10px;
-flex-wrap:nowrap;
-overflow:hidden;
+.editor-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
 }
 
-.post-btn{
-position:absolute;
-bottom:15px;
-right:15px;
-background:linear-gradient(135deg,#3b82f6,#2563eb);
-border:none;
-color:white;
-padding:8px 20px;
-border-radius:18px;
-font-weight:600;
-font-size:13px;
-cursor:pointer;
-display:flex;
-align-items:center;
-justify-content:center;
-transition:.2s ease;
-box-shadow:0 2px 6px rgba(0,0,0,.25);
+.post-btn {
+    background: var(--accent);
+    border: none;
+    color: #000;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
 }
+    
 .post-btn:hover{
 background:linear-gradient(135deg,#4da3ff,#2563eb);
 box-shadow:0 4px 10px rgba(0,0,0,.35);
@@ -496,16 +490,16 @@ margin-bottom:4px;
 .reaction-user img{
 width:16px;
 }
-.upload-btn{
-display:flex;
-align-items:center;
-justify-content:center;
-width:36px;
-height:36px;
-background:#1f2937;
-border-radius:10px;
-cursor:pointer;
-transition:.2s;
+.upload-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(77, 163, 255, 0.1);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.2s;
 }
 .upload-btn:hover{
 background:#2a2e38;
@@ -677,23 +671,21 @@ class="logout-icon">
 <div class="main">
 <!-- CREATE POST -->
 <div class="create-post">
-<div class="editor-container">
-<div id="postText" class="editor" contenteditable="true"
-placeholder="What's on your mind?"></div>
-</div>
-  
-<div class="editor-bar">
-  <label class="upload-btn">
-    <img src="image/icon/uploadimage.png">
-    <input type="file" id="postImage" accept="image/*" multiple>
-  </label>
+    <div class="editor-container">
+        <div id="postText" class="editor" contenteditable="true" placeholder="What's on your mind?"></div>
+    </div>
+    
+    <div id="imagePreview" class="image-preview"></div>
 
-  <div id="imagePreview" class="image-preview"></div>
+    <div class="editor-bar">
+        <label class="upload-btn" title="Upload Image">
+            <img src="image/icon/uploadimage.png">
+            <input type="file" id="postImage" accept="image/*" multiple>
+        </label>
+        
+        <button class="post-btn" onclick="createPost()">Post</button>
+    </div>
 </div>
-
-<button class="post-btn" onclick="createPost()">Post</button>
-  
-</div> <!-- end create-post -->
   
 <div class="posts-container">
 <div id="postsFeed"></div>
