@@ -895,10 +895,10 @@ window.showAllComments = (postId, total) => {
 
     if (commentState[postId]) {
         list.classList.add("open");
-        if (btn) btn.innerText = "Hide comments";
+        if (btn) btn.innerText = "Hide comments...";
     } else {
         list.classList.remove("open");
-        if (btn) btn.innerText = `💬 View ${total} comments`;
+        if (btn) btn.innerText = `💬 View ${total} comments...`;
     }
 }
   
