@@ -543,11 +543,53 @@ width:100%;
 border-radius:10px;
 object-fit:cover;
 }
-/* closed = show only 1 comment */
+
+/* Update these in your <style> section */
+
 .comments-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 85px; /* Fits roughly one comment */
+    overflow: hidden;
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    opacity: 0.9;
+}
+
+.comments-list.open {
+    max-height: 2000px; /* High enough to fit long threads */
+    opacity: 1;
+}
+
+.comment-item {
+    display: flex;
+    align-items: flex-start; /* Better alignment for long comments */
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 14px;
+    animation: fadeIn 0.4s ease forwards; /* Smooth entry for new comments */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.more-comments {
+    color: var(--accent);
+    font-size: 13px;
+    cursor: pointer;
+    margin-top: 8px;
+    font-weight: 600;
+    display: inline-block;
+    user-select: none;
+    transition: color 0.2s;
+}
+
+.more-comments:hover {
+    text-decoration: underline;
+    color: #82c0ff;
 }
 
 /* Hide every comment after the 1st one by default */
@@ -555,32 +597,6 @@ object-fit:cover;
     display: none;
 }
 
-.more-comments {
-    color: var(--accent);
-    font-size: 13px;
-    cursor: pointer; /* This changes the cursor to the hand icon */
-    margin-top: 8px;
-    font-weight: 600;
-    display: inline-block;
-    user-select: none; /* Optional: prevents the text from being highlighted when double-clicking */
-}
-
-.more-comments:hover {
-    text-decoration: underline;
-    cursor: pointer; /* Reinforce the hand icon on hover */
-}
-
-.comments-list {
-    max-height: 80px;
-    overflow: hidden;
-    transition: max-height .4s ease;
-}
-
-.comments-list.open{
-max-height:1000px;
-}
-
-/* Replace your old reaction classes with these */
 /* Reaction Bold + Color Fix */
 .like-btn.react-like {
     background: linear-gradient(90deg, #4da3ff, #2563eb);
@@ -1091,19 +1107,29 @@ onSnapshot(q, (snapshot) => {
             if (isOpen) list.classList.add("open");
 
             snap.forEach(c => {
-                const data = c.data();
-                list.innerHTML += `
-                    <div class="comment-item">
-                        <img class="comment-avatar" src="${data.photo}">
-                        <div style="flex:1;">
-                            <div class="comment-name">${data.name} ${getBadge(data.email)}</div>
-                            <div class="comment-text">${data.text}</div>
-                        </div>
-                        <div class="comment-time">
-                            ${data.time?.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) || ""}
-                        </div>
-                    </div>`;
-            });
+    const data = c.data();
+    const dateObj = data.time?.toDate();
+    
+    // Create a readable Date + Time string (e.g., "Oct 24, 2:30 PM")
+    const formattedDate = dateObj ? dateObj.toLocaleString([], {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    }) : "";
+
+    list.innerHTML += `
+        <div class="comment-item">
+            <img class="comment-avatar" src="${data.photo}">
+            <div style="flex:1;">
+                <div class="comment-name">${data.name} ${getBadge(data.email)}</div>
+                <div class="comment-text">${data.text}</div>
+            </div>
+            <div class="comment-time">
+                ${formattedDate}
+            </div>
+        </div>`;
+});
 
             // Clean up old buttons before adding new one
             const existingBtn = commentBox.querySelector(".more-comments");
