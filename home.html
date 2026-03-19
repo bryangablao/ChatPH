@@ -256,25 +256,16 @@ border-radius:18px;
 color:white;
 cursor:pointer;
 }
-.like-btn{
-font-weight:normal;
-transition:.2s;
+.like-btn {
+    font-weight: normal;
+    transition: all 0.2s ease;
+    cursor: pointer;
 }
-.like-btn.react-like,
-.like-btn.react-love,
-.like-btn.react-haha,
-.like-btn.react-wow,
-.like-btn.react-sad,
-.like-btn.react-angry{
-font-weight:bold;
+
+.like-btn:hover {
+    transform: scale(1.05);
+    opacity: 1;
 }
-.like-btn{
-transition:all .2s ease;
-}
-.like-btn:hover{
-transform:scale(1.05);
-}
-  
 .avatar{
 width:42px;
 height:42px;
@@ -311,7 +302,7 @@ margin-top:4px;
 color:#4da3ff;
 font-weight:600;
 }
-  
+  
 /* FOOTER */
 footer{
 text-align:center;
@@ -325,7 +316,7 @@ text-decoration:underline;
 /* BADGES */
 .admin-badge{
 margin-left:2px;
-position:relative;    
+position:relative;    
 font-size:11px;
 top:-2px;
 padding:3px 8px;
@@ -336,7 +327,7 @@ font-weight:700;
 }
 .mod-badge{
 margin-left:2px;
-position:relative;    
+position:relative;    
 font-size:11px;
 top:-2px;
 padding:3px 8px;
@@ -347,7 +338,7 @@ font-weight:600;
 }
 .vip-badge{
 margin-left:2px;
-position:relative;    
+position:relative;    
 font-size:11px;
 top:-2px;
 padding:3px 8px;
@@ -552,85 +543,75 @@ width:100%;
 border-radius:10px;
 object-fit:cover;
 }
-.react-like{
-background:linear-gradient(90deg,#4da3ff,#2563eb);
--webkit-background-clip:text;
-color:transparent;
-font-weight:700;
-}
-.react-love{
-background:linear-gradient(90deg,#ff3b3b,#ff0000);
--webkit-background-clip:text;
-color:transparent;
-font-weight:700;
-}
-/* LIKE */
-.react-like{
-background:linear-gradient(90deg,#4da3ff,#2563eb);
--webkit-background-clip:text;
-color:transparent;
-font-weight:bold;
-}
-/* LOVE */
-.react-love{
-background:linear-gradient(90deg,#ff3b3b,#ff0000);
--webkit-background-clip:text;
-color:transparent;
-font-weight:bold;
-}
-/* HAHA WOW SAD */
-.react-haha,
-.react-wow,
-.react-sad{
-background:linear-gradient(90deg,#ffd000,#ff9f00);
--webkit-background-clip:text;
-color:transparent;
-font-weight:bold;
-}
-/* ANGRY */
-.react-angry{
-background:linear-gradient(90deg,#ff5e00,#ff0000);
--webkit-background-clip:text;
-color:transparent;
-font-weight:bold;
-}
-
 /* closed = show only 1 comment */
 .comments-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 /* Hide every comment after the 1st one by default */
 .comments-list:not(.open) .comment-item:nth-child(n+2) {
-    display: none;
+    display: none;
 }
 
 .more-comments {
-    color: var(--accent);
-    font-size: 13px;
-    cursor: pointer;
-    margin-top: 8px;
-    font-weight: 600;
-    display: inline-block;
+    color: var(--accent);
+    font-size: 13px;
+    cursor: pointer;
+    margin-top: 8px;
+    font-weight: 600;
+    display: inline-block;
 }
 
 .more-comments:hover {
     text-decoration: underline;
-}xt-decoration:underline;
 }
 
-.comments-list{
-max-height:80px;
-overflow:hidden;
-transition:max-height .4s ease;
+.comments-list {
+    max-height: 80px;
+    overflow: hidden;
+    transition: max-height .4s ease;
 }
 
 .comments-list.open{
 max-height:1000px;
 }
-  
+
+/* Replace your old reaction classes with these */
+/* Reaction Bold + Color Fix */
+.like-btn.react-like {
+    background: linear-gradient(90deg, #4da3ff, #2563eb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    font-weight: 800 !important;
+}
+
+.like-btn.react-love {
+    background: linear-gradient(90deg, #ff3b3b, #ff0000);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    font-weight: 800 !important;
+}
+
+.like-btn.react-haha, .like-btn.react-wow, .like-btn.react-sad {
+    background: linear-gradient(90deg, #ffd000, #ff9f00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    font-weight: 800 !important;
+}
+
+.like-btn.react-angry {
+    background: linear-gradient(90deg, #ff5e00, #ff0000);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    font-weight: 800 !important;
+}
+  
 </style>
 </head>
 <body>
@@ -689,24 +670,24 @@ class="logout-icon">
 <div id="postText" class="editor" contenteditable="true"
 placeholder="What's on your mind?"></div>
 </div>
-  
+  
 <div class="editor-bar">
-  <label class="upload-btn">
-    <img src="image/icon/uploadimage.png">
-    <input type="file" id="postImage" accept="image/*" multiple>
-  </label>
+  <label class="upload-btn">
+    <img src="image/icon/uploadimage.png">
+    <input type="file" id="postImage" accept="image/*" multiple>
+  </label>
 
-  <div id="imagePreview" class="image-preview"></div>
+  <div id="imagePreview" class="image-preview"></div>
 </div>
 
 <button class="post-btn" onclick="createPost()">Post</button>
-  
+  
 </div> <!-- end create-post -->
-  
+  
 <div class="posts-container">
 <div id="postsFeed"></div>
 </div>
-  
+  
 <footer>
 <div>© 2026 ChatPH • All Rights Reserved</div>
 <div style="margin-top:6px;font-size:13px;">
@@ -760,7 +741,7 @@ appId: "1:324012163441:web:7a54be2231ad2cae71f6d0"
 };
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);  
+const auth = getAuth(app);  
 const storage = getStorage(app);
 const commentState = {};
 function getBadge(email){
@@ -844,7 +825,7 @@ createPost();
 }
 });
 import { getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-  
+  
 /* CREATE POST */
 window.createPost = async ()=>{
 const editor = document.getElementById("postText");
@@ -886,22 +867,22 @@ console.error(err);
 alert("Post failed.");
 }
 }
-  
+  
 window.showAllComments = (postId, total) => {
-    const list = document.getElementById("comments-" + postId);
-    const btn = document.getElementById("btn-" + postId);
-    
-    commentState[postId] = !commentState[postId];
+    const list = document.getElementById("comments-" + postId);
+    const btn = document.getElementById("btn-" + postId);
+    
+    commentState[postId] = !commentState[postId];
 
-    if (commentState[postId]) {
-        list.classList.add("open");
-        if (btn) btn.innerText = "Hide comments...";
-    } else {
-        list.classList.remove("open");
-        if (btn) btn.innerText = `💬 View ${total} comments...`;
-    }
+    if (commentState[postId]) {
+        list.classList.add("open");
+        if (btn) btn.innerText = "Hide comments...";
+    } else {
+        list.classList.remove("open");
+        if (btn) btn.innerText = `💬 View ${total} comments...`;
+    }
 }
-  
+  
 window.toggleComment = (id)=>{
 const box = document.getElementById("comment-"+id);
 box.style.display =
@@ -966,50 +947,49 @@ p.style.display="none";
 picker.style.display =
 picker.style.display === "flex" ? "none" : "flex";
 }
-  
-window.react = async (postId,type)=>{
-const user = auth.currentUser;
-const ref = doc(db,"posts",postId,"reactions",user.uid);
-const snap = await getDoc(ref);
-if(snap.exists() && snap.data().type === type){
-await deleteDoc(ref);
-const btn = document.getElementById("like-btn-"+postId);
-btn.innerText = "Like";
-btn.style.fontWeight = "normal";
-}else{
-await setDoc(ref,{
-type:type,
-user:user.uid,
-name:user.displayName || "User"
-});
-const icons={
-like:"Like.png",
-love:"Love.png",
-haha:"Haha.png",
-wow:"Wow.png",
-sad:"Sad.png",
-angry:"Angry.png"
+  
+window.react = async (postId, type) => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const reactionRef = doc(db, "posts", postId, "reactions", user.uid);
+    const snap = await getDoc(reactionRef);
+    const btn = document.getElementById("like-btn-" + postId);
+
+    if (snap.exists() && snap.data().type === type) {
+        // User clicked the same reaction: REMOVE IT
+        await deleteDoc(reactionRef);
+        btn.innerText = "Like";
+        btn.className = "action-btn like-btn"; 
+    } else {
+        // User added or changed reaction: SAVE IT
+        await setDoc(reactionRef, {
+            type: type,
+            user: user.uid,
+            name: user.displayName || "User"
+        });
+
+        const names = {
+            like: "Like",
+            love: "Love",
+            haha: "Haha",
+            wow: "Wow",
+            sad: "Sad",
+            angry: "Angry"
+        };
+
+        btn.innerText = names[type];
+        // This line adds the color and bolding
+        btn.className = "action-btn like-btn react-" + type;
+    }
+    document.getElementById("react-" + postId).style.display = "none";
 };
-const names={
-like:"Like",
-love:"Love",
-haha:"Haha",
-wow:"Wow",
-sad:"Sad",
-angry:"Angry"
-};
-const btn = document.getElementById("like-btn-"+postId);
-btn.innerText = names[type];
-btn.className = "action-btn like-btn react-"+type;
-}
-document.getElementById("react-"+postId).style.display="none";
-}
-  
+  
 window.sharePost = (id)=>{
 navigator.clipboard.writeText(location.href+"?post="+id);
 alert("Post link copied!");
 }
-  
+  
 /* LOAD POSTS */
 const feed = document.getElementById("postsFeed");
 const q = query(collection(db,"posts"), orderBy("time","desc"));
@@ -1081,6 +1061,22 @@ onkeydown="if(event.key==='Enter'){addComment('${doc.id}',this)}">
 </div>
 `;
 feed.appendChild(post);
+
+if (auth.currentUser) {
+    const userReactRef = doc(db, "posts", doc.id, "reactions", auth.currentUser.uid);
+
+    getDoc(userReactRef).then((uSnap) => {
+        if (uSnap.exists()) {
+            const rType = uSnap.data().type;
+            const activeBtn = document.getElementById("like-btn-" + doc.id);
+            if (activeBtn) {
+                activeBtn.className = "action-btn like-btn react-" + rType;
+                activeBtn.innerText = rType.charAt(0).toUpperCase() + rType.slice(1);
+            }
+        }
+    });
+}
+  
 /* REACTION COUNT SYSTEM */
 const reactRef = collection(db,"posts",doc.id,"reactions");
 onSnapshot(reactRef,(snap)=>{
@@ -1115,7 +1111,7 @@ html += `<span><img src="${map[type]}" style="width:16px"> ${counts[type]}</span
 const box = document.getElementById("react-count-"+doc.id);
 if(box) box.innerHTML = html;
 });
-  
+  
 /* LOAD COMMENTS FOR THIS POST */
 const commentsRef = query(
 collection(db,"posts",doc.id,"comments"),
@@ -1123,51 +1119,51 @@ orderBy("time","desc")
 );
 
 onSnapshot(commentsRef, (snap) => {
-    const list = document.getElementById("comments-" + doc.id);
-    const commentBox = document.getElementById("comment-" + doc.id);
-    if (!list) return;
+    const list = document.getElementById("comments-" + doc.id);
+    const commentBox = document.getElementById("comment-" + doc.id);
+    if (!list) return;
 
-    list.innerHTML = "";
-    const total = snap.size;
-    const isOpen = commentState[doc.id] || false;
+    list.innerHTML = "";
+    const total = snap.size;
+    const isOpen = commentState[doc.id] || false;
 
-    // 1. Apply the 'open' class if it was already open
-    if (isOpen) list.classList.add("open");
+    // 1. Apply the 'open' class if it was already open
+    if (isOpen) list.classList.add("open");
 
-    // 2. Render ALL comments (CSS will handle hiding them)
-    snap.forEach(c => {
-        const data = c.data();
-        list.innerHTML += `
-            <div class="comment-item">
-                <img class="comment-avatar" src="${data.photo}">
-                <div style="flex:1;">
-                    <div class="comment-name">
-                        ${data.name} ${getBadge(data.email)}
-                    </div>
-                    <div class="comment-text">${data.text}</div>
-                </div>
-                <div class="comment-time">
-                    ${data.time?.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) || ""}
-                </div>
-            </div>`;
-    });
+    // 2. Render ALL comments (CSS will handle hiding them)
+    snap.forEach(c => {
+        const data = c.data();
+        list.innerHTML += `
+            <div class="comment-item">
+                <img class="comment-avatar" src="${data.photo}">
+                <div style="flex:1;">
+                    <div class="comment-name">
+                        ${data.name} ${getBadge(data.email)}
+                    </div>
+                    <div class="comment-text">${data.text}</div>
+                </div>
+                <div class="comment-time">
+                    ${data.time?.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) || ""}
+                </div>
+            </div>`;
+    });
 
-    // 3. Handle the "View More" button
-    // Remove any existing button first
-    const existingBtn = commentBox.querySelector(".more-comments");
-    if (existingBtn) existingBtn.remove();
+    // 3. Handle the "View More" button
+    // Remove any existing button first
+    const existingBtn = commentBox.querySelector(".more-comments");
+    if (existingBtn) existingBtn.remove();
 
-    if (total > 1) {
-        const btn = document.createElement("div");
-        btn.className = "more-comments";
-        btn.id = "btn-" + doc.id;
-        btn.innerText = isOpen ? "Collapse comments" : `💬 View ${total} comments`;
-        
-        btn.onclick = () => window.showAllComments(doc.id, total);
-        
-        // Append it to the commentBox, but AFTER the list so it's never hidden by overflow
-        commentBox.appendChild(btn);
-    }
+    if (total > 1) {
+        const btn = document.createElement("div");
+        btn.className = "more-comments";
+        btn.id = "btn-" + doc.id;
+        btn.innerText = isOpen ? "Collapse comments" : `💬 View ${total} comments`;
+        
+        btn.onclick = () => window.showAllComments(doc.id, total);
+        
+        // Append it to the commentBox, but AFTER the list so it's never hidden by overflow
+        commentBox.appendChild(btn);
+    }
 });
 
 });
@@ -1188,16 +1184,16 @@ preview.appendChild(img);
 reader.readAsDataURL(files[i]);
 }
 });
-  
+  
 /* AUTH USER */
 onAuthStateChanged(auth,(user)=>{
-    if(user){
-        document.getElementById("userDisplay").innerText =
-        user.displayName || user.email;
-        document.getElementById("logoutBtn").style.display="inline";
-    }else{
-        window.location.href="index.html";
-    }
+    if(user){
+        document.getElementById("userDisplay").innerText =
+        user.displayName || user.email;
+        document.getElementById("logoutBtn").style.display="inline";
+    }else{
+        window.location.href="index.html";
+    }
 });
 document.getElementById("logoutBtn").onclick = async ()=>{
 await signOut(auth);
@@ -1240,9 +1236,7 @@ html += `<div class="more">+${count-5} others</div>`;
 box.innerHTML = html;
 });
 }
-  
+  
 </script>
 </body>
 </html>
-
-
