@@ -1114,30 +1114,28 @@ orderBy("time","desc")
 onSnapshot(commentsRef,(snap)=>{
 const list = document.getElementById("comments-"+doc.id);
 if(!list) return;
-  
+
 list.innerHTML="";
+
+const isOpen = commentState[doc.id] || false; // ✅ MOVE HERE
+
 if(isOpen){
 list.classList.add("open");
 }else{
 list.classList.remove("open");
 }
+
 let count = 0;
 const total = snap.size;
 
-const isOpen = commentState[doc.id] || false;
-
 snap.forEach(c=>{
     count++;
-
-    // 👇 LIMIT when CLOSED
     if(!isOpen && count > 1) return;
 
     const data = c.data();
-
     list.innerHTML += `
 <div class="comment-item">
     <img class="comment-avatar" src="${data.photo}">
-    
     <div style="flex:1;">
         <span class="comment-name">
         ${data.name}
