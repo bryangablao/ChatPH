@@ -1,1 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Under Construction</title>
 
+<!-- LOTTIE PLAYER -->
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+<style>
+body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:linear-gradient(180deg,#0f1115,#141821);
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height:100vh;
+    text-align:center;
+}
+
+.container{
+    max-width:420px;
+    animation:fadeIn 1s ease;
+}
+
+h1{
+    font-size:28px;
+    margin-bottom:10px;
+}
+
+p{
+    opacity:.7;
+    font-size:15px;
+}
+
+.note{
+    margin-top:10px;
+    font-size:13px;
+    color:#4da3ff;
+}
+
+/* animation fade */
+@keyframes fadeIn{
+    from{opacity:0; transform:translateY(20px);}
+    to{opacity:1; transform:translateY(0);}
+}
+
+.back-btn{
+    position:absolute;
+    top:20px;
+    left:20px;
+    padding:8px 16px;
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,0.15);
+    background:rgba(255,255,255,0.05);
+    color:white;
+    font-size:13px;
+    cursor:pointer;
+    transition:0.2s;
+    backdrop-filter:blur(6px);
+}
+
+.back-btn:hover{
+    background:#4da3ff;
+    color:#000;
+    transform:translateY(-2px);
+    box-shadow:0 5px 15px rgba(77,163,255,.4);
+}
+</style>
+</head>
+
+<body>
+<button class="back-btn" onclick="goBack()">← Back</button>
+<div class="container">
+
+    <!-- REAL ANIMATED CARTOON MAN -->
+    <lottie-player
+        src="https://assets10.lottiefiles.com/packages/lf20_jtbfg2nb.json"
+        background="transparent"
+        speed="1"
+        style="width: 260px; height: 260px; margin:auto;"
+        loop
+        autoplay>
+    </lottie-player>
+
+    <h1>🚧 Page Under Construction</h1>
+    <p>We’re building something awesome for you.<br>Stay tuned!</p>
+
+    <div class="note">Coming soon on ChatPH 👀</div>
+
+</div>
+
+<script>
+const messages=[
+"Building something awesome...",
+"Almost ready...",
+"Stay tuned 🚀",
+"New features coming soon 👀"
+];
+
+setInterval(()=>{
+    document.querySelector(".note").innerText=
+    messages[Math.floor(Math.random()*messages.length)];
+},3000);
+</script>
+
+<script>
+function goBack(){
+    if(document.referrer){
+        history.back();
+    }else{
+        window.location.href = "home.html"; // fallback
+    }
+}
+</script>
+</body>
+</html>
