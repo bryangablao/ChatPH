@@ -995,8 +995,9 @@ alert("Post link copied!");
   
 /* LOAD POSTS */
 const feed = document.getElementById("postsFeed");
-const q = query(collection(db,"posts"), orderBy("time","desc"));
+const q = query(collection(db,"posts"));
 onSnapshot(q,(snapshot)=>{
+    console.log("Posts count:", snapshot.size);
 feed.innerHTML="";
 snapshot.forEach(doc=>{
 const p = doc.data();
@@ -1127,10 +1128,7 @@ if(box) box.innerHTML = html;
 });
   
 /* LOAD COMMENTS FOR THIS POST */
-const commentsRef = query(
-collection(db,"posts",doc.id,"comments"),
-orderBy("time","desc")
-);
+const commentsRef = collection(db,"posts",doc.id,"comments");
 
 onSnapshot(commentsRef,(snap)=>{
 const list = document.getElementById("comments-"+doc.id);
@@ -1147,11 +1145,6 @@ const total = snap.size;
 snap.forEach(c=>{
     count++;
     const isOpen = list.dataset.open === "true";
-
-    if(count > 1 && !isOpen){
-        return;
-    }
-
     const data = c.data();
 
     list.innerHTML += `
