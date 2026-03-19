@@ -881,7 +881,14 @@ alert("Post failed.");
   
 window.showAllComments = (postId)=>{
 const list = document.getElementById("comments-"+postId);
-list.classList.toggle("open");
+
+commentState[postId] = !commentState[postId];
+
+if(commentState[postId]){
+list.classList.add("open");
+}else{
+list.classList.remove("open");
+}
 }
   
 window.toggleComment = (id)=>{
@@ -1109,10 +1116,15 @@ const list = document.getElementById("comments-"+doc.id);
 if(!list) return;
   
 list.innerHTML="";
+if(isOpen){
+list.classList.add("open");
+}else{
+list.classList.remove("open");
+}
 let count = 0;
 const total = snap.size;
 
-const isOpen = list.classList.contains("open");
+const isOpen = commentState[doc.id] || false;
 
 snap.forEach(c=>{
     count++;
