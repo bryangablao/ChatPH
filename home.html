@@ -995,7 +995,7 @@ const feed = document.getElementById("postsFeed");
 const q = query(collection(db, "posts"), orderBy("time", "desc"));
 
 onSnapshot(q, (snapshot) => {
-    feed.innerHTML = ""; // Clear feed once per update
+    feed.innerHTML = ""; 
     
     snapshot.forEach((postDoc) => {
         const p = postDoc.data();
@@ -1003,7 +1003,6 @@ onSnapshot(q, (snapshot) => {
         const postElement = document.createElement("div");
         postElement.className = "post";
         
-        // 1. Render the Post Structure
         postElement.innerHTML = `
             <div class="post-top">
                 <img class="avatar" src="${p.photo}">
@@ -1049,7 +1048,7 @@ onSnapshot(q, (snapshot) => {
         
         feed.appendChild(postElement);
 
-        // 2. Load User's Own Reaction (Persistence)
+        // PERSIST USER REACTION
         if (auth.currentUser) {
             getDoc(doc(db, "posts", postId, "reactions", auth.currentUser.uid)).then((uSnap) => {
                 if (uSnap.exists()) {
@@ -1063,7 +1062,7 @@ onSnapshot(q, (snapshot) => {
             });
         }
 
-        // 3. Independent Reaction Counter Listener
+        // REACTION COUNTER
         onSnapshot(collection(db, "posts", postId, "reactions"), (reactSnap) => {
             const counts = { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 };
             reactSnap.forEach(r => { if(counts[r.data().type] !== undefined) counts[r.data().type]++; });
@@ -1076,13 +1075,20 @@ onSnapshot(q, (snapshot) => {
             if (box) box.innerHTML = html;
         });
 
-        // 4. Independent Comment Listener
+        // COMMENTS SYSTEM (WITH VIEW MORE LOGIC)
         const commentsRef = query(collection(db, "posts", postId, "comments"), orderBy("time", "desc"));
-        onSnapshot(commentsRef, (commentSnap) => {
+        onSnapshot(commentsRef, (snap) => {
             const list = document.getElementById("comments-" + postId);
+            const commentBox = document.getElementById("comment-" + postId);
             if (!list) return;
+
             list.innerHTML = "";
-            commentSnap.forEach(c => {
+            const total = snap.size;
+            const isOpen = commentState[postId] || false;
+
+            if (isOpen) list.classList.add("open");
+
+            snap.forEach(c => {
                 const data = c.data();
                 list.innerHTML += `
                     <div class="comment-item">
@@ -1091,11 +1097,27 @@ onSnapshot(q, (snapshot) => {
                             <div class="comment-name">${data.name} ${getBadge(data.email)}</div>
                             <div class="comment-text">${data.text}</div>
                         </div>
+                        <div class="comment-time">
+                            ${data.time?.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) || ""}
+                        </div>
                     </div>`;
             });
+
+            // Clean up old buttons before adding new one
+            const existingBtn = commentBox.querySelector(".more-comments");
+            if (existingBtn) existingBtn.remove();
+
+            if (total > 1) {
+                const btn = document.createElement("div");
+                btn.className = "more-comments";
+                btn.id = "btn-" + postId;
+                btn.innerText = isOpen ? "Hide comments..." : `💬 View ${total} comments...`;
+                btn.onclick = () => window.showAllComments(postId, total);
+                commentBox.appendChild(btn);
+            }
         });
-    }); // End forEach
-}); // End main Snapshot
+    });
+});
 
 const imageInput = document.getElementById("postImage");
 const preview = document.getElementById("imagePreview");
