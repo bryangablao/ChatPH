@@ -880,7 +880,8 @@ alert("Post failed.");
 }
   
 window.showAllComments = (postId)=>{
-commentState[postId] = !commentState[postId];
+const list = document.getElementById("comments-"+postId);
+list.classList.toggle("open");
 }
   
 window.toggleComment = (id)=>{
@@ -1111,12 +1112,10 @@ list.innerHTML="";
 let count = 0;
 const total = snap.size;
 
-const isOpen = commentState[doc.id] === true;
+const isOpen = list.classList.contains("open");
 
 snap.forEach(c=>{
     count++;
-    if(!isOpen && count > 1) return;
-
     const data = c.data();
 
     list.innerHTML += `
