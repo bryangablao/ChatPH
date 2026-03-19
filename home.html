@@ -256,25 +256,16 @@ border-radius:18px;
 color:white;
 cursor:pointer;
 }
-.like-btn{
-font-weight:normal;
-transition:.2s;
+.like-btn {
+    font-weight: normal;
+    transition: all 0.2s ease;
+    cursor: pointer;
 }
-.like-btn.react-like,
-.like-btn.react-love,
-.like-btn.react-haha,
-.like-btn.react-wow,
-.like-btn.react-sad,
-.like-btn.react-angry{
-font-weight:bold;
+
+.like-btn:hover {
+    transform: scale(1.05);
+    opacity: 1;
 }
-.like-btn{
-transition:all .2s ease;
-}
-.like-btn:hover{
-transform:scale(1.05);
-}
-  
 .avatar{
 width:42px;
 height:42px;
@@ -311,7 +302,7 @@ margin-top:4px;
 color:#4da3ff;
 font-weight:600;
 }
-  
+  
 /* FOOTER */
 footer{
 text-align:center;
@@ -325,7 +316,7 @@ text-decoration:underline;
 /* BADGES */
 .admin-badge{
 margin-left:2px;
-position:relative;    
+position:relative;    
 font-size:11px;
 top:-2px;
 padding:3px 8px;
@@ -336,7 +327,7 @@ font-weight:700;
 }
 .mod-badge{
 margin-left:2px;
-position:relative;    
+position:relative;    
 font-size:11px;
 top:-2px;
 padding:3px 8px;
@@ -347,7 +338,7 @@ font-weight:600;
 }
 .vip-badge{
 margin-left:2px;
-position:relative;    
+position:relative;    
 font-size:11px;
 top:-2px;
 padding:3px 8px;
@@ -552,84 +543,75 @@ width:100%;
 border-radius:10px;
 object-fit:cover;
 }
-.react-like{
-background:linear-gradient(90deg,#4da3ff,#2563eb);
--webkit-background-clip:text;
-color:transparent;
-font-weight:700;
-}
-.react-love{
-background:linear-gradient(90deg,#ff3b3b,#ff0000);
--webkit-background-clip:text;
-color:transparent;
-font-weight:700;
-}
-/* LIKE */
-.react-like{
-background:linear-gradient(90deg,#4da3ff,#2563eb);
--webkit-background-clip:text;
-color:transparent;
-font-weight:bold;
-}
-/* LOVE */
-.react-love{
-background:linear-gradient(90deg,#ff3b3b,#ff0000);
--webkit-background-clip:text;
-color:transparent;
-font-weight:bold;
-}
-/* HAHA WOW SAD */
-.react-haha,
-.react-wow,
-.react-sad{
-background:linear-gradient(90deg,#ffd000,#ff9f00);
--webkit-background-clip:text;
-color:transparent;
-font-weight:bold;
-}
-/* ANGRY */
-.react-angry{
-background:linear-gradient(90deg,#ff5e00,#ff0000);
--webkit-background-clip:text;
-color:transparent;
-font-weight:bold;
-}
-
 /* closed = show only 1 comment */
 .comments-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 /* Hide every comment after the 1st one by default */
 .comments-list:not(.open) .comment-item:nth-child(n+2) {
-    display: none;
+    display: none;
 }
 
 .more-comments {
-    color: var(--accent);
-    font-size: 13px;
-    cursor: pointer;
-    margin-top: 8px;
-    font-weight: 600;
-    display: inline-block;
+    color: var(--accent);
+    font-size: 13px;
+    cursor: pointer;
+    margin-top: 8px;
+    font-weight: 600;
+    display: inline-block;
 }
 
 .more-comments:hover {
     text-decoration: underline;
 }
 
-.comments-list{
-max-height:80px;
-overflow:hidden;
-transition:max-height .4s ease;
+.comments-list {
+    max-height: 80px;
+    overflow: hidden;
+    transition: max-height .4s ease;
 }
 
 .comments-list.open{
 max-height:1000px;
 }
-  
+
+/* Replace your old reaction classes with these */
+/* Reaction Bold + Color Fix */
+.like-btn.react-like {
+    background: linear-gradient(90deg, #4da3ff, #2563eb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    font-weight: 800 !important;
+}
+
+.like-btn.react-love {
+    background: linear-gradient(90deg, #ff3b3b, #ff0000);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    font-weight: 800 !important;
+}
+
+.like-btn.react-haha, .like-btn.react-wow, .like-btn.react-sad {
+    background: linear-gradient(90deg, #ffd000, #ff9f00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    font-weight: 800 !important;
+}
+
+.like-btn.react-angry {
+    background: linear-gradient(90deg, #ff5e00, #ff0000);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    font-weight: 800 !important;
+}
+  
 </style>
 </head>
 <body>
@@ -688,24 +670,24 @@ class="logout-icon">
 <div id="postText" class="editor" contenteditable="true"
 placeholder="What's on your mind?"></div>
 </div>
-  
+  
 <div class="editor-bar">
-  <label class="upload-btn">
-    <img src="image/icon/uploadimage.png">
-    <input type="file" id="postImage" accept="image/*" multiple>
-  </label>
+  <label class="upload-btn">
+    <img src="image/icon/uploadimage.png">
+    <input type="file" id="postImage" accept="image/*" multiple>
+  </label>
 
-  <div id="imagePreview" class="image-preview"></div>
+  <div id="imagePreview" class="image-preview"></div>
 </div>
 
 <button class="post-btn" onclick="createPost()">Post</button>
-  
+  
 </div> <!-- end create-post -->
-  
+  
 <div class="posts-container">
 <div id="postsFeed"></div>
 </div>
-  
+  
 <footer>
 <div>© 2026 ChatPH • All Rights Reserved</div>
 <div style="margin-top:6px;font-size:13px;">
@@ -759,7 +741,7 @@ appId: "1:324012163441:web:7a54be2231ad2cae71f6d0"
 };
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);  
+const auth = getAuth(app);  
 const storage = getStorage(app);
 const commentState = {};
 function getBadge(email){
@@ -843,7 +825,7 @@ createPost();
 }
 });
 import { getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-  
+  
 /* CREATE POST */
 window.createPost = async ()=>{
 const editor = document.getElementById("postText");
@@ -885,22 +867,22 @@ console.error(err);
 alert("Post failed.");
 }
 }
-  
+  
 window.showAllComments = (postId, total) => {
-    const list = document.getElementById("comments-" + postId);
-    const btn = document.getElementById("btn-" + postId);
-    
-    commentState[postId] = !commentState[postId];
+    const list = document.getElementById("comments-" + postId);
+    const btn = document.getElementById("btn-" + postId);
+    
+    commentState[postId] = !commentState[postId];
 
-    if (commentState[postId]) {
-        list.classList.add("open");
-        if (btn) btn.innerText = "Hide comments...";
-    } else {
-        list.classList.remove("open");
-        if (btn) btn.innerText = `💬 View ${total} comments...`;
-    }
+    if (commentState[postId]) {
+        list.classList.add("open");
+        if (btn) btn.innerText = "Hide comments...";
+    } else {
+        list.classList.remove("open");
+        if (btn) btn.innerText = `💬 View ${total} comments...`;
+    }
 }
-  
+  
 window.toggleComment = (id)=>{
 const box = document.getElementById("comment-"+id);
 box.style.display =
@@ -965,212 +947,155 @@ p.style.display="none";
 picker.style.display =
 picker.style.display === "flex" ? "none" : "flex";
 }
-  
-window.react = async (postId,type)=>{
-const user = auth.currentUser;
-const ref = doc(db,"posts",postId,"reactions",user.uid);
-const snap = await getDoc(ref);
-if(snap.exists() && snap.data().type === type){
-await deleteDoc(ref);
-const btn = document.getElementById("like-btn-"+postId);
-btn.innerText = "Like";
-btn.style.fontWeight = "normal";
-}else{
-await setDoc(ref,{
-type:type,
-user:user.uid,
-name:user.displayName || "User"
-});
-const icons={
-like:"Like.png",
-love:"Love.png",
-haha:"Haha.png",
-wow:"Wow.png",
-sad:"Sad.png",
-angry:"Angry.png"
+  
+window.react = async (postId, type) => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const reactionRef = doc(db, "posts", postId, "reactions", user.uid);
+    const snap = await getDoc(reactionRef);
+    const btn = document.getElementById("like-btn-" + postId);
+
+    if (snap.exists() && snap.data().type === type) {
+        // User clicked the same reaction: REMOVE IT
+        await deleteDoc(reactionRef);
+        btn.innerText = "Like";
+        btn.className = "action-btn like-btn"; 
+    } else {
+        // User added or changed reaction: SAVE IT
+        await setDoc(reactionRef, {
+            type: type,
+            user: user.uid,
+            name: user.displayName || "User"
+        });
+
+        const names = {
+            like: "Like",
+            love: "Love",
+            haha: "Haha",
+            wow: "Wow",
+            sad: "Sad",
+            angry: "Angry"
+        };
+
+        btn.innerText = names[type];
+        // This line adds the color and bolding
+        btn.className = "action-btn like-btn react-" + type;
+    }
+    document.getElementById("react-" + postId).style.display = "none";
 };
-const names={
-like:"Like",
-love:"Love",
-haha:"Haha",
-wow:"Wow",
-sad:"Sad",
-angry:"Angry"
-};
-const btn = document.getElementById("like-btn-"+postId);
-btn.innerText = names[type];
-btn.className = "action-btn like-btn react-"+type;
-}
-document.getElementById("react-"+postId).style.display="none";
-}
-  
+  
 window.sharePost = (id)=>{
 navigator.clipboard.writeText(location.href+"?post="+id);
 alert("Post link copied!");
 }
-  
+  
 /* LOAD POSTS */
 const feed = document.getElementById("postsFeed");
-const q = query(collection(db,"posts"), orderBy("time","desc"));
-onSnapshot(q,(snapshot)=>{
-feed.innerHTML="";
-snapshot.forEach(doc=>{
-const p = doc.data();
-const post = document.createElement("div");
-post.className="post";
-post.innerHTML=`
-<div class="post-top">
-<img class="avatar" src="${p.photo}">
-<div>
-<div class="username">
-${p.name || "User"}
-${getBadge(p.email)}
-</div>
-<div class="time">
-${p.time?.toDate().toLocaleString() || ""}
-</div>
-</div>
-</div>
-<div class="post-text">${p.text}</div>
-${p.images && p.images.length ? `
-<div class="post-images">
-${p.images.map(img=>`<img src="${img}">`).join("")}
-</div>
-` : ""}
-<div class="reaction-counts"
-onmouseenter="showReactionUsers('${doc.id}')"
-onmouseleave="document.getElementById('hover-${doc.id}').style.display='none'"
-id="react-count-${doc.id}">
-</div>
-<div class="reaction-hover" id="hover-${doc.id}"></div>
-<div class="post-actions">
-<div class="like-container">
-<span class="action-btn like-btn"
-onclick="toggleReactionPicker('${doc.id}')"
-id="like-btn-${doc.id}">
-Like
-</span>
-<div class="reaction-picker" id="react-${doc.id}">
-<img src="image/icon/Like.png" onclick="react('${doc.id}','like')">
-<img src="image/icon/Love.png" onclick="react('${doc.id}','love')">
-<img src="image/icon/Haha.png" onclick="react('${doc.id}','haha')">
-<img src="image/icon/Wow.png" onclick="react('${doc.id}','wow')">
-<img src="image/icon/Sad.png" onclick="react('${doc.id}','sad')">
-<img src="image/icon/Angry.png" onclick="react('${doc.id}','angry')">
-</div>
-</div>
-<span class="action-btn comment-btn"
-onclick="toggleComment('${doc.id}')">
-Comment
-</span>
-<span class="action-btn"
-onclick="sharePost('${doc.id}')">
-Share
-</span>
-</div>
-<div class="comment-box" id="comment-${doc.id}" style="display:none">
-<div class="comment-input">
-<img class="comment-avatar" src="${p.photo}">
-<input type="text"
-class="comment-field"
-placeholder="Write a comment..."
-onkeydown="if(event.key==='Enter'){addComment('${doc.id}',this)}">
-</div>
-<div class="comments-list" id="comments-${doc.id}"></div>
-</div>
-`;
-feed.appendChild(post);
-/* REACTION COUNT SYSTEM */
-const reactRef = collection(db,"posts",doc.id,"reactions");
-onSnapshot(reactRef,(snap)=>{
-const counts = {
-like:0,
-love:0,
-haha:0,
-wow:0,
-sad:0,
-angry:0
-};
-snap.forEach(r=>{
-const type = r.data().type;
-if(counts[type] !== undefined){
-counts[type]++;
-}
-});
-let html="";
-const map={
-like:"image/icon/Like.png",
-love:"image/icon/Love.png",
-haha:"image/icon/Haha.png",
-wow:"image/icon/Wow.png",
-sad:"image/icon/Sad.png",
-angry:"image/icon/Angry.png"
-};
-for(const type in counts){
-if(counts[type] > 0){
-html += `<span><img src="${map[type]}" style="width:16px"> ${counts[type]}</span>`;
-}
-}
-const box = document.getElementById("react-count-"+doc.id);
-if(box) box.innerHTML = html;
-});
-  
-/* LOAD COMMENTS FOR THIS POST */
-const commentsRef = query(
-collection(db,"posts",doc.id,"comments"),
-orderBy("time","desc")
-);
+const q = query(collection(db, "posts"), orderBy("time", "desc"));
 
-onSnapshot(commentsRef, (snap) => {
-    const list = document.getElementById("comments-" + doc.id);
-    const commentBox = document.getElementById("comment-" + doc.id);
-    if (!list) return;
-
-    list.innerHTML = "";
-    const total = snap.size;
-    const isOpen = commentState[doc.id] || false;
-
-    // 1. Apply the 'open' class if it was already open
-    if (isOpen) list.classList.add("open");
-
-    // 2. Render ALL comments (CSS will handle hiding them)
-    snap.forEach(c => {
-        const data = c.data();
-        list.innerHTML += `
-            <div class="comment-item">
-                <img class="comment-avatar" src="${data.photo}">
-                <div style="flex:1;">
-                    <div class="comment-name">
-                        ${data.name} ${getBadge(data.email)}
+onSnapshot(q, (snapshot) => {
+    feed.innerHTML = ""; // Clear feed once per update
+    
+    snapshot.forEach((postDoc) => {
+        const p = postDoc.data();
+        const postId = postDoc.id;
+        const postElement = document.createElement("div");
+        postElement.className = "post";
+        
+        // 1. Render the Post Structure
+        postElement.innerHTML = `
+            <div class="post-top">
+                <img class="avatar" src="${p.photo}">
+                <div>
+                    <div class="username">${p.name || "User"} ${getBadge(p.email)}</div>
+                    <div class="time">${p.time?.toDate().toLocaleString() || ""}</div>
+                </div>
+            </div>
+            <div class="post-text">${p.text}</div>
+            ${p.images && p.images.length ? `
+                <div class="post-images">${p.images.map(img => `<img src="${img}">`).join("")}</div>
+            ` : ""}
+            <div class="reaction-counts" 
+                 onmouseenter="showReactionUsers('${postId}')" 
+                 onmouseleave="document.getElementById('hover-${postId}').style.display='none'"
+                 id="react-count-${postId}">
+            </div>
+            <div class="reaction-hover" id="hover-${postId}"></div>
+            <div class="post-actions">
+                <div class="like-container">
+                    <span class="action-btn like-btn" onclick="toggleReactionPicker('${postId}')" id="like-btn-${postId}">Like</span>
+                    <div class="reaction-picker" id="react-${postId}">
+                        <img src="image/icon/Like.png" onclick="react('${postId}','like')">
+                        <img src="image/icon/Love.png" onclick="react('${postId}','love')">
+                        <img src="image/icon/Haha.png" onclick="react('${postId}','haha')">
+                        <img src="image/icon/Wow.png" onclick="react('${postId}','wow')">
+                        <img src="image/icon/Sad.png" onclick="react('${postId}','sad')">
+                        <img src="image/icon/Angry.png" onclick="react('${postId}','angry')">
                     </div>
-                    <div class="comment-text">${data.text}</div>
                 </div>
-                <div class="comment-time">
-                    ${data.time?.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) || ""}
+                <span class="action-btn comment-btn" onclick="toggleComment('${postId}')">Comment</span>
+                <span class="action-btn" onclick="sharePost('${postId}')">Share</span>
+            </div>
+            <div class="comment-box" id="comment-${postId}" style="display:none">
+                <div class="comment-input">
+                    <img class="comment-avatar" src="${p.photo}">
+                    <input type="text" class="comment-field" placeholder="Write a comment..." 
+                           onkeydown="if(event.key==='Enter'){addComment('${postId}',this)}">
                 </div>
-            </div>`;
-    });
-
-    // 3. Handle the "View More" button
-    // Remove any existing button first
-    const existingBtn = commentBox.querySelector(".more-comments");
-    if (existingBtn) existingBtn.remove();
-
-    if (total > 1) {
-        const btn = document.createElement("div");
-        btn.className = "more-comments";
-        btn.id = "btn-" + doc.id;
-        btn.innerText = isOpen ? "Collapse comments" : `💬 View ${total} comments`;
+                <div class="comments-list" id="comments-${postId}"></div>
+            </div>
+        `;
         
-        btn.onclick = () => window.showAllComments(doc.id, total);
-        
-        // Append it to the commentBox, but AFTER the list so it's never hidden by overflow
-        commentBox.appendChild(btn);
-    }
-});
+        feed.appendChild(postElement);
 
-});
-});
+        // 2. Load User's Own Reaction (Persistence)
+        if (auth.currentUser) {
+            getDoc(doc(db, "posts", postId, "reactions", auth.currentUser.uid)).then((uSnap) => {
+                if (uSnap.exists()) {
+                    const rType = uSnap.data().type;
+                    const btn = document.getElementById("like-btn-" + postId);
+                    if (btn) {
+                        btn.className = "action-btn like-btn react-" + rType;
+                        btn.innerText = rType.charAt(0).toUpperCase() + rType.slice(1);
+                    }
+                }
+            });
+        }
+
+        // 3. Independent Reaction Counter Listener
+        onSnapshot(collection(db, "posts", postId, "reactions"), (reactSnap) => {
+            const counts = { like: 0, love: 0, haha: 0, wow: 0, sad: 0, angry: 0 };
+            reactSnap.forEach(r => { if(counts[r.data().type] !== undefined) counts[r.data().type]++; });
+            let html = "";
+            const map = { like: "Like.png", love: "Love.png", haha: "Haha.png", wow: "Wow.png", sad: "Sad.png", angry: "Angry.png" };
+            for (const type in counts) {
+                if (counts[type] > 0) html += `<span><img src="image/icon/${map[type]}" style="width:16px"> ${counts[type]}</span>`;
+            }
+            const box = document.getElementById("react-count-" + postId);
+            if (box) box.innerHTML = html;
+        });
+
+        // 4. Independent Comment Listener
+        const commentsRef = query(collection(db, "posts", postId, "comments"), orderBy("time", "desc"));
+        onSnapshot(commentsRef, (commentSnap) => {
+            const list = document.getElementById("comments-" + postId);
+            if (!list) return;
+            list.innerHTML = "";
+            commentSnap.forEach(c => {
+                const data = c.data();
+                list.innerHTML += `
+                    <div class="comment-item">
+                        <img class="comment-avatar" src="${data.photo}">
+                        <div style="flex:1;">
+                            <div class="comment-name">${data.name} ${getBadge(data.email)}</div>
+                            <div class="comment-text">${data.text}</div>
+                        </div>
+                    </div>`;
+            });
+        });
+    }); // End forEach
+}); // End main Snapshot
 
 const imageInput = document.getElementById("postImage");
 const preview = document.getElementById("imagePreview");
@@ -1187,16 +1112,16 @@ preview.appendChild(img);
 reader.readAsDataURL(files[i]);
 }
 });
-  
+  
 /* AUTH USER */
 onAuthStateChanged(auth,(user)=>{
-    if(user){
-        document.getElementById("userDisplay").innerText =
-        user.displayName || user.email;
-        document.getElementById("logoutBtn").style.display="inline";
-    }else{
-        window.location.href="index.html";
-    }
+    if(user){
+        document.getElementById("userDisplay").innerText =
+        user.displayName || user.email;
+        document.getElementById("logoutBtn").style.display="inline";
+    }else{
+        window.location.href="index.html";
+    }
 });
 document.getElementById("logoutBtn").onclick = async ()=>{
 await signOut(auth);
@@ -1239,7 +1164,7 @@ html += `<div class="more">+${count-5} others</div>`;
 box.innerHTML = html;
 });
 }
-  
+  
 </script>
 </body>
 </html>
