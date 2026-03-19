@@ -556,16 +556,18 @@ object-fit:cover;
 }
 
 .more-comments {
-    color: var(--accent);
-    font-size: 13px;
-    cursor: pointer;
-    margin-top: 8px;
-    font-weight: 600;
-    display: inline-block;
+    color: var(--accent);
+    font-size: 13px;
+    cursor: pointer; /* This changes the cursor to the hand icon */
+    margin-top: 8px;
+    font-weight: 600;
+    display: inline-block;
+    user-select: none; /* Optional: prevents the text from being highlighted when double-clicking */
 }
 
 .more-comments:hover {
     text-decoration: underline;
+    cursor: pointer; /* Reinforce the hand icon on hover */
 }
 
 .comments-list {
