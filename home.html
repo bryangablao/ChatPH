@@ -1152,14 +1152,18 @@ snap.forEach(c=>{
 });
 
 if(total > 1){
-list.innerHTML += ``; // leave list clean
+    const oldBtn = list.parentElement.querySelector(".more-comments");
+    if(oldBtn) oldBtn.remove(); // 🔥 prevent duplicates
 
-const btn = document.createElement("div");
-btn.className = "more-comments";
-btn.innerText = isOpen ? "Hide comments" : `💬 View ${total} comments`;
-btn.onclick = () => showAllComments(doc.id);
+    const btn = document.createElement("div");
+    btn.className = "more-comments";
+    btn.innerText = isOpen ? "Hide comments" : `💬 View ${total} comments`;
 
-list.parentElement.appendChild(btn);
+    btn.onclick = function(){
+        showAllComments(doc.id);
+    };
+
+    list.parentElement.appendChild(btn);
 }
 });
 
