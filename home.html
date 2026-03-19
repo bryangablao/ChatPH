@@ -1064,6 +1064,33 @@ onkeydown="if(event.key==='Enter'){addComment('${doc.id}',this)}">
 </div>
 `;
 feed.appendChild(post);
+
+/* LOAD USER REACTION (FIX COLOR RESET) */
+const user = auth.currentUser;
+if(user){
+    const userReactRef = doc(db,"posts",doc.id,"reactions",user.uid);
+    onSnapshot(userReactRef,(snap)=>{
+        const btn = document.getElementById("like-btn-"+doc.id);
+        if(!btn) return;
+
+        if(snap.exists()){
+            const type = snap.data().type;
+            const names={
+                like:"Like",
+                love:"Love",
+                haha:"Haha",
+                wow:"Wow",
+                sad:"Sad",
+                angry:"Angry"
+            };
+            btn.innerText = names[type];
+            btn.className = "action-btn like-btn react-"+type;
+        }else{
+            btn.innerText = "Like";
+            btn.className = "action-btn like-btn";
+        }
+    });
+}
 /* REACTION COUNT SYSTEM */
 const reactRef = collection(db,"posts",doc.id,"reactions");
 onSnapshot(reactRef,(snap)=>{
@@ -1120,6 +1147,11 @@ const total = snap.size;
 snap.forEach(c=>{
     count++;
     const isOpen = list.dataset.open === "true";
+
+    if(count > 1 && !isOpen){
+        return;
+    }
+
     const data = c.data();
 
     list.innerHTML += `
