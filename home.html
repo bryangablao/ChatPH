@@ -544,20 +544,18 @@ border-radius:10px;
 object-fit:cover;
 }
 
-/* Update these in your <style> section */
-
 .comments-list {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    max-height: 85px; /* Fits roughly one comment */
+    max-height: 85px; 
     overflow: hidden;
     transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
     opacity: 0.9;
 }
 
 .comments-list.open {
-    max-height: 2000px; /* High enough to fit long threads */
+    max-height: 2000px;
     opacity: 1;
 }
 
@@ -590,11 +588,6 @@ object-fit:cover;
 .more-comments:hover {
     text-decoration: underline;
     color: #82c0ff;
-}
-
-/* Hide every comment after the 1st one by default */
-.comments-list:not(.open) .comment-item:nth-child(n+2) {
-    display: none;
 }
 
 /* Reaction Bold + Color Fix */
