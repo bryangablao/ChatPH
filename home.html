@@ -1,3 +1,5 @@
+still 1 post is showing using this code
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -156,7 +158,6 @@ margin-top:10px;
 flex-wrap:nowrap;
 overflow:hidden;
 }
-
 .post-btn{
 position:absolute;
 bottom:15px;
@@ -587,12 +588,10 @@ background:linear-gradient(90deg,#ff5e00,#ff0000);
 color:transparent;
 font-weight:bold;
 }
-
 /* closed = show only 1 comment */
 .comments-list:not(.open){
 max-height:80px;
 }
-
 .more-comments{
 opacity:.7;
 font-size:13px;
@@ -600,18 +599,15 @@ cursor:pointer;
 margin-top:6px;
 transition:.2s;
 }
-
 .more-comments:hover{
 opacity:1;
 text-decoration:underline;
 }
-
 .comments-list{
 max-height:80px;
 overflow:hidden;
 transition:max-height .4s ease;
 }
-
 .comments-list.open{
 max-height:1000px;
 }
@@ -680,10 +676,8 @@ placeholder="What's on your mind?"></div>
     <img src="image/icon/uploadimage.png">
     <input type="file" id="postImage" accept="image/*" multiple>
   </label>
-
   <div id="imagePreview" class="image-preview"></div>
 </div>
-
 <button class="post-btn" onclick="createPost()">Post</button>
   
 </div> <!-- end create-post -->
@@ -768,14 +762,12 @@ return `<span class="vip-badge">💎 VIP</span>`;
 }
 return "";
 }
-
 function getVerified(user){
 if(user?.providerData?.some(p=>p.providerId==="google.com")){
 return `<img src="image/verified.png" class="verified-badge">`;
 }
 return "";
 }
-
 /* SIDEBAR */
 window.toggleMenu = () =>{
 document.getElementById("sidebar").classList.toggle("open");
@@ -873,7 +865,6 @@ alert("Post failed.");
   
 window.showAllComments = (postId)=>{
     const list = document.getElementById("comments-"+postId);
-
     if(list.classList.contains("open")){
         list.classList.remove("open");
         list.dataset.open = "false";
@@ -881,7 +872,6 @@ window.showAllComments = (postId)=>{
         list.classList.add("open");
         list.dataset.open = "true";
     }
-
     list.innerHTML = list.innerHTML;
 }
   
@@ -995,8 +985,12 @@ alert("Post link copied!");
   
 /* LOAD POSTS */
 const feed = document.getElementById("postsFeed");
-const q = query(collection(db,"posts"), orderBy("time","desc"));
+const q = query(
+  collection(db,"posts"),
+  orderBy("time","desc")
+);
 onSnapshot(q,(snapshot)=>{
+    console.log("Posts count:", snapshot.size);
 feed.innerHTML="";
 snapshot.forEach(doc=>{
 const p = doc.data();
@@ -1064,6 +1058,31 @@ onkeydown="if(event.key==='Enter'){addComment('${doc.id}',this)}">
 </div>
 `;
 feed.appendChild(post);
+/* LOAD USER REACTION (FIX COLOR RESET) */
+const user = auth.currentUser;
+if(user){
+    const userReactRef = doc(db,"posts",doc.id,"reactions",user.uid);
+    onSnapshot(userReactRef,(snap)=>{
+        const btn = document.getElementById("like-btn-"+doc.id);
+        if(!btn) return;
+        if(snap.exists()){
+            const type = snap.data().type;
+            const names={
+                like:"Like",
+                love:"Love",
+                haha:"Haha",
+                wow:"Wow",
+                sad:"Sad",
+                angry:"Angry"
+            };
+            btn.innerText = names[type];
+            btn.className = "action-btn like-btn react-"+type;
+        }else{
+            btn.innerText = "Like";
+            btn.className = "action-btn like-btn";
+        }
+    });
+}
 /* REACTION COUNT SYSTEM */
 const reactRef = collection(db,"posts",doc.id,"reactions");
 onSnapshot(reactRef,(snap)=>{
@@ -1100,15 +1119,10 @@ if(box) box.innerHTML = html;
 });
   
 /* LOAD COMMENTS FOR THIS POST */
-const commentsRef = query(
-collection(db,"posts",doc.id,"comments"),
-orderBy("time","desc")
-);
-
+const commentsRef = collection(db,"posts",doc.id,"comments");
 onSnapshot(commentsRef,(snap)=>{
 const list = document.getElementById("comments-"+doc.id);
 if(!list) return;
-
 if(!list.dataset.open){
     list.dataset.open = "false";
 }
@@ -1116,10 +1130,13 @@ if(!list.dataset.open){
 list.innerHTML="";
 let count = 0;
 const total = snap.size;
-
 snap.forEach(c=>{
     count++;
+
     const isOpen = list.dataset.open === "true";
+
+    if(!isOpen && count > 1) return;
+
     const data = c.data();
 
     list.innerHTML += `
@@ -1137,9 +1154,7 @@ snap.forEach(c=>{
     `;
 });
 
-/* ✅ ADD BUTTON HERE (OUTSIDE LOOP) */
 const isOpen = list.dataset.open === "true";
-
 if(total > 1){
     list.innerHTML += `
     <div class="more-comments"
@@ -1148,10 +1163,8 @@ if(total > 1){
     </div>`;
 }
 });
-
 });
 });
-
 const imageInput = document.getElementById("postImage");
 const preview = document.getElementById("imagePreview");
 imageInput.addEventListener("change",()=>{
@@ -1167,8 +1180,6 @@ preview.appendChild(img);
 reader.readAsDataURL(files[i]);
 }
 });
-  
-/* AUTH USER */
 onAuthStateChanged(auth,(user)=>{
     if(user){
         document.getElementById("userDisplay").innerText =
@@ -1178,10 +1189,12 @@ onAuthStateChanged(auth,(user)=>{
         window.location.href="index.html";
     }
 });
+  
 document.getElementById("logoutBtn").onclick = async ()=>{
 await signOut(auth);
 window.location.href="index.html";
 };
+  
 const sidebar = document.getElementById("sidebar");
 document.addEventListener("click",(e)=>{
 if(!sidebar.contains(e.target) && !e.target.classList.contains("hamburger")){
