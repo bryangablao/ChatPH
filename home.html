@@ -1200,10 +1200,22 @@ reader.readAsDataURL(files[i]);
 }
 });
 
+onAuthStateChanged(auth,(user)=>{
+    if(user){
+        document.getElementById("userDisplay").innerText =
+        user.displayName || user.email;
+
+        document.getElementById("logoutBtn").style.display="inline";
+    }else{
+        window.location.href="index.html";
+    }
+});
+  
 document.getElementById("logoutBtn").onclick = async ()=>{
 await signOut(auth);
 window.location.href="index.html";
 };
+  
 const sidebar = document.getElementById("sidebar");
 document.addEventListener("click",(e)=>{
 if(!sidebar.contains(e.target) && !e.target.classList.contains("hamburger")){
