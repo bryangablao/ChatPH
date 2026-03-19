@@ -403,10 +403,16 @@ outline:none;
 }
 .comment-item{
 display:flex;
-align-items:center;
+align-items:flex-start;
 gap:8px;
 margin-top:8px;
 font-size:14px;
+}
+.comment-time{
+font-size:11px;
+opacity:.6;
+white-space:nowrap;
+margin-left:auto;
 }
 .comment-item div{
 display:flex;
@@ -872,17 +878,17 @@ alert("Post failed.");
 }
   
 window.showAllComments = (postId)=>{
-    const list = document.getElementById("comments-"+postId);
+const list = document.getElementById("comments-"+postId);
 
-    if(list.classList.contains("open")){
-        list.classList.remove("open");
-        list.dataset.open = "false";
-    }else{
-        list.classList.add("open");
-        list.dataset.open = "true";
-    }
+const isOpen = list.dataset.open === "true";
 
-    list.innerHTML = list.innerHTML;
+if(isOpen){
+list.dataset.open = "false";
+list.classList.remove("open");
+}else{
+list.dataset.open = "true";
+list.classList.add("open");
+}
 }
   
 window.toggleComment = (id)=>{
@@ -1121,36 +1127,39 @@ snap.forEach(c=>{
     count++;
 
     const isOpen = list.dataset.open === "true";
-
-    // ✅ LIMIT COMMENTS WHEN CLOSED
     if(!isOpen && count > 1) return;
 
     const data = c.data();
 
-    list.innerHTML += `
-    <div class="comment-item">
-        <img class="comment-avatar" src="${data.photo}">
-        <div>
-            <span class="comment-name">
-            ${data.name}
-            ${getBadge(data.email)}
-            ${getVerified({providerData:[{providerId:"google.com"}]})}
-            </span>
-            <span class="comment-text">${data.text}</span>
-        </div>
+list.innerHTML += `
+<div class="comment-item">
+    <img class="comment-avatar" src="${data.photo}">
+    
+    <div style="flex:1;">
+        <span class="comment-name">
+        ${data.name}
+        ${getBadge(data.email)}
+        ${getVerified({providerData:[{providerId:"google.com"}]})}
+        </span>
+        <span class="comment-text">${data.text}</span>
     </div>
-    `;
+
+    <div class="comment-time">
+        ${data.time?.toDate().toLocaleString() || ""}
+    </div>
+</div>
+`;
 });
 
 /* ✅ ADD BUTTON HERE (OUTSIDE LOOP) */
 const isOpen = list.dataset.open === "true";
 
 if(total > 1){
-    list.innerHTML += `
-    <div class="more-comments"
-    onclick="showAllComments('${doc.id}')">
-    ${isOpen ? "Hide comments" : `💬 View ${total} comments`}
-    </div>`;
+list.innerHTML += `
+<div class="more-comments"
+onclick="showAllComments('${doc.id}')">
+${isOpen ? "Hide comments" : `💬 View ${total} comment${total>1?'s':''}`}
+</div>`;
 }
 });
 
