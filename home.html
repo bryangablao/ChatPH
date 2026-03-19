@@ -595,16 +595,22 @@ color:transparent;
 font-weight:bold;
 }
 
-/* closed = show only 1 comment */
 .comments-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+    display: grid;
+    grid-template-rows: 0fr; /* Start collapsed */
+    transition: grid-template-rows 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Hide every comment after the 1st one by default */
-.comments-list:not(.open) .comment-item:nth-child(n+2) {
-    display: none;
+.comments-list.open {
+    grid-template-rows: 1fr; 
+}
+
+.comments-inner {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; 
+    padding-bottom: 10px;
 }
 
 .more-comments {
@@ -618,19 +624,8 @@ font-weight:bold;
 
 .more-comments:hover {
     text-decoration: underline;
-}xt-decoration:underline;
 }
 
-.comments-list{
-max-height:80px;
-overflow:hidden;
-transition:max-height .4s ease;
-}
-
-.comments-list.open{
-max-height:1000px;
-}
-  
 </style>
 </head>
 <body>
@@ -725,17 +720,9 @@ Made with ❤️ in the Philippines
 <script type="module">
 import { initializeApp } from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-getFirestore,
-collection,
-addDoc,
-query,
-orderBy,
-onSnapshot,
-serverTimestamp,
-doc,
-setDoc,
-deleteDoc
+import { 
+    getFirestore, collection, addDoc, query, orderBy, onSnapshot, 
+    serverTimestamp, doc, setDoc, deleteDoc, getDoc, getDocs 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
 getAuth,
@@ -1009,6 +996,28 @@ window.sharePost = (id)=>{
 navigator.clipboard.writeText(location.href+"?post="+id);
 alert("Post link copied!");
 }
+
+window.toggleReplyInput = (commentId) => {
+    const el = document.getElementById("reply-input-" + commentId);
+    el.style.display = el.style.display === "block" ? "none" : "block";
+    if(el.style.display === "block") el.querySelector('input').focus();
+}
+
+window.addReply = async (postId, commentId, input) => {
+    const text = input.value.trim();
+    if (!text) return;
+    const user = auth.currentUser;
+    
+    await addDoc(collection(db, "posts", postId, "comments", commentId, "replies"), {
+        text: text,
+        name: user.displayName || "User",
+        email: user.email,
+        photo: user.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
+        time: serverTimestamp()
+    });
+    input.value = "";
+    document.getElementById("reply-input-" + commentId).style.display = "none";
+}
   
 /* LOAD POSTS */
 const feed = document.getElementById("postsFeed");
@@ -1127,45 +1136,70 @@ onSnapshot(commentsRef, (snap) => {
     const commentBox = document.getElementById("comment-" + doc.id);
     if (!list) return;
 
-    list.innerHTML = "";
+    list.innerHTML = `<div class="comments-inner" id="inner-${doc.id}"></div>`;
+    const inner = document.getElementById(`inner-${doc.id}`);
+    
     const total = snap.size;
     const isOpen = commentState[doc.id] || false;
-
-    // 1. Apply the 'open' class if it was already open
     if (isOpen) list.classList.add("open");
 
-    // 2. Render ALL comments (CSS will handle hiding them)
     snap.forEach(c => {
         const data = c.data();
-        list.innerHTML += `
-            <div class="comment-item">
-                <img class="comment-avatar" src="${data.photo}">
-                <div style="flex:1;">
-                    <div class="comment-name">
-                        ${data.name} ${getBadge(data.email)}
+        const commentId = c.id;
+        
+        const commentHtml = `
+            <div class="comment-wrapper" style="margin-bottom:10px;">
+                <div class="comment-item">
+                    <img class="comment-avatar" src="${data.photo}">
+                    <div style="flex:1;">
+                        <div class="comment-name">
+                            ${data.name} ${getBadge(data.email)}
+                            <span class="reply-btn" onclick="toggleReplyInput('${commentId}')">Reply</span>
+                        </div>
+                        <div class="comment-text">${data.text}</div>
                     </div>
-                    <div class="comment-text">${data.text}</div>
+                    <div class="comment-time">${data.time?.toDate().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) || ""}</div>
                 </div>
-                <div class="comment-time">
-                    ${data.time?.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) || ""}
+                
+                <div class="reply-input-box" id="reply-input-${commentId}">
+                    <input type="text" class="reply-field" placeholder="Write a reply..." 
+                        onkeydown="if(event.key==='Enter'){addReply('${doc.id}','${commentId}',this)}">
                 </div>
+
+                <div class="replies-container" id="replies-${commentId}"></div>
             </div>`;
+            
+        inner.innerHTML += commentHtml;
+
+        // LOAD REPLIES FOR THIS SPECIFIC COMMENT
+        const repliesRef = query(collection(db, "posts", doc.id, "comments", commentId, "replies"), orderBy("time", "asc"));
+        onSnapshot(repliesRef, (rSnap) => {
+            const rList = document.getElementById("replies-" + commentId);
+            if (!rList) return;
+            rList.innerHTML = "";
+            rSnap.forEach(rd => {
+                const rData = rd.data();
+                rList.innerHTML += `
+                    <div class="comment-item" style="margin-top:5px; font-size:13px;">
+                        <img class="comment-avatar" src="${rData.photo}" style="width:22px; height:22px;">
+                        <div style="flex:1;">
+                            <div class="comment-name">${rData.name}</div>
+                            <div class="comment-text">${rData.text}</div>
+                        </div>
+                    </div>`;
+            });
+        });
     });
 
-    // 3. Handle the "View More" button
-    // Remove any existing button first
+    // View More Button logic remains the same...
     const existingBtn = commentBox.querySelector(".more-comments");
     if (existingBtn) existingBtn.remove();
-
     if (total > 1) {
         const btn = document.createElement("div");
         btn.className = "more-comments";
         btn.id = "btn-" + doc.id;
         btn.innerText = isOpen ? "Collapse comments" : `💬 View ${total} comments`;
-        
         btn.onclick = () => window.showAllComments(doc.id, total);
-        
-        // Append it to the commentBox, but AFTER the list so it's never hidden by overflow
         commentBox.appendChild(btn);
     }
 });
