@@ -1099,16 +1099,18 @@ onSnapshot(q, (snapshot) => {
 
             if (isOpen) list.classList.add("open");
 
-            snap.forEach(c => {
+// Inside the onSnapshot for commentsRef...
+snap.forEach(c => {
     const data = c.data();
     const dateObj = data.time?.toDate();
     
-    // Create a readable Date + Time string (e.g., "Oct 24, 2:30 PM")
+    // Updated to include 'year'
     const formattedDate = dateObj ? dateObj.toLocaleString([], {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+        year: 'numeric',   // Adds 2026
+        month: 'short',    // Adds Mar
+        day: 'numeric',    // Adds 20
+        hour: '2-digit',   // Adds 02
+        minute: '2-digit'  // Adds 18
     }) : "";
 
     list.innerHTML += `
