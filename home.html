@@ -719,8 +719,7 @@ onSnapshot,
 serverTimestamp,
 doc,
 setDoc,
-deleteDoc,
-limit
+deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
 getAuth,
@@ -739,7 +738,7 @@ const firebaseConfig = {
 apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
 authDomain: "chatph-cc187.firebaseapp.com",
 projectId: "chatph-cc187",
-storageBucket: "chatph-cc187.appspot.com",
+storageBucket: "chatph-cc187.firebasestorage.app",
 messagingSenderId: "324012163441",
 appId: "1:324012163441:web:7a54be2231ad2cae71f6d0"
 };
@@ -747,11 +746,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);  
 const storage = getStorage(app);
-
-const imageInput = document.getElementById("postImage");
-const preview = document.getElementById("imagePreview");
 const commentState = {};
-let selectedImages = [];
 function getBadge(email){
 if(email === "ablaobryan4400@gmail.com"){
 return `<span class="admin-badge">💠 Admin</span>`;
@@ -839,34 +834,33 @@ window.createPost = async () => {
     const btn = document.querySelector(".post-btn"); 
     const editor = document.getElementById("postText");
     const text = editor.innerHTML.trim();
-    const imageFiles = selectedImages;
+    const imageFiles = document.getElementById("postImage").files;
     const user = auth.currentUser;
 
     if (!text && imageFiles.length === 0) {
-        showToast("Write something first ⚠️", "#f59e0b");
+        alert("Write something or upload an image.");
         return;
     }
-
     if (!user) {
-        showToast("Login required ⚠️", "#f59e0b");
+        alert("You must be logged in.");
         return;
     }
 
+    // --- START LOADING STATE ---
     btn.disabled = true; 
     btn.innerText = "Posting..."; 
+    btn.style.opacity = "0.7";
+    btn.style.cursor = "not-allowed";
 
     let imageURLs = [];
-
     try {
         if (imageFiles.length > 0) {
-            const uploadPromises = imageFiles.map(async (file) => {
-                const compressed = await compressImage(file);
+            for (const file of imageFiles) {
                 const storageRef = ref(storage, "posts/" + Date.now() + "_" + file.name);
-                await uploadBytes(storageRef, compressed);
-                return await getDownloadURL(storageRef);
-            });
-
-            imageURLs = await Promise.all(uploadPromises);
+                await uploadBytes(storageRef, file);
+                const url = await getDownloadURL(storageRef);
+                imageURLs.push(url);
+            }
         }
 
         await addDoc(collection(db, "posts"), {
@@ -878,58 +872,29 @@ window.createPost = async () => {
             time: serverTimestamp()
         });
 
-        showToast("Posted successfully ✅", "#16a34a");
 
         editor.innerHTML = "";
-        selectedImages = [];
-        imageInput.value = "";
-        renderPreview();
+        document.getElementById("postImage").value = "";
+        document.getElementById("imagePreview").innerHTML = "";
 
     } catch (err) {
         console.error(err);
-        showToast("Post failed ❌", "#dc2626");
+        alert("Post failed. Please try again.");
     } finally {
+
         btn.disabled = false;
         btn.innerText = "Post";
+        btn.style.opacity = "1";
+        btn.style.cursor = "pointer";
     }
 };
-
-async function compressImage(file) {
-    return new Promise((resolve) => {
-        const img = new Image();
-        const reader = new FileReader();
-
-        reader.onload = e => img.src = e.target.result;
-
-        img.onload = () => {
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-
-            const MAX_WIDTH = 800;
-            const scale = MAX_WIDTH / img.width;
-
-            canvas.width = MAX_WIDTH;
-            canvas.height = img.height * scale;
-
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-            canvas.toBlob(blob => {
-                resolve(new File([blob], file.name, { type: "image/jpeg" }));
-            }, "image/jpeg", 0.7); // quality 70%
-        };
-
-        reader.readAsDataURL(file);
-    });
-}
   
 window.showAllComments = (postId, total) => {
     const list = document.getElementById("comments-" + postId);
     const btn = document.getElementById("btn-" + postId);
-
-    // toggle state
+    
     commentState[postId] = !commentState[postId];
 
-    // apply UI
     if (commentState[postId]) {
         list.classList.add("open");
         if (btn) btn.innerText = "Hide comments...";
@@ -937,7 +902,7 @@ window.showAllComments = (postId, total) => {
         list.classList.remove("open");
         if (btn) btn.innerText = `💬 View ${total} comments...`;
     }
-};
+}
   
 window.toggleComment = (id)=>{
 const box = document.getElementById("comment-"+id);
@@ -1132,7 +1097,7 @@ onSnapshot(q, (snapshot) => {
         });
 
         // COMMENTS SYSTEM (WITH VIEW MORE LOGIC)
-        const commentsRef = query(collection(db, "posts", postId, "comments"),orderBy("time", "desc"),limit(1));
+        const commentsRef = query(collection(db, "posts", postId, "comments"), orderBy("time", "desc"));
         onSnapshot(commentsRef, (snap) => {
             const list = document.getElementById("comments-" + postId);
             const commentBox = document.getElementById("comment-" + postId);
@@ -1142,11 +1107,7 @@ onSnapshot(q, (snapshot) => {
             const total = snap.size;
             const isOpen = commentState[postId] || false;
 
-            if (isOpen) {
-                list.classList.add("open");
-            } else {
-                list.classList.remove("open");
-            }
+            if (isOpen) list.classList.add("open");
 
 // Inside the onSnapshot for commentsRef...
 snap.forEach(c => {
@@ -1179,23 +1140,10 @@ snap.forEach(c => {
             const existingBtn = commentBox.querySelector(".more-comments");
             if (existingBtn) existingBtn.remove();
 
-            if (total > 0) {
+            if (total > 1) {
                 const btn = document.createElement("div");
                 btn.className = "more-comments";
                 btn.id = "btn-" + postId;
-                const allCommentsRef = collection(db, "posts", postId, "comments");
-
-                onSnapshot(allCommentsRef, (allSnap) => {
-                  const totalComments = allSnap.size;
-                  const hiddenCount = totalComments - 1;
-
-                  if (hiddenCount > 0) {
-                    btn.innerText = `💬 View ${hiddenCount} more comments...`;
-                  } else {
-                    btn.innerText = `💬 View ${totalComments} comments...`;
-                  }
-                });
-                
                 btn.innerText = isOpen ? "Hide comments..." : `💬 View ${total} comments...`;
                 btn.onclick = () => window.showAllComments(postId, total);
                 commentBox.appendChild(btn);
@@ -1204,101 +1152,22 @@ snap.forEach(c => {
     });
 });
 
-imageInput.addEventListener("change", () => {
-    const files = Array.from(imageInput.files);
-
-    if (selectedImages.length + files.length > 5) {
-        showToast("Max 5 images only!", "#f59e0b");
-        return;
-    }
-
-    files.forEach(file => selectedImages.push(file));
-    renderPreview();
+const imageInput = document.getElementById("postImage");
+const preview = document.getElementById("imagePreview");
+imageInput.addEventListener("change",()=>{
+preview.innerHTML="";
+const files = imageInput.files;
+for(let i=0;i<files.length;i++){
+const reader = new FileReader();
+reader.onload = function(e){
+const img = document.createElement("img");
+img.src = e.target.result;
+preview.appendChild(img);
+};
+reader.readAsDataURL(files[i]);
+}
 });
-
-function renderPreview(){
-    preview.innerHTML = "";
-
-    selectedImages.forEach((file, index) => {
-        const reader = new FileReader();
-
-        reader.onload = function(e){
-            const div = document.createElement("div");
-            div.draggable = true;
-            div.style.position = "relative";
-
-            div.ondragstart = () => {
-                div.classList.add("dragging");
-            };
-
-            div.ondragend = () => {
-                div.classList.remove("dragging");
-            };
-
-            div.ondragover = (e) => {
-                e.preventDefault();
-            };
-
-            div.ondrop = (e) => {
-                e.preventDefault();
-
-                const draggingIndex = selectedImages.findIndex(f => f === document.querySelector(".dragging").fileRef);
-                
-                const temp = selectedImages[index];
-                selectedImages[index] = selectedImages[draggingIndex];
-                selectedImages[draggingIndex] = temp;
-
-                renderPreview();
-            };
-
-            div.fileRef = file;
-
-            const img = document.createElement("img");
-            img.src = e.target.result;
-
-            const removeBtn = document.createElement("div");
-            removeBtn.innerText = "×";
-
-            Object.assign(removeBtn.style,{
-                position:"absolute",
-                top:"5px",
-                right:"5px",
-                background:"rgba(0,0,0,0.7)",
-                color:"white",
-                borderRadius:"50%",
-                width:"20px",
-                height:"20px",
-                display:"flex",
-                alignItems:"center",
-                justifyContent:"center",
-                cursor:"pointer"
-            });
-
-            removeBtn.onclick = () => {
-                selectedImages.splice(index,1);
-                renderPreview();
-            };
-
-            div.appendChild(img);
-            div.appendChild(removeBtn);
-            preview.appendChild(div);
-        };
-
-        reader.readAsDataURL(file);
-    });
-}
-
-function showToast(msg, color="#1f2937"){
-    const toast = document.getElementById("toast");
-    toast.innerText = msg;
-    toast.style.background = color;
-    toast.style.opacity = "1";
-
-    setTimeout(()=>{
-        toast.style.opacity = "0";
-    }, 2500);
-}
-    
+  
 /* AUTH USER */
 onAuthStateChanged(auth,(user)=>{
     if(user){
@@ -1352,23 +1221,5 @@ box.innerHTML = html;
 }
   
 </script>
-
-<div id="toast" style="
-position:fixed;
-bottom:20px;
-left:50%;
-transform:translateX(-50%);
-background:#1f2937;
-color:white;
-padding:10px 18px;
-border-radius:20px;
-font-size:14px;
-opacity:0;
-transition:0.3s;
-z-index:9999;
-"></div>
-    
 </body>
 </html>
-
-
