@@ -14,7 +14,7 @@
             --text: #ffffff;
             --text-dim: #94a3b8;
             --accent: #3b82f6;
-            --glass: rgba(255, 255, 255, 0.03);
+            --glass: rgba(255, 255, 255, 0.05);
         }
 
         * { box-sizing: border-box; transition: all 0.2s ease; }
@@ -28,89 +28,72 @@
             position: sticky; top: 0; z-index: 1000; 
         }
 
-        /* SIDEBAR & OVERLAY */
+        /* SIDEBAR & CLICK-OUTSIDE OVERLAY */
         .sidebar { 
             position: fixed; top: 0; left: -280px; width: 260px; height: 100%; 
             background: var(--card); border-right: 1px solid var(--border); 
             padding-top: 80px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2001; 
         }
         .sidebar.open { left: 0; }
+        
+        /* The secret to closing the menu when clicking outside */
         .sidebar-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); opacity: 0; visibility: hidden; z-index: 2000;
         }
         .sidebar-overlay.active { opacity: 1; visibility: visible; }
+
         .sidebar a { display: block; padding: 15px 25px; color: white; text-decoration: none; font-weight: 600; }
         .sidebar a:hover { background: var(--glass); color: var(--accent); }
 
         /* PROFILE LAYOUT */
-        .cover-container { position: relative; height: 220px; width: 100%; background: #1e293b; }
+        .cover-container { position: relative; height: 200px; width: 100%; background: #1e293b; overflow: hidden; }
         #coverImg { width: 100%; height: 100%; object-fit: cover; }
         
         /* Fixed overlap for cover button */
         .btn-edit-cover {
-            position: absolute; bottom: 20px; right: 20px; z-index: 50;
+            position: absolute; bottom: 15px; right: 15px; z-index: 10;
             background: rgba(0,0,0,0.7); color: white; border: 1px solid rgba(255,255,255,0.2);
-            padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 12px;
+            padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 11px;
         }
 
         .profile-card {
-            max-width: 800px; margin: -60px auto 30px; position: relative; z-index: 100;
+            max-width: 800px; margin: -50px auto 30px; position: relative; z-index: 100;
             background: var(--card); border: 1px solid var(--border);
             border-radius: 24px; padding: 30px; text-align: center;
             box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
 
-        .pfp-area { position: relative; width: 130px; height: 130px; margin: -95px auto 15px; }
-        .profile-avatar { width: 100%; height: 100%; border-radius: 50%; border: 6px solid var(--card); object-fit: cover; background: #222; }
+        .pfp-area { position: relative; width: 120px; height: 120px; margin: -90px auto 15px; }
+        .profile-avatar { width: 100%; height: 100%; border-radius: 50%; border: 5px solid var(--card); object-fit: cover; background: #222; }
         .pfp-edit-badge { 
-            position: absolute; bottom: 5px; right: 5px; background: var(--accent); 
+            position: absolute; bottom: 0; right: 0; background: var(--accent); 
             width: 34px; height: 34px; border-radius: 50%; display: flex; 
             align-items: center; justify-content: center; cursor: pointer; border: 3px solid var(--card);
         }
 
         .stats { display: flex; justify-content: center; gap: 30px; margin: 20px 0; border-top: 1px solid var(--border); padding-top: 20px; }
         .stats b { display: block; font-size: 18px; color: var(--text); }
-        .stats span { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
-
-        .bio-box { background: var(--glass); padding: 18px; border-radius: 15px; font-size: 14px; color: #cbd5e1; margin-bottom: 20px; line-height: 1.6; }
+        .stats span { font-size: 11px; color: var(--text-dim); text-transform: uppercase; }
 
         /* CUSTOM MODAL */
         .modal-wrap {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 3000;
         }
-        .modal {
-            background: var(--card); border: 1px solid var(--border);
-            padding: 25px; border-radius: 20px; width: 90%; max-width: 400px;
-        }
-        .modal textarea {
-            width: 100%; height: 100px; background: #0b0e11; border: 1px solid var(--border);
-            color: white; border-radius: 12px; padding: 12px; margin: 15px 0; font-family: inherit; resize: none;
-        }
+        .modal { background: var(--card); border: 1px solid var(--border); padding: 25px; border-radius: 20px; width: 90%; max-width: 400px; }
+        .modal textarea { width: 100%; height: 100px; background: #0b0e11; border: 1px solid var(--border); color: white; border-radius: 12px; padding: 12px; margin: 15px 0; font-family: inherit; resize: none; }
 
-        /* BUTTONS */
         .btn { padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; font-weight: 700; font-size: 14px; }
         .btn-primary { background: var(--accent); color: white; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: white; }
 
-        /* POSTS */
-        .post { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 15px; text-align: left; }
-
-        #uploadToast {
-            position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
-            background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
-            font-size: 13px; font-weight: 600; display: none; z-index: 5000; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-
-        .badge-admin { background: gold; color: black; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; margin-left: 5px; }
+        .post { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 15px; margin-bottom: 12px; text-align: left; }
     </style>
 </head>
 <body>
 
 <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
-
-<div id="uploadToast">Uploading image...</div>
 
 <div class="modal-wrap" id="bioModal">
     <div class="modal">
@@ -154,7 +137,7 @@
             <div class="pfp-edit-badge" onclick="document.getElementById('pfpInput').click()">✏️</div>
         </div>
 
-        <h2 id="nameDisplay">User Name <span id="badgeLoc"></span></h2>
+        <h2 id="nameDisplay">User Name</h2>
         <p id="emailDisplay" style="color: var(--text-dim); margin-top: -10px; font-size: 14px;">loading...</p>
 
         <div class="stats">
@@ -163,10 +146,7 @@
             <div class="stat-item"><b>2026</b><span>Joined</span></div>
         </div>
 
-        <div class="bio-box" id="bioDisplay">
-            Loading your profile bio...
-        </div>
-
+        <div class="bio-box" id="bioDisplay">Loading bio...</div>
         <button class="btn btn-primary" onclick="openBioModal()">Edit Profile</button>
     </div>
 
@@ -180,7 +160,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
@@ -194,29 +173,22 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-    const storage = getStorage(app);
 
-    /* --- SIDEBAR LOGIC --- */
     window.toggleMenu = () => {
         document.getElementById("sidebar").classList.toggle("open");
         document.getElementById("overlay").classList.toggle("active");
     };
 
-    /* --- MODAL LOGIC --- */
     window.openBioModal = () => {
         document.getElementById("bioModal").style.display = "flex";
-        document.getElementById("bioInput").value = document.getElementById("bioDisplay").innerText === "Welcome! Tell us about yourself." ? "" : document.getElementById("bioDisplay").innerText;
+        document.getElementById("bioInput").value = document.getElementById("bioDisplay").innerText;
     };
     window.closeBioModal = () => document.getElementById("bioModal").style.display = "none";
 
-    /* --- AUTH & LOAD --- */
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            document.getElementById("nameDisplay").firstChild.textContent = user.displayName || "ChatPH User";
+            document.getElementById("nameDisplay").innerText = user.displayName || "User";
             document.getElementById("emailDisplay").innerText = user.email;
-            if(user.email === "ablaobryan4400@gmail.com") {
-                document.getElementById("badgeLoc").innerHTML = `<span class="badge-admin">💠 ADMIN</span>`;
-            }
             loadUserData(user);
             loadUserPosts(user.email);
         } else {
@@ -225,74 +197,58 @@
     });
 
     async function loadUserData(user) {
-        try {
-            const snap = await getDoc(doc(db, "users", user.uid));
-            if (snap.exists()) {
-                const data = snap.data();
-                document.getElementById("bioDisplay").innerText = data.bio || "Welcome! Tell us about yourself.";
-                if (data.pfpURL) document.getElementById("pfp").src = data.pfpURL;
-                if (data.coverURL) document.getElementById("coverImg").src = data.coverURL;
-            } else {
-                document.getElementById("bioDisplay").innerText = "Welcome! Tell us about yourself.";
-            }
-        } catch (e) {
-            document.getElementById("bioDisplay").innerText = "Error loading bio. Check rules.";
+        const snap = await getDoc(doc(db, "users", user.uid));
+        if (snap.exists()) {
+            const data = snap.data();
+            document.getElementById("bioDisplay").innerText = data.bio || "No bio yet.";
+            if (data.pfpBase64) document.getElementById("pfp").src = data.pfpBase64;
+            if (data.coverBase64) document.getElementById("coverImg").src = data.coverBase64;
+        } else {
+            document.getElementById("bioDisplay").innerText = "No bio yet.";
         }
     }
 
-    /* --- SAVE BIO --- */
     window.saveBio = async () => {
         const text = document.getElementById("bioInput").value;
         const user = auth.currentUser;
-        if (user) {
-            await setDoc(doc(db, "users", user.uid), { bio: text }, { merge: true });
-            document.getElementById("bioDisplay").innerText = text;
-            closeBioModal();
-        }
+        await setDoc(doc(db, "users", user.uid), { bio: text }, { merge: true });
+        document.getElementById("bioDisplay").innerText = text;
+        closeBioModal();
     };
 
-    /* --- REAL STORAGE UPLOAD --- */
-    const handleUpload = async (file, pathType) => {
+    /* --- THE BASE64 UPLOAD MAGIC (NO STORAGE NEEDED) --- */
+    const handleImageSelect = (file, type) => {
         if (!file) return;
-        const user = auth.currentUser;
-        const toast = document.getElementById("uploadToast");
         
-        toast.style.display = "block";
-        try {
-            const fileRef = ref(storage, `users/${user.uid}/${pathType}_${Date.now()}`);
-            await uploadBytes(fileRef, file);
-            const downloadURL = await getDownloadURL(fileRef);
-            
-            const field = pathType === 'pfp' ? 'pfpURL' : 'coverURL';
-            await setDoc(doc(db, "users", user.uid), { [field]: downloadURL }, { merge: true });
-            
-            document.getElementById(pathType === 'pfp' ? "pfp" : "coverImg").src = downloadURL;
-        } catch (err) {
-            console.error(err);
-            alert("Upload failed. Ensure Storage Rules allow write access.");
+        // Check file size (Firestore has a 1MB limit per document)
+        if (file.size > 800000) {
+            alert("Image is too large! Please pick a smaller image (under 800KB).");
+            return;
         }
-        toast.style.display = "none";
+
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            const base64String = reader.result;
+            const user = auth.currentUser;
+            const field = type === 'pfp' ? 'pfpBase64' : 'coverBase64';
+            
+            await setDoc(doc(db, "users", user.uid), { [field]: base64String }, { merge: true });
+            document.getElementById(type === 'pfp' ? "pfp" : "coverImg").src = base64String;
+        };
+        reader.readAsDataURL(file);
     };
 
-    document.getElementById("pfpInput").onchange = (e) => handleUpload(e.target.files[0], 'pfp');
-    document.getElementById("coverInput").onchange = (e) => handleUpload(e.target.files[0], 'cover');
+    document.getElementById("pfpInput").onchange = (e) => handleImageSelect(e.target.files[0], 'pfp');
+    document.getElementById("coverInput").onchange = (e) => handleImageSelect(e.target.files[0], 'cover');
 
-    /* --- POSTS --- */
     function loadUserPosts(email) {
         const q = query(collection(db, "posts"), where("email", "==", email), orderBy("time", "desc"));
         onSnapshot(q, (snapshot) => {
             const list = document.getElementById("userPosts");
             list.innerHTML = "";
             document.getElementById("postCount").innerText = snapshot.size;
-            
-            if (snapshot.empty) {
-                list.innerHTML = `<p style="opacity:0.3; text-align:center; padding:30px;">No posts yet.</p>`;
-                return;
-            }
-
-            snapshot.forEach(doc => {
-                const p = doc.data();
-                list.innerHTML += `<div class="post">${p.text}</div>`;
+            snapshot.forEach(d => {
+                list.innerHTML += `<div class="post">${d.data().text}</div>`;
             });
         });
     }
