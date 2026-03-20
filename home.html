@@ -719,7 +719,8 @@ onSnapshot,
 serverTimestamp,
 doc,
 setDoc,
-deleteDoc
+deleteDoc,
+limit
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
 getAuth,
@@ -842,34 +843,32 @@ window.createPost = async () => {
     const user = auth.currentUser;
 
     if (!text && imageFiles.length === 0) {
-        alert("Write something or upload an image.");
-        return;
-    }
-    if (!user) {
-        alert("You must be logged in.");
+        showToast("Write something first ⚠️", "#f59e0b");
         return;
     }
 
-    // --- START LOADING STATE ---
+    if (!user) {
+        showToast("Login required ⚠️", "#f59e0b");
+        return;
+    }
+
     btn.disabled = true; 
     btn.innerText = "Posting..."; 
-    btn.style.opacity = "0.7";
-    btn.style.cursor = "not-allowed";
 
     let imageURLs = [];
+
     try {
         if (imageFiles.length > 0) {
-            for (const file of imageFiles) {
+            const uploadPromises = imageFiles.map(async (file) => {
                 const compressed = await compressImage(file);
                 const storageRef = ref(storage, "posts/" + Date.now() + "_" + file.name);
                 await uploadBytes(storageRef, compressed);
-                // ✅ GET DOWNLOAD URL
-                const url = await getDownloadURL(storageRef);
-                // ✅ SAVE IT
-                imageURLs.push(url);
-            }
+                return await getDownloadURL(storageRef);
+            });
+
+            imageURLs = await Promise.all(uploadPromises);
         }
-        
+
         await addDoc(collection(db, "posts"), {
             text: text,
             images: imageURLs,
@@ -879,6 +878,8 @@ window.createPost = async () => {
             time: serverTimestamp()
         });
 
+        showToast("Posted successfully ✅", "#16a34a");
+
         editor.innerHTML = "";
         selectedImages = [];
         imageInput.value = "";
@@ -886,13 +887,10 @@ window.createPost = async () => {
 
     } catch (err) {
         console.error(err);
-        alert("Post failed. Please try again.");
+        showToast("Post failed ❌", "#dc2626");
     } finally {
-
         btn.disabled = false;
         btn.innerText = "Post";
-        btn.style.opacity = "1";
-        btn.style.cursor = "pointer";
     }
 };
 
@@ -1134,7 +1132,7 @@ onSnapshot(q, (snapshot) => {
         });
 
         // COMMENTS SYSTEM (WITH VIEW MORE LOGIC)
-        const commentsRef = query(collection(db, "posts", postId, "comments"), orderBy("time", "desc"));
+        const commentsRef = query(collection(db, "posts", postId, "comments"),orderBy("time", "desc"),limit(1));
         onSnapshot(commentsRef, (snap) => {
             const list = document.getElementById("comments-" + postId);
             const commentBox = document.getElementById("comment-" + postId);
@@ -1185,6 +1183,19 @@ snap.forEach(c => {
                 const btn = document.createElement("div");
                 btn.className = "more-comments";
                 btn.id = "btn-" + postId;
+                const allCommentsRef = collection(db, "posts", postId, "comments");
+
+                onSnapshot(allCommentsRef, (allSnap) => {
+                  const totalComments = allSnap.size;
+                  const hiddenCount = totalComments - 1;
+
+                  if (hiddenCount > 0) {
+                    btn.innerText = `💬 View ${hiddenCount} more comments...`;
+                  } else {
+                    btn.innerText = `💬 View ${totalComments} comments...`;
+                  }
+                });
+                
                 btn.innerText = isOpen ? "Hide comments..." : `💬 View ${total} comments...`;
                 btn.onclick = () => window.showAllComments(postId, total);
                 commentBox.appendChild(btn);
@@ -1197,7 +1208,7 @@ imageInput.addEventListener("change", () => {
     const files = Array.from(imageInput.files);
 
     if (selectedImages.length + files.length > 5) {
-        alert("Max 5 images only!");
+        showToast("Max 5 images only!", "#f59e0b");
         return;
     }
 
@@ -1276,6 +1287,17 @@ function renderPreview(){
         reader.readAsDataURL(file);
     });
 }
+
+function showToast(msg, color="#1f2937"){
+    const toast = document.getElementById("toast");
+    toast.innerText = msg;
+    toast.style.background = color;
+    toast.style.opacity = "1";
+
+    setTimeout(()=>{
+        toast.style.opacity = "0";
+    }, 2500);
+}
     
 /* AUTH USER */
 onAuthStateChanged(auth,(user)=>{
@@ -1330,6 +1352,22 @@ box.innerHTML = html;
 }
   
 </script>
+
+<div id="toast" style="
+position:fixed;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+background:#1f2937;
+color:white;
+padding:10px 18px;
+border-radius:20px;
+font-size:14px;
+opacity:0;
+transition:0.3s;
+z-index:9999;
+"></div>
+    
 </body>
 </html>
 
