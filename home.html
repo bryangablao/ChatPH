@@ -864,7 +864,10 @@ window.createPost = async () => {
                 const storageRef = ref(storage, "posts/" + Date.now() + "_" + file.name);
                 await uploadBytes(storageRef, compressed);
             }
+        }
 
+        imageURLs.push(url);
+        
         await addDoc(collection(db, "posts"), {
             text: text,
             images: imageURLs,
