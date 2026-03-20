@@ -616,7 +616,27 @@ object-fit:cover;
     display: inline-block;
     font-weight: 800 !important;
 }
-  
+
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1f2937;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.3s ease;
+    box-shadow: 0 6px 20px rgba(0,0,0,.4);
+    z-index: 9999;
+}
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
 </style>
 </head>
 <body>
@@ -830,12 +850,12 @@ window.createPost = async () => {
     const user = auth.currentUser;
 
     if (!text) {
-        alert("Write something.");
+        showToast("Write something.");
         return;
     }
 
     if (!user) {
-        alert("You must be logged in.");
+        showToast("You must be logged in.");
         return;
     }
 
@@ -855,13 +875,23 @@ window.createPost = async () => {
 
     } catch (err) {
         console.error(err);
-        alert("Post failed.");
+        showToast("Post failed.");
     } finally {
         btn.disabled = false;
         btn.innerText = "Post";
     }
 };
-  
+
+function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.innerText = message;
+    toast.classList.add("show");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2500);
+}
+    
 window.showAllComments = (postId, total) => {
     const list = document.getElementById("comments-" + postId);
     const btn = document.getElementById("btn-" + postId);
@@ -981,7 +1011,7 @@ window.react = async (postId, type) => {
   
 window.sharePost = (id)=>{
 navigator.clipboard.writeText(location.href+"?post="+id);
-alert("Post link copied!");
+showToast("Post link copied!");
 }
   
 /* LOAD POSTS */
@@ -1175,5 +1205,6 @@ box.innerHTML = html;
 }
   
 </script>
+<div id="toast" class="toast"></div>
 </body>
 </html>
