@@ -1,318 +1,363 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Profile | ChatPH</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile | ChatPH</title>
+    <link rel="icon" type="image/png" href="image/chatph-logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e11;
+            --card: #151921;
+            --border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.3);
+            --glass: rgba(255, 255, 255, 0.03);
+            --gradient: linear-gradient(135deg, #3b82f6 0%, #2dd4bf 100%);
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+        * { box-sizing: border-box; transition: all 0.2s ease-in-out; }
 
-<style>
-:root{
---bg:#0f1115;
---card:#171a21;
---border:#23262f;
---text:#ffffff;
---accent:#4da3ff;
---glass:rgba(255,255,255,0.04);
-}
+        body {
+            margin: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
 
-body{
-margin:0;
-font-family:'Inter',sans-serif;
-background:var(--bg);
-color:var(--text);
-}
+        /* CUSTOM SCROLLBAR */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
 
-/* HEADER */
-header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:12px 18px;
-background:#12141a;
-border-bottom:1px solid var(--border);
-}
+        /* HEADER & NAVIGATION */
+        header { 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 24px; height: 70px;
+            background: rgba(11, 14, 17, 0.8); 
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border); 
+            position: sticky; top: 0; z-index: 1000; 
+        }
+        
+        .logo { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .logo img { width: 35px; filter: drop-shadow(0 0 8px var(--accent-glow)); }
+        .logo span { font-weight: 700; font-size: 20px; letter-spacing: -0.5px; }
+        .hamburger { font-size: 24px; cursor: pointer; color: var(--text-dim); }
+        .hamburger:hover { color: var(--text-main); }
 
-.logo{display:flex;gap:10px;align-items:center;}
-.logo img{width:32px;}
-.hamburger{cursor:pointer;font-size:22px;}
+        /* SIDEBAR */
+        .sidebar { 
+            position: fixed; top: 0; left: -280px; width: 280px; height: 100%; 
+            background: var(--card); border-right: 1px solid var(--border); 
+            padding-top: 80px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1001; 
+            box-shadow: 20px 0 50px rgba(0,0,0,0.5);
+        }
+        .sidebar.open { left: 0; }
+        .sidebar a { 
+            display: flex; align-items: center; gap: 15px; padding: 16px 25px; 
+            text-decoration: none; color: var(--text-dim); font-weight: 500; 
+        }
+        .sidebar a:hover { background: var(--glass); color: var(--accent); padding-left: 30px; }
 
-/* SIDEBAR */
-.sidebar{
-position:fixed;
-top:0;
-left:-230px;
-width:230px;
-height:100%;
-background:#14171d;
-padding-top:70px;
-transition:.3s;
-}
-.sidebar.open{left:0;}
-.sidebar a{
-display:block;
-padding:14px 20px;
-color:white;
-text-decoration:none;
-}
-.sidebar a:hover{background:#1e222b;}
+        /* PROFILE LAYOUT */
+        .profile-container { max-width: 900px; margin: 0 auto; padding-bottom: 50px; }
 
-/* COVER */
-.cover{
-height:220px;
-background:linear-gradient(120deg,#4da3ff33,#2563eb55);
-border-bottom:1px solid var(--border);
-}
+        .cover-wrapper {
+            position: relative;
+            height: 260px;
+            width: 100%;
+            border-radius: 0 0 30px 30px;
+            overflow: hidden;
+            background: #1e293b;
+        }
 
-/* PROFILE CARD */
-.profile-card{
-max-width:600px;
-margin:-70px auto 20px;
-background:var(--glass);
-backdrop-filter:blur(12px);
-border:1px solid var(--border);
-border-radius:20px;
-padding:20px;
-text-align:center;
-box-shadow:0 20px 40px rgba(0,0,0,.5);
-}
+        #coverImg {
+            width: 100%; height: 100%; object-fit: cover;
+            filter: brightness(0.7);
+        }
 
-/* AVATAR */
-.avatar-wrap{
-position:relative;
-display:inline-block;
-}
+        .edit-cover-btn {
+            position: absolute; bottom: 15px; right: 15px;
+            background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2);
+            color: white; padding: 8px 15px; border-radius: 8px; font-size: 12px;
+            cursor: pointer; backdrop-filter: blur(5px);
+        }
 
-.profile-avatar{
-width:120px;
-height:120px;
-border-radius:50%;
-border:5px solid var(--bg);
-object-fit:cover;
-}
+        .profile-card {
+            max-width: 800px; margin: -80px auto 30px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
 
-/* ONLINE DOT */
-.online{
-position:absolute;
-bottom:10px;
-right:10px;
-width:16px;
-height:16px;
-background:#22c55e;
-border-radius:50%;
-border:3px solid var(--bg);
-}
+        .pfp-wrapper {
+            position: relative; width: 140px; height: 140px; margin: -100px auto 15px;
+        }
 
-/* NAME */
-.name{
-font-size:24px;
-font-weight:700;
-margin-top:10px;
-}
+        .profile-avatar {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            border: 6px solid var(--card);
+            background: var(--card);
+            object-fit: cover;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
 
-.email{
-opacity:.6;
-font-size:13px;
-}
+        .pfp-edit-overlay {
+            position: absolute; bottom: 5px; right: 5px;
+            background: var(--accent); width: 35px; height: 35px;
+            border-radius: 50%; border: 3px solid var(--card);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 14px;
+        }
 
-/* STATS */
-.stats{
-display:flex;
-justify-content:space-around;
-margin-top:20px;
-padding:15px 0;
-border-top:1px solid var(--border);
-border-bottom:1px solid var(--border);
-}
+        .user-info h2 { margin: 10px 0 5px; font-size: 28px; font-weight: 700; }
+        .user-info p { color: var(--text-dim); font-size: 15px; margin-bottom: 20px; }
 
-.stat b{
-display:block;
-font-size:18px;
-color:var(--accent);
-}
+        .stats-row {
+            display: flex; justify-content: center; gap: 40px;
+            margin: 25px 0; padding: 20px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
 
-.stat span{
-font-size:12px;
-opacity:.7;
-}
+        .stat-item b { display: block; font-size: 20px; color: var(--text-main); }
+        .stat-item span { font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
 
-/* BIO */
-.bio{
-background:var(--glass);
-padding:12px;
-border-radius:10px;
-margin-top:15px;
-font-size:14px;
-}
+        .bio-box {
+            background: var(--glass);
+            padding: 20px; border-radius: 16px;
+            font-size: 15px; color: #cbd5e1;
+            line-height: 1.7; border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
 
-/* BUTTON */
-.edit-btn{
-margin-top:12px;
-padding:8px 18px;
-border:none;
-border-radius:20px;
-background:linear-gradient(135deg,#4da3ff,#2563eb);
-color:black;
-font-weight:700;
-cursor:pointer;
-transition:.2s;
-}
-.edit-btn:hover{
-transform:scale(1.05);
-}
+        .action-btns { display: flex; gap: 10px; justify-content: center; }
 
-/* POSTS */
-.feed{
-max-width:520px;
-margin:auto;
-padding:16px;
-}
+        .btn {
+            padding: 10px 25px; border-radius: 12px; font-weight: 600;
+            cursor: pointer; border: none; font-size: 14px;
+            display: flex; align-items: center; gap: 8px;
+        }
 
-.post{
-background:var(--card);
-padding:14px;
-border-radius:12px;
-margin-bottom:12px;
-border:1px solid var(--border);
-transition:.2s;
-}
-.post:hover{
-transform:translateY(-3px);
-}
+        .btn-primary { background: var(--gradient); color: #000; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px var(--accent-glow); }
 
-/* FOOTER */
-footer{
-text-align:center;
-padding:30px;
-opacity:.5;
-}
-</style>
+        .btn-outline { background: transparent; color: white; border: 1px solid var(--border); }
+        .btn-outline:hover { background: var(--glass); }
+
+        /* POSTS FEED */
+        .feed-section { max-width: 600px; margin: 0 auto; padding: 0 20px; }
+        .section-title { 
+            font-size: 14px; font-weight: 700; color: var(--accent); 
+            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; display: block;
+        }
+
+        .post-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 18px; padding: 20px; margin-bottom: 20px;
+            animation: fadeIn 0.5s ease backwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* BADGES */
+        .badge-admin { 
+            background: linear-gradient(90deg, #f59e0b, #fbbf24); 
+            color: #000; padding: 3px 10px; border-radius: 6px; 
+            font-size: 11px; font-weight: 800; margin-left: 8px;
+        }
+
+        .logout-btn {
+            background: rgba(239, 68, 68, 0.1); color: #ef4444;
+            padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: 600;
+        }
+        .logout-btn:hover { background: #ef4444; color: white; }
+
+    </style>
 </head>
-
 <body>
 
 <header>
-<div class="logo">
-<div class="hamburger" onclick="toggleMenu()">☰</div>
-<span>ChatPH</span>
-</div>
-
-<div>
-<span id="userDisplay"></span>
-<img id="logoutBtn" src="image/icon/logout.png" style="width:22px;cursor:pointer;display:none;">
-</div>
+    <div class="logo">
+        <div class="hamburger" onclick="toggleMenu()">☰</div>
+        <img src="image/chatph-logo.png" alt="Logo">
+        <span>ChatPH</span>
+    </div>
+    <div id="authArea" style="display:flex; align-items:center; gap:15px;">
+        <span id="userDisplay" style="font-weight:600; font-size: 14px;">Guest</span>
+        <div id="logoutBtn" class="logout-btn" style="display:none;">Logout</div>
+    </div>
 </header>
 
 <div class="sidebar" id="sidebar">
-<a href="home.html">🏠 Home</a>
-<a href="msg.html">💬 Messages</a>
-<a href="frnd.html">👥 Friends</a>
-<a href="prfl.html">👤 Profile</a>
+    <a href="home.html">🏠 Home</a>
+    <a href="msg.html">💬 Messages</a>
+    <a href="frnd.html">👥 Friends</a>
+    <a href="srch.html">🔎 Search</a>
+    <a href="prfl.html" style="color: var(--accent); background: var(--glass);">👤 Profile</a>
 </div>
 
-<div class="cover"></div>
+<div class="profile-container">
+    <div class="cover-wrapper">
+        <img id="coverImg" src="https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop" alt="Cover">
+        <button class="edit-cover-btn" onclick="updatePhoto('cover')">📷 Change Cover</button>
+    </div>
 
-<div class="profile-card">
+    <div class="profile-card">
+        <div class="pfp-wrapper">
+            <img id="pfp" class="profile-avatar" src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png">
+            <div class="pfp-edit-overlay" onclick="updatePhoto('pfp')">✏️</div>
+        </div>
 
-<div class="avatar-wrap">
-<img id="pfp" class="profile-avatar">
-<div class="online"></div>
+        <div class="user-info">
+            <h2><span id="nameDisplay">User Name</span> <span id="badgeLoc"></span></h2>
+            <p id="emailDisplay">loading...</p>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-item"><b id="postCount">0</b><span>Posts</span></div>
+            <div class="stat-item"><b>128</b><span>Friends</span></div>
+            <div class="stat-item"><b>2026</b><span>Year</span></div>
+        </div>
+
+        <div class="bio-box" id="bioDisplay">
+            Loading profile information...
+        </div>
+
+        <div class="action-btns">
+            <button class="btn btn-primary" onclick="editBio()">Edit Bio</button>
+            <button class="btn btn-outline">Settings</button>
+        </div>
+    </div>
+
+    <div class="feed-section">
+        <span class="section-title">Timeline</span>
+        <div id="userPosts">
+            </div>
+    </div>
 </div>
-
-<div class="name" id="name"></div>
-<div class="email" id="email"></div>
-
-<div class="stats">
-<div class="stat"><b id="posts">0</b><span>Posts</span></div>
-<div class="stat"><b>0</b><span>Friends</span></div>
-<div class="stat"><b>2026</b><span>Joined</span></div>
-</div>
-
-<div class="bio" id="bio">No bio yet...</div>
-
-<button class="edit-btn" onclick="editBio()">Edit Profile</button>
-
-</div>
-
-<div class="feed" id="feed"></div>
-
-<footer>© 2026 ChatPH</footer>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, query, where, orderBy, onSnapshot, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, query, where, orderBy, onSnapshot, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-const app = initializeApp({
-apiKey:"AIza...",
-authDomain:"chatph-cc187.firebaseapp.com",
-projectId:"chatph-cc187"
-});
+    const firebaseConfig = {
+        apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
+        authDomain: "chatph-cc187.firebaseapp.com",
+        projectId: "chatph-cc187",
+        storageBucket: "chatph-cc187.firebasestorage.app",
+        messagingSenderId: "324012163441",
+        appId: "1:324012163441:web:7a54be2231ad2cae71f6d0"
+    };
 
-const db = getFirestore(app);
-const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-window.toggleMenu=()=>{
-document.getElementById("sidebar").classList.toggle("open");
-};
+    window.toggleMenu = () => document.getElementById("sidebar").classList.toggle("open");
 
-/* AUTH */
-onAuthStateChanged(auth, async user=>{
-if(!user) location.href="index.html";
+    function getBadge(email){
+        if(email === "ablaobryan4400@gmail.com") return `<span class="badge-admin">💠 ADMIN</span>`;
+        return "";
+    }
 
-document.getElementById("userDisplay").innerText=user.displayName;
-document.getElementById("logoutBtn").style.display="inline";
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            document.getElementById("userDisplay").innerText = user.displayName || "User";
+            document.getElementById("logoutBtn").style.display = "block";
+            document.getElementById("nameDisplay").innerText = user.displayName || "User";
+            document.getElementById("emailDisplay").innerText = user.email;
+            document.getElementById("badgeLoc").innerHTML = getBadge(user.email);
+            
+            loadUserData(user);
+            loadUserPosts(user.email);
+        } else {
+            window.location.href = "index.html";
+        }
+    });
 
-document.getElementById("name").innerText=user.displayName;
-document.getElementById("email").innerText=user.email;
-document.getElementById("pfp").src=user.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+    async function loadUserData(user) {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        
+        if (userSnap.exists()) {
+            const data = userSnap.data();
+            if (data.bio) document.getElementById("bioDisplay").innerText = data.bio;
+            if (data.pfpURL) document.getElementById("pfp").src = data.pfpURL;
+            if (data.coverURL) document.getElementById("coverImg").src = data.coverURL;
+        } else {
+            document.getElementById("bioDisplay").innerText = "No bio set. Click edit to share something!";
+        }
+    }
 
-loadBio(user.uid);
-loadPosts(user.email);
-});
+    window.editBio = async () => {
+        const current = document.getElementById("bioDisplay").innerText;
+        const newBio = prompt("What's on your mind?", current);
+        if (newBio) {
+            const user = auth.currentUser;
+            await setDoc(doc(db, "users", user.uid), { bio: newBio }, { merge: true });
+            document.getElementById("bioDisplay").innerText = newBio;
+        }
+    };
 
-/* BIO */
-async function loadBio(uid){
-const snap = await getDoc(doc(db,"users",uid));
-if(snap.exists()) document.getElementById("bio").innerText=snap.data().bio || "No bio yet...";
-}
+    window.updatePhoto = async (type) => {
+        const promptText = type === 'pfp' ? "Enter Image URL for Profile Picture:" : "Enter Image URL for Cover Photo:";
+        const url = prompt(promptText);
+        if (url) {
+            const user = auth.currentUser;
+            const updateObj = type === 'pfp' ? { pfpURL: url } : { coverURL: url };
+            await setDoc(doc(db, "users", user.uid), updateObj, { merge: true });
+            document.getElementById(type === 'pfp' ? "pfp" : "coverImg").src = url;
+        }
+    };
 
-window.editBio = async ()=>{
-const user=auth.currentUser;
-const bio = prompt("Edit bio:");
-if(bio){
-await setDoc(doc(db,"users",user.uid),{bio},{merge:true});
-document.getElementById("bio").innerText=bio;
-}
-};
+    function loadUserPosts(email) {
+        const q = query(collection(db, "posts"), where("email", "==", email), orderBy("time", "desc"));
+        const postContainer = document.getElementById("userPosts");
 
-/* POSTS */
-function loadPosts(email){
-const q = query(collection(db,"posts"),where("email","==",email),orderBy("time","desc"));
+        onSnapshot(q, (snapshot) => {
+            postContainer.innerHTML = "";
+            document.getElementById("postCount").innerText = snapshot.size;
 
-onSnapshot(q,snap=>{
-document.getElementById("posts").innerText=snap.size;
+            if(snapshot.empty) {
+                postContainer.innerHTML = `<div style="text-align:center; padding:40px; opacity:0.4;">
+                    <div style="font-size:40px;">📭</div>
+                    <p>No posts yet. Share your first thought!</p>
+                </div>`;
+                return;
+            }
 
-let html="";
-snap.forEach(doc=>{
-const p=doc.data();
-html+=`
-<div class="post">
-<div style="opacity:.5;font-size:12px;margin-bottom:6px;">
-${p.time?.toDate().toLocaleDateString()}
-</div>
-${p.text}
-</div>`;
-});
+            snapshot.forEach((postDoc) => {
+                const p = postDoc.data();
+                const date = p.time?.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                postContainer.innerHTML += `
+                    <div class="post-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                            <span style="font-size:12px; font-weight:700; color:var(--accent);">${date}</span>
+                            <span style="font-size:12px; opacity:0.4;">ChatPH Feed</span>
+                        </div>
+                        <div style="font-size:15px; color:#e2e8f0;">${p.text}</div>
+                    </div>`;
+            });
+        });
+    }
 
-document.getElementById("feed").innerHTML=html || "No posts yet";
-});
-}
-
-/* LOGOUT */
-logoutBtn.onclick=()=>{signOut(auth);};
+    document.getElementById("logoutBtn").onclick = () => signOut(auth).then(() => window.location.href = "index.html");
 </script>
-
 </body>
 </html>
