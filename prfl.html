@@ -5,176 +5,174 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile | ChatPH</title>
     <link rel="icon" type="image/png" href="image/chatph-logo.png">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #0b0e11;
             --card: #151921;
             --border: rgba(255, 255, 255, 0.08);
-            --text-main: #ffffff;
+            --text: #ffffff;
             --text-dim: #94a3b8;
             --accent: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.3);
             --glass: rgba(255, 255, 255, 0.03);
-            --gradient: linear-gradient(135deg, #3b82f6 0%, #2dd4bf 100%);
         }
 
-        * { box-sizing: border-box; transition: all 0.2s ease-in-out; }
+        * { box-sizing: border-box; transition: all 0.2s ease; }
+        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
 
-        body {
-            margin: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: var(--bg);
-            color: var(--text-main);
-            overflow-x: hidden;
-        }
-
-        /* HEADER & SIDEBAR */
+        /* HEADER */
         header { 
             display: flex; align-items: center; justify-content: space-between; 
-            padding: 0 24px; height: 70px; background: rgba(11, 14, 17, 0.9); 
-            backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); 
+            padding: 0 20px; height: 65px; background: rgba(11, 14, 17, 0.9); 
+            backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); 
             position: sticky; top: 0; z-index: 1000; 
         }
-        
+
+        /* SIDEBAR & OVERLAY */
         .sidebar { 
-            position: fixed; top: 0; left: -280px; width: 280px; height: 100%; 
+            position: fixed; top: 0; left: -280px; width: 260px; height: 100%; 
             background: var(--card); border-right: 1px solid var(--border); 
-            padding-top: 80px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2000; 
+            padding-top: 80px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2001; 
         }
         .sidebar.open { left: 0; }
         .sidebar-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); visibility: hidden; opacity: 0; z-index: 1999;
+            background: rgba(0,0,0,0.6); opacity: 0; visibility: hidden; z-index: 2000;
         }
-        .sidebar-overlay.active { visibility: visible; opacity: 1; }
+        .sidebar-overlay.active { opacity: 1; visibility: visible; }
+        .sidebar a { display: block; padding: 15px 25px; color: white; text-decoration: none; font-weight: 600; }
+        .sidebar a:hover { background: var(--glass); color: var(--accent); }
 
         /* PROFILE LAYOUT */
-        .cover-wrapper {
-            position: relative; height: 220px; width: 100%;
-            background: #1e293b; overflow: hidden;
-        }
+        .cover-container { position: relative; height: 220px; width: 100%; background: #1e293b; }
         #coverImg { width: 100%; height: 100%; object-fit: cover; }
         
-        .edit-cover-btn {
-            position: absolute; top: 20px; right: 20px; z-index: 10;
-            background: rgba(0,0,0,0.6); color: white; border: 1px solid var(--border);
-            padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px;
+        /* Fixed overlap for cover button */
+        .btn-edit-cover {
+            position: absolute; bottom: 20px; right: 20px; z-index: 50;
+            background: rgba(0,0,0,0.7); color: white; border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 12px;
         }
 
         .profile-card {
-            max-width: 800px; margin: -60px auto 30px;
+            max-width: 800px; margin: -60px auto 30px; position: relative; z-index: 100;
             background: var(--card); border: 1px solid var(--border);
             border-radius: 24px; padding: 30px; text-align: center;
-            position: relative; z-index: 5;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
 
-        .pfp-wrapper { position: relative; width: 130px; height: 130px; margin: -90px auto 15px; }
-        .profile-avatar { width: 100%; height: 100%; border-radius: 50%; border: 6px solid var(--card); object-fit: cover; }
-        .pfp-edit-overlay { 
+        .pfp-area { position: relative; width: 130px; height: 130px; margin: -95px auto 15px; }
+        .profile-avatar { width: 100%; height: 100%; border-radius: 50%; border: 6px solid var(--card); object-fit: cover; background: #222; }
+        .pfp-edit-badge { 
             position: absolute; bottom: 5px; right: 5px; background: var(--accent); 
-            width: 35px; height: 35px; border-radius: 50%; display: flex; 
+            width: 34px; height: 34px; border-radius: 50%; display: flex; 
             align-items: center; justify-content: center; cursor: pointer; border: 3px solid var(--card);
         }
 
-        .stats-row { display: flex; justify-content: center; gap: 40px; margin: 20px 0; border-top: 1px solid var(--border); padding-top: 20px; }
-        .stat-item b { display: block; font-size: 18px; }
-        .stat-item span { font-size: 12px; color: var(--text-dim); text-transform: uppercase; }
+        .stats { display: flex; justify-content: center; gap: 30px; margin: 20px 0; border-top: 1px solid var(--border); padding-top: 20px; }
+        .stats b { display: block; font-size: 18px; color: var(--text); }
+        .stats span { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+        .bio-box { background: var(--glass); padding: 18px; border-radius: 15px; font-size: 14px; color: #cbd5e1; margin-bottom: 20px; line-height: 1.6; }
 
         /* CUSTOM MODAL */
-        .modal-overlay {
+        .modal-wrap {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
-            display: none; align-items: center; justify-content: center; z-index: 3000;
+            background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 3000;
         }
         .modal {
             background: var(--card); border: 1px solid var(--border);
             padding: 25px; border-radius: 20px; width: 90%; max-width: 400px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
         .modal textarea {
             width: 100%; height: 100px; background: #0b0e11; border: 1px solid var(--border);
-            color: white; border-radius: 10px; padding: 10px; margin: 15px 0; font-family: inherit;
+            color: white; border-radius: 12px; padding: 12px; margin: 15px 0; font-family: inherit; resize: none;
         }
-        .modal-btns { display: flex; justify-content: flex-end; gap: 10px; }
+
+        /* BUTTONS */
+        .btn { padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; font-weight: 700; font-size: 14px; }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: white; }
 
         /* POSTS */
-        .post-card { background: var(--card); border: 1px solid var(--border); border-radius: 15px; padding: 20px; margin-bottom: 15px; text-align: left; }
-        
-        .btn { padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; }
-        .btn-primary { background: var(--accent); color: white; }
-        .btn-ghost { background: transparent; color: var(--text-dim); }
+        .post { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 15px; text-align: left; }
 
-        #loadingToast {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--accent); color: white; padding: 10px 20px;
-            border-radius: 30px; display: none; z-index: 9999;
+        #uploadToast {
+            position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+            background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+            font-size: 13px; font-weight: 600; display: none; z-index: 5000; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
+
+        .badge-admin { background: gold; color: black; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; margin-left: 5px; }
     </style>
 </head>
 <body>
 
 <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
-<div id="loadingToast">Uploading... Please wait</div>
 
-<div class="modal-overlay" id="bioModal">
+<div id="uploadToast">Uploading image...</div>
+
+<div class="modal-wrap" id="bioModal">
     <div class="modal">
-        <h3>Update Bio</h3>
-        <textarea id="bioInput" placeholder="Tell us about yourself..."></textarea>
-        <div class="modal-btns">
-            <button class="btn btn-ghost" onclick="closeModals()">Cancel</button>
-            <button class="btn btn-primary" onclick="saveBio()">Save Changes</button>
+        <h3 style="margin-top:0;">Edit Profile Bio</h3>
+        <textarea id="bioInput" placeholder="Write something about yourself..."></textarea>
+        <div style="display:flex; justify-content: flex-end; gap: 10px;">
+            <button class="btn btn-outline" onclick="closeBioModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveBio()">Save Bio</button>
         </div>
     </div>
 </div>
 
 <header>
-    <div style="display:flex; align-items:center; gap:15px;">
-        <div onclick="toggleMenu()" style="cursor:pointer; font-size: 24px;">☰</div>
-        <span style="font-weight: 700; font-size: 18px;">ChatPH</span>
+    <div style="display:flex; align-items:center; gap:12px;">
+        <div onclick="toggleMenu()" style="cursor:pointer; font-size: 22px;">☰</div>
+        <img src="image/chatph-logo.png" style="width:30px;">
+        <span style="font-weight: 700;">ChatPH</span>
     </div>
-    <div id="logoutBtn" style="color: #ef4444; font-size: 14px; cursor: pointer; font-weight: 600;">Logout</div>
+    <div id="logoutBtn" style="color: #ef4444; font-size: 13px; font-weight: 700; cursor: pointer;">Logout</div>
 </header>
 
 <div class="sidebar" id="sidebar">
-    <a href="home.html" style="display:block; padding: 15px 25px; text-decoration: none; color: white;">🏠 Home</a>
-    <a href="prfl.html" style="display:block; padding: 15px 25px; text-decoration: none; color: var(--accent);">👤 Profile</a>
+    <a href="home.html">🏠 Home</a>
+    <a href="msg.html">💬 Messages</a>
+    <a href="frnd.html">👥 Friends</a>
+    <a href="prfl.html" style="color: var(--accent);">👤 Profile</a>
 </div>
 
 <input type="file" id="pfpInput" hidden accept="image/*">
 <input type="file" id="coverInput" hidden accept="image/*">
 
-<div class="profile-container">
-    <div class="cover-wrapper">
-        <button class="edit-cover-btn" onclick="document.getElementById('coverInput').click()">📷 Change Cover</button>
+<div class="profile-page">
+    <div class="cover-container">
+        <button class="btn-edit-cover" onclick="document.getElementById('coverInput').click()">📷 Update Cover</button>
         <img id="coverImg" src="https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2000">
     </div>
 
     <div class="profile-card">
-        <div class="pfp-wrapper">
+        <div class="pfp-area">
             <img id="pfp" class="profile-avatar" src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png">
-            <div class="pfp-edit-overlay" onclick="document.getElementById('pfpInput').click()">✏️</div>
+            <div class="pfp-edit-badge" onclick="document.getElementById('pfpInput').click()">✏️</div>
         </div>
 
         <h2 id="nameDisplay">User Name <span id="badgeLoc"></span></h2>
-        <p id="emailDisplay" style="color: var(--text-dim); margin-top: -10px;">loading...</p>
+        <p id="emailDisplay" style="color: var(--text-dim); margin-top: -10px; font-size: 14px;">loading...</p>
 
-        <div class="stats-row">
+        <div class="stats">
             <div class="stat-item"><b id="postCount">0</b><span>Posts</span></div>
             <div class="stat-item"><b>0</b><span>Friends</span></div>
             <div class="stat-item"><b>2026</b><span>Joined</span></div>
         </div>
 
-        <div id="bioDisplay" style="background: var(--glass); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
-            Getting your bio...
+        <div class="bio-box" id="bioDisplay">
+            Loading your profile bio...
         </div>
 
         <button class="btn btn-primary" onclick="openBioModal()">Edit Profile</button>
     </div>
 
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h4 style="color: var(--accent); text-transform: uppercase; letter-spacing: 1px;">Recent Activity</h4>
-        <div id="userPosts"></div>
+    <div style="max-width: 550px; margin: 0 auto; padding: 0 20px 50px;">
+        <span style="font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase;">Recent Activity</span>
+        <div id="userPosts" style="margin-top: 15px;"></div>
     </div>
 </div>
 
@@ -198,28 +196,27 @@
     const auth = getAuth(app);
     const storage = getStorage(app);
 
-    // Sidebar Toggle
+    /* --- SIDEBAR LOGIC --- */
     window.toggleMenu = () => {
-        const sb = document.getElementById("sidebar");
-        const ov = document.getElementById("overlay");
-        sb.classList.toggle("open");
-        ov.classList.toggle("active");
+        document.getElementById("sidebar").classList.toggle("open");
+        document.getElementById("overlay").classList.toggle("active");
     };
 
-    // Modal Controls
+    /* --- MODAL LOGIC --- */
     window.openBioModal = () => {
         document.getElementById("bioModal").style.display = "flex";
-        document.getElementById("bioInput").value = document.getElementById("bioDisplay").innerText;
+        document.getElementById("bioInput").value = document.getElementById("bioDisplay").innerText === "Welcome! Tell us about yourself." ? "" : document.getElementById("bioDisplay").innerText;
     };
-    window.closeModals = () => {
-        document.getElementById("bioModal").style.display = "none";
-    };
+    window.closeBioModal = () => document.getElementById("bioModal").style.display = "none";
 
-    // Auth State
+    /* --- AUTH & LOAD --- */
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            document.getElementById("nameDisplay").firstChild.textContent = user.displayName || "User";
+            document.getElementById("nameDisplay").firstChild.textContent = user.displayName || "ChatPH User";
             document.getElementById("emailDisplay").innerText = user.email;
+            if(user.email === "ablaobryan4400@gmail.com") {
+                document.getElementById("badgeLoc").innerHTML = `<span class="badge-admin">💠 ADMIN</span>`;
+            }
             loadUserData(user);
             loadUserPosts(user.email);
         } else {
@@ -227,62 +224,75 @@
         }
     });
 
-    // Load User Data
     async function loadUserData(user) {
-        const snap = await getDoc(doc(db, "users", user.uid));
-        if (snap.exists()) {
-            const data = snap.data();
-            document.getElementById("bioDisplay").innerText = data.bio || "No bio yet. Tap 'Edit Profile' to add one!";
-            if (data.pfpURL) document.getElementById("pfp").src = data.pfpURL;
-            if (data.coverURL) document.getElementById("coverImg").src = data.coverURL;
-        } else {
-            document.getElementById("bioDisplay").innerText = "Welcome! Tap 'Edit Profile' to add a bio.";
+        try {
+            const snap = await getDoc(doc(db, "users", user.uid));
+            if (snap.exists()) {
+                const data = snap.data();
+                document.getElementById("bioDisplay").innerText = data.bio || "Welcome! Tell us about yourself.";
+                if (data.pfpURL) document.getElementById("pfp").src = data.pfpURL;
+                if (data.coverURL) document.getElementById("coverImg").src = data.coverURL;
+            } else {
+                document.getElementById("bioDisplay").innerText = "Welcome! Tell us about yourself.";
+            }
+        } catch (e) {
+            document.getElementById("bioDisplay").innerText = "Error loading bio. Check rules.";
         }
     }
 
-    // Save Bio
+    /* --- SAVE BIO --- */
     window.saveBio = async () => {
         const text = document.getElementById("bioInput").value;
         const user = auth.currentUser;
-        await setDoc(doc(db, "users", user.uid), { bio: text }, { merge: true });
-        document.getElementById("bioDisplay").innerText = text;
-        closeModals();
+        if (user) {
+            await setDoc(doc(db, "users", user.uid), { bio: text }, { merge: true });
+            document.getElementById("bioDisplay").innerText = text;
+            closeBioModal();
+        }
     };
 
-    // Handle File Uploads (Storage)
-    const uploadFile = async (file, type) => {
+    /* --- REAL STORAGE UPLOAD --- */
+    const handleUpload = async (file, pathType) => {
         if (!file) return;
         const user = auth.currentUser;
-        const toast = document.getElementById("loadingToast");
+        const toast = document.getElementById("uploadToast");
+        
         toast.style.display = "block";
-
         try {
-            const storageRef = ref(storage, `users/${user.uid}/${type}`);
-            await uploadBytes(storageRef, file);
-            const url = await getDownloadURL(storageRef);
+            const fileRef = ref(storage, `users/${user.uid}/${pathType}_${Date.now()}`);
+            await uploadBytes(fileRef, file);
+            const downloadURL = await getDownloadURL(fileRef);
             
-            await setDoc(doc(db, "users", user.uid), { [type === 'pfp' ? 'pfpURL' : 'coverURL']: url }, { merge: true });
-            document.getElementById(type === 'pfp' ? "pfp" : "coverImg").src = url;
-        } catch (e) {
-            console.error(e);
-            alert("Upload failed. Make sure your Firebase Storage rules allow uploads.");
+            const field = pathType === 'pfp' ? 'pfpURL' : 'coverURL';
+            await setDoc(doc(db, "users", user.uid), { [field]: downloadURL }, { merge: true });
+            
+            document.getElementById(pathType === 'pfp' ? "pfp" : "coverImg").src = downloadURL;
+        } catch (err) {
+            console.error(err);
+            alert("Upload failed. Ensure Storage Rules allow write access.");
         }
         toast.style.display = "none";
     };
 
-    document.getElementById("pfpInput").onchange = (e) => uploadFile(e.target.files[0], 'pfp');
-    document.getElementById("coverInput").onchange = (e) => uploadFile(e.target.files[0], 'cover');
+    document.getElementById("pfpInput").onchange = (e) => handleUpload(e.target.files[0], 'pfp');
+    document.getElementById("coverInput").onchange = (e) => handleUpload(e.target.files[0], 'cover');
 
-    // Posts
+    /* --- POSTS --- */
     function loadUserPosts(email) {
         const q = query(collection(db, "posts"), where("email", "==", email), orderBy("time", "desc"));
         onSnapshot(q, (snapshot) => {
-            const cont = document.getElementById("userPosts");
-            cont.innerHTML = "";
+            const list = document.getElementById("userPosts");
+            list.innerHTML = "";
             document.getElementById("postCount").innerText = snapshot.size;
-            snapshot.forEach(d => {
-                const p = d.data();
-                cont.innerHTML += `<div class="post-card">${p.text}</div>`;
+            
+            if (snapshot.empty) {
+                list.innerHTML = `<p style="opacity:0.3; text-align:center; padding:30px;">No posts yet.</p>`;
+                return;
+            }
+
+            snapshot.forEach(doc => {
+                const p = doc.data();
+                list.innerHTML += `<div class="post">${p.text}</div>`;
             });
         });
     }
