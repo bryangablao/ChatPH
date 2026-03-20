@@ -16,82 +16,69 @@
 --dim:#94a3b8;
 --accent:#3b82f6;
 }
-
 *{box-sizing:border-box;font-family:'Plus Jakarta Sans';}
-
-body{
-margin:0;
-background:var(--bg);
-color:var(--text);
-}
+body{margin:0;background:var(--bg);color:var(--text);}
 
 /* HEADER */
 header{
 display:flex;
 justify-content:space-between;
-align-items:center;
 padding:15px 20px;
-background:#0b0e11;
 border-bottom:1px solid var(--border);
-position:sticky;
-top:0;
-z-index:1000;
 }
 
 /* COVER */
 .cover{
 position:relative;
 height:200px;
-background:#1e293b;
 }
-
 .cover img{
 width:100%;
 height:100%;
 object-fit:cover;
 }
 
-/* EDIT BUTTON (TOP RIGHT FIXED) */
+/* EDIT BUTTON */
 .edit-btn{
 position:absolute;
 top:15px;
 right:15px;
+width:38px;height:38px;
 background:rgba(0,0,0,.6);
 border-radius:50%;
-width:36px;
-height:36px;
-display:flex;
-align-items:center;
-justify-content:center;
+display:flex;align-items:center;justify-content:center;
 cursor:pointer;
 }
 
-/* DROPDOWN MENU */
+/* SMOOTH DROPDOWN */
 .menu{
 position:absolute;
-top:50px;
-right:0;
+top:60px;
+right:15px;
 background:var(--card);
 border:1px solid var(--border);
 border-radius:12px;
-padding:8px;
-display:none;
-min-width:160px;
-z-index:999;
+overflow:hidden;
+opacity:0;
+transform:translateY(-10px);
+pointer-events:none;
+transition:.25s;
 }
-
+.menu.active{
+opacity:1;
+transform:translateY(0);
+pointer-events:auto;
+}
 .menu div{
-padding:8px;
-font-size:13px;
+padding:10px 15px;
 cursor:pointer;
-border-radius:8px;
+font-size:13px;
 }
-
 .menu div:hover{
 background:rgba(255,255,255,.05);
 }
 
-/* PROFILE CARD */
+/* CARD */
 .card{
 max-width:700px;
 margin:-60px auto 20px;
@@ -102,28 +89,28 @@ border:1px solid var(--border);
 text-align:center;
 }
 
-/* PROFILE PIC */
+/* PFP */
 .pfp-wrap{
 position:relative;
 width:110px;
 margin:-70px auto 10px;
 }
-
 .pfp{
-width:110px;
-height:110px;
+width:110px;height:110px;
 border-radius:50%;
 border:4px solid var(--card);
 }
 
-/* NAME */
-h2{
-margin:10px 0 5px;
-}
-
-.email{
-font-size:13px;
-color:var(--dim);
+/* PFP EDIT */
+.pfp-edit{
+position:absolute;
+bottom:0;
+right:0;
+width:34px;height:34px;
+background:var(--accent);
+border-radius:50%;
+display:flex;align-items:center;justify-content:center;
+cursor:pointer;
 }
 
 /* STATS */
@@ -137,15 +124,13 @@ border-bottom:1px solid var(--border);
 padding:15px 0;
 }
 
-.stats b{display:block}
-
 /* BIO */
 .bio{
 background:rgba(255,255,255,.03);
-padding:15px;
+padding:16px;
 border-radius:12px;
-margin-top:10px;
-font-size:14px;
+margin-top:15px;
+line-height:1.5;
 }
 
 /* BUTTON */
@@ -165,17 +150,12 @@ max-width:550px;
 margin:auto;
 padding:0 15px 40px;
 }
-
 .post{
 background:var(--card);
 border:1px solid var(--border);
 padding:15px;
 border-radius:12px;
 margin-top:10px;
-}
-
-.post small{
-color:var(--dim);
 }
 </style>
 </head>
@@ -206,9 +186,9 @@ color:var(--dim);
 <div class="pfp-wrap">
 <img id="pfp" class="pfp" src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png">
 
-<div class="edit-btn" style="bottom:0;top:auto;right:0;" onclick="toggleMenu('pfpMenu')">✏️</div>
+<div class="pfp-edit" onclick="toggleMenu('pfpMenu')">✏️</div>
 
-<div class="menu" id="pfpMenu" style="right:-20px;">
+<div class="menu" id="pfpMenu" style="top:40px; right:-10px;">
 <div onclick="uploadPfp()">Upload</div>
 <div onclick="viewImage('pfp')">View</div>
 <div onclick="deletePfp()">Delete</div>
@@ -216,7 +196,7 @@ color:var(--dim);
 </div>
 
 <h2 id="name">User</h2>
-<div class="email" id="email">email</div>
+<div id="email" style="color:var(--dim)"></div>
 
 <div class="stats">
 <div><b id="posts">0</b><span>Posts</span></div>
@@ -225,7 +205,6 @@ color:var(--dim);
 </div>
 
 <div class="bio" id="bio">No bio yet</div>
-
 <button class="btn" onclick="editBio()">Edit Bio</button>
 
 </div>
@@ -253,63 +232,74 @@ projectId:"chatph-cc187"
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-/* MENU */
+let authReady = false;
+
+/* DROPDOWN */
 window.toggleMenu = (id)=>{
-document.querySelectorAll('.menu').forEach(m=>m.style.display='none');
-const el = document.getElementById(id);
-el.style.display = el.style.display === 'block' ? 'none' : 'block';
+document.querySelectorAll('.menu').forEach(m=>m.classList.remove('active'));
+document.getElementById(id).classList.toggle('active');
 };
 
-/* VIEW IMAGE */
-window.viewImage = (id)=>{
-window.open(document.getElementById(id).src);
-};
+/* CLICK OUTSIDE CLOSE */
+document.addEventListener("click",(e)=>{
+if(!e.target.closest(".edit-btn") && !e.target.closest(".pfp-edit") && !e.target.closest(".menu")){
+document.querySelectorAll('.menu').forEach(m=>m.classList.remove('active'));
+}
+});
 
-/* UPLOAD HANDLER */
+/* IMAGE VIEW */
+window.viewImage = (id)=> window.open(document.getElementById(id).src);
+
+/* UPLOAD */
 function upload(file,type){
+if(!file) return;
 const reader=new FileReader();
 reader.onload=async()=>{
 const base64=reader.result;
 const user=auth.currentUser;
-const field = type==='pfp'?'pfpBase64':'coverBase64';
-
+const field=type==='pfp'?'pfpBase64':'coverBase64';
 await setDoc(doc(db,"users",user.uid),{[field]:base64},{merge:true});
 document.getElementById(type==='pfp'?'pfp':'coverImg').src=base64;
 };
 reader.readAsDataURL(file);
 }
 
-/* BUTTON ACTIONS */
 window.uploadPfp=()=>pfpInput.click();
 window.uploadCover=()=>coverInput.click();
 
 pfpInput.onchange=e=>upload(e.target.files[0],'pfp');
 coverInput.onchange=e=>upload(e.target.files[0],'cover');
 
-window.deletePfp=async()=>{
-document.getElementById("pfp").src="";
+/* DELETE */
+window.deletePfp=()=>{
+pfp.src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
 };
-
-window.deleteCover=async()=>{
-document.getElementById("coverImg").src="";
+window.deleteCover=()=>{
+coverImg.src="https://images.unsplash.com/photo-1557683316-973673baf926";
 };
 
 /* BIO */
-window.editBio = async ()=>{
+window.editBio=async()=>{
 const text=prompt("Edit bio:");
 if(!text) return;
 const user=auth.currentUser;
-
 await setDoc(doc(db,"users",user.uid),{bio:text},{merge:true});
-document.getElementById("bio").innerText=text;
+bio.innerText=text;
 };
 
-/* AUTH */
-onAuthStateChanged(auth,async(user)=>{
-if(!user) location="index.html";
+/* AUTH FIX */
+onAuthStateChanged(auth, async(user)=>{
+if(!authReady){
+authReady=true;
+if(!user){
+setTimeout(()=>{ if(!auth.currentUser) location="index.html"; },1000);
+return;
+}
+}
 
-document.getElementById("name").innerText=user.displayName;
-document.getElementById("email").innerText=user.email;
+if(user){
+name.innerText=user.displayName || "User";
+email.innerText=user.email;
 
 const snap=await getDoc(doc(db,"users",user.uid));
 if(snap.exists()){
@@ -324,17 +314,16 @@ const q=query(collection(db,"posts"),where("email","==",user.email),orderBy("tim
 onSnapshot(q,(snap)=>{
 postList.innerHTML="";
 posts.innerText=snap.size;
-
 snap.forEach(doc=>{
 const p=doc.data();
 postList.innerHTML+=`
 <div class="post">
 <small>${p.time?.toDate().toLocaleString()}</small>
 <div>${p.text}</div>
-</div>
-`;
+</div>`;
 });
 });
+}
 });
 
 /* LOGOUT */
