@@ -674,15 +674,8 @@ class="logout-icon">
     <div class="editor-container">
         <div id="postText" class="editor" contenteditable="true" placeholder="What's on your mind?"></div>
     </div>
-    
-    <div id="imagePreview" class="image-preview"></div>
 
     <div class="editor-bar">
-        <label class="upload-btn" title="Upload Image">
-            <img src="image/icon/uploadimage.png">
-            <input type="file" id="postImage" accept="image/*" multiple>
-        </label>
-        
         <button class="post-btn" onclick="createPost()">Post</button>
     </div>
 </div>
@@ -834,58 +827,38 @@ window.createPost = async () => {
     const btn = document.querySelector(".post-btn"); 
     const editor = document.getElementById("postText");
     const text = editor.innerHTML.trim();
-    const imageFiles = document.getElementById("postImage").files;
     const user = auth.currentUser;
 
-    if (!text && imageFiles.length === 0) {
-        alert("Write something or upload an image.");
+    if (!text) {
+        alert("Write something.");
         return;
     }
+
     if (!user) {
         alert("You must be logged in.");
         return;
     }
 
-    // --- START LOADING STATE ---
     btn.disabled = true; 
     btn.innerText = "Posting..."; 
-    btn.style.opacity = "0.7";
-    btn.style.cursor = "not-allowed";
 
-    let imageURLs = [];
     try {
-        if (imageFiles.length > 0) {
-            for (const file of imageFiles) {
-                const storageRef = ref(storage, "posts/" + Date.now() + "_" + file.name);
-                await uploadBytes(storageRef, file);
-                const url = await getDownloadURL(storageRef);
-                imageURLs.push(url);
-            }
-        }
-
         await addDoc(collection(db, "posts"), {
             text: text,
-            images: imageURLs,
             name: user.displayName || "User",
             email: user.email,
             photo: user.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
             time: serverTimestamp()
         });
 
-
         editor.innerHTML = "";
-        document.getElementById("postImage").value = "";
-        document.getElementById("imagePreview").innerHTML = "";
 
     } catch (err) {
         console.error(err);
-        alert("Post failed. Please try again.");
+        alert("Post failed.");
     } finally {
-
         btn.disabled = false;
         btn.innerText = "Post";
-        btn.style.opacity = "1";
-        btn.style.cursor = "pointer";
     }
 };
   
@@ -1033,9 +1006,6 @@ onSnapshot(q, (snapshot) => {
                 </div>
             </div>
             <div class="post-text">${p.text}</div>
-            ${p.images && p.images.length ? `
-                <div class="post-images">${p.images.map(img => `<img src="${img}">`).join("")}</div>
-            ` : ""}
             <div class="reaction-counts" 
                  onmouseenter="showReactionUsers('${postId}')" 
                  onmouseleave="document.getElementById('hover-${postId}').style.display='none'"
@@ -1150,22 +1120,6 @@ snap.forEach(c => {
             }
         });
     });
-});
-
-const imageInput = document.getElementById("postImage");
-const preview = document.getElementById("imagePreview");
-imageInput.addEventListener("change",()=>{
-preview.innerHTML="";
-const files = imageInput.files;
-for(let i=0;i<files.length;i++){
-const reader = new FileReader();
-reader.onload = function(e){
-const img = document.createElement("img");
-img.src = e.target.result;
-preview.appendChild(img);
-};
-reader.readAsDataURL(files[i]);
-}
 });
   
 /* AUTH USER */
