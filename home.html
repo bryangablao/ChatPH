@@ -738,7 +738,7 @@ const firebaseConfig = {
 apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
 authDomain: "chatph-cc187.firebaseapp.com",
 projectId: "chatph-cc187",
-storageBucket: "chatph-cc187.firebasestorage.app",
+storageBucket: "chatph-cc187.appspot.com",
 messagingSenderId: "324012163441",
 appId: "1:324012163441:web:7a54be2231ad2cae71f6d0"
 };
@@ -746,6 +746,9 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);  
 const storage = getStorage(app);
+
+const imageInput = document.getElementById("postImage");
+const preview = document.getElementById("imagePreview");
 const commentState = {};
 let selectedImages = [];
 function getBadge(email){
@@ -857,12 +860,10 @@ window.createPost = async () => {
     try {
         if (imageFiles.length > 0) {
             for (const file of imageFiles) {
+                const compressed = await compressImage(file);
                 const storageRef = ref(storage, "posts/" + Date.now() + "_" + file.name);
-                await uploadBytes(storageRef, file);
-                const url = await getDownloadURL(storageRef);
-                imageURLs.push(url);
+                await uploadBytes(storageRef, compressed);
             }
-        }
 
         await addDoc(collection(db, "posts"), {
             text: text,
@@ -889,13 +890,43 @@ window.createPost = async () => {
         btn.style.cursor = "pointer";
     }
 };
+
+async function compressImage(file) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        const reader = new FileReader();
+
+        reader.onload = e => img.src = e.target.result;
+
+        img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+
+            const MAX_WIDTH = 800;
+            const scale = MAX_WIDTH / img.width;
+
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scale;
+
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob(blob => {
+                resolve(new File([blob], file.name, { type: "image/jpeg" }));
+            }, "image/jpeg", 0.7); // quality 70%
+        };
+
+        reader.readAsDataURL(file);
+    });
+}
   
 window.showAllComments = (postId, total) => {
     const list = document.getElementById("comments-" + postId);
     const btn = document.getElementById("btn-" + postId);
-    
+
+    // toggle state
     commentState[postId] = !commentState[postId];
 
+    // apply UI
     if (commentState[postId]) {
         list.classList.add("open");
         if (btn) btn.innerText = "Hide comments...";
@@ -903,7 +934,7 @@ window.showAllComments = (postId, total) => {
         list.classList.remove("open");
         if (btn) btn.innerText = `💬 View ${total} comments...`;
     }
-}
+};
   
 window.toggleComment = (id)=>{
 const box = document.getElementById("comment-"+id);
@@ -1108,7 +1139,11 @@ onSnapshot(q, (snapshot) => {
             const total = snap.size;
             const isOpen = commentState[postId] || false;
 
-            if (isOpen) list.classList.add("open");
+            if (isOpen) {
+                list.classList.add("open");
+            } else {
+                list.classList.remove("open");
+            }
 
 // Inside the onSnapshot for commentsRef...
 snap.forEach(c => {
@@ -1153,16 +1188,15 @@ snap.forEach(c => {
     });
 });
 
-const imageInput = document.getElementById("postImage");
-const preview = document.getElementById("imagePreview");
-
 imageInput.addEventListener("change", () => {
     const files = Array.from(imageInput.files);
 
-    files.forEach(file => {
-        selectedImages.push(file);
-    });
+    if (selectedImages.length + files.length > 5) {
+        alert("Max 5 images only!");
+        return;
+    }
 
+    files.forEach(file => selectedImages.push(file));
     renderPreview();
 });
 
@@ -1174,25 +1208,55 @@ function renderPreview(){
 
         reader.onload = function(e){
             const div = document.createElement("div");
+            div.draggable = true;
             div.style.position = "relative";
+
+            div.ondragstart = () => {
+                div.classList.add("dragging");
+            };
+
+            div.ondragend = () => {
+                div.classList.remove("dragging");
+            };
+
+            div.ondragover = (e) => {
+                e.preventDefault();
+            };
+
+            div.ondrop = (e) => {
+                e.preventDefault();
+
+                const draggingIndex = selectedImages.findIndex(f => f === document.querySelector(".dragging").fileRef);
+                
+                const temp = selectedImages[index];
+                selectedImages[index] = selectedImages[draggingIndex];
+                selectedImages[draggingIndex] = temp;
+
+                renderPreview();
+            };
+
+            div.fileRef = file;
 
             const img = document.createElement("img");
             img.src = e.target.result;
 
             const removeBtn = document.createElement("div");
             removeBtn.innerText = "×";
-            removeBtn.style.position = "absolute";
-            removeBtn.style.top = "5px";
-            removeBtn.style.right = "5px";
-            removeBtn.style.background = "rgba(0,0,0,0.7)";
-            removeBtn.style.color = "white";
-            removeBtn.style.borderRadius = "50%";
-            removeBtn.style.width = "20px";
-            removeBtn.style.height = "20px";
-            removeBtn.style.display = "flex";
-            removeBtn.style.alignItems = "center";
-            removeBtn.style.justifyContent = "center";
-            removeBtn.style.cursor = "pointer";
+
+            Object.assign(removeBtn.style,{
+                position:"absolute",
+                top:"5px",
+                right:"5px",
+                background:"rgba(0,0,0,0.7)",
+                color:"white",
+                borderRadius:"50%",
+                width:"20px",
+                height:"20px",
+                display:"flex",
+                alignItems:"center",
+                justifyContent:"center",
+                cursor:"pointer"
+            });
 
             removeBtn.onclick = () => {
                 selectedImages.splice(index,1);
