@@ -27,234 +27,162 @@
             background: var(--bg);
             color: var(--text-main);
             overflow-x: hidden;
-            line-height: 1.6;
         }
 
-        /* CUSTOM SCROLLBAR */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg); }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-
-        /* HEADER & NAVIGATION */
+        /* HEADER & SIDEBAR */
         header { 
             display: flex; align-items: center; justify-content: space-between; 
-            padding: 0 24px; height: 70px;
-            background: rgba(11, 14, 17, 0.8); 
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border); 
+            padding: 0 24px; height: 70px; background: rgba(11, 14, 17, 0.9); 
+            backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); 
             position: sticky; top: 0; z-index: 1000; 
         }
         
-        .logo { display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .logo img { width: 35px; filter: drop-shadow(0 0 8px var(--accent-glow)); }
-        .logo span { font-weight: 700; font-size: 20px; letter-spacing: -0.5px; }
-        .hamburger { font-size: 24px; cursor: pointer; color: var(--text-dim); }
-        .hamburger:hover { color: var(--text-main); }
-
-        /* SIDEBAR */
         .sidebar { 
             position: fixed; top: 0; left: -280px; width: 280px; height: 100%; 
             background: var(--card); border-right: 1px solid var(--border); 
-            padding-top: 80px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1001; 
-            box-shadow: 20px 0 50px rgba(0,0,0,0.5);
+            padding-top: 80px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2000; 
         }
         .sidebar.open { left: 0; }
-        .sidebar a { 
-            display: flex; align-items: center; gap: 15px; padding: 16px 25px; 
-            text-decoration: none; color: var(--text-dim); font-weight: 500; 
+        .sidebar-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); visibility: hidden; opacity: 0; z-index: 1999;
         }
-        .sidebar a:hover { background: var(--glass); color: var(--accent); padding-left: 30px; }
+        .sidebar-overlay.active { visibility: visible; opacity: 1; }
 
         /* PROFILE LAYOUT */
-        .profile-container { max-width: 900px; margin: 0 auto; padding-bottom: 50px; }
-
         .cover-wrapper {
-            position: relative;
-            height: 260px;
-            width: 100%;
-            border-radius: 0 0 30px 30px;
-            overflow: hidden;
-            background: #1e293b;
+            position: relative; height: 220px; width: 100%;
+            background: #1e293b; overflow: hidden;
         }
-
-        #coverImg {
-            width: 100%; height: 100%; object-fit: cover;
-            filter: brightness(0.7);
-        }
-
+        #coverImg { width: 100%; height: 100%; object-fit: cover; }
+        
         .edit-cover-btn {
-            position: absolute; bottom: 15px; right: 15px;
-            background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2);
-            color: white; padding: 8px 15px; border-radius: 8px; font-size: 12px;
-            cursor: pointer; backdrop-filter: blur(5px);
+            position: absolute; top: 20px; right: 20px; z-index: 10;
+            background: rgba(0,0,0,0.6); color: white; border: 1px solid var(--border);
+            padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px;
         }
 
         .profile-card {
-            max-width: 800px; margin: -80px auto 30px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 30px;
-            text-align: center;
-            position: relative;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
-
-        .pfp-wrapper {
-            position: relative; width: 140px; height: 140px; margin: -100px auto 15px;
-        }
-
-        .profile-avatar {
-            width: 100%; height: 100%;
-            border-radius: 50%;
-            border: 6px solid var(--card);
-            background: var(--card);
-            object-fit: cover;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        }
-
-        .pfp-edit-overlay {
-            position: absolute; bottom: 5px; right: 5px;
-            background: var(--accent); width: 35px; height: 35px;
-            border-radius: 50%; border: 3px solid var(--card);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-size: 14px;
-        }
-
-        .user-info h2 { margin: 10px 0 5px; font-size: 28px; font-weight: 700; }
-        .user-info p { color: var(--text-dim); font-size: 15px; margin-bottom: 20px; }
-
-        .stats-row {
-            display: flex; justify-content: center; gap: 40px;
-            margin: 25px 0; padding: 20px 0;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .stat-item b { display: block; font-size: 20px; color: var(--text-main); }
-        .stat-item span { font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
-
-        .bio-box {
-            background: var(--glass);
-            padding: 20px; border-radius: 16px;
-            font-size: 15px; color: #cbd5e1;
-            line-height: 1.7; border: 1px solid var(--border);
-            margin-bottom: 20px;
-        }
-
-        .action-btns { display: flex; gap: 10px; justify-content: center; }
-
-        .btn {
-            padding: 10px 25px; border-radius: 12px; font-weight: 600;
-            cursor: pointer; border: none; font-size: 14px;
-            display: flex; align-items: center; gap: 8px;
-        }
-
-        .btn-primary { background: var(--gradient); color: #000; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px var(--accent-glow); }
-
-        .btn-outline { background: transparent; color: white; border: 1px solid var(--border); }
-        .btn-outline:hover { background: var(--glass); }
-
-        /* POSTS FEED */
-        .feed-section { max-width: 600px; margin: 0 auto; padding: 0 20px; }
-        .section-title { 
-            font-size: 14px; font-weight: 700; color: var(--accent); 
-            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; display: block;
-        }
-
-        .post-card {
+            max-width: 800px; margin: -60px auto 30px;
             background: var(--card); border: 1px solid var(--border);
-            border-radius: 18px; padding: 20px; margin-bottom: 20px;
-            animation: fadeIn 0.5s ease backwards;
+            border-radius: 24px; padding: 30px; text-align: center;
+            position: relative; z-index: 5;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .pfp-wrapper { position: relative; width: 130px; height: 130px; margin: -90px auto 15px; }
+        .profile-avatar { width: 100%; height: 100%; border-radius: 50%; border: 6px solid var(--card); object-fit: cover; }
+        .pfp-edit-overlay { 
+            position: absolute; bottom: 5px; right: 5px; background: var(--accent); 
+            width: 35px; height: 35px; border-radius: 50%; display: flex; 
+            align-items: center; justify-content: center; cursor: pointer; border: 3px solid var(--card);
         }
 
-        /* BADGES */
-        .badge-admin { 
-            background: linear-gradient(90deg, #f59e0b, #fbbf24); 
-            color: #000; padding: 3px 10px; border-radius: 6px; 
-            font-size: 11px; font-weight: 800; margin-left: 8px;
-        }
+        .stats-row { display: flex; justify-content: center; gap: 40px; margin: 20px 0; border-top: 1px solid var(--border); padding-top: 20px; }
+        .stat-item b { display: block; font-size: 18px; }
+        .stat-item span { font-size: 12px; color: var(--text-dim); text-transform: uppercase; }
 
-        .logout-btn {
-            background: rgba(239, 68, 68, 0.1); color: #ef4444;
-            padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: 600;
+        /* CUSTOM MODAL */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+            display: none; align-items: center; justify-content: center; z-index: 3000;
         }
-        .logout-btn:hover { background: #ef4444; color: white; }
+        .modal {
+            background: var(--card); border: 1px solid var(--border);
+            padding: 25px; border-radius: 20px; width: 90%; max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .modal textarea {
+            width: 100%; height: 100px; background: #0b0e11; border: 1px solid var(--border);
+            color: white; border-radius: 10px; padding: 10px; margin: 15px 0; font-family: inherit;
+        }
+        .modal-btns { display: flex; justify-content: flex-end; gap: 10px; }
 
+        /* POSTS */
+        .post-card { background: var(--card); border: 1px solid var(--border); border-radius: 15px; padding: 20px; margin-bottom: 15px; text-align: left; }
+        
+        .btn { padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-ghost { background: transparent; color: var(--text-dim); }
+
+        #loadingToast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--accent); color: white; padding: 10px 20px;
+            border-radius: 30px; display: none; z-index: 9999;
+        }
     </style>
 </head>
 <body>
 
+<div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
+<div id="loadingToast">Uploading... Please wait</div>
+
+<div class="modal-overlay" id="bioModal">
+    <div class="modal">
+        <h3>Update Bio</h3>
+        <textarea id="bioInput" placeholder="Tell us about yourself..."></textarea>
+        <div class="modal-btns">
+            <button class="btn btn-ghost" onclick="closeModals()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveBio()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
 <header>
-    <div class="logo">
-        <div class="hamburger" onclick="toggleMenu()">☰</div>
-        <img src="image/chatph-logo.png" alt="Logo">
-        <span>ChatPH</span>
+    <div style="display:flex; align-items:center; gap:15px;">
+        <div onclick="toggleMenu()" style="cursor:pointer; font-size: 24px;">☰</div>
+        <span style="font-weight: 700; font-size: 18px;">ChatPH</span>
     </div>
-    <div id="authArea" style="display:flex; align-items:center; gap:15px;">
-        <span id="userDisplay" style="font-weight:600; font-size: 14px;">Guest</span>
-        <div id="logoutBtn" class="logout-btn" style="display:none;">Logout</div>
-    </div>
+    <div id="logoutBtn" style="color: #ef4444; font-size: 14px; cursor: pointer; font-weight: 600;">Logout</div>
 </header>
 
 <div class="sidebar" id="sidebar">
-    <a href="home.html">🏠 Home</a>
-    <a href="msg.html">💬 Messages</a>
-    <a href="frnd.html">👥 Friends</a>
-    <a href="srch.html">🔎 Search</a>
-    <a href="prfl.html" style="color: var(--accent); background: var(--glass);">👤 Profile</a>
+    <a href="home.html" style="display:block; padding: 15px 25px; text-decoration: none; color: white;">🏠 Home</a>
+    <a href="prfl.html" style="display:block; padding: 15px 25px; text-decoration: none; color: var(--accent);">👤 Profile</a>
 </div>
+
+<input type="file" id="pfpInput" hidden accept="image/*">
+<input type="file" id="coverInput" hidden accept="image/*">
 
 <div class="profile-container">
     <div class="cover-wrapper">
-        <img id="coverImg" src="https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop" alt="Cover">
-        <button class="edit-cover-btn" onclick="updatePhoto('cover')">📷 Change Cover</button>
+        <button class="edit-cover-btn" onclick="document.getElementById('coverInput').click()">📷 Change Cover</button>
+        <img id="coverImg" src="https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2000">
     </div>
 
     <div class="profile-card">
         <div class="pfp-wrapper">
             <img id="pfp" class="profile-avatar" src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png">
-            <div class="pfp-edit-overlay" onclick="updatePhoto('pfp')">✏️</div>
+            <div class="pfp-edit-overlay" onclick="document.getElementById('pfpInput').click()">✏️</div>
         </div>
 
-        <div class="user-info">
-            <h2><span id="nameDisplay">User Name</span> <span id="badgeLoc"></span></h2>
-            <p id="emailDisplay">loading...</p>
-        </div>
+        <h2 id="nameDisplay">User Name <span id="badgeLoc"></span></h2>
+        <p id="emailDisplay" style="color: var(--text-dim); margin-top: -10px;">loading...</p>
 
         <div class="stats-row">
             <div class="stat-item"><b id="postCount">0</b><span>Posts</span></div>
-            <div class="stat-item"><b>128</b><span>Friends</span></div>
-            <div class="stat-item"><b>2026</b><span>Year</span></div>
+            <div class="stat-item"><b>0</b><span>Friends</span></div>
+            <div class="stat-item"><b>2026</b><span>Joined</span></div>
         </div>
 
-        <div class="bio-box" id="bioDisplay">
-            Loading profile information...
+        <div id="bioDisplay" style="background: var(--glass); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+            Getting your bio...
         </div>
 
-        <div class="action-btns">
-            <button class="btn btn-primary" onclick="editBio()">Edit Bio</button>
-            <button class="btn btn-outline">Settings</button>
-        </div>
+        <button class="btn btn-primary" onclick="openBioModal()">Edit Profile</button>
     </div>
 
-    <div class="feed-section">
-        <span class="section-title">Timeline</span>
-        <div id="userPosts">
-            </div>
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h4 style="color: var(--accent); text-transform: uppercase; letter-spacing: 1px;">Recent Activity</h4>
+        <div id="userPosts"></div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, query, where, orderBy, onSnapshot, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
@@ -268,22 +196,30 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
+    const storage = getStorage(app);
 
-    window.toggleMenu = () => document.getElementById("sidebar").classList.toggle("open");
+    // Sidebar Toggle
+    window.toggleMenu = () => {
+        const sb = document.getElementById("sidebar");
+        const ov = document.getElementById("overlay");
+        sb.classList.toggle("open");
+        ov.classList.toggle("active");
+    };
 
-    function getBadge(email){
-        if(email === "ablaobryan4400@gmail.com") return `<span class="badge-admin">💠 ADMIN</span>`;
-        return "";
-    }
+    // Modal Controls
+    window.openBioModal = () => {
+        document.getElementById("bioModal").style.display = "flex";
+        document.getElementById("bioInput").value = document.getElementById("bioDisplay").innerText;
+    };
+    window.closeModals = () => {
+        document.getElementById("bioModal").style.display = "none";
+    };
 
+    // Auth State
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            document.getElementById("userDisplay").innerText = user.displayName || "User";
-            document.getElementById("logoutBtn").style.display = "block";
-            document.getElementById("nameDisplay").innerText = user.displayName || "User";
+            document.getElementById("nameDisplay").firstChild.textContent = user.displayName || "User";
             document.getElementById("emailDisplay").innerText = user.email;
-            document.getElementById("badgeLoc").innerHTML = getBadge(user.email);
-            
             loadUserData(user);
             loadUserPosts(user.email);
         } else {
@@ -291,73 +227,67 @@
         }
     });
 
+    // Load User Data
     async function loadUserData(user) {
-        const userRef = doc(db, "users", user.uid);
-        const userSnap = await getDoc(userRef);
-        
-        if (userSnap.exists()) {
-            const data = userSnap.data();
-            if (data.bio) document.getElementById("bioDisplay").innerText = data.bio;
+        const snap = await getDoc(doc(db, "users", user.uid));
+        if (snap.exists()) {
+            const data = snap.data();
+            document.getElementById("bioDisplay").innerText = data.bio || "No bio yet. Tap 'Edit Profile' to add one!";
             if (data.pfpURL) document.getElementById("pfp").src = data.pfpURL;
             if (data.coverURL) document.getElementById("coverImg").src = data.coverURL;
         } else {
-            document.getElementById("bioDisplay").innerText = "No bio set. Click edit to share something!";
+            document.getElementById("bioDisplay").innerText = "Welcome! Tap 'Edit Profile' to add a bio.";
         }
     }
 
-    window.editBio = async () => {
-        const current = document.getElementById("bioDisplay").innerText;
-        const newBio = prompt("What's on your mind?", current);
-        if (newBio) {
-            const user = auth.currentUser;
-            await setDoc(doc(db, "users", user.uid), { bio: newBio }, { merge: true });
-            document.getElementById("bioDisplay").innerText = newBio;
-        }
+    // Save Bio
+    window.saveBio = async () => {
+        const text = document.getElementById("bioInput").value;
+        const user = auth.currentUser;
+        await setDoc(doc(db, "users", user.uid), { bio: text }, { merge: true });
+        document.getElementById("bioDisplay").innerText = text;
+        closeModals();
     };
 
-    window.updatePhoto = async (type) => {
-        const promptText = type === 'pfp' ? "Enter Image URL for Profile Picture:" : "Enter Image URL for Cover Photo:";
-        const url = prompt(promptText);
-        if (url) {
-            const user = auth.currentUser;
-            const updateObj = type === 'pfp' ? { pfpURL: url } : { coverURL: url };
-            await setDoc(doc(db, "users", user.uid), updateObj, { merge: true });
+    // Handle File Uploads (Storage)
+    const uploadFile = async (file, type) => {
+        if (!file) return;
+        const user = auth.currentUser;
+        const toast = document.getElementById("loadingToast");
+        toast.style.display = "block";
+
+        try {
+            const storageRef = ref(storage, `users/${user.uid}/${type}`);
+            await uploadBytes(storageRef, file);
+            const url = await getDownloadURL(storageRef);
+            
+            await setDoc(doc(db, "users", user.uid), { [type === 'pfp' ? 'pfpURL' : 'coverURL']: url }, { merge: true });
             document.getElementById(type === 'pfp' ? "pfp" : "coverImg").src = url;
+        } catch (e) {
+            console.error(e);
+            alert("Upload failed. Make sure your Firebase Storage rules allow uploads.");
         }
+        toast.style.display = "none";
     };
 
+    document.getElementById("pfpInput").onchange = (e) => uploadFile(e.target.files[0], 'pfp');
+    document.getElementById("coverInput").onchange = (e) => uploadFile(e.target.files[0], 'cover');
+
+    // Posts
     function loadUserPosts(email) {
         const q = query(collection(db, "posts"), where("email", "==", email), orderBy("time", "desc"));
-        const postContainer = document.getElementById("userPosts");
-
         onSnapshot(q, (snapshot) => {
-            postContainer.innerHTML = "";
+            const cont = document.getElementById("userPosts");
+            cont.innerHTML = "";
             document.getElementById("postCount").innerText = snapshot.size;
-
-            if(snapshot.empty) {
-                postContainer.innerHTML = `<div style="text-align:center; padding:40px; opacity:0.4;">
-                    <div style="font-size:40px;">📭</div>
-                    <p>No posts yet. Share your first thought!</p>
-                </div>`;
-                return;
-            }
-
-            snapshot.forEach((postDoc) => {
-                const p = postDoc.data();
-                const date = p.time?.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                postContainer.innerHTML += `
-                    <div class="post-card">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                            <span style="font-size:12px; font-weight:700; color:var(--accent);">${date}</span>
-                            <span style="font-size:12px; opacity:0.4;">ChatPH Feed</span>
-                        </div>
-                        <div style="font-size:15px; color:#e2e8f0;">${p.text}</div>
-                    </div>`;
+            snapshot.forEach(d => {
+                const p = d.data();
+                cont.innerHTML += `<div class="post-card">${p.text}</div>`;
             });
         });
     }
 
-    document.getElementById("logoutBtn").onclick = () => signOut(auth).then(() => window.location.href = "index.html");
+    document.getElementById("logoutBtn").onclick = () => signOut(auth);
 </script>
 </body>
 </html>
