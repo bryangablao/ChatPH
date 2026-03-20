@@ -224,22 +224,30 @@ import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, o
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-setPersistence(auth, browserLocalPersistence);
 const app = initializeApp({
-apiKey:"AIza...",
-authDomain:"chatph-cc187.firebaseapp.com",
-projectId:"chatph-cc187"
+apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
+authDomain: "chatph-cc187.firebaseapp.com",
+projectId: "chatph-cc187",
+storageBucket: "chatph-cc187.firebasestorage.app",
+messagingSenderId: "324012163441",
+appId: "1:324012163441:web:7a54be2231ad2cae71f6d0"
 });
 
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-let authReady = false;
+setPersistence(auth, browserLocalPersistence);
 
 /* DROPDOWN */
-window.toggleMenu = (id)=>{
-document.querySelectorAll('.menu').forEach(m=>m.classList.remove('active'));
-document.getElementById(id).classList.toggle('active');
+window.toggleMenu = (id) => {
+    const menu = document.getElementById(id);
+    const isOpen = menu.classList.contains("active");
+
+    document.querySelectorAll('.menu').forEach(m => m.classList.remove('active'));
+
+    if (!isOpen) {
+        menu.classList.add("active");
+    }
 };
 
 /* CLICK OUTSIDE CLOSE */
@@ -273,20 +281,27 @@ pfpInput.onchange=e=>upload(e.target.files[0],'pfp');
 coverInput.onchange=e=>upload(e.target.files[0],'cover');
 
 /* DELETE */
-window.deletePfp=()=>{
-pfp.src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+window.deletePfp = async () => {
+    const user = auth.currentUser;
+    await setDoc(doc(db,"users",user.uid), { pfpBase64: "" }, { merge:true });
+    pfp.src = "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
 };
-window.deleteCover=()=>{
-coverImg.src="https://images.unsplash.com/photo-1557683316-973673baf926";
+
+window.deleteCover = async () => {
+    const user = auth.currentUser;
+    await setDoc(doc(db,"users",user.uid), { coverBase64: "" }, { merge:true });
+    coverImg.src = "https://images.unsplash.com/photo-1557683316-973673baf926";
 };
 
 /* BIO */
-window.editBio=async()=>{
-const text=prompt("Edit bio:");
-if(!text) return;
-const user=auth.currentUser;
-await setDoc(doc(db,"users",user.uid),{bio:text},{merge:true});
-bio.innerText=text;
+window.editBio = async () => {
+    const text = prompt("Edit your bio:");
+    if (!text) return;
+
+    const user = auth.currentUser;
+    await setDoc(doc(db,"users",user.uid), { bio: text }, { merge:true });
+
+    document.getElementById("bio").innerText = text;
 };
 
 /* AUTH FIX */
