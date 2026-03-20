@@ -1,259 +1,345 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile | ChatPH</title>
-    <link rel="icon" type="image/png" href="image/chatph-logo.png">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #0b0e11;
-            --card: #151921;
-            --border: rgba(255, 255, 255, 0.08);
-            --text: #ffffff;
-            --text-dim: #94a3b8;
-            --accent: #3b82f6;
-            --glass: rgba(255, 255, 255, 0.05);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile | ChatPH</title>
 
-        * { box-sizing: border-box; transition: all 0.2s ease; }
-        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 
-        /* HEADER */
-        header { 
-            display: flex; align-items: center; justify-content: space-between; 
-            padding: 0 20px; height: 65px; background: rgba(11, 14, 17, 0.9); 
-            backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); 
-            position: sticky; top: 0; z-index: 1000; 
-        }
+<style>
+:root{
+--bg:#0b0e11;
+--card:#151921;
+--border:rgba(255,255,255,.08);
+--text:#fff;
+--dim:#94a3b8;
+--accent:#3b82f6;
+}
 
-        /* SIDEBAR & CLICK-OUTSIDE OVERLAY */
-        .sidebar { 
-            position: fixed; top: 0; left: -280px; width: 260px; height: 100%; 
-            background: var(--card); border-right: 1px solid var(--border); 
-            padding-top: 80px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2001; 
-        }
-        .sidebar.open { left: 0; }
-        
-        /* The secret to closing the menu when clicking outside */
-        .sidebar-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); opacity: 0; visibility: hidden; z-index: 2000;
-        }
-        .sidebar-overlay.active { opacity: 1; visibility: visible; }
+*{box-sizing:border-box;font-family:'Plus Jakarta Sans';}
 
-        .sidebar a { display: block; padding: 15px 25px; color: white; text-decoration: none; font-weight: 600; }
-        .sidebar a:hover { background: var(--glass); color: var(--accent); }
+body{
+margin:0;
+background:var(--bg);
+color:var(--text);
+}
 
-        /* PROFILE LAYOUT */
-        .cover-container { position: relative; height: 200px; width: 100%; background: #1e293b; overflow: hidden; }
-        #coverImg { width: 100%; height: 100%; object-fit: cover; }
-        
-        /* Fixed overlap for cover button */
-        .btn-edit-cover {
-            position: absolute; bottom: 15px; right: 15px; z-index: 10;
-            background: rgba(0,0,0,0.7); color: white; border: 1px solid rgba(255,255,255,0.2);
-            padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 11px;
-        }
+/* HEADER */
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 20px;
+background:#0b0e11;
+border-bottom:1px solid var(--border);
+position:sticky;
+top:0;
+z-index:1000;
+}
 
-        .profile-card {
-            max-width: 800px; margin: -50px auto 30px; position: relative; z-index: 100;
-            background: var(--card); border: 1px solid var(--border);
-            border-radius: 24px; padding: 30px; text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
+/* COVER */
+.cover{
+position:relative;
+height:200px;
+background:#1e293b;
+}
 
-        .pfp-area { position: relative; width: 120px; height: 120px; margin: -90px auto 15px; }
-        .profile-avatar { width: 100%; height: 100%; border-radius: 50%; border: 5px solid var(--card); object-fit: cover; background: #222; }
-        .pfp-edit-badge { 
-            position: absolute; bottom: 0; right: 0; background: var(--accent); 
-            width: 34px; height: 34px; border-radius: 50%; display: flex; 
-            align-items: center; justify-content: center; cursor: pointer; border: 3px solid var(--card);
-        }
+.cover img{
+width:100%;
+height:100%;
+object-fit:cover;
+}
 
-        .stats { display: flex; justify-content: center; gap: 30px; margin: 20px 0; border-top: 1px solid var(--border); padding-top: 20px; }
-        .stats b { display: block; font-size: 18px; color: var(--text); }
-        .stats span { font-size: 11px; color: var(--text-dim); text-transform: uppercase; }
+/* EDIT BUTTON (TOP RIGHT FIXED) */
+.edit-btn{
+position:absolute;
+top:15px;
+right:15px;
+background:rgba(0,0,0,.6);
+border-radius:50%;
+width:36px;
+height:36px;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+}
 
-        /* CUSTOM MODAL */
-        .modal-wrap {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 3000;
-        }
-        .modal { background: var(--card); border: 1px solid var(--border); padding: 25px; border-radius: 20px; width: 90%; max-width: 400px; }
-        .modal textarea { width: 100%; height: 100px; background: #0b0e11; border: 1px solid var(--border); color: white; border-radius: 12px; padding: 12px; margin: 15px 0; font-family: inherit; resize: none; }
+/* DROPDOWN MENU */
+.menu{
+position:absolute;
+top:50px;
+right:0;
+background:var(--card);
+border:1px solid var(--border);
+border-radius:12px;
+padding:8px;
+display:none;
+min-width:160px;
+z-index:999;
+}
 
-        .btn { padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; font-weight: 700; font-size: 14px; }
-        .btn-primary { background: var(--accent); color: white; }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: white; }
+.menu div{
+padding:8px;
+font-size:13px;
+cursor:pointer;
+border-radius:8px;
+}
 
-        .post { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 15px; margin-bottom: 12px; text-align: left; }
-    </style>
+.menu div:hover{
+background:rgba(255,255,255,.05);
+}
+
+/* PROFILE CARD */
+.card{
+max-width:700px;
+margin:-60px auto 20px;
+background:var(--card);
+padding:25px;
+border-radius:20px;
+border:1px solid var(--border);
+text-align:center;
+}
+
+/* PROFILE PIC */
+.pfp-wrap{
+position:relative;
+width:110px;
+margin:-70px auto 10px;
+}
+
+.pfp{
+width:110px;
+height:110px;
+border-radius:50%;
+border:4px solid var(--card);
+}
+
+/* NAME */
+h2{
+margin:10px 0 5px;
+}
+
+.email{
+font-size:13px;
+color:var(--dim);
+}
+
+/* STATS */
+.stats{
+display:flex;
+justify-content:center;
+gap:30px;
+margin:20px 0;
+border-top:1px solid var(--border);
+border-bottom:1px solid var(--border);
+padding:15px 0;
+}
+
+.stats b{display:block}
+
+/* BIO */
+.bio{
+background:rgba(255,255,255,.03);
+padding:15px;
+border-radius:12px;
+margin-top:10px;
+font-size:14px;
+}
+
+/* BUTTON */
+.btn{
+margin-top:15px;
+padding:10px 18px;
+background:var(--accent);
+border:none;
+border-radius:10px;
+color:white;
+cursor:pointer;
+}
+
+/* POSTS */
+.feed{
+max-width:550px;
+margin:auto;
+padding:0 15px 40px;
+}
+
+.post{
+background:var(--card);
+border:1px solid var(--border);
+padding:15px;
+border-radius:12px;
+margin-top:10px;
+}
+
+.post small{
+color:var(--dim);
+}
+</style>
 </head>
+
 <body>
 
-<div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
-
-<div class="modal-wrap" id="bioModal">
-    <div class="modal">
-        <h3 style="margin-top:0;">Edit Profile Bio</h3>
-        <textarea id="bioInput" placeholder="Write something about yourself..."></textarea>
-        <div style="display:flex; justify-content: flex-end; gap: 10px;">
-            <button class="btn btn-outline" onclick="closeBioModal()">Cancel</button>
-            <button class="btn btn-primary" onclick="saveBio()">Save Bio</button>
-        </div>
-    </div>
-</div>
-
 <header>
-    <div style="display:flex; align-items:center; gap:12px;">
-        <div onclick="toggleMenu()" style="cursor:pointer; font-size: 22px;">☰</div>
-        <img src="image/chatph-logo.png" style="width:30px;">
-        <span style="font-weight: 700;">ChatPH</span>
-    </div>
-    <div id="logoutBtn" style="color: #ef4444; font-size: 13px; font-weight: 700; cursor: pointer;">Logout</div>
+<div>☰ ChatPH</div>
+<div id="logoutBtn">Logout</div>
 </header>
 
-<div class="sidebar" id="sidebar">
-    <a href="home.html">🏠 Home</a>
-    <a href="msg.html">💬 Messages</a>
-    <a href="frnd.html">👥 Friends</a>
-    <a href="prfl.html" style="color: var(--accent);">👤 Profile</a>
+<!-- COVER -->
+<div class="cover">
+<img id="coverImg" src="https://images.unsplash.com/photo-1557683316-973673baf926">
+
+<div class="edit-btn" onclick="toggleMenu('coverMenu')">✏️</div>
+
+<div class="menu" id="coverMenu">
+<div onclick="uploadCover()">Upload</div>
+<div onclick="viewImage('coverImg')">View</div>
+<div onclick="deleteCover()">Delete</div>
+</div>
 </div>
 
-<input type="file" id="pfpInput" hidden accept="image/*">
-<input type="file" id="coverInput" hidden accept="image/*">
+<!-- PROFILE -->
+<div class="card">
 
-<div class="profile-page">
-    <div class="cover-container">
-        <button class="btn-edit-cover" onclick="document.getElementById('coverInput').click()">📷 Update Cover</button>
-        <img id="coverImg" src="https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2000">
-    </div>
+<div class="pfp-wrap">
+<img id="pfp" class="pfp" src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png">
 
-    <div class="profile-card">
-        <div class="pfp-area">
-            <img id="pfp" class="profile-avatar" src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png">
-            <div class="pfp-edit-badge" onclick="document.getElementById('pfpInput').click()">✏️</div>
-        </div>
+<div class="edit-btn" style="bottom:0;top:auto;right:0;" onclick="toggleMenu('pfpMenu')">✏️</div>
 
-        <h2 id="nameDisplay">User Name</h2>
-        <p id="emailDisplay" style="color: var(--text-dim); margin-top: -10px; font-size: 14px;">loading...</p>
-
-        <div class="stats">
-            <div class="stat-item"><b id="postCount">0</b><span>Posts</span></div>
-            <div class="stat-item"><b>0</b><span>Friends</span></div>
-            <div class="stat-item"><b>2026</b><span>Joined</span></div>
-        </div>
-
-        <div class="bio-box" id="bioDisplay">Loading bio...</div>
-        <button class="btn btn-primary" onclick="openBioModal()">Edit Profile</button>
-    </div>
-
-    <div style="max-width: 550px; margin: 0 auto; padding: 0 20px 50px;">
-        <span style="font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase;">Recent Activity</span>
-        <div id="userPosts" style="margin-top: 15px;"></div>
-    </div>
+<div class="menu" id="pfpMenu" style="right:-20px;">
+<div onclick="uploadPfp()">Upload</div>
+<div onclick="viewImage('pfp')">View</div>
+<div onclick="deletePfp()">Delete</div>
 </div>
+</div>
+
+<h2 id="name">User</h2>
+<div class="email" id="email">email</div>
+
+<div class="stats">
+<div><b id="posts">0</b><span>Posts</span></div>
+<div><b>0</b><span>Friends</span></div>
+<div><b>2026</b><span>Joined</span></div>
+</div>
+
+<div class="bio" id="bio">No bio yet</div>
+
+<button class="btn" onclick="editBio()">Edit Bio</button>
+
+</div>
+
+<!-- POSTS -->
+<div class="feed">
+<h4>Recent Activity</h4>
+<div id="postList"></div>
+</div>
+
+<input type="file" id="pfpInput" hidden>
+<input type="file" id="coverInput" hidden>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
-        authDomain: "chatph-cc187.firebaseapp.com",
-        projectId: "chatph-cc187",
-        storageBucket: "chatph-cc187.firebasestorage.app",
-        messagingSenderId: "324012163441",
-        appId: "1:324012163441:web:7a54be2231ad2cae71f6d0"
-    };
+const app = initializeApp({
+apiKey:"AIza...",
+authDomain:"chatph-cc187.firebaseapp.com",
+projectId:"chatph-cc187"
+});
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-    window.toggleMenu = () => {
-        document.getElementById("sidebar").classList.toggle("open");
-        document.getElementById("overlay").classList.toggle("active");
-    };
+/* MENU */
+window.toggleMenu = (id)=>{
+document.querySelectorAll('.menu').forEach(m=>m.style.display='none');
+const el = document.getElementById(id);
+el.style.display = el.style.display === 'block' ? 'none' : 'block';
+};
 
-    window.openBioModal = () => {
-        document.getElementById("bioModal").style.display = "flex";
-        document.getElementById("bioInput").value = document.getElementById("bioDisplay").innerText;
-    };
-    window.closeBioModal = () => document.getElementById("bioModal").style.display = "none";
+/* VIEW IMAGE */
+window.viewImage = (id)=>{
+window.open(document.getElementById(id).src);
+};
 
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            document.getElementById("nameDisplay").innerText = user.displayName || "User";
-            document.getElementById("emailDisplay").innerText = user.email;
-            loadUserData(user);
-            loadUserPosts(user.email);
-        } else {
-            window.location.href = "index.html";
-        }
-    });
+/* UPLOAD HANDLER */
+function upload(file,type){
+const reader=new FileReader();
+reader.onload=async()=>{
+const base64=reader.result;
+const user=auth.currentUser;
+const field = type==='pfp'?'pfpBase64':'coverBase64';
 
-    async function loadUserData(user) {
-        const snap = await getDoc(doc(db, "users", user.uid));
-        if (snap.exists()) {
-            const data = snap.data();
-            document.getElementById("bioDisplay").innerText = data.bio || "No bio yet.";
-            if (data.pfpBase64) document.getElementById("pfp").src = data.pfpBase64;
-            if (data.coverBase64) document.getElementById("coverImg").src = data.coverBase64;
-        } else {
-            document.getElementById("bioDisplay").innerText = "No bio yet.";
-        }
-    }
+await setDoc(doc(db,"users",user.uid),{[field]:base64},{merge:true});
+document.getElementById(type==='pfp'?'pfp':'coverImg').src=base64;
+};
+reader.readAsDataURL(file);
+}
 
-    window.saveBio = async () => {
-        const text = document.getElementById("bioInput").value;
-        const user = auth.currentUser;
-        await setDoc(doc(db, "users", user.uid), { bio: text }, { merge: true });
-        document.getElementById("bioDisplay").innerText = text;
-        closeBioModal();
-    };
+/* BUTTON ACTIONS */
+window.uploadPfp=()=>pfpInput.click();
+window.uploadCover=()=>coverInput.click();
 
-    /* --- THE BASE64 UPLOAD MAGIC (NO STORAGE NEEDED) --- */
-    const handleImageSelect = (file, type) => {
-        if (!file) return;
-        
-        // Check file size (Firestore has a 1MB limit per document)
-        if (file.size > 800000) {
-            alert("Image is too large! Please pick a smaller image (under 800KB).");
-            return;
-        }
+pfpInput.onchange=e=>upload(e.target.files[0],'pfp');
+coverInput.onchange=e=>upload(e.target.files[0],'cover');
 
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-            const base64String = reader.result;
-            const user = auth.currentUser;
-            const field = type === 'pfp' ? 'pfpBase64' : 'coverBase64';
-            
-            await setDoc(doc(db, "users", user.uid), { [field]: base64String }, { merge: true });
-            document.getElementById(type === 'pfp' ? "pfp" : "coverImg").src = base64String;
-        };
-        reader.readAsDataURL(file);
-    };
+window.deletePfp=async()=>{
+document.getElementById("pfp").src="";
+};
 
-    document.getElementById("pfpInput").onchange = (e) => handleImageSelect(e.target.files[0], 'pfp');
-    document.getElementById("coverInput").onchange = (e) => handleImageSelect(e.target.files[0], 'cover');
+window.deleteCover=async()=>{
+document.getElementById("coverImg").src="";
+};
 
-    function loadUserPosts(email) {
-        const q = query(collection(db, "posts"), where("email", "==", email), orderBy("time", "desc"));
-        onSnapshot(q, (snapshot) => {
-            const list = document.getElementById("userPosts");
-            list.innerHTML = "";
-            document.getElementById("postCount").innerText = snapshot.size;
-            snapshot.forEach(d => {
-                list.innerHTML += `<div class="post">${d.data().text}</div>`;
-            });
-        });
-    }
+/* BIO */
+window.editBio = async ()=>{
+const text=prompt("Edit bio:");
+if(!text) return;
+const user=auth.currentUser;
 
-    document.getElementById("logoutBtn").onclick = () => signOut(auth);
+await setDoc(doc(db,"users",user.uid),{bio:text},{merge:true});
+document.getElementById("bio").innerText=text;
+};
+
+/* AUTH */
+onAuthStateChanged(auth,async(user)=>{
+if(!user) location="index.html";
+
+document.getElementById("name").innerText=user.displayName;
+document.getElementById("email").innerText=user.email;
+
+const snap=await getDoc(doc(db,"users",user.uid));
+if(snap.exists()){
+const d=snap.data();
+if(d.bio) bio.innerText=d.bio;
+if(d.pfpBase64) pfp.src=d.pfpBase64;
+if(d.coverBase64) coverImg.src=d.coverBase64;
+}
+
+/* POSTS */
+const q=query(collection(db,"posts"),where("email","==",user.email),orderBy("time","desc"));
+onSnapshot(q,(snap)=>{
+postList.innerHTML="";
+posts.innerText=snap.size;
+
+snap.forEach(doc=>{
+const p=doc.data();
+postList.innerHTML+=`
+<div class="post">
+<small>${p.time?.toDate().toLocaleString()}</small>
+<div>${p.text}</div>
+</div>
+`;
+});
+});
+});
+
+/* LOGOUT */
+logoutBtn.onclick=()=>signOut(auth);
 </script>
+
 </body>
 </html>
