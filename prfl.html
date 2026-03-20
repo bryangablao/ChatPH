@@ -222,7 +222,9 @@ margin-top:10px;
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+setPersistence(auth, browserLocalPersistence);
 const app = initializeApp({
 apiKey:"AIza...",
 authDomain:"chatph-cc187.firebaseapp.com",
@@ -288,42 +290,48 @@ bio.innerText=text;
 };
 
 /* AUTH FIX */
-onAuthStateChanged(auth, async(user)=>{
-if(!authReady){
-authReady=true;
-if(!user){
-setTimeout(()=>{ if(!auth.currentUser) location="index.html"; },1000);
-return;
-}
-}
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        // ✅ User is logged in → load data
+        document.getElementById("name").innerText = user.displayName || "User";
+        document.getElementById("email").innerText = user.email;
 
-if(user){
-name.innerText=user.displayName || "User";
-email.innerText=user.email;
+        const snap = await getDoc(doc(db,"users",user.uid));
+        if(snap.exists()){
+            const d = snap.data();
+            if(d.bio) bio.innerText = d.bio;
+            if(d.pfpBase64) pfp.src = d.pfpBase64;
+            if(d.coverBase64) coverImg.src = d.coverBase64;
+        }
 
-const snap=await getDoc(doc(db,"users",user.uid));
-if(snap.exists()){
-const d=snap.data();
-if(d.bio) bio.innerText=d.bio;
-if(d.pfpBase64) pfp.src=d.pfpBase64;
-if(d.coverBase64) coverImg.src=d.coverBase64;
-}
+        // POSTS
+        const q = query(
+            collection(db,"posts"),
+            where("email","==",user.email),
+            orderBy("time","desc")
+        );
 
-/* POSTS */
-const q=query(collection(db,"posts"),where("email","==",user.email),orderBy("time","desc"));
-onSnapshot(q,(snap)=>{
-postList.innerHTML="";
-posts.innerText=snap.size;
-snap.forEach(doc=>{
-const p=doc.data();
-postList.innerHTML+=`
-<div class="post">
-<small>${p.time?.toDate().toLocaleString()}</small>
-<div>${p.text}</div>
-</div>`;
-});
-});
-}
+        onSnapshot(q,(snap)=>{
+            postList.innerHTML="";
+            posts.innerText=snap.size;
+            snap.forEach(doc=>{
+                const p=doc.data();
+                postList.innerHTML+=`
+                <div class="post">
+                    <small>${p.time?.toDate().toLocaleString()}</small>
+                    <div>${p.text}</div>
+                </div>`;
+            });
+        });
+
+    } else {
+        // ❗ Delay redirect slightly (prevents false logout)
+        setTimeout(() => {
+            if (!auth.currentUser) {
+                window.location.href = "index.html";
+            }
+        }, 500);
+    }
 });
 
 /* LOGOUT */
