@@ -621,21 +621,36 @@ object-fit:cover;
     position: fixed;
     bottom: 20px;
     left: 50%;
-    transform: translateX(-50%) translateY(20px);
+    transform: translateX(-50%) translateY(30px);
     background: #1f2937;
     color: #fff;
-    padding: 12px 20px;
+    padding: 12px 18px;
     border-radius: 10px;
     font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     opacity: 0;
     pointer-events: none;
-    transition: 0.3s ease;
+    transition: all 0.35s ease;
     box-shadow: 0 6px 20px rgba(0,0,0,.4);
     z-index: 9999;
 }
+
+/* SHOW ANIMATION */
 .toast.show {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
+}
+
+/* TYPES */
+.toast.success { background: #16a34a; } /* green */
+.toast.error   { background: #dc2626; } /* red */
+.toast.info    { background: #2563eb; } /* blue */
+
+/* ICON */
+.toast .icon {
+    font-size: 18px;
 }
 </style>
 </head>
@@ -850,12 +865,12 @@ window.createPost = async () => {
     const user = auth.currentUser;
 
     if (!text) {
-        showToast("Write something.");
+        showToast("Write something.", "info");
         return;
     }
 
     if (!user) {
-        showToast("You must be logged in.");
+        showToast("You must be logged in.", "error");
         return;
     }
 
@@ -872,19 +887,29 @@ window.createPost = async () => {
         });
 
         editor.innerHTML = "";
+        showToast("Post created!", "success");
 
     } catch (err) {
         console.error(err);
-        showToast("Post failed.");
+        showToast("Post failed.", "error");
     } finally {
         btn.disabled = false;
         btn.innerText = "Post";
     }
 };
 
-function showToast(message) {
+function showToast(message, type = "info") {
     const toast = document.getElementById("toast");
-    toast.innerText = message;
+
+    const icons = {
+        success: "✅",
+        error: "⚠️",
+        info: "ℹ️"
+    };
+
+    toast.className = "toast " + type;
+    toast.innerHTML = `<span class="icon">${icons[type]}</span> ${message}`;
+
     toast.classList.add("show");
 
     setTimeout(() => {
@@ -1011,7 +1036,7 @@ window.react = async (postId, type) => {
   
 window.sharePost = (id)=>{
 navigator.clipboard.writeText(location.href+"?post="+id);
-showToast("Post link copied!");
+showToast("Post link copied!", "success");
 }
   
 /* LOAD POSTS */
