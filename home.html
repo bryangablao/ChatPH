@@ -863,10 +863,12 @@ window.createPost = async () => {
                 const compressed = await compressImage(file);
                 const storageRef = ref(storage, "posts/" + Date.now() + "_" + file.name);
                 await uploadBytes(storageRef, compressed);
+                // ✅ GET DOWNLOAD URL
+                const url = await getDownloadURL(storageRef);
+                // ✅ SAVE IT
+                imageURLs.push(url);
             }
         }
-
-        imageURLs.push(url);
         
         await addDoc(collection(db, "posts"), {
             text: text,
@@ -1179,7 +1181,7 @@ snap.forEach(c => {
             const existingBtn = commentBox.querySelector(".more-comments");
             if (existingBtn) existingBtn.remove();
 
-            if (total > 1) {
+            if (total > 0) {
                 const btn = document.createElement("div");
                 btn.className = "more-comments";
                 btn.id = "btn-" + postId;
