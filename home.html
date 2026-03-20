@@ -747,6 +747,7 @@ const db = getFirestore(app);
 const auth = getAuth(app);  
 const storage = getStorage(app);
 const commentState = {};
+let selectedImages = [];
 function getBadge(email){
 if(email === "ablaobryan4400@gmail.com"){
 return `<span class="admin-badge">💠 Admin</span>`;
@@ -834,7 +835,7 @@ window.createPost = async () => {
     const btn = document.querySelector(".post-btn"); 
     const editor = document.getElementById("postText");
     const text = editor.innerHTML.trim();
-    const imageFiles = document.getElementById("postImage").files;
+    const imageFiles = selectedImages;
     const user = auth.currentUser;
 
     if (!text && imageFiles.length === 0) {
@@ -872,10 +873,10 @@ window.createPost = async () => {
             time: serverTimestamp()
         });
 
-
         editor.innerHTML = "";
-        document.getElementById("postImage").value = "";
-        document.getElementById("imagePreview").innerHTML = "";
+        selectedImages = [];
+        imageInput.value = "";
+        renderPreview();
 
     } catch (err) {
         console.error(err);
@@ -1154,20 +1155,59 @@ snap.forEach(c => {
 
 const imageInput = document.getElementById("postImage");
 const preview = document.getElementById("imagePreview");
-imageInput.addEventListener("change",()=>{
-preview.innerHTML="";
-const files = imageInput.files;
-for(let i=0;i<files.length;i++){
-const reader = new FileReader();
-reader.onload = function(e){
-const img = document.createElement("img");
-img.src = e.target.result;
-preview.appendChild(img);
-};
-reader.readAsDataURL(files[i]);
-}
+
+imageInput.addEventListener("change", () => {
+    const files = Array.from(imageInput.files);
+
+    files.forEach(file => {
+        selectedImages.push(file);
+    });
+
+    renderPreview();
 });
-  
+
+function renderPreview(){
+    preview.innerHTML = "";
+
+    selectedImages.forEach((file, index) => {
+        const reader = new FileReader();
+
+        reader.onload = function(e){
+            const div = document.createElement("div");
+            div.style.position = "relative";
+
+            const img = document.createElement("img");
+            img.src = e.target.result;
+
+            const removeBtn = document.createElement("div");
+            removeBtn.innerText = "×";
+            removeBtn.style.position = "absolute";
+            removeBtn.style.top = "5px";
+            removeBtn.style.right = "5px";
+            removeBtn.style.background = "rgba(0,0,0,0.7)";
+            removeBtn.style.color = "white";
+            removeBtn.style.borderRadius = "50%";
+            removeBtn.style.width = "20px";
+            removeBtn.style.height = "20px";
+            removeBtn.style.display = "flex";
+            removeBtn.style.alignItems = "center";
+            removeBtn.style.justifyContent = "center";
+            removeBtn.style.cursor = "pointer";
+
+            removeBtn.onclick = () => {
+                selectedImages.splice(index,1);
+                renderPreview();
+            };
+
+            div.appendChild(img);
+            div.appendChild(removeBtn);
+            preview.appendChild(div);
+        };
+
+        reader.readAsDataURL(file);
+    });
+}
+    
 /* AUTH USER */
 onAuthStateChanged(auth,(user)=>{
     if(user){
