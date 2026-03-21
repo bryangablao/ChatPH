@@ -162,19 +162,46 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /*---Header--*/
+    .header-left{
+        display:flex;
+        align-items:center;
+        gap:12px;
+        cursor:pointer;
+    }
+
+    .menu-icon{
+        font-size:26px; /* bigger ☰ */
+    }
+
+    .logo{
+        width:28px;
+        height:28px;
+        border-radius:6px;
+    }
+
+    .brand{
+        font-weight:700;
+        font-size:1.2rem;
+    }
         
     </style>
 </head>
 
 <body>
 
-    <header>
-        <div style="display:flex;align-items:center;gap:8px;cursor:pointer;" onclick="toggleSidebar()">☰ ChatPH
-            <img src="image/chatph-logo.png" style="width:26px;height:26px;border-radius:6px;">
-            <span style="font-weight:700;font-size:1.2rem;">ChatPH</span>
-        </div>
-        <div id="logoutBtn">Logout</div>
-    </header>
+<header>
+    <div class="header-left" onclick="toggleSidebar()">
+        <span class="menu-icon">☰</span>
+
+        <img src="image/chatph-logo.png" class="logo">
+
+        <span class="brand">ChatPH</span>
+    </div>
+
+    <div id="logoutBtn">Logout</div>
+</header>
 
     <div class="sidebar" id="sidebar">
         <a href="home.html">Home</a>
@@ -220,7 +247,10 @@
             <div class="stats">
                 <div><b id="statPosts">0</b><span>Posts</span></div>
                 <div><b>0</b><span>Friends</span></div>
-                <div><b>2026</b><span>Joined</span></div>
+                <div>
+                    <b>20<span id="yearAnim">00</span></b>
+                    <span>Joined</span>
+                </div>
             </div>
 
             <div class="bio" id="userBio">No bio yet</div>
@@ -277,14 +307,12 @@
     };
 
     // --- Menu Handling ---
-    document.querySelectorAll('.edit-trigger').forEach(btn => {
-        btn.onclick = (e) => {
-            e.stopPropagation();
-            const target = btn.dataset.target;
-            document.querySelectorAll('.menu').forEach(m => m.id !== target && m.classList.remove('active'));
-            document.getElementById(target).classList.toggle('active');
-        };
+document.querySelectorAll('.menu div').forEach(item=>{
+    item.addEventListener("click", (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('.menu').forEach(m=>m.classList.remove('active'));
     });
+});
 
     document.addEventListener("click", (e) => {
         if (!e.target.closest(".menu") && !e.target.closest(".edit-trigger")) {
@@ -429,6 +457,26 @@ const handleFile = (e, type) => {
             link.classList.add("active");
         };
     });
+
+const animateYear = () => {
+    let target = "26";
+    let current = [0, 0];
+
+    const el = document.getElementById("yearAnim");
+
+    let interval = setInterval(() => {
+        if (current[0] < 2) current[0]++;
+        if (current[1] < 6) current[1]++;
+
+        el.innerText = current.join("");
+
+        if (current[0] === 2 && current[1] === 6) {
+            clearInterval(interval);
+        }
+    }, 80);
+};
+
+animateYear();
     
 </script>
 
