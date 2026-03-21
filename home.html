@@ -32,10 +32,20 @@ position:sticky;
 top:0;
 z-index:1000;
 }
+/* HEADER */
+.header-left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    cursor:pointer;
+}
+.menu-icon{
+    font-size:26px;
+}
 .logo{
-display:flex;
-align-items:center;
-gap:10px;
+    width:28px;
+    height:28px;
+    border-radius:6px;
 }
 .logo img{
 width:32px;
@@ -44,39 +54,77 @@ width:32px;
 font-weight:700;
 font-size:18px;
 }
+.brand{
+    font-weight:700;
+    font-size:1.2rem;
+}
+
+/* SIDEBAR (MODERN) */
+.sidebar{
+    position:fixed;
+    top:0;
+    left:-260px;
+    width:240px;
+    height:100%;
+    background:rgba(21,25,33,0.75);
+    backdrop-filter: blur(12px);
+    border-right:1px solid rgba(255,255,255,0.08);
+    padding-top:70px;
+    transition:.3s;
+    z-index:999;
+}
+.sidebar.open{
+    left:0;
+}
+.sidebar a{
+    display:block;
+    padding:14px 20px;
+    text-decoration:none;
+    color:white;
+    position: relative;
+}
+.sidebar a.active {
+    background: rgba(59,130,246,0.15);
+    color: var(--accent);
+    border-left: 3px solid var(--accent);
+}
+.sidebar a:hover {
+    background: rgba(255,255,255,0.05);
+    color: var(--accent);
+}
+
+/* INDICATOR */
+.indicator {
+    position: absolute;
+    left: 0;
+    width: 4px;
+    height: 44px;
+    background: var(--accent);
+    border-radius: 4px;
+    top: 0;
+    transition: 0.3s ease;
+    box-shadow: 0 0 10px rgba(59,130,246,0.7);
+}
+
+/* OVERLAY */
+.overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.5);
+    opacity:0;
+    pointer-events:none;
+    transition:.3s;
+    z-index:998;
+}
+.overlay.active{
+    opacity:1;
+    pointer-events:auto;
+}
+
 /* HAMBURGER */
 .hamburger{
 font-size:22px;
 cursor:pointer;
-}
-/* SIDEBAR */
-.sidebar{
-position:fixed;
-top:0;
-left:-230px;
-width:230px;
-height:100%;
-background:#14171d;
-border-right:1px solid var(--border);
-padding-top:70px;
-transition:.3s;
-z-index:1001;
-}
-.sidebar.open{
-left:0;
-}
-.sidebar a{
-display:flex;
-align-items:center;
-gap:12px;
-padding:14px 20px;
-text-decoration:none;
-color:white;
-font-weight:500;
-transition:.2s;
-}
-.sidebar a:hover{
-background:#1e222b;
 }
 /* MARQUEE AD */
 .marquee{
@@ -657,26 +705,29 @@ object-fit:cover;
 <body>
 <!-- HEADER -->
 <header>
-<div class="logo">
-<div class="hamburger" onclick="toggleMenu()">☰</div>
-<img src="image/chatph-logo.png">
-<span>ChatPH</span>
-</div>
-<div style="display:flex;align-items:center;gap:10px;">
-<span id="userDisplay">Guest</span>
-<img id="logoutBtn"
-src="image/icon/logout.png"
-class="logout-icon">
-</div>
+    <div class="header-left" onclick="toggleSidebar()">
+        <span class="menu-icon">☰</span>
+        <img src="image/chatph-logo.png" class="logo">
+        <span class="brand">ChatPH</span>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;">
+        <span id="userDisplay">Guest</span>
+        <img id="logoutBtn" src="image/icon/logout.png" class="logout-icon">
+    </div>
 </header>
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
-<a href="home.html">Home</a>
-<a href="msg.html">Messages</a>
-<a href="frnd.html">Friends</a>
-<a href="srch.html">Search User</a>
-<a href="prfl.html">Profile</a>
+    <a href="#" class="active">Home</a>
+    <a href="msg.html">Messages</a>
+    <a href="frnd.html">Friends</a>
+    <a href="srch.html">Search User</a>
+    <a href="prfl.html">Profile</a>
+
+    <div class="indicator" id="indicator"></div>
 </div>
+
+<div class="overlay" id="overlay" onclick="toggleSidebar(true)"></div>
 <!-- ADVERTISEMENT MARQUEE -->
 <div class="marquee">
 <div class="marquee-track">
@@ -805,9 +856,18 @@ return "";
 }
 
 /* SIDEBAR */
-window.toggleMenu = () =>{
-document.getElementById("sidebar").classList.toggle("open");
-}
+window.toggleSidebar = (forceClose = false) => {
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("overlay");
+
+    if (forceClose) {
+        sidebar.classList.remove("open");
+        overlay.classList.remove("active");
+    } else {
+        sidebar.classList.toggle("open");
+        overlay.classList.toggle("active");
+    }
+};
 function format(command){
 const editor = document.getElementById("postText");
 editor.focus();
@@ -1228,7 +1288,26 @@ html += `<div class="more">+${count-5} others</div>`;
 box.innerHTML = html;
 });
 }
-  
+
+const links = document.querySelectorAll(".sidebar a");
+const indicator = document.getElementById("indicator");
+
+links.forEach(link => {
+    link.onclick = () => {
+        links.forEach(l => l.classList.remove("active"));
+        link.classList.add("active");
+
+        indicator.style.top = link.offsetTop + "px";
+        indicator.style.height = link.offsetHeight + "px";
+    };
+});
+
+window.addEventListener("load", () => {
+    const active = document.querySelector(".sidebar a.active") || links[0];
+    indicator.style.top = active.offsetTop + "px";
+    indicator.style.height = active.offsetHeight + "px";
+});
+    
 </script>
 <div id="toast" class="toast"></div>
 </body>
