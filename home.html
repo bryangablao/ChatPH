@@ -1134,7 +1134,7 @@ onSnapshot(q, (snapshot) => {
             </div>
             <div class="comment-box" id="comment-${postId}" style="display:none">
                 <div class="comment-input">
-                    <img class="comment-avatar" src="${p.photo}">
+                    <img class="comment-avatar" src="${auth.currentUser?.photoURL || 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}">
                     <input type="text" class="comment-field" placeholder="Write a comment..." 
                            onkeydown="if(event.key==='Enter'){addComment('${postId}',this)}">
                 </div>
