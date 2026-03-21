@@ -439,10 +439,17 @@ const handleFile = (e, type) => {
         }
     };
 
-    document.querySelectorAll('.menu div').forEach(item=>{
-        item.onclick = () => {
-            document.querySelectorAll('.menu').forEach(m=>m.classList.remove('active'));
-        };
+    document.querySelectorAll('.edit-trigger').forEach(btn => {
+    btn.onclick = (e) => {
+        e.stopPropagation();
+        const target = btn.dataset.target;
+
+    document.querySelectorAll('.menu').forEach(m => {
+        if (m.id !== target) m.classList.remove('active');
+    });
+
+        document.getElementById(target).classList.toggle('active');
+      };
     });
 
     const showLoader = (state) => {
@@ -458,25 +465,25 @@ const handleFile = (e, type) => {
         };
     });
 
-const animateYear = () => {
-    let target = "26";
-    let current = [0, 0];
-
+const animateYear = (year) => {
     const el = document.getElementById("yearAnim");
+    const target = year.toString().slice(-2); // last 2 digits
 
-    let interval = setInterval(() => {
-        if (current[0] < 2) current[0]++;
-        if (current[1] < 6) current[1]++;
+    let current = 0;
 
-        el.innerText = current.join("");
+    const interval = setInterval(() => {
+        current++;
+        el.innerText = current.toString().padStart(2, "0");
 
-        if (current[0] === 2 && current[1] === 6) {
+        if (current >= target) {
+            el.innerText = target;
             clearInterval(interval);
         }
-    }, 80);
+    }, 60);
 };
 
-animateYear();
+const currentYear = new Date().getFullYear();
+animateYear(currentYear);
     
 </script>
 
