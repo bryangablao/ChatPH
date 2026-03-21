@@ -398,8 +398,21 @@ const handleFile = (e, type) => {
         };
     });
 
-    document.querySelectorAll('.view-trigger').forEach(btn => btn.onclick = () => window.open(document.getElementById(btn.dataset.img).src));
+const imageViewer = document.getElementById("imageViewer");
+const viewerImg = document.getElementById("viewerImg");
 
+document.querySelectorAll('.view-trigger').forEach(btn => {
+    btn.onclick = () => {
+        const src = document.getElementById(btn.dataset.img).src;
+        viewerImg.src = src;
+        imageViewer.classList.add("active");
+    };
+});
+
+imageViewer.onclick = () => {
+    imageViewer.classList.remove("active");
+};
+    
     // --- State & Feed ---
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
@@ -425,7 +438,11 @@ const handleFile = (e, type) => {
             document.getElementById("statPosts").innerText = snap.size;
             snap.forEach(doc => {
                 const p = doc.data();
-                list.innerHTML += `<div class="post"><small>${p.time?.toDate().toLocaleString() || 'Recent'}</small><div>${p.text}</div></div>`;
+list.innerHTML += `
+<div class="post">
+    <small>${p.time?.toDate().toLocaleString() || 'Recent'}</small>
+    <div style="margin-top:8px;">${p.text}</div>
+</div>`;
             });
         });
     });
@@ -511,6 +528,39 @@ z-index:3000;
     animation:spin 1s linear infinite;
     "></div>
 </div>
+
+<div class="modal-overlay" id="imageViewer">
+    <img id="viewerImg" style="
+        max-width:90%;
+        max-height:90%;
+        border-radius:12px;
+        box-shadow:0 20px 40px rgba(0,0,0,0.6);
+    ">
+</div>
+
+<footer style="
+text-align:center;
+padding:30px 20px;
+color:#94a3b8;
+border-top:1px solid rgba(255,255,255,0.08);
+margin-top:40px;
+">
+<div>© 2026 ChatPH • All Rights Reserved</div>
+
+<div style="margin-top:6px;font-size:13px;">
+<a href="#" style="color:#4da3ff;text-decoration:none;">About</a>
+&nbsp;|&nbsp;
+<a href="#" style="color:#4da3ff;text-decoration:none;">Privacy</a>
+&nbsp;|&nbsp;
+<a href="#" style="color:#4da3ff;text-decoration:none;">Terms</a>
+&nbsp;|&nbsp;
+<a href="#" style="color:#4da3ff;text-decoration:none;">Contact</a>
+</div>
+
+<div style="margin-top:6px;font-size:12px;opacity:.7;">
+Made with ❤️ in the Philippines
+</div>
+</footer>
     
 </body>
 </html>
