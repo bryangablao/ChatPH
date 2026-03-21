@@ -23,6 +23,7 @@ color:var(--text);
 /* HEADER */
 header {
     display: flex;
+    height: 70px;
     justify-content: space-between;
     align-items: center;
     padding: 15px 24px;
@@ -59,10 +60,10 @@ font-size:18px;
 /* SIDEBAR (MODERN) */
 .sidebar{
     position: fixed;
-    top: 60px;
+    top: 70px;
+    height: calc(100% - 70px);
     left: -260px;
     width: 240px;
-    height: calc(100% - 60px);
     background: rgba(21,25,33,0.75);
     backdrop-filter: blur(12px);
     border-right: 1px solid rgba(255,255,255,0.08);
