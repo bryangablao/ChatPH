@@ -45,7 +45,7 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
         .edit-trigger:hover { background: var(--accent); transform: scale(1.1); }
-        .edit-trigger svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
+        .edit-trigger svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2; }
 
         .cover-edit-btn { position: absolute; top: 15px; right: 15px; width: 40px; height: 40px; }
         .pfp-edit-btn { position: absolute; bottom: 5px; right: 5px; width: 36px; height: 36px; background: var(--accent); }
@@ -100,16 +100,51 @@
         /* --- Feed --- */
         .feed { max-width: 550px; margin: auto; padding: 0 20px 60px; }
         .post { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 16px; margin-top: 15px; }
+        
+          /* --- Sidebar --- */
+        .sidebar{
+            position:fixed;
+            top:0;
+            left:-260px;
+            width:240px;
+            height:100%;
+            background:var(--card);
+            border-right:1px solid var(--border);
+            padding-top:70px;
+            transition:.3s;
+            z-index:999;
+           }
+        .sidebar a{
+            display:block;
+            padding:14px 20px;
+            text-decoration:none;
+            color:white;
+        }
+        .sidebar.open{
+            left:0;
+        }
+
+        .menu{
+            z-index: 2000;
+        }
     </style>
 </head>
 
 <body>
 
     <header>
-        <div style="font-weight: 700; font-size: 1.2rem;">☰ ChatPH</div>
+        <div style="font-weight:700;font-size:1.2rem;cursor:pointer;" onclick="toggleSidebar()">☰ ChatPH</div>
         <div id="logoutBtn">Logout</div>
     </header>
 
+    <div class="sidebar" id="sidebar">
+        <a href="home.html">Home</a>
+        <a href="msg.html">Messages</a>
+        <a href="frnd.html">Friends</a>
+        <a href="srch.html">Search User</a>
+        <a href="prfl.html">Profile</a>
+    </div>
+    
     <main>
         <section class="cover">
             <img id="coverImg" src="https://images.unsplash.com/photo-1557683316-973673baf926">
@@ -231,13 +266,17 @@
     document.querySelectorAll('.upload-trigger').forEach(btn => btn.onclick = () => document.getElementById(btn.dataset.input).click());
     
     const handleFile = (e, type) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
         const reader = new FileReader();
         reader.onload = async () => {
             const field = type === 'pfp' ? 'pfpBase64' : 'coverBase64';
             await updateDB({ [field]: reader.result });
+    
             document.getElementById(type === 'pfp' ? 'pfp' : 'coverImg').src = reader.result;
         };
-        reader.readAsDataURL(e.target.files[0]);
+        reader.readAsDataURL(file);
     };
 
     document.getElementById('pfpInput').onchange = (e) => handleFile(e, 'pfp');
@@ -285,6 +324,17 @@
     });
 
     document.getElementById('logoutBtn').onclick = () => signOut(auth);
+
+    window.toggleSidebar = () => {
+        document.getElementById("sidebar").classList.toggle("open");
+    };
+
+    document.querySelectorAll('.menu div').forEach(item=>{
+        item.onclick = () => {
+            document.querySelectorAll('.menu').forEach(m=>m.classList.remove('active'));
+        };
+    });
+    
 </script>
 
 </body>
