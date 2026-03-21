@@ -1,329 +1,357 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChatPH | Professional Feed</title>
-    <link rel="icon" type="image/png" href="image/chatph-logo.png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-main: #0b0e14;
-            --bg-card: #151921;
-            --bg-header: rgba(18, 20, 26, 0.8);
-            --border: rgba(255, 255, 255, 0.08);
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
-            --danger: #ef4444;
-            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChatPH</title>
+<link rel="icon" type="image/png" href="image/chatph-logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 
-        * { box-sizing: border-box; }
+<style>
+:root{
+--bg:#0b0e11;
+--card:#151921;
+--border:rgba(255,255,255,.08);
+--text:#fff;
+--dim:#94a3b8;
+--accent:#3b82f6;
+}
+*{box-sizing:border-box;font-family:'Plus Jakarta Sans';}
+body{margin:0;background:var(--bg);color:var(--text);}
 
-        body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-main);
-            color: var(--text-primary);
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-        }
+/* HEADER */
+header{
+display:flex;
+justify-content:space-between;
+padding:15px 20px;
+border-bottom:1px solid var(--border);
+}
 
-        /* --- LAYOUT --- */
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-            height: 64px;
-            background: var(--bg-header);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
+/* COVER */
+.cover{
+position:relative;
+height:200px;
+}
+.cover img{
+width:100%;
+height:100%;
+object-fit:cover;
+}
 
-        .main-container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 24px 16px;
-        }
+/* EDIT BUTTON */
+.edit-btn{
+position:absolute;
+top:15px;
+right:15px;
+width:38px;height:38px;
+background:rgba(0,0,0,.6);
+border-radius:50%;
+display:flex;align-items:center;justify-content:center;
+cursor:pointer;
+}
 
-        /* --- COMPONENTS --- */
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            font-size: 1.2rem;
-        }
+/* SMOOTH DROPDOWN */
+.menu{
+position:absolute;
+top:60px;
+right:15px;
+background:var(--card);
+border:1px solid var(--border);
+border-radius:12px;
+overflow:hidden;
+opacity:0;
+transform:translateY(-10px);
+pointer-events:none;
+transition:.25s;
+}
+.menu.active{
+opacity:1;
+transform:translateY(0);
+pointer-events:auto;
+}
+.menu div{
+padding:10px 15px;
+cursor:pointer;
+font-size:13px;
+}
+.menu div:hover{
+background:rgba(255,255,255,.05);
+}
 
-        .logo img { width: 32px; height: 32px; border-radius: 8px; }
+/* CARD */
+.card{
+max-width:700px;
+margin:-60px auto 20px;
+background:var(--card);
+padding:25px;
+border-radius:20px;
+border:1px solid var(--border);
+text-align:center;
+}
 
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -280px;
-            width: 280px;
-            height: 100%;
-            background: var(--bg-card);
-            border-right: 1px solid var(--border);
-            padding: 80px 16px 20px;
-            transition: var(--transition);
-            z-index: 999;
-        }
+/* PFP */
+.pfp-wrap{
+position:relative;
+width:110px;
+margin:-70px auto 10px;
+}
+.pfp{
+width:110px;height:110px;
+border-radius:50%;
+border:4px solid var(--card);
+}
 
-        .sidebar.open { left: 0; box-shadow: 20px 0 50px rgba(0,0,0,0.5); }
+/* PFP EDIT */
+.pfp-edit{
+position:absolute;
+bottom:0;
+right:0;
+width:34px;height:34px;
+background:var(--accent);
+border-radius:50%;
+display:flex;align-items:center;justify-content:center;
+cursor:pointer;
+}
 
-        .sidebar a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            text-decoration: none;
-            color: var(--text-secondary);
-            border-radius: 10px;
-            margin-bottom: 4px;
-            transition: var(--transition);
-        }
+/* STATS */
+.stats{
+display:flex;
+justify-content:center;
+gap:30px;
+margin:20px 0;
+border-top:1px solid var(--border);
+border-bottom:1px solid var(--border);
+padding:15px 0;
+}
 
-        .sidebar a:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+/* BIO */
+.bio{
+background:rgba(255,255,255,.03);
+padding:16px;
+border-radius:12px;
+margin-top:15px;
+line-height:1.5;
+}
 
-        /* --- POST COMPONENT --- */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: var(--transition);
-        }
+/* BUTTON */
+.btn{
+margin-top:15px;
+padding:10px 18px;
+background:var(--accent);
+border:none;
+border-radius:10px;
+color:white;
+cursor:pointer;
+}
 
-        .create-post { border: 1px solid var(--accent); background: rgba(59, 130, 246, 0.03); }
-
-        .editor {
-            width: 100%;
-            min-height: 100px;
-            background: rgba(0,0,0,0.2);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 14px;
-            color: var(--text-primary);
-            outline: none;
-            font-size: 15px;
-        }
-
-        .editor:focus { border-color: var(--accent); }
-
-        .btn-primary {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 99px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
-
-        .post-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-        
-        .avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
-
-        .username { font-weight: 600; font-size: 15px; }
-
-        .badge {
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            margin-left: 6px;
-        }
-
-        .badge-admin { background: #fbbf24; color: #000; }
-
-        .post-content { font-size: 15px; color: #e2e8f0; line-height: 1.6; }
-
-        .post-actions {
-            display: flex;
-            gap: 24px;
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid var(--border);
-        }
-
-        .action-link {
-            color: var(--text-secondary);
-            font-size: 14px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: var(--transition);
-        }
-
-        .action-link:hover { color: var(--accent); }
-
-        /* --- TOAST & UTILS --- */
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            padding: 12px 24px;
-            border-radius: 12px;
-            background: #1e293b;
-            color: white;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
-            transform: translateY(100px);
-            opacity: 0;
-            transition: var(--transition);
-            z-index: 9999;
-        }
-
-        .toast.show { transform: translateY(0); opacity: 1; }
-
-        /* Marquee Professional Refresh */
-        .marquee { background: #1e293b; padding: 8px 0; font-size: 13px; color: var(--accent); }
-
-        @keyframes scrollAds {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-        .marquee-track {
-            display: inline-block;
-            white-space: nowrap;
-            animation: scrollAds 30s linear infinite;
-        }
-        
-    </style>
-    
+/* POSTS */
+.feed{
+max-width:550px;
+margin:auto;
+padding:0 15px 40px;
+}
+.post{
+background:var(--card);
+border:1px solid var(--border);
+padding:15px;
+border-radius:12px;
+margin-top:10px;
+}
+</style>
 </head>
+
 <body>
 
 <header>
-    <div class="logo">
-        <div style="cursor:pointer" onclick="toggleMenu()">☰</div>
-        <img src="image/chatph-logo.png" alt="Logo">
-        <span>ChatPH</span>
-    </div>
-    <div style="display:flex; align-items:center; gap:16px;">
-        <span id="userDisplay" style="font-size:14px; color:var(--text-secondary)">Loading...</span>
-        <img id="logoutBtn" src="image/icon/logout.png" style="width:20px; cursor:pointer; display:none;">
-    </div>
+<div>☰ ChatPH</div>
+<div id="logoutBtn">Logout</div>
 </header>
 
-<nav class="sidebar" id="sidebar">
-    <a href="home.html">🏠 Home</a>
-    <a href="msg.html">💬 Messages</a>
-    <a href="frnd.html">👥 Friends</a>
-    <a href="prfl.html">👤 Profile</a>
-</nav>
+<!-- COVER -->
+<div class="cover">
+<img id="coverImg" src="https://images.unsplash.com/photo-1557683316-973673baf926">
 
-<div class="marquee">
-    <div class="marquee-track">
-        🚀 Elevate your business with ChatPH Ads &nbsp;&nbsp; • &nbsp;&nbsp; 
-        ✨ Professional networking reimagined &nbsp;&nbsp; • &nbsp;&nbsp; 
-        🔒 Secure & Encrypted Conversations
-    </div>
+<div class="edit-btn" onclick="toggleMenu('coverMenu')">✏️</div>
+
+<div class="menu" id="coverMenu">
+<div onclick="uploadCover()">Upload</div>
+<div onclick="viewImage('coverImg')">View</div>
+<div onclick="deleteCover()">Delete</div>
+</div>
 </div>
 
-<main class="main-container">
-    <div class="card create-post">
-        <div id="postText" class="editor" contenteditable="true" data-placeholder="What's on your mind?"></div>
-        <div style="display:flex; justify-content: flex-end; margin-top:12px;">
-            <button class="btn-primary" onclick="createPost()">Post</button>
-        </div>
-    </div>
+<!-- PROFILE -->
+<div class="card">
 
-    <div id="postsFeed">
-        </div>
-</main>
+<div class="pfp-wrap">
+<img id="pfp" class="pfp" src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png">
 
-<div id="toast" class="toast"></div>
+<div class="pfp-edit" onclick="toggleMenu('pfpMenu')">✏️</div>
+
+<div class="menu" id="pfpMenu" style="top:40px; right:-10px;">
+<div onclick="uploadPfp()">Upload</div>
+<div onclick="viewImage('pfp')">View</div>
+<div onclick="deletePfp()">Delete</div>
+</div>
+</div>
+
+<h2 id="name">User</h2>
+<div id="email" style="color:var(--dim)"></div>
+
+<div class="stats">
+<div><b id="posts">0</b><span>Posts</span></div>
+<div><b>0</b><span>Friends</span></div>
+<div><b>2026</b><span>Joined</span></div>
+</div>
+
+<div class="bio" id="bio">No bio yet</div>
+<button class="btn" onclick="editBio()">Edit Bio</button>
+
+</div>
+
+<!-- POSTS -->
+<div class="feed">
+<h4>Recent Activity</h4>
+<div id="postList"></div>
+</div>
+
+<input type="file" id="pfpInput" hidden>
+<input type="file" id="coverInput" hidden>
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-const firebaseConfig = {
-    apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
-    authDomain: "chatph-cc187.firebaseapp.com",
-    projectId: "chatph-cc187",
-    storageBucket: "chatph-cc187.firebasestorage.app",
-    messagingSenderId: "324012163441",
-    appId: "1:324012163441:web:7a54be2231ad2cae71f6d0"
-};
+const app = initializeApp({
+apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
+authDomain: "chatph-cc187.firebaseapp.com",
+projectId: "chatph-cc187",
+storageBucket: "chatph-cc187.firebasestorage.app",
+messagingSenderId: "324012163441",
+appId: "1:324012163441:web:7a54be2231ad2cae71f6d0"
+});
 
-const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-onAuthStateChanged(auth, (user) => {
-    const userDisplay = document.getElementById("userDisplay");
-    const logoutBtn = document.getElementById("logoutBtn");
+setPersistence(auth, browserLocalPersistence);
 
-    if (user) {
-        userDisplay.innerText = user.displayName || user.email;
-        logoutBtn.style.display = "inline";
-    } else {
-        // Redirect to login if not logged in
-        window.location.href = "index.html"; 
+/* DROPDOWN */
+window.toggleMenu = (id) => {
+    const menu = document.getElementById(id);
+    const isOpen = menu.classList.contains("active");
+
+    document.querySelectorAll('.menu').forEach(m => m.classList.remove('active'));
+
+    if (!isOpen) {
+        menu.classList.add("active");
     }
+};
+
+/* CLICK OUTSIDE CLOSE */
+document.addEventListener("click",(e)=>{
+if(!e.target.closest(".edit-btn") && !e.target.closest(".pfp-edit") && !e.target.closest(".menu")){
+document.querySelectorAll('.menu').forEach(m=>m.classList.remove('active'));
+}
 });
 
-window.createPost = async () => {
-    const editor = document.getElementById("postText");
-    const text = editor.innerText.trim();
+/* IMAGE VIEW */
+window.viewImage = (id)=> window.open(document.getElementById(id).src);
+
+/* UPLOAD */
+function upload(file,type){
+if(!file) return;
+const reader=new FileReader();
+reader.onload=async()=>{
+const base64=reader.result;
+const user=auth.currentUser;
+const field=type==='pfp'?'pfpBase64':'coverBase64';
+await setDoc(doc(db,"users",user.uid),{[field]:base64},{merge:true});
+document.getElementById(type==='pfp'?'pfp':'coverImg').src=base64;
+};
+reader.readAsDataURL(file);
+}
+
+window.uploadPfp=()=>pfpInput.click();
+window.uploadCover=()=>coverInput.click();
+
+pfpInput.onchange=e=>upload(e.target.files[0],'pfp');
+coverInput.onchange=e=>upload(e.target.files[0],'cover');
+
+/* DELETE */
+window.deletePfp = async () => {
     const user = auth.currentUser;
+    await setDoc(doc(db,"users",user.uid), { pfpBase64: "" }, { merge:true });
+    pfp.src = "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+};
 
-    if (!text) {
-        window.showToast("Please write something first!", "error");
-        return;
-    }
+window.deleteCover = async () => {
+    const user = auth.currentUser;
+    await setDoc(doc(db,"users",user.uid), { coverBase64: "" }, { merge:true });
+    coverImg.src = "https://images.unsplash.com/photo-1557683316-973673baf926";
+};
 
-    try {
-        await addDoc(collection(db, "posts"), {
-            text: text,
-            uid: user.uid,
-            name: user.displayName || "User",
-            photo: user.photoURL || "https://via.placeholder.com/44",
-            time: serverTimestamp()
+/* BIO */
+window.editBio = async () => {
+    const text = prompt("Edit your bio:");
+    if (!text) return;
+
+    const user = auth.currentUser;
+    await setDoc(doc(db,"users",user.uid), { bio: text }, { merge:true });
+
+    document.getElementById("bio").innerText = text;
+};
+
+/* AUTH FIX */
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        // ✅ User is logged in → load data
+        document.getElementById("name").innerText = user.displayName || "User";
+        document.getElementById("email").innerText = user.email;
+
+        const snap = await getDoc(doc(db,"users",user.uid));
+        if(snap.exists()){
+            const d = snap.data();
+            if(d.bio) bio.innerText = d.bio;
+            if(d.pfpBase64) pfp.src = d.pfpBase64;
+            if(d.coverBase64) coverImg.src = d.coverBase64;
+        }
+
+        // POSTS
+        const q = query(
+            collection(db,"posts"),
+            where("email","==",user.email),
+            orderBy("time","desc")
+        );
+
+        onSnapshot(q,(snap)=>{
+            postList.innerHTML="";
+            posts.innerText=snap.size;a
+            snap.forEach(doc=>{
+                const p=doc.data();
+                postList.innerHTML+=`
+                <div class="post">
+                    <small>${p.time?.toDate().toLocaleString()}</small>
+                    <div>${p.text}</div>
+                </div>`;
+            });
         });
-        editor.innerText = ""; // Clear editor
-        window.showToast("Post shared successfully!", "success");
-    } catch (err) {
-        console.error(err);
-        window.showToast("Failed to post.", "error");
-    }
-};
 
-document.getElementById("logoutBtn").onclick = () => signOut(auth);
-
-window.showToast = (msg, type = "info") => {
-    const toast = document.getElementById("toast");
-    toast.innerText = msg;
-    toast.className = `toast show ${type}`; // Support different colors
-    toast.style.borderLeft = type === "error" ? "4px solid #ef4444" : "4px solid #3b82f6";
-    setTimeout(() => toast.classList.remove("show"), 3000);
-};
-
-window.toggleMenu = () => document.getElementById("sidebar").classList.toggle("open");
-
-document.addEventListener('click', (e) => {
-    const sidebar = document.getElementById('sidebar');
-    if (!sidebar.contains(e.target) && !e.target.closest('.logo')) {
-        sidebar.classList.remove('open');
+    } else {
+        // ❗ Delay redirect slightly (prevents false logout)
+        setTimeout(() => {
+            if (!auth.currentUser) {
+                window.location.href = "index.html";
+            }
+        }, 500);
     }
 });
 
+/* LOGOUT */
+logoutBtn.onclick=()=>signOut(auth);
 </script>
+
 </body>
 </html>
