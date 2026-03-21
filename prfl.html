@@ -45,10 +45,10 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
         .edit-trigger:hover { background: var(--accent); transform: scale(1.1); }
-        .edit-trigger svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2; }
+        .edit-trigger svg { width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 2; }
 
-        .cover-edit-btn { position: absolute; top: 15px; right: 15px; width: 40px; height: 40px; }
-        .pfp-edit-btn { position: absolute; bottom: 5px; right: 5px; width: 36px; height: 36px; background: var(--accent); }
+        .cover-edit-btn { position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; }
+        .pfp-edit-btn { position: absolute; bottom: 5px; right: 5px; width: 28px; height: 28px; background: var(--accent); }
 
         /* --- Profile Card --- */
         .card {
@@ -108,12 +108,16 @@
             left:-260px;
             width:240px;
             height:100%;
-            background:var(--card);
-            border-right:1px solid var(--border);
+
+            background:rgba(21,25,33,0.75);
+            backdrop-filter: blur(12px);
+
+            border-right:1px solid rgba(255,255,255,0.08);
             padding-top:70px;
             transition:.3s;
             z-index:999;
-           }
+        }
+        
         .sidebar a{
             display:block;
             padding:14px 20px;
@@ -124,9 +128,41 @@
             left:0;
         }
 
+        .sidebar a.active {
+            background: rgba(59,130,246,0.15);
+            color: var(--accent);
+            border-left: 3px solid var(--accent);
+        }
+
+        .sidebar a:hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--accent);
+        }
+
         .menu{
             z-index: 2000;
         }
+
+        /*---Sidebar Overlay---*/
+        .overlay{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.5);
+            opacity:0;
+            pointer-events:none;
+            transition:.3s;
+            z-index:998;
+        }
+        .overlay.active{
+            opacity:1;
+            pointer-events:auto;
+        }
+
+        /*---Spinner---*/
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
     </style>
 </head>
 
@@ -144,6 +180,8 @@
         <a href="srch.html">Search User</a>
         <a href="prfl.html">Profile</a>
     </div>
+
+    <div class="overlay" id="overlay" onclick="toggleSidebar(true)"></div>
     
     <main>
         <section class="cover">
@@ -265,21 +303,47 @@
     // --- Uploads & Deletes ---
     document.querySelectorAll('.upload-trigger').forEach(btn => btn.onclick = () => document.getElementById(btn.dataset.input).click());
     
-    const handleFile = (e, type) => {
-        if (!auth.currentUser) return;
-        
-        const file = e.target.files[0];
-        if (!file) return;
+const handleFile = (e, type) => {
+    if (!auth.currentUser) return;
 
-        const reader = new FileReader();
-        reader.onload = async () => {
-            const field = type === 'pfp' ? 'pfpBase64' : 'coverBase64';
-            await updateDB({ [field]: reader.result });
-    
-            document.getElementById(type === 'pfp' ? 'pfp' : 'coverImg').src = reader.result;
-        };
-        reader.readAsDataURL(file);
+    const file = e.target.files[0];
+    if (!file) return;
+
+    showLoader(true); // 👈 show spinner
+
+    const img = new Image();
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+        img.src = event.target.result;
     };
+
+    img.onload = async () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        // 🔥 resize (important)
+        const MAX_WIDTH = 600;
+        const scale = MAX_WIDTH / img.width;
+
+        canvas.width = MAX_WIDTH;
+        canvas.height = img.height * scale;
+
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        // 🔥 compress
+        const compressed = canvas.toDataURL("image/jpeg", 0.7);
+
+        const field = type === 'pfp' ? 'pfpBase64' : 'coverBase64';
+        await updateDB({ [field]: compressed });
+
+        document.getElementById(type === 'pfp' ? 'pfp' : 'coverImg').src = compressed;
+
+        showLoader(false); // 👈 hide spinner
+    };
+
+    reader.readAsDataURL(file);
+};
 
     document.getElementById('pfpInput').onchange = (e) => handleFile(e, 'pfp');
     document.getElementById('coverInput').onchange = (e) => handleFile(e, 'cover');
@@ -327,8 +391,17 @@
 
     document.getElementById('logoutBtn').onclick = () => signOut(auth);
 
-    window.toggleSidebar = () => {
-        document.getElementById("sidebar").classList.toggle("open");
+    window.toggleSidebar = (forceClose = false) => {
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("overlay");
+
+        if (forceClose) {
+            sidebar.classList.remove("open");
+            overlay.classList.remove("active");
+        } else {
+            sidebar.classList.toggle("open");
+            overlay.classList.toggle("active");
+        }
     };
 
     document.querySelectorAll('.menu div').forEach(item=>{
@@ -336,8 +409,40 @@
             document.querySelectorAll('.menu').forEach(m=>m.classList.remove('active'));
         };
     });
+
+    const showLoader = (state) => {
+        document.getElementById("loader").style.display = state ? "flex" : "none";
+    };
+
+    const links = document.querySelectorAll(".sidebar a");
+
+    links.forEach(link => {
+        link.onclick = () => {
+            links.forEach(l => l.classList.remove("active"));
+            link.classList.add("active");
+        };
+    });
     
 </script>
 
+<div id="loader" style="
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.6);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:3000;
+">
+    <div style="
+    width:40px;
+    height:40px;
+    border:4px solid #3b82f6;
+    border-top:4px solid transparent;
+    border-radius:50%;
+    animation:spin 1s linear infinite;
+    "></div>
+</div>
+    
 </body>
 </html>
