@@ -15,178 +15,91 @@
             --text: #ffffff;
             --dim: #94a3b8;
             --accent: #3b82f6;
-            --transition: all 0.25s ease;
+            --transition: all 0.2s ease-in-out;
         }
 
         * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        
-        body { 
-            margin: 0; 
-            background: var(--bg); 
-            color: var(--text); 
-            line-height: 1.6;
-        }
+        body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.6; }
 
-        /* --- Header --- */
+        /* --- UI Components --- */
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 24px;
-            border-bottom: 1px solid var(--border);
-            background: var(--bg);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 24px; border-bottom: 1px solid var(--border);
+            background: var(--bg); position: sticky; top: 0; z-index: 100;
         }
 
-        #logoutBtn { cursor: pointer; color: var(--dim); font-weight: 600; }
-        #logoutBtn:hover { color: var(--accent); }
+        #logoutBtn { cursor: pointer; color: var(--dim); font-weight: 600; font-size: 14px; }
+        #logoutBtn:hover { color: #ff4b4b; }
 
-        /* --- Cover Section --- */
-        .cover {
-            position: relative;
-            height: 220px;
-            background: #222;
+        .cover { position: relative; height: 220px; background: #1a1e26; }
+        .cover img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* --- Modern Edit Icon Styling --- */
+        .edit-trigger {
+            background: rgba(11, 14, 17, 0.7);
+            backdrop-filter: blur(4px);
+            color: white;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: var(--transition);
+            border: 1px solid rgba(255,255,255,0.1);
         }
+        .edit-trigger:hover { background: var(--accent); transform: scale(1.1); }
+        .edit-trigger svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
 
-        .cover img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* --- Dropdown Menus --- */
-        .menu {
-            position: absolute;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            overflow: hidden;
-            opacity: 0;
-            transform: translateY(-10px);
-            pointer-events: none;
-            transition: var(--transition);
-            z-index: 10;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            min-width: 120px;
-        }
-
-        .menu.active {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
-        }
-
-        .menu div {
-            padding: 12px 16px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .menu div:hover { background: rgba(255, 255, 255, .05); color: var(--accent); }
+        .cover-edit-btn { position: absolute; top: 15px; right: 15px; width: 40px; height: 40px; }
+        .pfp-edit-btn { position: absolute; bottom: 5px; right: 5px; width: 36px; height: 36px; background: var(--accent); }
 
         /* --- Profile Card --- */
         .card {
-            max-width: 700px;
-            margin: -60px auto 30px;
-            background: var(--card);
-            padding: 30px;
-            border-radius: 24px;
-            border: 1px solid var(--border);
-            text-align: center;
-            position: relative;
+            max-width: 700px; margin: -60px auto 30px; background: var(--card);
+            padding: 30px; border-radius: 24px; border: 1px solid var(--border);
+            text-align: center; position: relative;
         }
 
-        .pfp-wrap {
-            position: relative;
-            width: 120px;
-            margin: -80px auto 15px;
-        }
+        .pfp-wrap { position: relative; width: 120px; margin: -80px auto 15px; }
+        .pfp { width: 120px; height: 120px; border-radius: 50%; border: 5px solid var(--card); object-fit: cover; }
 
-        .pfp {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 5px solid var(--card);
-            object-fit: cover;
+        .menu {
+            position: absolute; background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; overflow: hidden; opacity: 0; transform: translateY(-10px);
+            pointer-events: none; transition: var(--transition); z-index: 10;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); min-width: 140px;
         }
+        .menu.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .menu div { padding: 12px 16px; cursor: pointer; font-size: 14px; text-align: left; }
+        .menu div:hover { background: rgba(255, 255, 255, .05); color: var(--accent); }
 
-        /* Edit Triggers */
-        .edit-trigger {
-            background: rgba(0, 0, 0, .6);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .cover-edit-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 40px;
-            height: 40px;
-        }
-
-        .pfp-edit-btn {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            width: 36px;
-            height: 36px;
-            background: var(--accent);
-        }
-
-        /* --- Stats & Content --- */
-        .stats {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin: 25px 0;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            padding: 20px 0;
-        }
-
+        .stats { display: flex; justify-content: center; gap: 40px; margin: 25px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 20px 0; }
         .stats b { display: block; font-size: 18px; }
         .stats span { color: var(--dim); font-size: 13px; }
 
-        .bio {
-            background: rgba(255, 255, 255, .02);
-            padding: 20px;
-            border-radius: 16px;
-            margin: 20px 0;
-            font-size: 15px;
-            border: 1px solid var(--border);
-        }
+        .bio { background: rgba(255, 255, 255, .02); padding: 20px; border-radius: 16px; margin: 20px 0; font-size: 15px; border: 1px solid var(--border); min-height: 60px; }
 
-        .btn-primary {
-            padding: 10px 24px;
-            background: var(--accent);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-        }
+        .btn-primary { padding: 10px 24px; background: var(--accent); border: none; border-radius: 12px; color: white; font-weight: 600; cursor: pointer; transition: var(--transition); }
+        .btn-primary:hover { opacity: 0.9; }
 
-        .btn-primary:hover { opacity: 0.9; transform: scale(1.02); }
+        /* --- CUSTOM MODAL --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+            display: none; align-items: center; justify-content: center; z-index: 1000;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--card); border: 1px solid var(--border); width: 90%; max-width: 400px;
+            padding: 25px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .modal h3 { margin-top: 0; font-size: 18px; }
+        .modal textarea {
+            width: 100%; height: 100px; background: var(--bg); border: 1px solid var(--border);
+            border-radius: 10px; color: white; padding: 12px; resize: none; margin: 15px 0; outline: none;
+        }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .btn-secondary { background: transparent; color: var(--dim); border: none; cursor: pointer; padding: 10px; }
 
         /* --- Feed --- */
         .feed { max-width: 550px; margin: auto; padding: 0 20px 60px; }
-        .post {
-            background: var(--card);
-            border: 1px solid var(--border);
-            padding: 20px;
-            border-radius: 16px;
-            margin-top: 15px;
-        }
-        .post small { color: var(--dim); display: block; margin-bottom: 8px; }
+        .post { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 16px; margin-top: 15px; }
     </style>
 </head>
 
@@ -199,25 +112,29 @@
 
     <main>
         <section class="cover">
-            <img id="coverImg" src="https://images.unsplash.com/photo-1557683316-973673baf926" alt="Cover">
-            <div class="edit-trigger cover-edit-btn" data-target="coverMenu">✏️</div>
+            <img id="coverImg" src="https://images.unsplash.com/photo-1557683316-973673baf926">
+            <div class="edit-trigger cover-edit-btn" data-target="coverMenu">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            </div>
             
             <div class="menu" id="coverMenu" style="top: 60px; right: 15px;">
-                <div class="upload-trigger" data-input="coverInput">Upload</div>
-                <div class="view-trigger" data-img="coverImg">View</div>
-                <div class="delete-trigger" data-type="cover">Delete</div>
+                <div class="upload-trigger" data-input="coverInput">Upload Cover</div>
+                <div class="view-trigger" data-img="coverImg">View Image</div>
+                <div class="delete-trigger" data-type="cover">Remove</div>
             </div>
         </section>
 
         <section class="card">
             <div class="pfp-wrap">
-                <img id="pfp" class="pfp" src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png" alt="Avatar">
-                <div class="edit-trigger pfp-edit-btn" data-target="pfpMenu">✏️</div>
+                <img id="pfp" class="pfp" src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png">
+                <div class="edit-trigger pfp-edit-btn" data-target="pfpMenu">
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                </div>
                 
                 <div class="menu" id="pfpMenu" style="top: 45px; left: 80px;">
-                    <div class="upload-trigger" data-input="pfpInput">Upload</div>
-                    <div class="view-trigger" data-img="pfp">View</div>
-                    <div class="delete-trigger" data-type="pfp">Delete</div>
+                    <div class="upload-trigger" data-input="pfpInput">Upload Photo</div>
+                    <div class="view-trigger" data-img="pfp">View Photo</div>
+                    <div class="delete-trigger" data-type="pfp">Remove</div>
                 </div>
             </div>
 
@@ -231,14 +148,25 @@
             </div>
 
             <div class="bio" id="userBio">No bio yet</div>
-            <button class="btn-primary" id="editBioBtn">Edit Bio</button>
+            <button class="btn-primary" id="openBioModal">Edit Bio</button>
         </section>
 
         <section class="feed">
-            <h4 style="color: var(--dim); text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Recent Activity</h4>
+            <h4 style="color: var(--dim); text-transform: uppercase; font-size: 11px; letter-spacing: 1.5px;">Activity</h4>
             <div id="postList"></div>
         </section>
     </main>
+
+    <div class="modal-overlay" id="bioModal">
+        <div class="modal">
+            <h3>Update Bio</h3>
+            <textarea id="bioInput" placeholder="Tell us something about yourself..."></textarea>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="closeBioModal">Cancel</button>
+                <button class="btn-primary" id="saveBioBtn">Save Bio</button>
+            </div>
+        </div>
+    </div>
 
     <input type="file" id="pfpInput" hidden accept="image/*">
     <input type="file" id="coverInput" hidden accept="image/*">
@@ -248,9 +176,8 @@
     import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    // --- Firebase Setup ---
     const firebaseConfig = {
-        apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
+        apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E", 
         authDomain: "chatph-cc187.firebaseapp.com",
         projectId: "chatph-cc187",
         storageBucket: "chatph-cc187.firebasestorage.app",
@@ -263,133 +190,100 @@
     const auth = getAuth(app);
     setPersistence(auth, browserLocalPersistence);
 
-    // --- Constants ---
-    const DEFAULT_PFP = "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
-    const DEFAULT_COVER = "https://images.unsplash.com/photo-1557683316-973673baf926";
+    // --- DOM Refs ---
+    const bioModal = document.getElementById('bioModal');
+    const bioInput = document.getElementById('bioInput');
 
-    // --- Core Logic ---
+    // --- Helpers ---
+    const updateDB = async (data) => {
+        if (!auth.currentUser) return;
+        await setDoc(doc(db, "users", auth.currentUser.uid), data, { merge: true });
+    };
 
-    // Generic Update Function
-    async function updateUserData(data) {
-        const user = auth.currentUser;
-        if (!user) return;
-        try {
-            await setDoc(doc(db, "users", user.uid), data, { merge: true });
-        } catch (err) {
-            console.error("Update failed:", err);
-        }
-    }
-
-    // Toggle Dropdowns
+    // --- Menu Handling ---
     document.querySelectorAll('.edit-trigger').forEach(btn => {
         btn.onclick = (e) => {
             e.stopPropagation();
-            const targetId = btn.getAttribute('data-target');
-            document.querySelectorAll('.menu').forEach(m => m.id !== targetId && m.classList.remove('active'));
-            document.getElementById(targetId).classList.toggle('active');
+            const target = btn.dataset.target;
+            document.querySelectorAll('.menu').forEach(m => m.id !== target && m.classList.remove('active'));
+            document.getElementById(target).classList.toggle('active');
         };
     });
 
-    // Close menus on outside click
-    document.addEventListener("click", () => {
-        document.querySelectorAll('.menu').forEach(m => m.classList.remove('active'));
-    });
+    document.onclick = () => document.querySelectorAll('.menu').forEach(m => m.classList.remove('active'));
 
-    // View Image
-    document.querySelectorAll('.view-trigger').forEach(btn => {
-        btn.onclick = () => window.open(document.getElementById(btn.dataset.img).src);
-    });
+    // --- Modal Handling ---
+    document.getElementById('openBioModal').onclick = () => {
+        bioInput.value = document.getElementById('userBio').innerText === "No bio yet" ? "" : document.getElementById('userBio').innerText;
+        bioModal.classList.add('active');
+    };
 
-    // Handle Uploads
-    document.querySelectorAll('.upload-trigger').forEach(btn => {
-        btn.onclick = () => document.getElementById(btn.dataset.input).click();
-    });
+    document.getElementById('closeBioModal').onclick = () => bioModal.classList.remove('active');
 
+    document.getElementById('saveBioBtn').onclick = async () => {
+        const text = bioInput.value.trim();
+        await updateDB({ bio: text });
+        document.getElementById('userBio').innerText = text || "No bio yet";
+        bioModal.classList.remove('active');
+    };
+
+    // --- Uploads & Deletes ---
+    document.querySelectorAll('.upload-trigger').forEach(btn => btn.onclick = () => document.getElementById(btn.dataset.input).click());
+    
     const handleFile = (e, type) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
         const reader = new FileReader();
         reader.onload = async () => {
-            const base64 = reader.result;
             const field = type === 'pfp' ? 'pfpBase64' : 'coverBase64';
-            const imgId = type === 'pfp' ? 'pfp' : 'coverImg';
-            
-            await updateUserData({ [field]: base64 });
-            document.getElementById(imgId).src = base64;
+            await updateDB({ [field]: reader.result });
+            document.getElementById(type === 'pfp' ? 'pfp' : 'coverImg').src = reader.result;
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(e.target.files[0]);
     };
 
     document.getElementById('pfpInput').onchange = (e) => handleFile(e, 'pfp');
     document.getElementById('coverInput').onchange = (e) => handleFile(e, 'cover');
 
-    // Delete Actions
     document.querySelectorAll('.delete-trigger').forEach(btn => {
         btn.onclick = async () => {
             const type = btn.dataset.type;
-            if (type === 'pfp') {
-                await updateUserData({ pfpBase64: "" });
-                document.getElementById('pfp').src = DEFAULT_PFP;
-            } else {
-                await updateUserData({ coverBase64: "" });
-                document.getElementById('coverImg').src = DEFAULT_COVER;
-            }
+            const field = type === 'pfp' ? 'pfpBase64' : 'coverBase64';
+            await updateDB({ [field]: "" });
+            document.getElementById(type === 'pfp' ? 'pfp' : 'coverImg').src = type === 'pfp' ? "https://cdn-icons-png.flaticon.com/512/3177/3177440.png" : "https://images.unsplash.com/photo-1557683316-973673baf926";
         };
     });
 
-    // Bio Edit
-    document.getElementById('editBioBtn').onclick = async () => {
-        const text = prompt("Edit your bio:");
-        if (text === null) return;
-        await updateUserData({ bio: text });
-        document.getElementById("userBio").innerText = text || "No bio yet";
-    };
+    document.querySelectorAll('.view-trigger').forEach(btn => btn.onclick = () => window.open(document.getElementById(btn.dataset.img).src));
 
-    // --- Auth Observer ---
+    // --- State & Feed ---
     onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            document.getElementById("userName").innerText = user.displayName || "User";
-            document.getElementById("userEmail").innerText = user.email;
-
-            // Load User Data
-            const snap = await getDoc(doc(db, "users", user.uid));
-            if (snap.exists()) {
-                const d = snap.data();
-                if (d.bio) document.getElementById("userBio").innerText = d.bio;
-                if (d.pfpBase64) document.getElementById("pfp").src = d.pfpBase64;
-                if (d.coverBase64) document.getElementById("coverImg").src = d.coverBase64;
-            }
-
-            // Load Posts
-            const q = query(
-                collection(db, "posts"),
-                where("email", "==", user.email),
-                orderBy("time", "desc")
-            );
-
-            onSnapshot(q, (snap) => {
-                const list = document.getElementById("postList");
-                list.innerHTML = "";
-                document.getElementById("statPosts").innerText = snap.size;
-                
-                snap.forEach(doc => {
-                    const p = doc.data();
-                    const date = p.time?.toDate().toLocaleString() || "Just now";
-                    list.innerHTML += `
-                        <article class="post">
-                            <small>${date}</small>
-                            <div>${p.text}</div>
-                        </article>`;
-                });
-            });
-
-        } else {
-            setTimeout(() => { if (!auth.currentUser) window.location.href = "index.html"; }, 800);
+        if (!user) {
+            setTimeout(() => { if(!auth.currentUser) window.location.href="index.html" }, 800);
+            return;
         }
+
+        document.getElementById("userName").innerText = user.displayName || "User";
+        document.getElementById("userEmail").innerText = user.email;
+
+        const snap = await getDoc(doc(db, "users", user.uid));
+        if (snap.exists()) {
+            const d = snap.data();
+            if (d.bio) document.getElementById("userBio").innerText = d.bio;
+            if (d.pfpBase64) document.getElementById("pfp").src = d.pfpBase64;
+            if (d.coverBase64) document.getElementById("coverImg").src = d.coverBase64;
+        }
+
+        const q = query(collection(db, "posts"), where("email", "==", user.email), orderBy("time", "desc"));
+        onSnapshot(q, (snap) => {
+            const list = document.getElementById("postList");
+            list.innerHTML = "";
+            document.getElementById("statPosts").innerText = snap.size;
+            snap.forEach(doc => {
+                const p = doc.data();
+                list.innerHTML += `<div class="post"><small>${p.time?.toDate().toLocaleString() || 'Recent'}</small><div>${p.text}</div></div>`;
+            });
+        });
     });
 
-    // Logout
     document.getElementById('logoutBtn').onclick = () => signOut(auth);
 </script>
 
