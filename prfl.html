@@ -1,356 +1,396 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ChatPH</title>
-<link rel="icon" type="image/png" href="image/chatph-logo.png">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatPH | Profile</title>
+    <link rel="icon" type="image/png" href="image/chatph-logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 
-<style>
-:root{
---bg:#0b0e11;
---card:#151921;
---border:rgba(255,255,255,.08);
---text:#fff;
---dim:#94a3b8;
---accent:#3b82f6;
-}
-*{box-sizing:border-box;font-family:'Plus Jakarta Sans';}
-body{margin:0;background:var(--bg);color:var(--text);}
+    <style>
+        :root {
+            --bg: #0b0e11;
+            --card: #151921;
+            --border: rgba(255, 255, 255, .08);
+            --text: #ffffff;
+            --dim: #94a3b8;
+            --accent: #3b82f6;
+            --transition: all 0.25s ease;
+        }
 
-/* HEADER */
-header{
-display:flex;
-justify-content:space-between;
-padding:15px 20px;
-border-bottom:1px solid var(--border);
-}
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            margin: 0; 
+            background: var(--bg); 
+            color: var(--text); 
+            line-height: 1.6;
+        }
 
-/* COVER */
-.cover{
-position:relative;
-height:200px;
-}
-.cover img{
-width:100%;
-height:100%;
-object-fit:cover;
-}
+        /* --- Header --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-/* EDIT BUTTON */
-.edit-btn{
-position:absolute;
-top:15px;
-right:15px;
-width:38px;height:38px;
-background:rgba(0,0,0,.6);
-border-radius:50%;
-display:flex;align-items:center;justify-content:center;
-cursor:pointer;
-}
+        #logoutBtn { cursor: pointer; color: var(--dim); font-weight: 600; }
+        #logoutBtn:hover { color: var(--accent); }
 
-/* SMOOTH DROPDOWN */
-.menu{
-position:absolute;
-top:60px;
-right:15px;
-background:var(--card);
-border:1px solid var(--border);
-border-radius:12px;
-overflow:hidden;
-opacity:0;
-transform:translateY(-10px);
-pointer-events:none;
-transition:.25s;
-}
-.menu.active{
-opacity:1;
-transform:translateY(0);
-pointer-events:auto;
-}
-.menu div{
-padding:10px 15px;
-cursor:pointer;
-font-size:13px;
-}
-.menu div:hover{
-background:rgba(255,255,255,.05);
-}
+        /* --- Cover Section --- */
+        .cover {
+            position: relative;
+            height: 220px;
+            background: #222;
+        }
 
-/* CARD */
-.card{
-max-width:700px;
-margin:-60px auto 20px;
-background:var(--card);
-padding:25px;
-border-radius:20px;
-border:1px solid var(--border);
-text-align:center;
-}
+        .cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-/* PFP */
-.pfp-wrap{
-position:relative;
-width:110px;
-margin:-70px auto 10px;
-}
-.pfp{
-width:110px;height:110px;
-border-radius:50%;
-border:4px solid var(--card);
-}
+        /* --- Dropdown Menus --- */
+        .menu {
+            position: absolute;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+            transition: var(--transition);
+            z-index: 10;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            min-width: 120px;
+        }
 
-/* PFP EDIT */
-.pfp-edit{
-position:absolute;
-bottom:0;
-right:0;
-width:34px;height:34px;
-background:var(--accent);
-border-radius:50%;
-display:flex;align-items:center;justify-content:center;
-cursor:pointer;
-}
+        .menu.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
 
-/* STATS */
-.stats{
-display:flex;
-justify-content:center;
-gap:30px;
-margin:20px 0;
-border-top:1px solid var(--border);
-border-bottom:1px solid var(--border);
-padding:15px 0;
-}
+        .menu div {
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 14px;
+        }
 
-/* BIO */
-.bio{
-background:rgba(255,255,255,.03);
-padding:16px;
-border-radius:12px;
-margin-top:15px;
-line-height:1.5;
-}
+        .menu div:hover { background: rgba(255, 255, 255, .05); color: var(--accent); }
 
-/* BUTTON */
-.btn{
-margin-top:15px;
-padding:10px 18px;
-background:var(--accent);
-border:none;
-border-radius:10px;
-color:white;
-cursor:pointer;
-}
+        /* --- Profile Card --- */
+        .card {
+            max-width: 700px;
+            margin: -60px auto 30px;
+            background: var(--card);
+            padding: 30px;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            text-align: center;
+            position: relative;
+        }
 
-/* POSTS */
-.feed{
-max-width:550px;
-margin:auto;
-padding:0 15px 40px;
-}
-.post{
-background:var(--card);
-border:1px solid var(--border);
-padding:15px;
-border-radius:12px;
-margin-top:10px;
-}
-</style>
+        .pfp-wrap {
+            position: relative;
+            width: 120px;
+            margin: -80px auto 15px;
+        }
+
+        .pfp {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 5px solid var(--card);
+            object-fit: cover;
+        }
+
+        /* Edit Triggers */
+        .edit-trigger {
+            background: rgba(0, 0, 0, .6);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .cover-edit-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+        }
+
+        .pfp-edit-btn {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 36px;
+            height: 36px;
+            background: var(--accent);
+        }
+
+        /* --- Stats & Content --- */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 25px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 0;
+        }
+
+        .stats b { display: block; font-size: 18px; }
+        .stats span { color: var(--dim); font-size: 13px; }
+
+        .bio {
+            background: rgba(255, 255, 255, .02);
+            padding: 20px;
+            border-radius: 16px;
+            margin: 20px 0;
+            font-size: 15px;
+            border: 1px solid var(--border);
+        }
+
+        .btn-primary {
+            padding: 10px 24px;
+            background: var(--accent);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary:hover { opacity: 0.9; transform: scale(1.02); }
+
+        /* --- Feed --- */
+        .feed { max-width: 550px; margin: auto; padding: 0 20px 60px; }
+        .post {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 16px;
+            margin-top: 15px;
+        }
+        .post small { color: var(--dim); display: block; margin-bottom: 8px; }
+    </style>
 </head>
 
 <body>
 
-<header>
-<div>☰ ChatPH</div>
-<div id="logoutBtn">Logout</div>
-</header>
+    <header>
+        <div style="font-weight: 700; font-size: 1.2rem;">☰ ChatPH</div>
+        <div id="logoutBtn">Logout</div>
+    </header>
 
-<!-- COVER -->
-<div class="cover">
-<img id="coverImg" src="https://images.unsplash.com/photo-1557683316-973673baf926">
+    <main>
+        <section class="cover">
+            <img id="coverImg" src="https://images.unsplash.com/photo-1557683316-973673baf926" alt="Cover">
+            <div class="edit-trigger cover-edit-btn" data-target="coverMenu">✏️</div>
+            
+            <div class="menu" id="coverMenu" style="top: 60px; right: 15px;">
+                <div class="upload-trigger" data-input="coverInput">Upload</div>
+                <div class="view-trigger" data-img="coverImg">View</div>
+                <div class="delete-trigger" data-type="cover">Delete</div>
+            </div>
+        </section>
 
-<div class="edit-btn" onclick="toggleMenu('coverMenu')">✏️</div>
+        <section class="card">
+            <div class="pfp-wrap">
+                <img id="pfp" class="pfp" src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png" alt="Avatar">
+                <div class="edit-trigger pfp-edit-btn" data-target="pfpMenu">✏️</div>
+                
+                <div class="menu" id="pfpMenu" style="top: 45px; left: 80px;">
+                    <div class="upload-trigger" data-input="pfpInput">Upload</div>
+                    <div class="view-trigger" data-img="pfp">View</div>
+                    <div class="delete-trigger" data-type="pfp">Delete</div>
+                </div>
+            </div>
 
-<div class="menu" id="coverMenu">
-<div onclick="uploadCover()">Upload</div>
-<div onclick="viewImage('coverImg')">View</div>
-<div onclick="deleteCover()">Delete</div>
-</div>
-</div>
+            <h2 id="userName" style="margin: 0;">User</h2>
+            <div id="userEmail" style="color:var(--dim); font-size: 14px;"></div>
 
-<!-- PROFILE -->
-<div class="card">
+            <div class="stats">
+                <div><b id="statPosts">0</b><span>Posts</span></div>
+                <div><b>0</b><span>Friends</span></div>
+                <div><b>2026</b><span>Joined</span></div>
+            </div>
 
-<div class="pfp-wrap">
-<img id="pfp" class="pfp" src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png">
+            <div class="bio" id="userBio">No bio yet</div>
+            <button class="btn-primary" id="editBioBtn">Edit Bio</button>
+        </section>
 
-<div class="pfp-edit" onclick="toggleMenu('pfpMenu')">✏️</div>
+        <section class="feed">
+            <h4 style="color: var(--dim); text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Recent Activity</h4>
+            <div id="postList"></div>
+        </section>
+    </main>
 
-<div class="menu" id="pfpMenu" style="top:40px; right:-10px;">
-<div onclick="uploadPfp()">Upload</div>
-<div onclick="viewImage('pfp')">View</div>
-<div onclick="deletePfp()">Delete</div>
-</div>
-</div>
-
-<h2 id="name">User</h2>
-<div id="email" style="color:var(--dim)"></div>
-
-<div class="stats">
-<div><b id="posts">0</b><span>Posts</span></div>
-<div><b>0</b><span>Friends</span></div>
-<div><b>2026</b><span>Joined</span></div>
-</div>
-
-<div class="bio" id="bio">No bio yet</div>
-<button class="btn" onclick="editBio()">Edit Bio</button>
-
-</div>
-
-<!-- POSTS -->
-<div class="feed">
-<h4>Recent Activity</h4>
-<div id="postList"></div>
-</div>
-
-<input type="file" id="pfpInput" hidden>
-<input type="file" id="coverInput" hidden>
+    <input type="file" id="pfpInput" hidden accept="image/*">
+    <input type="file" id="coverInput" hidden accept="image/*">
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-const app = initializeApp({
-apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
-authDomain: "chatph-cc187.firebaseapp.com",
-projectId: "chatph-cc187",
-storageBucket: "chatph-cc187.firebasestorage.app",
-messagingSenderId: "324012163441",
-appId: "1:324012163441:web:7a54be2231ad2cae71f6d0"
-});
+    // --- Firebase Setup ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
+        authDomain: "chatph-cc187.firebaseapp.com",
+        projectId: "chatph-cc187",
+        storageBucket: "chatph-cc187.firebasestorage.app",
+        messagingSenderId: "324012163441",
+        appId: "1:324012163441:web:7a54be2231ad2cae71f6d0"
+    };
 
-const db = getFirestore(app);
-const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    setPersistence(auth, browserLocalPersistence);
 
-setPersistence(auth, browserLocalPersistence);
+    // --- Constants ---
+    const DEFAULT_PFP = "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+    const DEFAULT_COVER = "https://images.unsplash.com/photo-1557683316-973673baf926";
 
-/* DROPDOWN */
-window.toggleMenu = (id) => {
-    const menu = document.getElementById(id);
-    const isOpen = menu.classList.contains("active");
+    // --- Core Logic ---
 
-    document.querySelectorAll('.menu').forEach(m => m.classList.remove('active'));
-
-    if (!isOpen) {
-        menu.classList.add("active");
-    }
-};
-
-/* CLICK OUTSIDE CLOSE */
-document.addEventListener("click",(e)=>{
-if(!e.target.closest(".edit-btn") && !e.target.closest(".pfp-edit") && !e.target.closest(".menu")){
-document.querySelectorAll('.menu').forEach(m=>m.classList.remove('active'));
-}
-});
-
-/* IMAGE VIEW */
-window.viewImage = (id)=> window.open(document.getElementById(id).src);
-
-/* UPLOAD */
-function upload(file,type){
-if(!file) return;
-const reader=new FileReader();
-reader.onload=async()=>{
-const base64=reader.result;
-const user=auth.currentUser;
-const field=type==='pfp'?'pfpBase64':'coverBase64';
-await setDoc(doc(db,"users",user.uid),{[field]:base64},{merge:true});
-document.getElementById(type==='pfp'?'pfp':'coverImg').src=base64;
-};
-reader.readAsDataURL(file);
-}
-
-window.uploadPfp=()=>pfpInput.click();
-window.uploadCover=()=>coverInput.click();
-
-pfpInput.onchange=e=>upload(e.target.files[0],'pfp');
-coverInput.onchange=e=>upload(e.target.files[0],'cover');
-
-/* DELETE */
-window.deletePfp = async () => {
-    const user = auth.currentUser;
-    await setDoc(doc(db,"users",user.uid), { pfpBase64: "" }, { merge:true });
-    pfp.src = "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
-};
-
-window.deleteCover = async () => {
-    const user = auth.currentUser;
-    await setDoc(doc(db,"users",user.uid), { coverBase64: "" }, { merge:true });
-    coverImg.src = "https://images.unsplash.com/photo-1557683316-973673baf926";
-};
-
-/* BIO */
-window.editBio = async () => {
-    const text = prompt("Edit your bio:");
-    if (!text) return;
-
-    const user = auth.currentUser;
-    await setDoc(doc(db,"users",user.uid), { bio: text }, { merge:true });
-
-    document.getElementById("bio").innerText = text;
-};
-
-/* AUTH FIX */
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        // ✅ User is logged in → load data
-        document.getElementById("name").innerText = user.displayName || "User";
-        document.getElementById("email").innerText = user.email;
-
-        const snap = await getDoc(doc(db,"users",user.uid));
-        if(snap.exists()){
-            const d = snap.data();
-            if(d.bio) bio.innerText = d.bio;
-            if(d.pfpBase64) pfp.src = d.pfpBase64;
-            if(d.coverBase64) coverImg.src = d.coverBase64;
+    // Generic Update Function
+    async function updateUserData(data) {
+        const user = auth.currentUser;
+        if (!user) return;
+        try {
+            await setDoc(doc(db, "users", user.uid), data, { merge: true });
+        } catch (err) {
+            console.error("Update failed:", err);
         }
-
-        // POSTS
-        const q = query(
-            collection(db,"posts"),
-            where("email","==",user.email),
-            orderBy("time","desc")
-        );
-
-        onSnapshot(q,(snap)=>{
-            postList.innerHTML="";
-            posts.innerText=snap.size;a
-            snap.forEach(doc=>{
-                const p=doc.data();
-                postList.innerHTML+=`
-                <div class="post">
-                    <small>${p.time?.toDate().toLocaleString()}</small>
-                    <div>${p.text}</div>
-                </div>`;
-            });
-        });
-
-    } else {
-        // ❗ Delay redirect slightly (prevents false logout)
-        setTimeout(() => {
-            if (!auth.currentUser) {
-                window.location.href = "index.html";
-            }
-        }, 500);
     }
-});
 
-/* LOGOUT */
-logoutBtn.onclick=()=>signOut(auth);
+    // Toggle Dropdowns
+    document.querySelectorAll('.edit-trigger').forEach(btn => {
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            const targetId = btn.getAttribute('data-target');
+            document.querySelectorAll('.menu').forEach(m => m.id !== targetId && m.classList.remove('active'));
+            document.getElementById(targetId).classList.toggle('active');
+        };
+    });
+
+    // Close menus on outside click
+    document.addEventListener("click", () => {
+        document.querySelectorAll('.menu').forEach(m => m.classList.remove('active'));
+    });
+
+    // View Image
+    document.querySelectorAll('.view-trigger').forEach(btn => {
+        btn.onclick = () => window.open(document.getElementById(btn.dataset.img).src);
+    });
+
+    // Handle Uploads
+    document.querySelectorAll('.upload-trigger').forEach(btn => {
+        btn.onclick = () => document.getElementById(btn.dataset.input).click();
+    });
+
+    const handleFile = (e, type) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async () => {
+            const base64 = reader.result;
+            const field = type === 'pfp' ? 'pfpBase64' : 'coverBase64';
+            const imgId = type === 'pfp' ? 'pfp' : 'coverImg';
+            
+            await updateUserData({ [field]: base64 });
+            document.getElementById(imgId).src = base64;
+        };
+        reader.readAsDataURL(file);
+    };
+
+    document.getElementById('pfpInput').onchange = (e) => handleFile(e, 'pfp');
+    document.getElementById('coverInput').onchange = (e) => handleFile(e, 'cover');
+
+    // Delete Actions
+    document.querySelectorAll('.delete-trigger').forEach(btn => {
+        btn.onclick = async () => {
+            const type = btn.dataset.type;
+            if (type === 'pfp') {
+                await updateUserData({ pfpBase64: "" });
+                document.getElementById('pfp').src = DEFAULT_PFP;
+            } else {
+                await updateUserData({ coverBase64: "" });
+                document.getElementById('coverImg').src = DEFAULT_COVER;
+            }
+        };
+    });
+
+    // Bio Edit
+    document.getElementById('editBioBtn').onclick = async () => {
+        const text = prompt("Edit your bio:");
+        if (text === null) return;
+        await updateUserData({ bio: text });
+        document.getElementById("userBio").innerText = text || "No bio yet";
+    };
+
+    // --- Auth Observer ---
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            document.getElementById("userName").innerText = user.displayName || "User";
+            document.getElementById("userEmail").innerText = user.email;
+
+            // Load User Data
+            const snap = await getDoc(doc(db, "users", user.uid));
+            if (snap.exists()) {
+                const d = snap.data();
+                if (d.bio) document.getElementById("userBio").innerText = d.bio;
+                if (d.pfpBase64) document.getElementById("pfp").src = d.pfpBase64;
+                if (d.coverBase64) document.getElementById("coverImg").src = d.coverBase64;
+            }
+
+            // Load Posts
+            const q = query(
+                collection(db, "posts"),
+                where("email", "==", user.email),
+                orderBy("time", "desc")
+            );
+
+            onSnapshot(q, (snap) => {
+                const list = document.getElementById("postList");
+                list.innerHTML = "";
+                document.getElementById("statPosts").innerText = snap.size;
+                
+                snap.forEach(doc => {
+                    const p = doc.data();
+                    const date = p.time?.toDate().toLocaleString() || "Just now";
+                    list.innerHTML += `
+                        <article class="post">
+                            <small>${date}</small>
+                            <div>${p.text}</div>
+                        </article>`;
+                });
+            });
+
+        } else {
+            setTimeout(() => { if (!auth.currentUser) window.location.href = "index.html"; }, 800);
+        }
+    });
+
+    // Logout
+    document.getElementById('logoutBtn').onclick = () => signOut(auth);
 </script>
 
 </body>
