@@ -893,12 +893,14 @@ e.preventDefault();
 format("justifyRight");
 }
 if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "f"){
-e.preventDefault();
-const select = document.querySelector("select");
-if(select) select.focus();
+    e.preventDefault();
+    const select = document.querySelector("select");
+    if(select) select.focus();
+}
+
 if(e.ctrlKey && e.key === "Enter"){
-e.preventDefault();
-createPost();
+    e.preventDefault();
+    createPost();
 }
 });
 import { getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -1239,7 +1241,7 @@ window.location.href="index.html";
 };
 const sidebar = document.getElementById("sidebar");
 document.addEventListener("click",(e)=>{
-if(!sidebar.contains(e.target) && !e.target.classList.contains("hamburger")){
+if(!sidebar.contains(e.target) && !e.target.classList.contains("menu-icon")){
 sidebar.classList.remove("open");
 }
 });
