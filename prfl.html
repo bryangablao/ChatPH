@@ -158,6 +158,9 @@
             background: rgba(59,130,246,0.15);
             color: var(--accent);
             border-left: 3px solid var(--accent);
+            pointer-events: none;
+            cursor: default;
+            opacity: 0.8;
         }
 
         .sidebar a:hover {
@@ -253,7 +256,7 @@
         <a href="msg.html">Messages</a>
         <a href="frnd.html">Friends</a>
         <a href="srch.html">Search User</a>
-        <a href="prfl.html" class="active">Profile</a>
+        <a href="#" class="active">Profile</a>
         
         <div class="indicator" id="indicator"></div>
     </div>
@@ -558,7 +561,12 @@ const currentYear = new Date().getFullYear();
 animateYear(currentYear);
 
 window.addEventListener("load", () => {
-    const active = document.querySelector(".sidebar a.active") || links[0];
+const active = document.querySelector(".sidebar a.active");
+
+if (active) {
+    indicator.style.top = active.offsetTop + "px";
+    indicator.style.height = active.offsetHeight + "px";
+}
     active.classList.add("active");
     indicator.style.top = active.offsetTop + "px";
     indicator.style.height = active.offsetHeight + "px";
