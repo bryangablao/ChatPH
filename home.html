@@ -43,12 +43,9 @@ header {
     font-size:26px;
 }
 .logo{
-    width:28px;
-    height:28px;
+    width:32px;
+    height:32px;
     border-radius:6px;
-}
-.logo img{
-width:32px;
 }
 .logo span{
 font-weight:700;
@@ -131,12 +128,7 @@ font-size:18px;
 #logoutBtn:hover {
     color: #ff4b4b;
 }
-    
-/* HAMBURGER */
-.hamburger{
-font-size:22px;
-cursor:pointer;
-}
+
 /* MARQUEE AD */
 .marquee{
 overflow:hidden;
@@ -435,13 +427,14 @@ color:white;
 font-size:14px;
 outline:none;
 }
-.comment-item{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:8px;
-margin-top:8px;
-font-size:14px;
+.comment-item {
+    display: flex;
+    align-items: flex-start; /* Better alignment for long comments */
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 14px;
+    animation: fadeIn 0.4s ease forwards; /* Smooth entry for new comments */
 }
 .comment-time{
 font-size:11px;
@@ -600,16 +593,6 @@ object-fit:cover;
 .comments-list.open {
     max-height: 2000px;
     opacity: 1;
-}
-
-.comment-item {
-    display: flex;
-    align-items: flex-start; /* Better alignment for long comments */
-    justify-content: space-between;
-    gap: 8px;
-    margin-top: 8px;
-    font-size: 14px;
-    animation: fadeIn 0.4s ease forwards; /* Smooth entry for new comments */
 }
 
 @keyframes fadeIn {
@@ -911,8 +894,8 @@ format("justifyRight");
 }
 if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "f"){
 e.preventDefault();
-document.querySelector("select").focus();
-}
+const select = document.querySelector("select");
+if(select) select.focus();
 if(e.ctrlKey && e.key === "Enter"){
 e.preventDefault();
 createPost();
