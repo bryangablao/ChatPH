@@ -21,16 +21,16 @@ background:var(--bg);
 color:var(--text);
 }
 /* HEADER */
-header{
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:12px 18px;
-background:#12141a;
-border-bottom:1px solid var(--border);
-position:sticky;
-top:0;
-z-index:1000;
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 /* HEADER */
 .header-left{
@@ -61,17 +61,16 @@ font-size:18px;
 
 /* SIDEBAR (MODERN) */
 .sidebar{
-    position:fixed;
-    top:0;
-    left:-260px;
-    width:240px;
-    height:100%;
-    background:rgba(21,25,33,0.75);
+    position: fixed;
+    top: 60px;
+    left: -260px;
+    width: 240px;
+    height: calc(100% - 60px);
+    background: rgba(21,25,33,0.75);
     backdrop-filter: blur(12px);
-    border-right:1px solid rgba(255,255,255,0.08);
-    padding-top:70px;
-    transition:.3s;
-    z-index:999;
+    border-right: 1px solid rgba(255,255,255,0.08);
+    transition: .3s;
+    z-index: 999;
 }
 .sidebar.open{
     left:0;
@@ -121,6 +120,18 @@ font-size:18px;
     pointer-events:auto;
 }
 
+#logoutBtn {
+    cursor: pointer;
+    color: #94a3b8;
+    font-weight: 600;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+#logoutBtn:hover {
+    color: #ff4b4b;
+}
+    
 /* HAMBURGER */
 .hamburger{
 font-size:22px;
@@ -389,17 +400,7 @@ background:linear-gradient(90deg,#ff00cc,#ff66ff);
 color:white;
 font-weight:700;
 }
-/* ICON LOGOUT */
-.logout-icon{
-width:22px;
-cursor:pointer;
-display:none;
-transition:0.2s;
-}
-.logout-icon:hover{
-transform:scale(1.1);
-opacity:0.8;
-}
+
 .posts-container{
 margin-top:20px;
 }
@@ -706,14 +707,16 @@ object-fit:cover;
 <!-- HEADER -->
 <header>
     <div class="header-left" onclick="toggleSidebar()">
-        <span class="menu-icon hamburger">☰</span>
+        <span class="menu-icon">☰</span>
         <img src="image/chatph-logo.png" class="logo">
         <span class="brand">ChatPH</span>
     </div>
 
-    <div style="display:flex;align-items:center;gap:12px;">
+    <div style="display:flex;align-items:center;gap:16px;">
         <span id="userDisplay">Guest</span>
-        <img id="logoutBtn" src="image/icon/logout.png" class="logout-icon">
+        <div id="logoutBtn" style="cursor:pointer;color:#94a3b8;font-weight:600;font-size:14px;">
+            Logout
+        </div>
     </div>
 </header>
 <!-- SIDEBAR -->
