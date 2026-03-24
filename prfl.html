@@ -351,7 +351,19 @@ z-index:3000;
     
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import {
+    getFirestore,
+    doc,
+    setDoc,
+    getDoc,
+    collection,
+    query,
+    where,
+    orderBy,
+    onSnapshot,
+    addDoc,
+    serverTimestamp,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
@@ -431,7 +443,7 @@ const handleFile = (e, type) => {
 
         // 🔥 resize (important)
         const MAX_WIDTH = 600;
-        const scale = MAX_WIDTH / img.width;
+        const scale = img.width > MAX_WIDTH ? MAX_WIDTH / img.width : 1;
 
         canvas.width = MAX_WIDTH;
         canvas.height = img.height * scale;
@@ -527,8 +539,77 @@ list.innerHTML += `
     <div style="margin-top:10px;line-height:1.6;">
         ${p.text}
     </div>
+
+    <!-- REACTIONS -->
+    <div class="reaction-counts" id="react-count-${doc.id}"></div>
+
+    <div class="post-actions">
+        <div class="like-container">
+            <span class="action-btn like-btn" onclick="toggleReactionPicker('${doc.id}')" id="like-btn-${doc.id}">Like</span>
+
+            <div class="reaction-picker" id="react-${doc.id}">
+                <img src="image/icon/Like.png" onclick="react('${doc.id}','like')">
+                <img src="image/icon/Love.png" onclick="react('${doc.id}','love')">
+                <img src="image/icon/Haha.png" onclick="react('${doc.id}','haha')">
+                <img src="image/icon/Wow.png" onclick="react('${doc.id}','wow')">
+                <img src="image/icon/Sad.png" onclick="react('${doc.id}','sad')">
+                <img src="image/icon/Angry.png" onclick="react('${doc.id}','angry')">
+            </div>
+        </div>
+
+        <span class="action-btn" onclick="toggleComment('${doc.id}')">Comment</span>
+    </div>
+
+    <!-- COMMENTS -->
+    <div id="comment-${doc.id}" style="display:none;">
+        <div class="comment-input">
+            <img class="comment-avatar" src="${user.photoURL || 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}">
+            <input type="text" class="comment-field"
+                placeholder="Write a comment..."
+                onkeydown="if(event.key==='Enter'){addComment('${doc.id}',this)}">
+        </div>
+        <div class="comments-list" id="comments-${doc.id}"></div>
+    </div>
 </div>
 `;
+
+// 🔥 LOAD COMMENTS REALTIME
+const commentsRef = collection(db, "posts", doc.id, "comments");
+
+onSnapshot(commentsRef, (cSnap) => {
+    const listEl = document.getElementById("comments-" + doc.id);
+    if (!listEl) return;
+
+    listEl.innerHTML = "";
+
+    cSnap.forEach(c => {
+        const d = c.data();
+
+        listEl.innerHTML += `
+        <div style="display:flex;gap:8px;margin-top:6px;">
+            <img src="${d.photo || 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}" style="width:25px;height:25px;border-radius:50%;">
+            <div>
+                <b>${d.name}</b>
+                <div style="font-size:13px;">${d.text}</div>
+            </div>
+        </div>
+        `;
+    });
+});
+
+    // 🔥 LOAD REACTIONS
+const reactRef = collection(db, "posts", doc.id, "reactions");
+
+onSnapshot(reactRef, (rSnap) => {
+    const box = document.getElementById("react-count-" + doc.id);
+    if (!box) return;
+
+    let count = 0;
+    rSnap.forEach(() => count++);
+
+    box.innerHTML = count > 0 ? `👍 ${count}` : "";
+});
+                
             });
         });
     });
@@ -605,8 +686,59 @@ if (active) {
     indicator.style.height = active.offsetHeight + "px";
     active.classList.add("active");
 }
-    indicator.style.top = active.offsetTop + "px";
-    indicator.style.height = active.offsetHeight + "px";
+});
+
+window.toggleComment = (id)=>{
+    const box = document.getElementById("comment-"+id);
+    box.style.display = box.style.display === "none" ? "block" : "none";
+};
+
+window.addComment = async (postId,input)=>{
+    const text = input.value.trim();
+    if(!text) return;
+    const user = auth.currentUser;
+
+    await addDoc(collection(db,"posts",postId,"comments"),{
+        text,
+        name:user.displayName || "User",
+        email:user.email,
+        photo:user.photoURL || "",
+        time: serverTimestamp()
+    });
+
+    input.value="";
+};
+
+window.toggleReactionPicker = (postId)=>{
+    const picker = document.getElementById("react-"+postId);
+
+    document.querySelectorAll(".reaction-picker").forEach(p=>{
+        if(p.id !== "react-"+postId){
+            p.style.display="none";
+        }
+    });
+
+    picker.style.display =
+        picker.style.display === "flex" ? "none" : "flex";
+};
+    
+window.react = async (postId,type)=>{
+    const user = auth.currentUser;
+    const refDoc = doc(db,"posts",postId,"reactions",user.uid);
+
+    await setDoc(refDoc,{
+        type,
+        user:user.uid,
+        name:user.displayName
+    });
+
+    document.getElementById("react-"+postId).style.display = "none";
+};
+
+document.addEventListener("click", () => {
+    document.querySelectorAll(".reaction-picker").forEach(p=>{
+        p.style.display="none";
+    });
 });
     
 </script>
