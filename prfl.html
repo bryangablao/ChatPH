@@ -229,6 +229,34 @@
     #imageViewer.active {
         opacity: 1;
     }
+
+    .post-text{
+    margin-top:10px;
+    line-height:1.6;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    }
+
+    .post-actions{
+    margin-top:12px;
+    display:flex;
+}
+
+.comment-btn{
+    background:none;
+    border:none;
+    color:#94a3b8;
+    cursor:pointer;
+    font-size:14px;
+    padding:6px 10px;
+    border-radius:8px;
+}
+
+.comment-btn:hover{
+    background:rgba(255,255,255,0.05);
+    color:#3b82f6;
+}
         
     </style>
 </head>
@@ -514,6 +542,7 @@ const q = query(
                 const p = doc.data();
 list.innerHTML += `
 <div class="post">
+
     <div style="display:flex;align-items:center;gap:10px;">
         <img src="${p.photo}" style="width:40px;height:40px;border-radius:50%;">
         <div>
@@ -524,9 +553,25 @@ list.innerHTML += `
         </div>
     </div>
 
-    <div style="margin-top:10px;line-height:1.6;">
+    <div class="post-text">
         ${p.text}
     </div>
+
+<div class="reaction-wrap">
+    👍 3
+
+    <div class="reaction-popup">
+        <div class="reaction-user">Bryan</div>
+        <div class="reaction-user">John</div>
+        <div class="reaction-user">Maria</div>
+    </div>
+</div>
+
+    <!-- 🔥 ONLY COMMENT BUTTON -->
+    <div class="post-actions">
+        <button class="comment-btn">💬 Comment</button>
+    </div>
+
 </div>
 `;
             });
