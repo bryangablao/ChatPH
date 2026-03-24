@@ -171,10 +171,6 @@
         .sidebar a:hover::before {
             left: 0;
         }
-        
-        .menu{
-            z-index: 2000;
-        }
 
         /*---Sidebar Overlay---*/
         .overlay{
@@ -325,6 +321,34 @@
     <input type="file" id="pfpInput" hidden accept="image/*">
     <input type="file" id="coverInput" hidden accept="image/*">
 
+    <div id="loader" style="
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.6);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:3000;
+">
+    <div style="
+    width:40px;
+    height:40px;
+    border:4px solid #3b82f6;
+    border-top:4px solid transparent;
+    border-radius:50%;
+    animation:spin 1s linear infinite;
+    "></div>
+</div>
+    
+    <div class="modal-overlay" id="imageViewer">
+    <img id="viewerImg" style="
+        max-width:90%;
+        max-height:90%;
+        border-radius:12px;
+        box-shadow:0 20px 40px rgba(0,0,0,0.6);
+    ">
+    </div>
+    
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -355,10 +379,10 @@
     };
 
     // --- Menu Handling ---
-document.querySelectorAll('.menu div').forEach(item=>{
-    item.addEventListener("click", (e) => {
+document.querySelectorAll('.menu').forEach(menu=>{
+    menu.addEventListener("click", (e)=>{
         e.stopPropagation();
-        document.querySelectorAll('.menu').forEach(m=>m.classList.remove('active'));
+        menu.classList.remove('active');
     });
 });
 
@@ -443,9 +467,9 @@ const handleFile = (e, type) => {
 const imageViewer = document.getElementById("imageViewer");
 const viewerImg = document.getElementById("viewerImg");
 
-viewerImg.onclick = (e) => {
-    e.stopPropagation();
-};
+if (viewerImg) {
+    viewerImg.onclick = (e) => e.stopPropagation();
+}
     
 document.querySelectorAll('.view-trigger').forEach(btn => {
     btn.onclick = () => {
@@ -572,45 +596,16 @@ animateYear(currentYear);
 
 window.addEventListener("load", () => {
 const active = document.querySelector(".sidebar a.active");
-
 if (active) {
     indicator.style.top = active.offsetTop + "px";
     indicator.style.height = active.offsetHeight + "px";
-}
     active.classList.add("active");
+}
     indicator.style.top = active.offsetTop + "px";
     indicator.style.height = active.offsetHeight + "px";
 });
     
 </script>
-
-<div id="loader" style="
-position:fixed;
-inset:0;
-background:rgba(0,0,0,0.6);
-display:none;
-align-items:center;
-justify-content:center;
-z-index:3000;
-">
-    <div style="
-    width:40px;
-    height:40px;
-    border:4px solid #3b82f6;
-    border-top:4px solid transparent;
-    border-radius:50%;
-    animation:spin 1s linear infinite;
-    "></div>
-</div>
-
-<div class="modal-overlay" id="imageViewer">
-    <img id="viewerImg" style="
-        max-width:90%;
-        max-height:90%;
-        border-radius:12px;
-        box-shadow:0 20px 40px rgba(0,0,0,0.6);
-    ">
-</div>
 
 <footer style="
 text-align:center;
