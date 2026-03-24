@@ -229,6 +229,141 @@
     #imageViewer.active {
         opacity: 1;
     }
+
+    /* --- Post Actions --- */
+.post-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 12px;
+    font-size: 14px;
+    color: var(--dim);
+}
+
+.action-btn {
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: var(--transition);
+}
+
+.action-btn:hover {
+    background: rgba(255,255,255,0.05);
+    color: var(--accent);
+}
+
+/* --- Reaction Picker --- */
+.like-container {
+    position: relative;
+}
+
+.reaction-picker {
+    position: absolute;
+    bottom: 35px;
+    left: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    padding: 6px 8px;
+    display: none;
+    gap: 6px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+}
+
+.reaction-picker img {
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    transition: 0.15s;
+}
+
+.reaction-picker img:hover {
+    transform: scale(1.2);
+}
+
+/* --- Reaction Count --- */
+.reaction-counts {
+    font-size: 13px;
+    color: var(--dim);
+    margin-top: 8px;
+}
+
+/* --- Comments --- */
+.comment-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.comment-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+}
+
+.comment-field {
+    flex: 1;
+    padding: 8px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: white;
+    font-size: 13px;
+    outline: none;
+}
+
+.comments-list {
+    margin-top: 8px;
+    font-size: 13px;
+}
+
+@media (max-width: 600px) {
+
+    .card {
+        margin: -40px 10px 20px;
+        padding: 20px;
+    }
+
+    .pfp {
+        width: 90px;
+        height: 90px;
+    }
+
+    .pfp-wrap {
+        width: 90px;
+        margin: -60px auto 10px;
+    }
+
+    .stats {
+        gap: 20px;
+        padding: 15px 0;
+    }
+
+    .post {
+        padding: 15px;
+    }
+
+    .post-actions {
+        font-size: 13px;
+        gap: 10px;
+    }
+
+    .reaction-picker img {
+        width: 24px;
+        height: 24px;
+    }
+
+    .comment-avatar {
+        width: 24px;
+        height: 24px;
+    }
+
+    .comment-field {
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+
+}
         
     </style>
 </head>
