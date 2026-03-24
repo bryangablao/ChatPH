@@ -229,181 +229,6 @@
     #imageViewer.active {
         opacity: 1;
     }
-
-    /* --- Post Actions --- */
-.post-actions{
-margin-top:14px;
-display:flex;
-gap:18px;
-padding-top:10px;
-border-top:1px solid #2a2f3b;
-}
-
-.action-btn {
-    cursor: pointer;
-    padding: 6px 10px;
-    border-radius: 8px;
-    transition: var(--transition);
-}
-
-.action-btn:hover {
-    background: rgba(255,255,255,0.05);
-    color: var(--accent);
-}
-
-/* --- Reaction Picker --- */
-.like-container {
-    position: relative;
-}
-
-.reaction-picker {
-    position: absolute;
-    bottom: 35px;
-    left: 0;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 30px;
-    padding: 6px 8px;
-    display: none;
-    gap: 6px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-}
-
-.reaction-picker img {
-    width: 28px;
-    height: 28px;
-    cursor: pointer;
-    transition: 0.15s;
-}
-
-.reaction-picker img:hover {
-    transform: scale(1.2);
-}
-
-/* --- Reaction Count --- */
-.reaction-counts {
-    font-size: 13px;
-    color: var(--dim);
-    margin-top: 8px;
-}
-
-/* --- Comments --- */
-.comment-input {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 10px;
-}
-
-.comment-avatar {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-}
-
-.comment-field {
-    flex: 1;
-    padding: 8px 10px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: white;
-    font-size: 13px;
-    outline: none;
-}
-
-.comments-list {
-    margin-top: 8px;
-    font-size: 13px;
-}
-
-.comments-list div {
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-}
-
-.comments-list b {
-    display: block;
-}
-
-.comments-list div div {
-    white-space: normal;
-}
-
-.comments-list div {
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-}
-
-.comments-list b {
-    display: block;
-}
-
-.comments-list div div {
-    white-space: normal;
-}
-
-.post-actions {
-    flex-wrap: wrap;
-    justify-content: space-between;
-}
-
-.action-btn {
-    flex: 1;
-    text-align: center;
-}
-.reaction-counts img {
-    vertical-align: middle;
-    margin-right: 2px;
-}
-        
-@media (max-width: 600px) {
-
-    .card {
-        margin: -40px 10px 20px;
-        padding: 20px;
-    }
-
-    .pfp {
-        width: 90px;
-        height: 90px;
-    }
-
-    .pfp-wrap {
-        width: 90px;
-        margin: -60px auto 10px;
-    }
-
-    .stats {
-        gap: 20px;
-        padding: 15px 0;
-    }
-
-    .post {
-        padding: 15px;
-    }
-
-    .post-actions {
-        font-size: 13px;
-        gap: 10px;
-    }
-
-    .reaction-picker img {
-        width: 24px;
-        height: 24px;
-    }
-
-    .comment-avatar {
-        width: 24px;
-        height: 24px;
-    }
-
-    .comment-field {
-        font-size: 12px;
-        padding: 6px 8px;
-    }
-
-}
         
     </style>
 </head>
@@ -526,19 +351,7 @@ z-index:3000;
     
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import {
-    getFirestore,
-    doc,
-    setDoc,
-    getDoc,
-    collection,
-    query,
-    where,
-    orderBy,
-    onSnapshot,
-    addDoc,
-    serverTimestamp,
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
@@ -618,7 +431,7 @@ const handleFile = (e, type) => {
 
         // 🔥 resize (important)
         const MAX_WIDTH = 600;
-        const scale = img.width > MAX_WIDTH ? MAX_WIDTH / img.width : 1;
+        const scale = MAX_WIDTH / img.width;
 
         canvas.width = MAX_WIDTH;
         canvas.height = img.height * scale;
@@ -701,121 +514,21 @@ const q = query(
                 const p = doc.data();
 list.innerHTML += `
 <div class="post">
-  <div style="display:flex;align-items:center;gap:10px;">
-    <img src="${p.photo}" style="width:40px;height:40px;border-radius:50%;">
-    <div>
-      <div style="font-weight:600;">${p.name || "User"}</div>
-      <div style="font-size:12px;opacity:.6;">
-        ${p.time?.toDate().toLocaleString() || "Recent"}
-      </div>
-    </div>
-  </div>
-
-  <div style="margin-top:10px;line-height:1.6;">
-    ${p.text}
-  </div>
-
-  <!-- ✅ REACTION COUNTS -->
-  <div class="reaction-counts" id="react-count-${doc.id}"></div>
-
-  <!-- ✅ ACTION BUTTONS -->
-  <div class="post-actions">
-    <div class="like-container">
-      <span class="action-btn"
-        onclick="toggleReactionPicker('${doc.id}')">
-        Like
-      </span>
-
-      <div class="reaction-picker" id="react-${doc.id}">
-        <img src="image/icon/Like.png" onclick="react('${doc.id}','like')">
-        <img src="image/icon/Love.png" onclick="react('${doc.id}','love')">
-        <img src="image/icon/Haha.png" onclick="react('${doc.id}','haha')">
-        <img src="image/icon/Wow.png" onclick="react('${doc.id}','wow')">
-        <img src="image/icon/Sad.png" onclick="react('${doc.id}','sad')">
-        <img src="image/icon/Angry.png" onclick="react('${doc.id}','angry')">
-      </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+        <img src="${p.photo}" style="width:40px;height:40px;border-radius:50%;">
+        <div>
+            <div style="font-weight:600;">${p.name || "User"}</div>
+            <div style="font-size:12px;opacity:.6;">
+                ${p.time?.toDate().toLocaleString() || "Recent"}
+            </div>
+        </div>
     </div>
 
-    <span class="action-btn"
-      onclick="toggleComment('${doc.id}')">
-      Comment
-    </span>
-
-    <span class="action-btn"
-      onclick="sharePost('${doc.id}')">
-      Share
-    </span>
-  </div>
-
-  <!-- ✅ COMMENTS -->
-  <div id="comment-${doc.id}" style="display:none;">
-    <div class="comment-input">
-      <img class="comment-avatar"
-        src="${user.photoURL || 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}">
-
-      <input type="text"
-        class="comment-field"
-        placeholder="Write a comment..."
-        onkeydown="if(event.key==='Enter'){addComment('${doc.id}',this)}">
+    <div style="margin-top:10px;line-height:1.6;">
+        ${p.text}
     </div>
-
-    <div class="comments-list" id="comments-${doc.id}"></div>
-  </div>
 </div>
 `;
-
-// 🔥 LOAD COMMENTS REALTIME
-const commentsRef = collection(db, "posts", doc.id, "comments");
-
-onSnapshot(commentsRef, (cSnap) => {
-  const listEl = document.getElementById("comments-" + doc.id);
-  if (!listEl) return;
-
-  listEl.innerHTML = "";
-
-  cSnap.forEach(c => {
-    const d = c.data();
-
-    listEl.innerHTML += `
-    <div style="display:flex;gap:8px;margin-top:8px;">
-      <img src="${d.photo || ''}"
-        style="width:28px;height:28px;border-radius:50%;">
-
-      <div>
-        <b>${d.name}</b>
-        <div>${d.text}</div>
-      </div>
-    </div>
-    `;
-  });
-});
-
-    // 🔥 LOAD REACTIONS
-const reactRef = collection(db, "posts", doc.id, "reactions");
-
-onSnapshot(reactRef, (rSnap) => {
-  const box = document.getElementById("react-count-" + doc.id);
-  if (!box) return;
-
-  let counts = { like:0, love:0, haha:0, wow:0, sad:0, angry:0 };
-
-  rSnap.forEach(d => {
-    const type = d.data().type;
-    if(counts[type] !== undefined) counts[type]++;
-  });
-
-  let html = "";
-
-  if(counts.like) html += `👍 ${counts.like} `;
-  if(counts.love) html += `❤️ ${counts.love} `;
-  if(counts.haha) html += `😂 ${counts.haha} `;
-  if(counts.wow) html += `😮 ${counts.wow} `;
-  if(counts.sad) html += `😢 ${counts.sad} `;
-  if(counts.angry) html += `😡 ${counts.angry} `;
-
-  box.innerHTML = html;
-});
-                
             });
         });
     });
@@ -892,66 +605,9 @@ if (active) {
     indicator.style.height = active.offsetHeight + "px";
     active.classList.add("active");
 }
+    indicator.style.top = active.offsetTop + "px";
+    indicator.style.height = active.offsetHeight + "px";
 });
-
-window.toggleComment = (id)=>{
-    const box = document.getElementById("comment-"+id);
-    box.style.display = box.style.display === "none" ? "block" : "none";
-};
-
-window.addComment = async (postId,input)=>{
-    const text = input.value.trim();
-    if(!text) return;
-    const user = auth.currentUser;
-
-    await addDoc(collection(db,"posts",postId,"comments"),{
-        text,
-        name:user.displayName || "User",
-        email:user.email,
-        photo:user.photoURL || "",
-        time: serverTimestamp()
-    });
-
-    input.value="";
-};
-
-window.toggleReactionPicker = (postId)=>{
-    const picker = document.getElementById("react-"+postId);
-
-    document.querySelectorAll(".reaction-picker").forEach(p=>{
-        if(p.id !== "react-"+postId){
-            p.style.display="none";
-        }
-    });
-
-    picker.style.display =
-        picker.style.display === "flex" ? "none" : "flex";
-};
-    
-window.react = async (postId,type)=>{
-    const user = auth.currentUser;
-    const refDoc = doc(db,"posts",postId,"reactions",user.uid);
-
-    await setDoc(refDoc,{
-        type,
-        user:user.uid,
-        name:user.displayName
-    });
-
-    document.getElementById("react-"+postId).style.display = "none";
-};
-
-document.addEventListener("click", () => {
-    document.querySelectorAll(".reaction-picker").forEach(p=>{
-        p.style.display="none";
-    });
-});
-
-window.sharePost = (postId) => {
-    const url = window.location.href + "?post=" + postId;
-    navigator.clipboard.writeText(url);
-    alert("Post link copied!");
-};
     
 </script>
 
@@ -981,3 +637,6 @@ Made with ❤️ in the Philippines
     
 </body>
 </html>
+
+
+
