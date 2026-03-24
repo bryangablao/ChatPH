@@ -486,9 +486,21 @@ imageViewer.onclick = () => {
                 const p = doc.data();
 list.innerHTML += `
 <div class="post">
-    <small>${p.time?.toDate().toLocaleString() || 'Recent'}</small>
-    <div style="margin-top:8px;">${p.text}</div>
-</div>`;
+    <div style="display:flex;align-items:center;gap:10px;">
+        <img src="${p.photo}" style="width:40px;height:40px;border-radius:50%;">
+        <div>
+            <div style="font-weight:600;">${p.name || "User"}</div>
+            <div style="font-size:12px;opacity:.6;">
+                ${p.time?.toDate().toLocaleString() || "Recent"}
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top:10px;line-height:1.6;">
+        ${p.text}
+    </div>
+</div>
+`;
             });
         });
     });
