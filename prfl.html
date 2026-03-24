@@ -317,6 +317,46 @@
     font-size: 13px;
 }
 
+.comments-list div {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.comments-list b {
+    display: block;
+}
+
+.comments-list div div {
+    white-space: normal;
+}
+
+.comments-list div {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.comments-list b {
+    display: block;
+}
+
+.comments-list div div {
+    white-space: normal;
+}
+
+.post-actions {
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.action-btn {
+    flex: 1;
+    text-align: center;
+}
+.reaction-counts img {
+    vertical-align: middle;
+    margin-right: 2px;
+}
+        
 @media (max-width: 600px) {
 
     .card {
@@ -678,22 +718,23 @@ list.innerHTML += `
     <!-- REACTIONS -->
     <div class="reaction-counts" id="react-count-${doc.id}"></div>
 
-    <div class="post-actions">
-        <div class="like-container">
-            <span class="action-btn like-btn" onclick="toggleReactionPicker('${doc.id}')" id="like-btn-${doc.id}">Like</span>
-
-            <div class="reaction-picker" id="react-${doc.id}">
-                <img src="image/icon/Like.png" onclick="react('${doc.id}','like')">
-                <img src="image/icon/Love.png" onclick="react('${doc.id}','love')">
-                <img src="image/icon/Haha.png" onclick="react('${doc.id}','haha')">
-                <img src="image/icon/Wow.png" onclick="react('${doc.id}','wow')">
-                <img src="image/icon/Sad.png" onclick="react('${doc.id}','sad')">
-                <img src="image/icon/Angry.png" onclick="react('${doc.id}','angry')">
-            </div>
+<div class="post-actions" style="justify-content:space-around;border-top:1px solid var(--border);padding-top:10px;">
+    <div class="like-container">
+        <span class="action-btn" onclick="toggleReactionPicker('${doc.id}')">Like</span>
+        <div class="reaction-picker" id="react-${doc.id}">
+            <img src="image/icon/Like.png" onclick="react('${doc.id}','like')">
+            <img src="image/icon/Love.png" onclick="react('${doc.id}','love')">
+            <img src="image/icon/Haha.png" onclick="react('${doc.id}','haha')">
+            <img src="image/icon/Wow.png" onclick="react('${doc.id}','wow')">
+            <img src="image/icon/Sad.png" onclick="react('${doc.id}','sad')">
+            <img src="image/icon/Angry.png" onclick="react('${doc.id}','angry')">
         </div>
-
-        <span class="action-btn" onclick="toggleComment('${doc.id}')">Comment</span>
     </div>
+
+    <span class="action-btn" onclick="toggleComment('${doc.id}')">💬 Comment</span>
+
+    <span class="action-btn" onclick="sharePost('${doc.id}')">↗️ Share</span>
+</div>
 
     <!-- COMMENTS -->
     <div id="comment-${doc.id}" style="display:none;">
@@ -721,11 +762,15 @@ onSnapshot(commentsRef, (cSnap) => {
         const d = c.data();
 
         listEl.innerHTML += `
-        <div style="display:flex;gap:8px;margin-top:6px;">
-            <img src="${d.photo || 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}" style="width:25px;height:25px;border-radius:50%;">
-            <div>
-                <b>${d.name}</b>
-                <div style="font-size:13px;">${d.text}</div>
+        <div style="display:flex;align-items:flex-start;gap:8px;margin-top:8px;">
+            <img src="${d.photo || 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}"
+                 style="width:28px;height:28px;border-radius:50%;flex-shrink:0;">
+    
+            <div style="flex:1;">
+                <div style="font-weight:600;font-size:13px;">${d.name}</div>
+                <div style="font-size:13px;opacity:.9;word-wrap:break-word;">
+                    ${d.text}
+                </div>
             </div>
         </div>
         `;
@@ -734,15 +779,27 @@ onSnapshot(commentsRef, (cSnap) => {
 
     // 🔥 LOAD REACTIONS
 const reactRef = collection(db, "posts", doc.id, "reactions");
-
 onSnapshot(reactRef, (rSnap) => {
     const box = document.getElementById("react-count-" + doc.id);
     if (!box) return;
 
-    let count = 0;
-    rSnap.forEach(() => count++);
+    let counts = { like:0, love:0, haha:0, wow:0, sad:0, angry:0 };
 
-    box.innerHTML = count > 0 ? `👍 ${count}` : "";
+    rSnap.forEach(doc=>{
+        const type = doc.data().type;
+        if(counts[type] !== undefined) counts[type]++;
+    });
+
+    let html = "";
+
+    if(counts.like) html += `<img src="image/icon/Like.png" style="width:18px;"> ${counts.like} `;
+    if(counts.love) html += `<img src="image/icon/Love.png" style="width:18px;"> ${counts.love} `;
+    if(counts.haha) html += `<img src="image/icon/Haha.png" style="width:18px;"> ${counts.haha} `;
+    if(counts.wow) html += `<img src="image/icon/Wow.png" style="width:18px;"> ${counts.wow} `;
+    if(counts.sad) html += `<img src="image/icon/Sad.png" style="width:18px;"> ${counts.sad} `;
+    if(counts.angry) html += `<img src="image/icon/Angry.png" style="width:18px;"> ${counts.angry} `;
+
+    box.innerHTML = html;
 });
                 
             });
@@ -875,6 +932,12 @@ document.addEventListener("click", () => {
         p.style.display="none";
     });
 });
+
+window.sharePost = (postId) => {
+    const url = window.location.href + "?post=" + postId;
+    navigator.clipboard.writeText(url);
+    alert("Post link copied!");
+};
     
 </script>
 
