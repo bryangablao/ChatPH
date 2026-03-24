@@ -718,27 +718,26 @@ list.innerHTML += `
     <!-- REACTIONS -->
     <div class="reaction-counts" id="react-count-${doc.id}"></div>
 
-<div class="post-actions">
-    <div class="like-container">
-        <span class="action-btn like-btn" onclick="toggleReactionPicker('${doc.id}')" id="like-btn-${doc.id}">Like</span>
-        
-        <div class="reaction-picker" id="react-${doc.id}">
-            <img src="image/icon/Like.png" onclick="react('${doc.id}','like')">
-            <img src="image/icon/Love.png" onclick="react('${doc.id}','love')">
-            <img src="image/icon/Haha.png" onclick="react('${doc.id}','haha')">
-            <img src="image/icon/Wow.png" onclick="react('${doc.id}','wow')">
-            <img src="image/icon/Sad.png" onclick="react('${doc.id}','sad')">
-            <img src="image/icon/Angry.png" onclick="react('${doc.id}','angry')">
+    <div class="post-actions">
+        <div class="like-container">
+            <span class="action-btn like-btn"
+                onclick="toggleReactionPicker('${doc.id}')"
+                id="like-btn-${doc.id}">
+                Like
+            </span>
+
+            <div class="reaction-picker" id="react-${doc.id}">
+                <img src="image/icon/Like.png" onclick="react('${doc.id}','like')">
+                <img src="image/icon/Love.png" onclick="react('${doc.id}','love')">
+                <img src="image/icon/Haha.png" onclick="react('${doc.id}','haha')">
+                <img src="image/icon/Wow.png" onclick="react('${doc.id}','wow')">
+                <img src="image/icon/Sad.png" onclick="react('${doc.id}','sad')">
+                <img src="image/icon/Angry.png" onclick="react('${doc.id}','angry')">
+            </div>
         </div>
-    </div>
 
     <span class="action-btn comment-btn" onclick="toggleComment('${doc.id}')">Comment</span>
     <span class="action-btn" onclick="sharePost('${doc.id}')">Share</span>
-</div>
-
-    <span class="action-btn" onclick="toggleComment('${doc.id}')">💬 Comment</span>
-
-    <span class="action-btn" onclick="sharePost('${doc.id}')">↗️ Share</span>
 </div>
 
     <!-- COMMENTS -->
