@@ -231,12 +231,12 @@
     }
 
     /* --- Post Actions --- */
-.post-actions {
-    display: flex;
-    gap: 15px;
-    margin-top: 12px;
-    font-size: 14px;
-    color: var(--dim);
+.post-actions{
+margin-top:14px;
+display:flex;
+gap:18px;
+padding-top:10px;
+border-top:1px solid #2a2f3b;
 }
 
 .action-btn {
@@ -718,9 +718,10 @@ list.innerHTML += `
     <!-- REACTIONS -->
     <div class="reaction-counts" id="react-count-${doc.id}"></div>
 
-<div class="post-actions" style="justify-content:space-around;border-top:1px solid var(--border);padding-top:10px;">
+<div class="post-actions">
     <div class="like-container">
-        <span class="action-btn" onclick="toggleReactionPicker('${doc.id}')">Like</span>
+        <span class="action-btn like-btn" onclick="toggleReactionPicker('${doc.id}')" id="like-btn-${doc.id}">Like</span>
+        
         <div class="reaction-picker" id="react-${doc.id}">
             <img src="image/icon/Like.png" onclick="react('${doc.id}','like')">
             <img src="image/icon/Love.png" onclick="react('${doc.id}','love')">
@@ -730,6 +731,10 @@ list.innerHTML += `
             <img src="image/icon/Angry.png" onclick="react('${doc.id}','angry')">
         </div>
     </div>
+
+    <span class="action-btn comment-btn" onclick="toggleComment('${doc.id}')">Comment</span>
+    <span class="action-btn" onclick="sharePost('${doc.id}')">Share</span>
+</div>
 
     <span class="action-btn" onclick="toggleComment('${doc.id}')">💬 Comment</span>
 
