@@ -119,17 +119,8 @@ font-size:18px;
     pointer-events:auto;
 }
 
-#logoutBtn {
-    cursor: pointer;
-    color: #94a3b8;
-    font-weight: 600;
-    font-size: 14px;
-    transition: color 0.2s ease;
-}
-
-#logoutBtn:hover {
-    color: #ff4b4b;
-}
+#logoutBtn { cursor: pointer; color: var(--dim); font-weight: 600; font-size: 14px; }
+#logoutBtn:hover { color: #ff4b4b; }
 
 /* MARQUEE AD */
 .marquee{
@@ -699,9 +690,7 @@ object-fit:cover;
 
     <div style="display:flex;align-items:center;gap:16px;">
         <span id="userDisplay">Guest</span>
-        <div id="logoutBtn" style="cursor:pointer;color:#94a3b8;font-weight:600;font-size:14px;">
-            Logout
-        </div>
+        <div id="logoutBtn">Logout</div>
     </div>
 </header>
 <!-- SIDEBAR -->
