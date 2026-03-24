@@ -677,6 +677,103 @@ object-fit:cover;
 .toast .icon {
     font-size: 18px;
 }
+
+/* 📱 MOBILE RESPONSIVE FIX */
+@media (max-width: 600px){
+
+/* MAIN WIDTH */
+.main{
+    max-width:100%;
+    padding:12px;
+}
+
+/* HEADER */
+header{
+    padding:12px;
+}
+.brand{
+    font-size:1rem;
+}
+#userDisplay{
+    font-size:12px;
+}
+
+/* POSTS */
+.post{
+    padding:12px;
+}
+.post-text{
+    font-size:14px;
+    word-break:break-word;
+}
+
+/* COMMENTS FIX */
+.comment-item{
+    flex-direction:column;
+    align-items:flex-start;
+}
+.comment-time{
+    margin-left:0;
+    margin-top:4px;
+}
+
+/* COMMENT INPUT */
+.comment-input{
+    flex-wrap:wrap;
+}
+.comment-field{
+    font-size:13px;
+}
+
+/* ACTION BUTTONS */
+.post-actions{
+    flex-wrap:wrap;
+    gap:10px;
+}
+.post-actions button,
+.action-btn{
+    font-size:13px;
+    padding:6px 10px;
+}
+
+/* REACTION PICKER */
+.reaction-picker{
+    bottom:40px;
+    left:0;
+    transform:scale(.9);
+}
+
+/* IMAGES */
+.post-images{
+    grid-template-columns:repeat(auto-fill,minmax(100px,1fr));
+}
+.image-preview{
+    grid-template-columns:repeat(auto-fill,minmax(70px,1fr));
+}
+
+/* COMMENTS LIST HEIGHT FIX */
+.comments-list{
+    max-height:120px;
+}
+
+/* SIDEBAR WIDTH */
+.sidebar{
+    width:220px;
+}
+
+/* TOAST */
+.toast{
+    width:90%;
+    font-size:13px;
+}
+
+/* EDITOR */
+.editor{
+    font-size:14px;
+    padding:12px;
+}
+}
+    
 </style>
 </head>
 <body>
