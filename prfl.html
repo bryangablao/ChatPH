@@ -501,7 +501,11 @@ imageViewer.onclick = () => {
             if (d.coverBase64) document.getElementById("coverImg").src = d.coverBase64;
         }
 
-        const q = query(collection(db, "posts"), where("email", "==", user.email), orderBy("time", "desc"));
+const q = query(
+  collection(db, "posts"),
+  where("email", "==", user.email)
+);
+        
         onSnapshot(q, (snap) => {
             const list = document.getElementById("postList");
             list.innerHTML = "";
