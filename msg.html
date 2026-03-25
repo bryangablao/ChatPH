@@ -357,55 +357,6 @@ font-weight:700;
     z-index:1001;
 }
 
-.section{
-    padding:10px;
-}
-
-.section-title{
-    font-size:12px;
-    opacity:.6;
-    margin-bottom:8px;
-    text-transform:uppercase;
-}
-
-.dropdown{
-    display:flex;
-    justify-content:space-between;
-    padding:10px 12px;
-    border-radius:8px;
-    cursor:pointer;
-    transition:.2s;
-    margin-bottom:6px;
-}
-
-.dropdown:hover{
-    background:#1a1f29;
-}
-
-/* SPECIAL STYLES */
-.dropdown.important{
-    color:#ffd700;
-    font-weight:600;
-}
-
-.dropdown.blocked{
-    color:#ff4b4b;
-}
-
-.important-user{
-    background: rgba(255,215,0,0.15);
-    border-left: 3px solid gold;
-}
-
-.mute-user{
-    opacity: 0.5;
-}
-
-.blocked-user{
-    background: rgba(255,0,0,0.15);
-    border-left: 3px solid red;
-}
-    
 #chatHeader{
     font-size:15px;
     background:#11141a;
@@ -421,8 +372,7 @@ font-weight:700;
 #logoutBtn:hover {
     color: #ff4b4b;
 }
-
-
+    
 </style>
 </head>
 
@@ -459,31 +409,6 @@ font-weight:700;
 
 <!-- USERS -->
 <div class="chat-list">
-
-    <!-- CATEGORY SECTION -->
-    <div class="section">
-        <div class="section-title">Categories</div>
-
-<div class="dropdown" onclick="filterType('all')">All Messages <span>▾</span></div>
-<div class="dropdown" onclick="filterType('inbox')">Inbox <span>▾</span></div>
-<div class="dropdown" onclick="filterType('sent')">Sent <span>▾</span></div>
-<div class="dropdown" onclick="filterType('draft')">Draft <span>▾</span></div>
-<div class="dropdown" onclick="filterType('archive')">Archive <span>▾</span></div>
-<div class="dropdown" onclick="filterType('trash')">Trash <span>▾</span></div>
-
-    </div>
-
-    <!-- SPACE -->
-    <div style="height:30px;"></div>
-
-    <!-- LABEL SECTION -->
-    <div class="section">
-        <div class="section-title">Labels</div>
-
-<div class="dropdown important" onclick="filterLabel('important')">Important <span>▾</span></div>
-<div class="dropdown" onclick="filterLabel('mute')">Mute <span>▾</span></div>
-<div class="dropdown blocked" onclick="filterLabel('blocked')">Blocked <span>▾</span></div>
-    </div>
 
     <!-- SEARCH + CREATE -->
     <div class="chat-top">
@@ -567,9 +492,7 @@ import {
     query,
     where,
     addDoc,
-    onSnapshot,
-    updateDoc,
-    getDoc
+    onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import {
@@ -591,7 +514,6 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 let allUsers = [];
-let userLabels = {};
 
 async function loadUsers(){
     const q = query(collection(db, "users"));
@@ -619,7 +541,6 @@ onAuthStateChanged(auth, async (user) => {
         }, { merge: true });
 
         await loadUsers();
-        await loadLabels();
 
         document.getElementById("userName").innerText = user.displayName;
 
@@ -671,14 +592,12 @@ async function sendMsg(){
 
     const user = auth.currentUser;
 
-await addDoc(collection(db, "messages"), {
-    text: text,
-    from: user.uid,
-    to: currentChatUser,
-    time: Date.now(),
-    type: "inbox", // 🔥 IMPORTANT
-    labels: []     // 🔥 IMPORTANT
-});
+    await addDoc(collection(db, "messages"), {
+        text: text,
+        from: user.uid,
+        to: currentChatUser,
+        time: Date.now()
+    });
 
     input.value="";
 }
@@ -735,23 +654,13 @@ document.getElementById("userSearch").addEventListener("input", function(){
         return;
     }
 
-filtered.forEach(user=>{
-    const label = userLabels[user.uid] || "";
-
-    let extraClass = "";
-    if(label === "important") extraClass = "important-user";
-    if(label === "mute") extraClass = "mute-user";
-    if(label === "blocked") extraClass = "blocked-user";
-
+    filtered.forEach(user=>{
     results.innerHTML += `
-        <div class="chat-user ${extraClass}"
-             onclick="openChat('${user.uid}')"
-             oncontextmenu="openOptions('${user.uid}'); return false;">
+        <div class="chat-user" onclick="openChat('${user.uid}')">
             ${user.name}
         </div>
     `;
 });
-    
 });
 
 /* GROUP PANEL */
@@ -783,95 +692,26 @@ function loadMessages(){
         snap.forEach(doc=>{
             const m = doc.data();
 
-            // ✅ FILTER CHAT (your current chat)
             const isChat =
                 (m.from === auth.currentUser.uid && m.to === currentChatUser) ||
                 (m.from === currentChatUser && m.to === auth.currentUser.uid);
 
-            if(!isChat) return;
-
-            // ✅ TYPE FILTER
-            if(currentFilter !== "all" && m.type !== currentFilter) return;
-
-            // ✅ LABEL FILTER
-            if(currentLabel && (!m.labels || !m.labels.includes(currentLabel))) return;
-
-            box.innerHTML += `
-                <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}">
-                    ${m.text}
-                    <div style="font-size:10px;opacity:.6;margin-top:4px;">
-                        ${new Date(m.time).toLocaleTimeString()}
+            if(isChat){
+                box.innerHTML += `
+                    <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}">
+                        ${m.text}
+                        <div style="font-size:10px;opacity:.6;margin-top:4px;">
+                            ${new Date(m.time).toLocaleTimeString()}
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            }
         });
 
         box.scrollTop = box.scrollHeight;
     });
 }
 
-let currentFilter = "all";
-let currentLabel = null;
-
-function filterType(type){
-    currentFilter = type;
-    currentLabel = null;
-    loadMessages();
-}
-
-function filterLabel(label){
-    currentLabel = label;
-    currentFilter = "all";
-    loadMessages();
-}
-
-async function openOptions(uid){
-    const action = prompt("Type: important / mute / blocked");
-    if(!action) return;
-
-    const clean = action.toLowerCase().trim();
-    const valid = ["important", "mute", "blocked"];
-    if(!valid.includes(clean)){
-        console.log("Invalid action");
-        return;
-    }
-
-    const myId = auth.currentUser.uid;
-
-    // 🔥 SAVE TO FIREBASE
-    await setDoc(doc(db, "userLabels", myId), {
-        [uid]: clean
-    }, { merge: true });
-
-    console.log("Saved:", clean, "for user:", uid);
-
-    // UI feedback
-    const header = document.getElementById("chatHeader");
-    const oldText = header.innerText;
-    header.innerText = "✔ " + clean + " applied";
-    setTimeout(() => {
-        header.innerText = oldText;
-    }, 1500);
-
-    loadUserList(); // refresh UI
-}
-
-async function loadLabels(){
-    const myId = auth.currentUser.uid;
-    const ref = doc(db, "userLabels", myId);
-    const snap = await getDoc(ref);
-
-    if(snap.exists()){
-        userLabels = snap.data();
-    } else {
-        userLabels = {};
-    }
-}
-
-function loadUserList(){
-    document.getElementById("userSearch").dispatchEvent(new Event("input"));
-}
-    
 import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 document.getElementById("logoutBtn").onclick = async () => {
@@ -880,7 +720,6 @@ document.getElementById("logoutBtn").onclick = async () => {
 };
 
 // 🔥 MAKE FUNCTIONS GLOBAL (IMPORTANT)
-window.openOptions = openOptions;
 window.openChat = openChat;
 window.toggleSidebar = toggleSidebar;
 window.openGroupPanel = openGroupPanel;
@@ -889,3 +728,4 @@ window.sendMsg = sendMsg;
 
 </body>
 </html>
+
