@@ -98,20 +98,21 @@
         .btn-secondary { background: transparent; color: var(--dim); border: none; cursor: pointer; padding: 10px; }
 
         /* --- Feed --- */
-        .feed { max-width: 600px; margin: auto; padding: 0 20px 60px; display: block; }
+        .feed { max-width: 600px; margin: auto; padding: 0 20px 60px; }
         .post { 
             background: var(--card); 
             border: 1px solid var(--border); 
             padding: 20px; 
             border-radius: 16px; 
             margin-top: 15px; 
-            margin-bottom: 15px;
             word-wrap: break-word; 
             overflow-wrap: break-word; 
             word-break: break-word; 
             width: 100%;
+            width: 100%;
             max-width: 100%;
-            display: block;
+            flex-shrink: 0;
+            scroll-snap-align: start;
         }
         
         .post div:last-child { white-space: pre-wrap; }
@@ -313,17 +314,6 @@
 * {
     scrollbar-width: thin;
     scrollbar-color: var(--card) var(--bg);
-}
-
-#postList {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: stretch !important;
-}
-
-.post {
-    width: 100% !important;
-    display: block !important;
 }
         
     </style>
@@ -600,36 +590,35 @@ imageViewer.onclick = () => {
 const q = query(
   collection(db, "posts"),
   where("email", "==", user.email)
-  orderBy("time", "desc")
 );
         
-onSnapshot(q, (snap) => {
-    const list = document.getElementById("postList");
-    list.innerHTML = "";
+        onSnapshot(q, (snap) => {
+            const list = document.getElementById("postList");
+            list.innerHTML = "";
+            document.getElementById("statPosts").innerText = snap.size;
+            snap.forEach(doc => {
+                const p = doc.data();
+list.innerHTML += `
+<div class="post">
 
-    document.getElementById("statPosts").innerText = snap.size;
+    <div class="post-header">
+        <img src="${p.photo}" class="avatar">
+        <div class="post-info">
+            <div class="username">${p.name || "User"}</div>
+            <div class="time">${p.time?.toDate().toLocaleString() || "Recent"}</div>
+        </div>
+    </div>
 
-    snap.forEach(doc => {
-        const p = doc.data();
+    <div class="post-text">
+        ${p.text}
+    </div>
 
-        const postEl = document.createElement("div");
-        postEl.className = "post";
-
-        postEl.innerHTML = `
-            <div class="post-header">
-                <img src="${p.photo}" class="avatar">
-                <div class="post-info">
-                    <div class="username">${p.name || "User"}</div>
-                    <div class="time">${p.time?.toDate().toLocaleString() || "Recent"}</div>
-                </div>
-            </div>
-            <div class="post-text">${p.text}</div>
-        `;
-
-        list.appendChild(postEl);
+</div>
+`;
+            });
+        });
     });
-});
-        
+
     document.getElementById('logoutBtn').onclick = () => signOut(auth);
 
     window.toggleSidebar = (forceClose = false) => {
