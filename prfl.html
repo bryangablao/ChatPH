@@ -243,59 +243,207 @@
     display:flex;
 }
 
-.comment-btn{
-    background:none;
-    border:none;
-    color:#94a3b8;
-    cursor:pointer;
-    font-size:14px;
-    padding:6px 10px;
-    border-radius:8px;
+/* COMMENTS FIX */
+.comment-avatar{
+width:28px;
+height:28px;
+border-radius:50%;
+}
+.comment-field{
+flex:1;
+background:transparent;
+border:none;
+color:white;
+font-size:14px;
+outline:none;
+}
+.comment-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 8px;
+    font-size: 14px;
+    animation: fadeIn 0.4s ease forwards;
+}
+.comment-time{
+font-size:11px;
+opacity:.6;
+white-space:nowrap;
+margin-left:auto;
+}
+.comment-item > div {
+    flex: 1;
+}
+.comment-text {
+    word-break: break-word;
+}
+.comment-name{
+font-weight:600;
+display:flex;
+align-items:center;
+gap:4px;
+}
+.verified-badge{
+width:14px;
+margin-left:2px;
+position:relative;
+top:-2px;
+}
+.comment-time{
+    margin-left:0;
+    margin-top:4px;
+}
+/* COMMENT INPUT */
+.comment-input{
+    flex-wrap:wrap;
+}
+.comment-field{
+    font-size:13px;
+}
+/* COMMENTS LIST HEIGHT FIX */
+.comments-list{
+    max-height:120px;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.reaction-bar{
+display:flex;
+gap:10px;
+margin-top:8px;
+font-size:18px;
+}
+.reaction-bar span{
+cursor:pointer;
+transition:0.2s;
+}
+.reaction-bar span:hover{
+transform:scale(1.3);
+}
+.like-container{
+position:relative;
+display:inline-block;
+}
+.reaction-picker{
+position:absolute;
+bottom:35px;
+left:0;
+background:#0f141c;
+border:1px solid #2a2f3b;
+border-radius:30px;
+padding:6px 10px;
+display:flex;
+gap:8px;
+box-shadow:0 8px 20px rgba(0,0,0,.5);
+display:none;
+}
+.reaction-picker span{
+font-size:20px;
+cursor:pointer;
+transition:.15s;
+}
+.reaction-picker span:hover{
+transform:scale(1.3);
+}
+.reaction-picker img{
+width:26px;
+cursor:pointer;
+transition:.15s;
+}
+.reaction-picker img:hover{
+transform:scale(1.3);
+}
+.reaction-hover{
+position:absolute;
+background:#0f141c;
+border:1px solid #2a2f3b;
+border-radius:10px;
+padding:10px;
+font-size:13px;
+width:200px;
+box-shadow:0 6px 20px rgba(0,0,0,.5);
+display:none;
+z-index:20;
+}
+.reaction-user{
+display:flex;
+align-items:center;
+gap:6px;
+margin-bottom:4px;
+}
+.reaction-user img{
+width:16px;
 }
 
-.comment-btn:hover{
-    background:rgba(255,255,255,0.05);
-    color:#3b82f6;
+/* Reaction Bold + Color Fix */
+.like-btn.react-like {
+    background: linear-gradient(90deg, #4da3ff, #2563eb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    font-weight: 800 !important;
 }
 
-.reaction-wrap{
-    position: relative;
-    display: inline-flex;
+.like-btn.react-love {
+    background: linear-gradient(90deg, #ff3b3b, #ff0000);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    font-weight: 800 !important;
+}
+
+.like-btn.react-haha, .like-btn.react-wow, .like-btn.react-sad {
+    background: linear-gradient(90deg, #ffd000, #ff9f00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    font-weight: 800 !important;
+}
+
+.like-btn.react-angry {
+    background: linear-gradient(90deg, #ff5e00, #ff0000);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    font-weight: 800 !important;
+}
+
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(30px);
+    background: #1f2937;
+    color: #fff;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    display: flex;
     align-items: center;
-    gap: 6px;
-    cursor: pointer;
-}
-
-.reaction-popup{
-    position: absolute;
-    bottom: 140%;
-    left: 0;
-    background: #151921;
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: 12px;
-    padding: 10px;
-    min-width: 140px;
+    gap: 10px;
     opacity: 0;
     pointer-events: none;
-    transform: translateY(10px);
-    transition: .2s;
-    z-index: 50;
+    transition: all 0.35s ease;
+    box-shadow: 0 6px 20px rgba(0,0,0,.4);
+    z-index: 9999;
 }
 
-.reaction-wrap:hover .reaction-popup{
+/* SHOW ANIMATION */
+.toast.show {
     opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0);
+    transform: translateX(-50%) translateY(0);
 }
 
-.reaction-user{
-    font-size: 13px;
-    padding: 6px;
-    border-radius: 6px;
-}
+/* TYPES */
+.toast.success { background: #16a34a; } /* green */
+.toast.error   { background: #dc2626; } /* red */
+.toast.info    { background: #2563eb; } /* blue */
 
-.reaction-user:hover{
-    background: rgba(255,255,255,.05);
+/* ICON */
+.toast .icon {
+    font-size: 18px;
+    font-weight: 800 !important;
 }
         
     </style>
@@ -582,48 +730,88 @@ const q = query(
                 const p = doc.data();
 list.innerHTML += `
 <div class="post">
-
-    <div style="display:flex;align-items:center;gap:10px;">
-        <img src="${p.photo}" style="width:40px;height:40px;border-radius:50%;">
+    <div class="post-top">
+        <img class="avatar" src="${p.photo}">
         <div>
-            <div style="font-weight:600;">${p.name || "User"}</div>
-            <div style="font-size:12px;opacity:.6;">
-                ${p.time?.toDate().toLocaleString() || "Recent"}
-            </div>
+            <div class="username">${p.name || "User"}</div>
+            <div class="time">${p.time?.toDate().toLocaleString() || ""}</div>
         </div>
     </div>
 
-    <div class="post-text">
-        ${p.text}
-    </div>
+    <div class="post-text">${p.text}</div>
 
-<div class="reaction-wrap">
-    👍 3
-
-    <div class="reaction-popup">
-        <div class="reaction-user">Bryan</div>
-        <div class="reaction-user">John</div>
-        <div class="reaction-user">Maria</div>
-    </div>
-</div>
-
-    <!-- 🔥 ONLY COMMENT BUTTON -->
     <div class="post-actions">
-        <button class="comment-btn">💬 Comment</button>
+        <div class="like-container">
+            <span class="action-btn like-btn" onclick="toggleReactionPicker('${doc.id}')" id="like-btn-${doc.id}">Like</span>
+
+            <div class="reaction-picker" id="react-${doc.id}">
+                <img src="image/icon/Like.png" onclick="react('${doc.id}','like')">
+                <img src="image/icon/Love.png" onclick="react('${doc.id}','love')">
+                <img src="image/icon/Haha.png" onclick="react('${doc.id}','haha')">
+                <img src="image/icon/Wow.png" onclick="react('${doc.id}','wow')">
+                <img src="image/icon/Sad.png" onclick="react('${doc.id}','sad')">
+                <img src="image/icon/Angry.png" onclick="react('${doc.id}','angry')">
+            </div>
+        </div>
+
+        <span class="action-btn comment-btn" onclick="toggleComment('${doc.id}')">Comment</span>
     </div>
 
+    <div class="comment-box" id="comment-${doc.id}" style="display:none">
+        <div class="comment-input">
+            <img class="comment-avatar" src="${auth.currentUser?.photoURL}">
+            <input type="text" class="comment-field"
+                placeholder="Write a comment..."
+                onkeydown="if(event.key==='Enter'){addComment('${doc.id}',this)}">
+        </div>
+
+        <div class="comments-list" id="comments-${doc.id}"></div>
+    </div>
 </div>
 `;
             });
 
+const commentsRef = query(
+    collection(db, "posts", doc.id, "comments"),
+    orderBy("time", "desc")
+);
+
+onSnapshot(commentsRef, (snap) => {
+    const listEl = document.getElementById("comments-" + doc.id);
+    if (!listEl) return;
+
+    listEl.innerHTML = "";
+
+    snap.forEach(c => {
+        const data = c.data();
+        const dateObj = data.time?.toDate();
+
+        const formattedDate = dateObj ? dateObj.toLocaleString([], {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }) : "";
+
+        listEl.innerHTML += `
+        <div class="comment-item">
+            <img class="comment-avatar" src="${data.photo}">
+            <div>
+                <div class="comment-name">${data.name}</div>
+                <div class="comment-text">${data.text}</div>
+            </div>
+            <div class="comment-time">${formattedDate}</div>
+        </div>`;
+        });
+    });         
+});
 document.getElementById("postList").addEventListener("click", (e) => {
     if (e.target.classList.contains("comment-btn")) {
         alert("Comment clicked!");
     }
-});
-            
-        });
     });
+});
 
     document.getElementById('logoutBtn').onclick = () => signOut(auth);
 
@@ -695,10 +883,7 @@ const active = document.querySelector(".sidebar a.active");
 if (active) {
     indicator.style.top = active.offsetTop + "px";
     indicator.style.height = active.offsetHeight + "px";
-    active.classList.add("active");
 }
-    indicator.style.top = active.offsetTop + "px";
-    indicator.style.height = active.offsetHeight + "px";
 });
     
 </script>
