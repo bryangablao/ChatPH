@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Messages - ChatPH</title>
+<title>ChatPH | Message</title>
+<link rel="icon" type="image/png" href="image/chatph-logo.png">
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
@@ -360,6 +361,17 @@ font-weight:700;
     font-size:15px;
     background:#11141a;
 }
+
+#logoutBtn {
+    cursor: pointer;
+    color: #aaa;
+    font-weight: 600;
+    font-size: 14px;
+}
+    
+#logoutBtn:hover {
+    color: #ff4b4b;
+}
     
 </style>
 </head>
@@ -374,8 +386,10 @@ font-weight:700;
 <span class="brand">ChatPH</span>
 </div>
 
-<div id="userName">Loading...</div>
-</header>
+<div style="display:flex;align-items:center;gap:12px;">
+    <span id="userName">Loading...</span>
+    <div id="logoutBtn">Logout</div>
+</div>
 
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
@@ -662,33 +676,45 @@ function createGroup(){
     },2000);
 }
 
+import { query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 function loadMessages(){
     const box = document.getElementById("messages");
 
-    onSnapshot(collection(db, "messages"), (snap)=>{
+    const q = query(collection(db, "messages"));
+
+    onSnapshot(q, (snap)=>{
         box.innerHTML = "";
 
         snap.forEach(doc=>{
             const m = doc.data();
 
-            if(
+            const isChat =
                 (m.from === auth.currentUser.uid && m.to === currentChatUser) ||
-                (m.from === currentChatUser && m.to === auth.currentUser.uid)
-            ){
-box.innerHTML += `
-    <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}">
-        ${m.text}
-        <div style="font-size:10px;opacity:.6;margin-top:4px;">
-            ${new Date(m.time).toLocaleTimeString()}
-        </div>
-    </div>
-`;
+                (m.from === currentChatUser && m.to === auth.currentUser.uid);
+
+            if(isChat){
+                box.innerHTML += `
+                    <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}">
+                        ${m.text}
+                        <div style="font-size:10px;opacity:.6;margin-top:4px;">
+                            ${new Date(m.time).toLocaleTimeString()}
+                        </div>
+                    </div>
+                `;
             }
         });
 
         box.scrollTop = box.scrollHeight;
     });
 }
+
+import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+document.getElementById("logoutBtn").onclick = async () => {
+    await signOut(auth);
+    window.location.href = "index.html";
+};
 
 // 🔥 MAKE FUNCTIONS GLOBAL (IMPORTANT)
 window.openChat = openChat;
