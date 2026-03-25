@@ -352,6 +352,34 @@ font-weight:700;
     color:white;
 }
 
+.group-panel h3{
+    margin-bottom:10px;
+}
+
+.group-panel label{
+    font-size:12px;
+    opacity:.7;
+}
+
+.group-panel select{
+    width:100%;
+    padding:8px;
+    border-radius:10px;
+    border:none;
+    background:#1f2937;
+    color:white;
+    margin-bottom:10px;
+}
+
+.member-chip{
+    display:inline-block;
+    padding:5px 10px;
+    margin:3px;
+    border-radius:20px;
+    background:#1f2937;
+    font-size:12px;
+}
+
 .menu-icon{
     position:relative;
     z-index:1001;
@@ -458,9 +486,27 @@ font-weight:700;
 
 <!-- GROUP PANEL -->
 <div class="group-panel" id="groupPanel">
-    <h3>Create Group</h3>
+    <h3>Create Group Chat</h3>
+
+    <label>Group Name</label>
+    <input type="text" id="groupName" placeholder="Enter group name">
+
+    <label>Theme</label>
+    <select id="groupTheme">
+        <option value="#4da3ff">Blue</option>
+        <option value="#ff4b4b">Red</option>
+        <option value="#facc15">Yellow</option>
+        <option value="#22c55e">Green</option>
+        <option value="#a855f7">Purple</option>
+        <option value="#92400e">Brown</option>
+    </select>
+
+    <label>Add Members</label>
     <input type="text" id="groupSearch" placeholder="Search users...">
     <div id="groupUsers"></div>
+
+    <div id="selectedMembers" style="margin-top:10px;"></div>
+
     <button onclick="createGroup()">Create Group</button>
 </div>
   
@@ -514,7 +560,11 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 let allUsers = [];
-
+let selectedMembers = [];
+let currentGroup = null;
+let unsubscribe = null;
+let groupTheme = "";
+    
 async function loadUsers(){
     const q = query(collection(db, "users"));
     const snap = await getDocs(q);
@@ -573,6 +623,24 @@ async function loadChatList(){
             </div>
         `;
     });
+
+// 🔥 LOAD GROUPS
+box.innerHTML += `<div class="not-found">Groups</div>`; 
+
+const groupSnap = await getDocs(collection(db, "groups"));
+
+groupSnap.forEach(doc=>{
+    const g = doc.data();
+
+    if(g.members.includes(auth.currentUser.uid)){
+        box.innerHTML += `
+            <div class="chat-user" onclick="openGroup('${doc.id}', '${g.name}', '${g.theme}')">
+                👥 ${g.name}
+            </div>
+        `;
+    }
+});
+    
 }
 
 import { setDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -612,7 +680,12 @@ overlay.classList.toggle("active");
 let currentChatUser = "";
 
 function openChat(uid){
+    document.querySelectorAll(".chat-user").forEach(el=>{
+        el.classList.remove("active-chat");
+    });
+
     currentChatUser = uid;
+    currentGroup = null; // 🔥 add this (important)
 
     // ✅ SAVE LAST CHAT
     localStorage.setItem("lastChatUser", uid);
@@ -628,22 +701,39 @@ function openChat(uid){
 
     loadMessages();
 }
+
+function openGroup(id, name, theme){
+    document.querySelectorAll(".chat-user").forEach(el=>{
+        el.classList.remove("active-chat");
+    });
+
+    groupTheme = theme;
+    currentGroup = id;
+    currentChatUser = null;
+
+    document.getElementById("emptyState").style.display = "none";
+    document.getElementById("chatUI").style.display = "flex";
+    document.getElementById("chatHeader").innerText = name;
+
+    loadGroupMessages();
+}
+    
 async function sendMsg(){
     const input = document.getElementById("msgInput");
     const text = input.value.trim();
-    if(!text || !currentChatUser) return;
+
+    if(!text || (!currentChatUser && !currentGroup)) return;
 
     const user = auth.currentUser;
 
     await addDoc(collection(db, "messages"), {
         text: text,
         from: user.uid,
-        to: currentChatUser,
+        to: currentChatUser || null,
+        groupId: currentGroup || null,
         time: Date.now()
     });
 
-    loadChatList();
-    
     input.value="";
 }
 
@@ -708,30 +798,79 @@ document.getElementById("userSearch").addEventListener("input", function(){
 });
 });
 
+document.getElementById("groupSearch").addEventListener("input", function(){
+    const value = this.value.toLowerCase();
+    const box = document.getElementById("groupUsers");
+    box.innerHTML = "";
+
+    const filtered = allUsers.filter(u => 
+        u.name.toLowerCase().includes(value)
+    );
+
+    filtered.forEach(user=>{
+        box.innerHTML += `
+            <div class="chat-user" onclick="addMember('${user.uid}', '${user.name}')">
+                ${user.name}
+            </div>
+        `;
+    });
+});
+    
+
 /* GROUP PANEL */
 function openGroupPanel(){
     document.getElementById("groupPanel").classList.toggle("open");
 }
 
 /* CREATE GROUP (demo only) */
-function createGroup(){
-    const panel = document.getElementById("groupPanel");
-    panel.classList.remove("open");
+async function createGroup(){
+    const name = document.getElementById("groupName").value.trim();
+    const theme = document.getElementById("groupTheme").value;
 
-    const box = document.getElementById("userResults");
-    box.innerHTML = `<div class="not-found">Group created ✅</div>`;
+    if(!name || selectedMembers.length === 0) return;
 
-    setTimeout(()=>{
-        box.innerHTML = "";
-    },2000);
+    const myId = auth.currentUser.uid;
+
+    const groupData = {
+        name: name,
+        theme: theme,
+        members: [myId, ...selectedMembers],
+        type: "group",
+        createdAt: Date.now()
+    };
+
+    const docRef = await addDoc(collection(db, "groups"), groupData);
+    openGroup(docRef.id, name, theme); // ✅ OPEN AFTER CREATE
+    
+    // reset UI
+    document.getElementById("groupPanel").classList.remove("open");
+    document.getElementById("groupName").value = "";
+    document.getElementById("selectedMembers").innerHTML = "";
+    selectedMembers = [];
+
+    loadChatList(); // refresh sidebar
+}
+
+function addMember(uid, name){
+    if(selectedMembers.includes(uid)) return;
+
+    selectedMembers.push(uid);
+
+    const box = document.getElementById("selectedMembers");
+
+    box.innerHTML += `
+        <span class="member-chip">${name}</span>
+    `;
 }
 
 function loadMessages(){
     const box = document.getElementById("messages");
 
+    if(unsubscribe) unsubscribe(); // 🔥 stop old listener
+
     const q = query(collection(db, "messages"));
 
-    onSnapshot(q, (snap)=>{
+    unsubscribe = onSnapshot(q, (snap)=>{
         box.innerHTML = "";
 
         snap.forEach(doc=>{
@@ -756,6 +895,34 @@ function loadMessages(){
         box.scrollTop = box.scrollHeight;
     });
 }
+
+function loadGroupMessages(){
+    const box = document.getElementById("messages");
+
+    if(unsubscribe) unsubscribe(); // 🔥 stop old listener
+
+    const q = query(collection(db, "messages"));
+
+    unsubscribe = onSnapshot(q, (snap)=>{
+        box.innerHTML = "";
+
+        snap.forEach(doc=>{
+            const m = doc.data();
+
+            if(m.groupId !== currentGroup) return;
+
+            box.innerHTML += `
+                <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
+                     style="background:${m.from === auth.currentUser.uid ? groupTheme : ''}">
+                    ${m.text}
+                </div>
+            `;
+        });
+
+        box.scrollTop = box.scrollHeight;
+    });
+}
+    
 
 import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
