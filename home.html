@@ -80,15 +80,35 @@ font-size:18px;
     text-decoration:none;
     color:white;
     position: relative;
+    overflow: hidden;
 }
+
+/* SLIDE EFFECT */
+.sidebar a::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:0;
+    width:0%;
+    height:100%;
+    background:rgba(77,163,255,0.15);
+    transition:0.3s ease;
+    z-index:-1;
+}
+
+.sidebar a:hover::before{
+    width:100%;
+}
+    
 .sidebar a.active {
     background: rgba(59,130,246,0.15);
     color: var(--accent);
     border-left: 3px solid var(--accent);
 }
+    
 .sidebar a:hover {
-    background: rgba(255,255,255,0.05);
     color: var(--accent);
+    transform: translateX(6px);
 }
 
 /* INDICATOR */
