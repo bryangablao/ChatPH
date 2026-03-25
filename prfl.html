@@ -99,8 +99,9 @@
 
         /* --- Feed --- */
         .feed { max-width: 550px; margin: auto; padding: 0 20px 60px; }
-        .post { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 16px; margin-top: 15px; }
-        
+        .post { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 16px; margin-top: 15px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word;}
+        .post div:last-child { white-space: pre-wrap; }
+        .post-text { margin-top: 10px; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; max-width: 100%; max-height: 200px; overflow-y: auto; }
           /* --- Sidebar --- */
         .sidebar{
             position:fixed;
@@ -229,7 +230,13 @@
     #imageViewer.active {
         opacity: 1;
     }
-        
+
+    #postList {
+    display: flex;
+    flex-direction: column;
+    }
+
+    
     </style>
 </head>
 
@@ -524,7 +531,7 @@ list.innerHTML += `
         </div>
     </div>
 
-    <div style="margin-top:10px;line-height:1.6;">
+    <div class="post-text">
         ${p.text}
     </div>
 </div>
