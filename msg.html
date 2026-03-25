@@ -21,6 +21,7 @@ margin:0;
 font-family:'Inter',sans-serif;
 background:var(--bg);
 color:var(--text);
+overflow:hidden;
 }
 
 /* HEADER */
@@ -142,8 +143,8 @@ pointer-events:auto;
 
 /* MAIN CHAT LAYOUT */
 .main{
-display:flex;
-height:calc(100vh - 70px);
+    display:flex;
+    height:calc(100vh - 120px);
 }
 
 /* LEFT: USERS */
@@ -198,29 +199,38 @@ background:#1f2937;
 
 /* INPUT */
 .chat-input{
-display:flex;
-padding:12px;
-border-top:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px;
+    border-top:1px solid var(--border);
+    background:#11141a;
 }
 
 .chat-input input{
-flex:1;
-padding:10px;
-border-radius:20px;
-border:none;
-background:#1f2937;
-color:white;
-outline:none;
+    flex:1;
+    padding:12px 16px;
+    border-radius:30px;
+    border:none;
+    background:#1f2937;
+    color:white;
+    outline:none;
+    font-size:14px;
 }
 
 .chat-input button{
-margin-left:10px;
-padding:10px 16px;
-border:none;
-border-radius:20px;
-background:var(--accent);
-font-weight:600;
-cursor:pointer;
+    padding:10px 18px;
+    border:none;
+    border-radius:30px;
+    background:var(--accent);
+    color:#000;
+    font-weight:600;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.chat-input button:hover{
+    opacity:.8;
 }
 
 /* FOOTER */
@@ -331,7 +341,17 @@ font-weight:700;
     background:#1f2937;
     color:white;
 }
-  
+
+.menu-icon{
+    position:relative;
+    z-index:1001;
+}
+
+#chatHeader{
+    font-size:15px;
+    background:#11141a;
+}
+    
 </style>
 </head>
 
@@ -345,7 +365,7 @@ font-weight:700;
 <span class="brand">ChatPH</span>
 </div>
 
-<div>Messages</div>
+<div id="userName">Loading...</div>
 </header>
 
 <!-- SIDEBAR -->
@@ -382,9 +402,14 @@ font-weight:700;
 <div class="chat-box" id="chatBox">
 
     <!-- EMPTY STATE -->
-    <div id="emptyState" style="margin:auto;text-align:center;opacity:.5;">
-        Select a user to start chatting
-    </div>
+<div id="emptyState" style="
+    margin:auto;
+    text-align:center;
+    opacity:.4;
+    font-size:14px;
+">
+    Select a user to start chatting 💬
+</div>
 
     <!-- CHAT UI -->
     <div id="chatUI" style="display:none;flex-direction:column;height:100%;">
@@ -404,9 +429,6 @@ font-weight:700;
     </div>
 
 </div>
-    
-<input type="text" id="msgInput" placeholder="Type a message...">
-<button onclick="sendMsg()">Send</button>
 </div>
 </div>
 
@@ -485,7 +507,23 @@ async function loadUsers(){
     });
 }
 
-loadUsers();
+import { setDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+onAuthStateChanged(auth, async (user) => {
+    if(user){
+
+        // 🔥 SAVE USER TO FIRESTORE
+        await setDoc(doc(db, "users", user.uid), {
+            name: user.displayName
+        });
+
+        // THEN LOAD USERS
+        await loadUsers();
+
+        // ✅ SHOW NAME IN HEADER
+        document.querySelector("header div:last-child").innerText = user.displayName;
+    }
+});
     
 /* SIDEBAR */
 function toggleSidebar(forceClose=false){
@@ -598,7 +636,15 @@ function openGroupPanel(){
 
 /* CREATE GROUP (demo only) */
 function createGroup(){
-    alert("Group created (demo)");
+    const panel = document.getElementById("groupPanel");
+    panel.classList.remove("open");
+
+    const box = document.getElementById("userResults");
+    box.innerHTML = `<div class="not-found">Group created ✅</div>`;
+
+    setTimeout(()=>{
+        box.innerHTML = "";
+    },2000);
 }
 
 function loadMessages(){
