@@ -154,14 +154,16 @@ background:#11141a;
 overflow-y:auto;
 }
 
+/* USER ITEM */
 .chat-user{
-padding:14px;
-border-bottom:1px solid var(--border);
-cursor:pointer;
+    padding:14px;
+    border-bottom:1px solid var(--border);
+    cursor:pointer;
+    transition:.2s;
 }
 
 .chat-user:hover{
-background:#1a1f29;
+    background:#1a1f29;
 }
 
 /* RIGHT: CHAT BOX */
@@ -224,9 +226,46 @@ cursor:pointer;
 /* FOOTER */
 footer{
 text-align:center;
-padding:15px;
-font-size:13px;
+padding:20px;
 opacity:.6;
+font-size:14px;
+}
+footer a:hover{
+text-decoration:underline;
+}
+/* BADGES */
+.admin-badge{
+margin-left:2px;
+position:relative;    
+font-size:11px;
+top:-2px;
+padding:3px 8px;
+border-radius:20px;
+background:linear-gradient(90deg,#ffd700,#ffae00);
+color:#000;
+font-weight:700;
+}
+.mod-badge{
+margin-left:2px;
+position:relative;    
+font-size:11px;
+top:-2px;
+padding:3px 8px;
+border-radius:20px;
+background:linear-gradient(90deg,#a855f7,#7e22ce);
+color:white;
+font-weight:600;
+}
+.vip-badge{
+margin-left:2px;
+position:relative;    
+font-size:11px;
+top:-2px;
+padding:3px 8px;
+border-radius:20px;
+background:linear-gradient(90deg,#ff00cc,#ff66ff);
+color:white;
+font-weight:700;
 }
 
 /* TOP SEARCH BAR */
@@ -257,18 +296,6 @@ opacity:.6;
     font-size:20px;
     font-weight:bold;
     cursor:pointer;
-}
-
-/* USER ITEM */
-.chat-user{
-    padding:14px;
-    border-bottom:1px solid var(--border);
-    cursor:pointer;
-    transition:.2s;
-}
-
-.chat-user:hover{
-    background:#1a1f29;
 }
 
 /* NOT FOUND */
@@ -347,16 +374,32 @@ opacity:.6;
 
     <!-- USER RESULTS -->
     <div id="userResults"></div>
-<div class="chat-user">John Doe</div>
-<div class="chat-user">Jane Smith</div>
-<div class="chat-user">Alex</div>
+
 </div>
 
 <!-- CHAT -->
-<div class="chat-box">
-<div class="messages" id="messages"></div>
+<div class="chat-box" id="chatBox">
+    <div id="emptyState" style="margin:auto;text-align:center;opacity:.5;">
+        Select a user to start chatting
+    </div>
 
-<div class="chat-input">
+    <div id="chatUI" style="display:none;flex-direction:column;height:100%;">
+        
+        <!-- HEADER (receiver name) -->
+        <div id="chatHeader" style="padding:12px;border-bottom:1px solid var(--border);font-weight:600;"></div>
+
+        <!-- MESSAGES -->
+        <div class="messages" id="messages"></div>
+
+        <!-- INPUT -->
+        <div class="chat-input">
+            <input type="text" id="msgInput" placeholder="Type a message...">
+            <button onclick="sendMsg()">Send</button>
+        </div>
+
+    </div>
+</div>
+    
 <input type="text" id="msgInput" placeholder="Type a message...">
 <button onclick="sendMsg()">Send</button>
 </div>
@@ -374,10 +417,71 @@ opacity:.6;
 
 <!-- FOOTER -->
 <footer>
-© 2026 ChatPH
+<div>© 2026 ChatPH • All Rights Reserved</div>
+<div style="margin-top:6px;font-size:13px;">
+<a href="#" style="color:#4da3ff;text-decoration:none;">About</a>
+&nbsp;|&nbsp;
+<a href="#" style="color:#4da3ff;text-decoration:none;">Privacy</a>
+&nbsp;|&nbsp;
+<a href="#" style="color:#4da3ff;text-decoration:none;">Terms</a>
+&nbsp;|&nbsp;
+<a href="#" style="color:#4da3ff;text-decoration:none;">Contact</a>
+</div>
+<div style="margin-top:6px;font-size:12px;opacity:.7;">
+Made with ❤️ in the Philippines
+</div>
 </footer>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+    getFirestore,
+    collection,
+    getDocs,
+    query,
+    addDoc,
+    onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+import {
+    getAuth,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
+  authDomain: "chatph-cc187.firebaseapp.com",
+  projectId: "chatph-cc187",
+  storageBucket: "chatph-cc187.firebasestorage.app",
+  messagingSenderId: "324012163441",
+  appId: "1:324012163441:web:7a54be2231ad2cae71f6d0"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+let allUsers = [];
+
+async function loadUsers(){
+    const q = query(collection(db, "users"));
+    const snap = await getDocs(q);
+
+    allUsers = [];
+
+    snap.forEach(doc=>{
+        const data = doc.data();
+        if(data.name){
+            allUsers.push({
+    name: data.name,
+    uid: doc.id
+});
+        }
+    });
+}
+
+loadUsers();
+    
 /* SIDEBAR */
 function toggleSidebar(forceClose=false){
 const sidebar = document.getElementById("sidebar");
@@ -392,18 +496,39 @@ overlay.classList.toggle("active");
 }
 }
 
-/* CHAT DEMO FUNCTION */
-function sendMsg(){
-const input = document.getElementById("msgInput");
-const text = input.value.trim();
-if(!text) return;
+let currentChatUser = "";
 
-const msgBox = document.getElementById("messages");
+function openChat(uid){
+    currentChatUser = uid;
 
-msgBox.innerHTML += `<div class="msg me">${text}</div>`;
+    // find user name
+    const user = allUsers.find(u => u.uid === uid);
 
-input.value="";
-msgBox.scrollTop = msgBox.scrollHeight;
+    // hide empty, show chat
+    document.getElementById("emptyState").style.display = "none";
+    document.getElementById("chatUI").style.display = "flex";
+
+    // set header name
+    document.getElementById("chatHeader").innerText = user ? user.name : "User";
+
+    loadMessages();
+}
+
+async function sendMsg(){
+    const input = document.getElementById("msgInput");
+    const text = input.value.trim();
+    if(!text || !currentChatUser) return;
+
+    const user = auth.currentUser;
+
+    await addDoc(collection(db, "messages"), {
+        text: text,
+        from: user.uid,
+        to: currentChatUser,
+        time: Date.now()
+    });
+
+    input.value="";
 }
 
 /* INDICATOR */
@@ -440,7 +565,12 @@ document.getElementById("userSearch").addEventListener("input", function(){
     const results = document.getElementById("userResults");
     results.innerHTML = "";
 
-    const filtered = users.filter(u => u.toLowerCase().includes(value));
+    if(!value){
+        results.innerHTML = `<div class="not-found">Search for users...</div>`;
+        return;
+    }
+
+    const filtered = allUsers.filter(u => u.name.toLowerCase().includes(value));
 
     if(filtered.length === 0){
         results.innerHTML = `<div class="not-found">User not found</div>`;
@@ -448,19 +578,13 @@ document.getElementById("userSearch").addEventListener("input", function(){
     }
 
     filtered.forEach(user=>{
-        results.innerHTML += `
-            <div class="chat-user" onclick="openChat('${user}')">
-                ${user}
-            </div>
-        `;
-    });
+    results.innerHTML += `
+        <div class="chat-user" onclick="openChat('${user.uid}')">
+            ${user.name}
+        </div>
+    `;
 });
-
-/* OPEN CHAT */
-function openChat(name){
-    const box = document.getElementById("messages");
-    box.innerHTML = `<div class="msg other">Chat with ${name}</div>`;
-}
+});
 
 /* GROUP PANEL */
 function openGroupPanel(){
@@ -471,7 +595,32 @@ function openGroupPanel(){
 function createGroup(){
     alert("Group created (demo)");
 }
-  
+
+function loadMessages(){
+    const box = document.getElementById("messages");
+
+    onSnapshot(collection(db, "messages"), (snap)=>{
+        box.innerHTML = "";
+
+        snap.forEach(doc=>{
+            const m = doc.data();
+
+            if(
+                (m.from === auth.currentUser.uid && m.to === currentChatUser) ||
+                (m.from === currentChatUser && m.to === auth.currentUser.uid)
+            ){
+                box.innerHTML += `
+                    <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}">
+                        ${m.text}
+                    </div>
+                `;
+            }
+        });
+
+        box.scrollTop = box.scrollHeight;
+    });
+}
+    
 </script>
 
 </body>
