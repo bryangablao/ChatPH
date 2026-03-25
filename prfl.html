@@ -9,10 +9,10 @@
 
     <style>
         :root {
-            --bg: #0f141a;
-            --card: #1a212b;
+            --bg: #0b0e11;
+            --card: #151921;
             --border: rgba(255, 255, 255, .08);
-            --text: #e6edf3;
+            --text: #ffffff;
             --dim: #94a3b8;
             --accent: #3b82f6;
             --transition: all 0.2s ease-in-out;
@@ -98,71 +98,10 @@
         .btn-secondary { background: transparent; color: var(--dim); border: none; cursor: pointer; padding: 10px; }
 
         /* --- Feed --- */
-        .feed { max-width: 600px; margin: auto; padding: 0 20px 60px; display: block; }
-        .post { 
-            background: var(--card); 
-            border: 1px solid var(--border); 
-            padding: 20px; 
-            border-radius: 16px; 
-            margin-top: 15px; 
-            margin-bottom: 15px;
-            word-wrap: break-word; 
-            overflow-wrap: break-word; 
-            word-break: break-word; 
-            width: 100%;
-            max-width: 100%;
-            display: block;
-        }
+        .feed { max-width: 550px; margin: auto; padding: 0 20px 60px; }
+        .post { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 16px; margin-top: 15px; }
         
-        .post div:last-child { white-space: pre-wrap; }
-        
-        .post-text { 
-            margin-top: 10px; 
-            line-height: 1.6; 
-            word-wrap: break-word; 
-            overflow-wrap: break-word; 
-            word-break: break-word; 
-            max-width: 100%; 
-            white-space: pre-wrap; 
-        }
-        
-        .post-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        #postList {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .post-info {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.2;
-        }
-
-        .username {
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .time {
-            font-size: 12px;
-            color: var(--dim);
-        }
-        
-        /* --- Sidebar --- */
+          /* --- Sidebar --- */
         .sidebar{
             position:fixed;
             top:0;
@@ -290,30 +229,6 @@
     #imageViewer.active {
         opacity: 1;
     }
-
-    /* Chrome, Edge, Safari */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--bg);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--card);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--accent);
-}
-
-/* Firefox */
-* {
-    scrollbar-width: thin;
-    scrollbar-color: var(--card) var(--bg);
-}
         
     </style>
 </head>
@@ -599,19 +514,19 @@ const q = query(
                 const p = doc.data();
 list.innerHTML += `
 <div class="post">
-
-    <div class="post-header">
-        <img src="${p.photo}" class="avatar">
-        <div class="post-info">
-            <div class="username">${p.name || "User"}</div>
-            <div class="time">${p.time?.toDate().toLocaleString() || "Recent"}</div>
+    <div style="display:flex;align-items:center;gap:10px;">
+        <img src="${p.photo}" style="width:40px;height:40px;border-radius:50%;">
+        <div>
+            <div style="font-weight:600;">${p.name || "User"}</div>
+            <div style="font-size:12px;opacity:.6;">
+                ${p.time?.toDate().toLocaleString() || "Recent"}
+            </div>
         </div>
     </div>
 
-    <div class="post-text">
+    <div style="margin-top:10px;line-height:1.6;">
         ${p.text}
     </div>
-
 </div>
 `;
             });
@@ -722,3 +637,6 @@ Made with ❤️ in the Philippines
     
 </body>
 </html>
+
+
+
