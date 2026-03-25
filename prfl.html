@@ -99,9 +99,9 @@
 
         /* --- Feed --- */
         .feed { max-width: 550px; margin: auto; padding: 0 20px 60px; }
-        .post { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 16px; margin-top: 15px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word;}
+        .post { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 16px; margin-top: 15px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; width: 100%; }
         .post div:last-child { white-space: pre-wrap; }
-        .post-text { margin-top: 10px; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; max-width: 100%; max-height: 200px; overflow-y: auto; }
+        .post-text { margin-top: 10px; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; max-width: 100%; white-space: pre-wrap; }
           /* --- Sidebar --- */
         .sidebar{
             position:fixed;
@@ -232,10 +232,10 @@
     }
 
     #postList {
-    display: flex;
-    flex-direction: column;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
     }
-
     
     </style>
 </head>
