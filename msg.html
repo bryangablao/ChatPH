@@ -24,15 +24,41 @@ color:var(--text);
 }
 
 /* HEADER */
-header{
+header {
 display:flex;
 justify-content:space-between;
 align-items:center;
 padding:15px 24px;
 border-bottom:1px solid var(--border);
+background:var(--bg);
+position:sticky;
+top:0;
+z-index:100;
 }
 
-/* SIDEBAR (same as yours) */
+.header-left{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
+.menu-icon{
+font-size:26px;
+cursor:pointer;
+}
+
+.logo{
+width:32px;
+height:32px;
+border-radius:6px;
+}
+
+.brand{
+font-weight:700;
+font-size:1.2rem;
+}
+
+/* SIDEBAR */
 .sidebar{
 position:fixed;
 top:0;
@@ -40,34 +66,143 @@ left:-260px;
 width:240px;
 height:100%;
 background:rgba(21,25,33,0.75);
+backdrop-filter: blur(12px);
+border-right:1px solid rgba(255,255,255,0.08);
 padding-top:70px;
 transition:.3s;
 z-index:999;
 }
-.sidebar.open{ left:0; }
 
-/* MAIN */
-.main{
-display:flex;
-height:calc(100vh - 60px);
+.sidebar.open{
+left:0;
 }
 
-/* LEFT PANEL */
-.left{
-width:300px;
+.sidebar a{
+display:block;
+padding:14px 20px;
+text-decoration:none;
+color:white;
+position:relative;
+overflow:hidden;
+z-index:1;
+}
+
+.sidebar a::before{
+content:"";
+position:absolute;
+left:-100%;
+top:0;
+width:100%;
+height:100%;
+background:rgba(59,130,246,0.1);
+transition:left 0.25s ease;
+z-index:0;
+}
+
+.sidebar a:hover::before{
+left:0;
+}
+
+.sidebar a:hover{
+color:var(--accent);
+}
+
+.sidebar a.active{
+background:rgba(59,130,246,0.15);
+color:var(--accent);
+border-left:3px solid var(--accent);
+}
+
+/* INDICATOR */
+.indicator{
+position:absolute;
+left:0;
+width:4px;
+height:44px;
+background:var(--accent);
+border-radius:4px;
+transition:.3s;
+}
+
+/* OVERLAY */
+.overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.5);
+opacity:0;
+pointer-events:none;
+transition:.3s;
+z-index:998;
+}
+
+.overlay.active{
+opacity:1;
+pointer-events:auto;
+}
+
+/* MAIN CHAT LAYOUT */
+.main{
+display:flex;
+height:calc(100vh - 70px);
+}
+
+/* LEFT: USERS */
+.chat-list{
+width:260px;
 border-right:1px solid var(--border);
+background:#11141a;
+overflow-y:auto;
+}
+
+.chat-user{
+padding:14px;
+border-bottom:1px solid var(--border);
+cursor:pointer;
+}
+
+.chat-user:hover{
+background:#1a1f29;
+}
+
+/* RIGHT: CHAT BOX */
+.chat-box{
+flex:1;
 display:flex;
 flex-direction:column;
 }
 
-/* SEARCH */
-.search{
-padding:10px;
-border-bottom:1px solid var(--border);
+.messages{
+flex:1;
+padding:16px;
+overflow-y:auto;
 }
 
-.search input{
-width:100%;
+.msg{
+margin-bottom:10px;
+padding:10px 14px;
+border-radius:14px;
+max-width:60%;
+}
+
+.msg.me{
+background:var(--accent);
+color:#000;
+margin-left:auto;
+}
+
+.msg.other{
+background:#1f2937;
+}
+
+/* INPUT */
+.chat-input{
+display:flex;
+padding:12px;
+border-top:1px solid var(--border);
+}
+
+.chat-input input{
+flex:1;
 padding:10px;
 border-radius:20px;
 border:none;
@@ -76,273 +211,267 @@ color:white;
 outline:none;
 }
 
-/* USER LIST */
-.user-list{
-flex:1;
-overflow-y:auto;
-}
-
-.user{
-padding:12px;
-cursor:pointer;
-border-bottom:1px solid var(--border);
-}
-
-.user:hover{
-background:#1a1f29;
-}
-
-/* RIGHT CHAT */
-.chat{
-flex:1;
-display:flex;
-flex-direction:column;
-}
-
-/* EMPTY */
-.empty{
-display:flex;
-justify-content:center;
-align-items:center;
-height:100%;
-opacity:.5;
-}
-
-/* MESSAGES */
-.messages{
-flex:1;
-padding:15px;
-overflow-y:auto;
-}
-
-.msg{
-padding:10px 14px;
-margin:6px 0;
-border-radius:14px;
-max-width:60%;
-}
-
-.me{
-background:var(--accent);
-color:#000;
-margin-left:auto;
-}
-
-.other{
-background:#1f2937;
-}
-
-/* INPUT */
-.input{
-display:flex;
-padding:10px;
-border-top:1px solid var(--border);
-}
-
-.input input{
-flex:1;
-padding:10px;
-border-radius:20px;
-border:none;
-background:#1f2937;
-color:white;
-}
-
-.input button{
+.chat-input button{
 margin-left:10px;
 padding:10px 16px;
 border:none;
 border-radius:20px;
 background:var(--accent);
+font-weight:600;
 cursor:pointer;
 }
 
-/* GROUP BUTTON */
-.group-btn{
-padding:10px;
+/* FOOTER */
+footer{
 text-align:center;
-border-top:1px solid var(--border);
-cursor:pointer;
-background:#11141a;
+padding:15px;
+font-size:13px;
+opacity:.6;
 }
 
-.group-btn:hover{
-background:#1a1f29;
+/* TOP SEARCH BAR */
+.chat-top{
+    display:flex;
+    gap:8px;
+    padding:10px;
+    border-bottom:1px solid var(--border);
 }
 
-/* GROUP PANEL */
+.chat-top input{
+    flex:1;
+    padding:8px 12px;
+    border-radius:20px;
+    border:none;
+    background:#1f2937;
+    color:white;
+    outline:none;
+}
+
+/* + BUTTON */
+.create-btn{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    border:none;
+    background:var(--accent);
+    font-size:20px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+/* USER ITEM */
+.chat-user{
+    padding:14px;
+    border-bottom:1px solid var(--border);
+    cursor:pointer;
+    transition:.2s;
+}
+
+.chat-user:hover{
+    background:#1a1f29;
+}
+
+/* NOT FOUND */
+.not-found{
+    padding:12px;
+    font-size:13px;
+    opacity:.6;
+}
+
 .group-panel{
-position:fixed;
-right:-300px;
-top:0;
-width:300px;
-height:100%;
-background:#11141a;
-transition:.3s;
-z-index:1000;
-padding:10px;
+    position:fixed;
+    right:-300px;
+    top:70px;
+    width:280px;
+    height:100%;
+    background:#11141a;
+    border-left:1px solid var(--border);
+    padding:12px;
+    transition:.3s;
+    z-index:999;
 }
 
 .group-panel.open{
-right:0;
+    right:0;
 }
 
-.not-found{
-padding:10px;
-color:red;
-font-size:13px;
+.group-panel input{
+    width:100%;
+    padding:8px;
+    margin:10px 0;
+    border-radius:10px;
+    border:none;
+    background:#1f2937;
+    color:white;
 }
+  
 </style>
 </head>
 
 <body>
 
+<!-- HEADER -->
 <header>
-<span>💬 Messages</span>
+<div class="header-left">
+<span class="menu-icon" onclick="toggleSidebar()">☰</span>
+<img src="image/chatph-logo.png" class="logo">
+<span class="brand">ChatPH</span>
+</div>
+
+<div>Messages</div>
 </header>
 
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+<a href="home.html">Home</a>
+<a href="#" class="active">Messages</a>
+<a href="frnd.html">Friends</a>
+<a href="srch.html">Search User</a>
+<a href="prfl.html">Profile</a>
+<div class="indicator" id="indicator"></div>
+</div>
+
+<div class="overlay" id="overlay" onclick="toggleSidebar(true)"></div>
+
+<!-- MAIN -->
 <div class="main">
 
-<!-- LEFT -->
-<div class="left">
+<!-- USERS -->
+<div class="chat-list">
 
-<div class="search">
-<input type="text" id="searchUser" placeholder="Search user...">
+    <!-- SEARCH + CREATE -->
+    <div class="chat-top">
+        <input type="text" id="userSearch" placeholder="Search user...">
+        <button class="create-btn" onclick="openGroupPanel()">+</button>
+    </div>
+
+    <!-- USER RESULTS -->
+    <div id="userResults"></div>
+<div class="chat-user">John Doe</div>
+<div class="chat-user">Jane Smith</div>
+<div class="chat-user">Alex</div>
 </div>
 
-<div class="user-list" id="userList"></div>
-
-<div class="group-btn" onclick="toggleGroup()">➕ Create Group</div>
-
-</div>
-
-<!-- RIGHT -->
-<div class="chat">
-
-<div id="empty" class="empty">Select a conversation</div>
-
-<div id="chatUI" style="display:none;flex:1;flex-direction:column;">
+<!-- CHAT -->
+<div class="chat-box">
 <div class="messages" id="messages"></div>
 
-<div class="input">
-<input id="msgInput" placeholder="Type message...">
+<div class="chat-input">
+<input type="text" id="msgInput" placeholder="Type a message...">
 <button onclick="sendMsg()">Send</button>
-</div>
-</div>
-
 </div>
 </div>
 
 <!-- GROUP PANEL -->
 <div class="group-panel" id="groupPanel">
-<h3>Create Group</h3>
-<input id="groupSearch" placeholder="Search users..." style="width:100%;padding:8px;">
-<div id="groupResults"></div>
+    <h3>Create Group</h3>
+    <input type="text" id="groupSearch" placeholder="Search users...">
+    <div id="groupUsers"></div>
+    <button onclick="createGroup()">Create Group</button>
+</div>
+  
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-getFirestore, collection, addDoc, query, where, getDocs,
-onSnapshot, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+<!-- FOOTER -->
+<footer>
+© 2026 ChatPH
+</footer>
 
-import {
-getAuth
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+<script>
+/* SIDEBAR */
+function toggleSidebar(forceClose=false){
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
 
-/* FIREBASE */
-const firebaseConfig = {
-apiKey: "AIzaSy...",
-authDomain: "chatph-cc187.firebaseapp.com",
-projectId: "chatph-cc187"
+if(forceClose){
+sidebar.classList.remove("open");
+overlay.classList.remove("active");
+}else{
+sidebar.classList.toggle("open");
+overlay.classList.toggle("active");
+}
+}
+
+/* CHAT DEMO FUNCTION */
+function sendMsg(){
+const input = document.getElementById("msgInput");
+const text = input.value.trim();
+if(!text) return;
+
+const msgBox = document.getElementById("messages");
+
+msgBox.innerHTML += `<div class="msg me">${text}</div>`;
+
+input.value="";
+msgBox.scrollTop = msgBox.scrollHeight;
+}
+
+/* INDICATOR */
+const links = document.querySelectorAll(".sidebar a");
+const indicator = document.getElementById("indicator");
+
+links.forEach(link=>{
+link.onclick=()=>{
+links.forEach(l=>l.classList.remove("active"));
+link.classList.add("active");
+
+indicator.style.top = link.offsetTop+"px";
+indicator.style.height = link.offsetHeight+"px";
 };
+});
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+window.addEventListener("load",()=>{
+const active = document.querySelector(".sidebar a.active");
+indicator.style.top = active.offsetTop+"px";
+indicator.style.height = active.offsetHeight+"px";
+});
 
-let currentChatId = null;
+/* FAKE USER DATABASE (replace later with Firebase) */
+const users = [
+    "Bryan",
+    "Alex",
+    "John",
+    "Jane"
+];
 
 /* SEARCH USER */
-document.getElementById("searchUser").addEventListener("input", async (e)=>{
-const val = e.target.value;
+document.getElementById("userSearch").addEventListener("input", function(){
+    const value = this.value.toLowerCase();
+    const results = document.getElementById("userResults");
+    results.innerHTML = "";
 
-if(!val){
-document.getElementById("userList").innerHTML="";
-return;
-}
+    const filtered = users.filter(u => u.toLowerCase().includes(value));
 
-const q = query(collection(db,"users"), where("name",">=",val));
-const snap = await getDocs(q);
+    if(filtered.length === 0){
+        results.innerHTML = `<div class="not-found">User not found</div>`;
+        return;
+    }
 
-const list = document.getElementById("userList");
-list.innerHTML="";
-
-if(snap.empty){
-list.innerHTML = `<div class="not-found">User not found</div>`;
-return;
-}
-
-snap.forEach(doc=>{
-const u = doc.data();
-
-const div = document.createElement("div");
-div.className="user";
-div.innerText = u.name;
-
-div.onclick = ()=> openChat(doc.id, u.name);
-
-list.appendChild(div);
-});
+    filtered.forEach(user=>{
+        results.innerHTML += `
+            <div class="chat-user" onclick="openChat('${user}')">
+                ${user}
+            </div>
+        `;
+    });
 });
 
 /* OPEN CHAT */
-function openChat(uid,name){
-currentChatId = uid;
-
-document.getElementById("empty").style.display="none";
-document.getElementById("chatUI").style.display="flex";
-
-loadMessages(uid);
+function openChat(name){
+    const box = document.getElementById("messages");
+    box.innerHTML = `<div class="msg other">Chat with ${name}</div>`;
 }
-
-/* LOAD MESSAGES */
-function loadMessages(uid){
-const ref = collection(db,"chats",uid,"messages");
-
-onSnapshot(ref,(snap)=>{
-const box = document.getElementById("messages");
-box.innerHTML="";
-
-snap.forEach(d=>{
-const m = d.data();
-box.innerHTML += `
-<div class="msg ${m.sender===auth.currentUser.uid ? 'me':'other'}">
-${m.text}
-</div>`;
-});
-});
-}
-
-/* SEND */
-window.sendMsg = async ()=>{
-const text = document.getElementById("msgInput").value;
-if(!text) return;
-
-await addDoc(collection(db,"chats",currentChatId,"messages"),{
-text:text,
-sender:auth.currentUser.uid,
-time:serverTimestamp()
-});
-
-document.getElementById("msgInput").value="";
-};
 
 /* GROUP PANEL */
-window.toggleGroup = ()=>{
-document.getElementById("groupPanel").classList.toggle("open");
-};
+function openGroupPanel(){
+    document.getElementById("groupPanel").classList.toggle("open");
+}
+
+/* CREATE GROUP (demo only) */
+function createGroup(){
+    alert("Group created (demo)");
+}
+  
 </script>
 
 </body>
