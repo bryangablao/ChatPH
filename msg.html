@@ -610,65 +610,55 @@ async function loadUsers(){
     });
 }
 
-async function loadChatList(){
+function listenChatList(){
     const box = document.getElementById("userResults");
-    const snap = await getDocs(collection(db, "messages"));
 
-    let chatMap = {};
-
-    snap.forEach(doc=>{
-        const m = doc.data();
+    onSnapshot(collection(db, "messages"), async (snap)=>{
+        let chatMap = {};
         const myId = auth.currentUser.uid;
 
-        // only chats involving me
-        if(m.from === myId || m.to === myId){
-            const otherUser = m.from === myId ? m.to : m.from;
+        snap.forEach(doc=>{
+            const m = doc.data();
 
-            // store latest message time
-            if(!chatMap[otherUser] || chatMap[otherUser] < m.time){
-                chatMap[otherUser] = m.time;
+            if(m.from === myId || m.to === myId){
+                const otherUser = m.from === myId ? m.to : m.from;
+
+                if(!chatMap[otherUser] || chatMap[otherUser] < m.time){
+                    chatMap[otherUser] = m.time;
+                }
             }
-        }
+        });
+
+        const sorted = Object.entries(chatMap).sort((a,b)=>b[1]-a[1]);
+
+        box.innerHTML = "";
+
+        sorted.forEach(([uid])=>{
+            const user = allUsers.find(u => u.uid === uid);
+
+            box.innerHTML += `
+                <div class="chat-user" onclick="openChat('${uid}')">
+                    ${user ? user.name : "Unknown User"}
+                </div>
+            `;
+        });
+
+        // GROUPS
+        box.innerHTML += `<div class="not-found">Groups</div>`;
+
+        const groupSnap = await getDocs(collection(db, "groups"));
+        groupSnap.forEach(doc=>{
+            const g = doc.data();
+
+            if(g.members.includes(myId)){
+                box.innerHTML += `
+                    <div class="chat-user" onclick="openGroup('${doc.id}', '${g.name}', '${g.theme}')">
+                        👥 ${g.name}
+                    </div>
+                `;
+            }
+        });
     });
-
-    // convert to array and sort (latest first)
-    const sorted = Object.entries(chatMap)
-        .sort((a,b)=>b[1]-a[1]);
-
-    box.innerHTML = "";
-
-    if(sorted.length === 0){
-        box.innerHTML = `<div class="not-found">No conversations yet</div>`;
-        return;
-    }
-
-    sorted.forEach(([uid])=>{
-        const user = allUsers.find(u => u.uid === uid);
-
-        box.innerHTML += `
-            <div class="chat-user" onclick="openChat('${uid}')">
-                ${user ? user.name : "Unknown User"}
-            </div>
-        `;
-    });
-
-// 🔥 LOAD GROUPS
-box.innerHTML += `<div class="not-found">Groups</div>`; 
-
-const groupSnap = await getDocs(collection(db, "groups"));
-
-groupSnap.forEach(doc=>{
-    const g = doc.data();
-
-    if(g.members.includes(auth.currentUser.uid)){
-        box.innerHTML += `
-            <div class="chat-user" onclick="openGroup('${doc.id}', '${g.name}', '${g.theme}')">
-                👥 ${g.name}
-            </div>
-        `;
-    }
-});
-    
 }
 
 import { setDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -680,7 +670,7 @@ onAuthStateChanged(auth, async (user) => {
         }, { merge: true });
 
         await loadUsers();
-        await loadChatList();
+        await listenChatList();
         document.getElementById("userName").innerText = user.displayName;
 
         // ✅ RESTORE LAST CHAT AFTER LOGIN
@@ -888,6 +878,7 @@ if(selectedMembers.length === 0){
 }
 
 function addMember(uid, name){
+    if(uid === auth.currentUser.uid) return; // 🚫 block yourself
     if(selectedMembers.includes(uid)) return;
 
     selectedMembers.push(uid);
@@ -950,10 +941,19 @@ function loadMessages(){
     });
 }
 
-function loadGroupMessages(){
+import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+async function loadGroupMessages(){
     const box = document.getElementById("messages");
 
-    if(unsubscribe) unsubscribe(); // 🔥 stop old listener
+    if(unsubscribe) unsubscribe();
+
+    // ✅ get group theme
+    const groupSnap = await getDoc(doc(db, "groups", currentGroup));
+    const theme = groupSnap.data().theme;
+
+    // ✅ set background (light version)
+    document.getElementById("chatBox").style.background = theme + "22";
 
     const q = query(collection(db, "messages"));
 
@@ -965,18 +965,28 @@ function loadGroupMessages(){
 
             if(m.groupId !== currentGroup) return;
 
+            const user = allUsers.find(u => u.uid === m.from);
+
             box.innerHTML += `
                 <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
-                     style="background:${m.from === auth.currentUser.uid ? groupTheme : ''}">
+                    style="background:${m.from === auth.currentUser.uid ? theme : '#2a2a2a'}">
+
+                    <div style="font-size:11px;opacity:.7;">
+                        ${user ? user.name : "User"}
+                    </div>
+
                     ${m.text}
+
+                    <div style="font-size:10px;opacity:.6;margin-top:4px;">
+                        ${new Date(m.time).toLocaleString()}
+                    </div>
                 </div>
             `;
         });
 
         box.scrollTop = box.scrollHeight;
     });
-}
-    
+}    
 
 import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
