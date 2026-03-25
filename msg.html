@@ -490,6 +490,7 @@ import {
     collection,
     getDocs,
     query,
+    where,
     addDoc,
     onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -679,8 +680,6 @@ function createGroup(){
         box.innerHTML = "";
     },2000);
 }
-
-import { query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 function loadMessages(){
     const box = document.getElementById("messages");
