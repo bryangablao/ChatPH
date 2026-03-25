@@ -371,6 +371,23 @@ font-weight:700;
     margin-bottom:10px;
 }
 
+.group-panel button{
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:12px;
+    background:var(--accent);
+    color:#000;
+    font-weight:600;
+    cursor:pointer;
+    margin-top:10px;
+    transition:.2s;
+}
+
+.group-panel button:hover{
+    opacity:.8;
+}
+
 .member-chip{
     display:inline-block;
     padding:5px 10px;
@@ -827,7 +844,15 @@ async function createGroup(){
     const name = document.getElementById("groupName").value.trim();
     const theme = document.getElementById("groupTheme").value;
 
-    if(!name || selectedMembers.length === 0) return;
+    if(!name){
+    alert("Enter group name");
+    return;
+}
+
+if(selectedMembers.length === 0){
+    alert("Select at least 1 member");
+    return;
+}
 
     const myId = auth.currentUser.uid;
 
@@ -855,12 +880,27 @@ function addMember(uid, name){
     if(selectedMembers.includes(uid)) return;
 
     selectedMembers.push(uid);
+    renderMembers();
+}
 
+function renderMembers(){
     const box = document.getElementById("selectedMembers");
+    box.innerHTML = "";
 
-    box.innerHTML += `
-        <span class="member-chip">${name}</span>
-    `;
+    selectedMembers.forEach(uid=>{
+        const user = allUsers.find(u=>u.uid===uid);
+
+        box.innerHTML += `
+            <span class="member-chip" onclick="removeMember('${uid}')">
+                ${user ? user.name : "User"} ✕
+            </span>
+        `;
+    });
+}
+
+function removeMember(uid){
+    selectedMembers = selectedMembers.filter(id => id !== uid);
+    renderMembers();
 }
 
 function loadMessages(){
@@ -932,6 +972,7 @@ document.getElementById("logoutBtn").onclick = async () => {
 };
 
 // 🔥 MAKE FUNCTIONS GLOBAL (IMPORTANT)
+window.openGroup = openGroup;
 window.openChat = openChat;
 window.toggleSidebar = toggleSidebar;
 window.openGroupPanel = openGroupPanel;
