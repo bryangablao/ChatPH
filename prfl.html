@@ -232,7 +232,7 @@
     }
 
     #postList {
-        display: flex;
+        display: block;
         flex-direction: column;
         gap: 15px;
     }
@@ -519,21 +519,14 @@ const q = query(
             document.getElementById("statPosts").innerText = snap.size;
             snap.forEach(doc => {
                 const p = doc.data();
-list.innerHTML += `
-<div class="post">
-    <div style="display:flex;align-items:center;gap:10px;">
-        <img src="${p.photo}" style="width:40px;height:40px;border-radius:50%;">
-        <div>
-            <div style="font-weight:600;">${p.name || "User"}</div>
-            <div style="font-size:12px;opacity:.6;">
-                ${p.time?.toDate().toLocaleString() || "Recent"}
-            </div>
+    list.innerHTML += `
+<div class="post-header">
+    <img src="${p.photo}" class="avatar">
+    <div class="post-info">
+             <div class="username">${p.name || "User"}</div>
+             <div class="time">${p.time?.toDate().toLocaleString() || "Recent"}</div>
         </div>
-    </div>
-
-    <div class="post-text">
-        ${p.text}
-    </div>
+    <div class="post-text"> ${p.text} </div>
 </div>
 `;
             });
