@@ -532,6 +532,49 @@ async function loadUsers(){
     });
 }
 
+async function loadChatList(){
+    const box = document.getElementById("userResults");
+    const snap = await getDocs(collection(db, "messages"));
+
+    let chatMap = {};
+
+    snap.forEach(doc=>{
+        const m = doc.data();
+        const myId = auth.currentUser.uid;
+
+        // only chats involving me
+        if(m.from === myId || m.to === myId){
+            const otherUser = m.from === myId ? m.to : m.from;
+
+            // store latest message time
+            if(!chatMap[otherUser] || chatMap[otherUser] < m.time){
+                chatMap[otherUser] = m.time;
+            }
+        }
+    });
+
+    // convert to array and sort (latest first)
+    const sorted = Object.entries(chatMap)
+        .sort((a,b)=>b[1]-a[1]);
+
+    box.innerHTML = "";
+
+    if(sorted.length === 0){
+        box.innerHTML = `<div class="not-found">No conversations yet</div>`;
+        return;
+    }
+
+    sorted.forEach(([uid])=>{
+        const user = allUsers.find(u => u.uid === uid);
+
+        box.innerHTML += `
+            <div class="chat-user" onclick="openChat('${uid}')">
+                ${user ? user.name : "Unknown User"}
+            </div>
+        `;
+    });
+}
+
 import { setDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 onAuthStateChanged(auth, async (user) => {
@@ -541,7 +584,7 @@ onAuthStateChanged(auth, async (user) => {
         }, { merge: true });
 
         await loadUsers();
-
+        await loadChatList();
         document.getElementById("userName").innerText = user.displayName;
 
         // ✅ RESTORE LAST CHAT AFTER LOGIN
@@ -599,6 +642,8 @@ async function sendMsg(){
         time: Date.now()
     });
 
+    loadChatList();
+    
     input.value="";
 }
 
