@@ -102,7 +102,36 @@
         .post { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 16px; margin-top: 15px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; width: 100%; }
         .post div:last-child { white-space: pre-wrap; }
         .post-text { margin-top: 10px; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; max-width: 100%; white-space: pre-wrap; }
-          /* --- Sidebar --- */
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .post-info {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .username {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .time {
+            font-size: 12px;
+            color: var(--dim);
+        }
+        
+        /* --- Sidebar --- */
         .sidebar{
             position:fixed;
             top:0;
