@@ -9,10 +9,10 @@
 
     <style>
         :root {
-            --bg: #0b0e11;
-            --card: #151921;
+            --bg: #0f141a;
+            --card: #1a212b;
             --border: rgba(255, 255, 255, .08);
-            --text: #ffffff;
+            --text: #e6edf3;
             --dim: #94a3b8;
             --accent: #3b82f6;
             --transition: all 0.2s ease-in-out;
@@ -98,7 +98,7 @@
         .btn-secondary { background: transparent; color: var(--dim); border: none; cursor: pointer; padding: 10px; }
 
         /* --- Feed --- */
-        .feed { max-width: 550px; margin: auto; padding: 0 20px 60px; }
+        .feed { max-width: 600px; margin: auto; padding: 0 20px 60px; }
         .post { 
             background: var(--card); 
             border: 1px solid var(--border); 
@@ -109,8 +109,8 @@
             overflow-wrap: break-word; 
             word-break: break-word; 
             width: 100%;
-            min-width: 300px;
-            max-width: 300px;
+            width: 100%;
+            max-width: 100%;
             flex-shrink: 0;
             scroll-snap-align: start;
         }
@@ -136,11 +136,8 @@
 
         #postList {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             gap: 15px;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            padding-bottom: 10px;
         }
 
         .avatar {
@@ -294,7 +291,31 @@
     #imageViewer.active {
         opacity: 1;
     }
-    
+
+    /* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--card);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+}
+
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--card) var(--bg);
+}
+        
     </style>
 </head>
 
