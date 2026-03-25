@@ -22,6 +22,9 @@ font-family:'Inter',sans-serif;
 background:var(--bg);
 color:var(--text);
 overflow:hidden;
+display:flex;
+flex-direction:column;
+height:100vh;
 }
 
 /* HEADER */
@@ -44,8 +47,10 @@ gap:12px;
 }
 
 .menu-icon{
-font-size:26px;
-cursor:pointer;
+    font-size:26px;
+    cursor:pointer;
+    position:relative;
+    z-index:2000;
 }
 
 .logo{
@@ -143,8 +148,9 @@ pointer-events:auto;
 
 /* MAIN CHAT LAYOUT */
 .main{
+    flex:1;
     display:flex;
-    height:calc(100vh - 120px);
+    overflow:hidden;
 }
 
 /* LEFT: USERS */
@@ -235,14 +241,17 @@ background:#1f2937;
 
 /* FOOTER */
 footer{
-text-align:center;
-padding:20px;
-opacity:.6;
-font-size:14px;
+    text-align:center;
+    padding:10px;
+    font-size:13px;
+    opacity:.6;
+    background:var(--bg);
 }
+    
 footer a:hover{
 text-decoration:underline;
 }
+    
 /* BADGES */
 .admin-badge{
 margin-left:2px;
@@ -513,15 +522,15 @@ onAuthStateChanged(auth, async (user) => {
     if(user){
 
         // 🔥 SAVE USER TO FIRESTORE
-        await setDoc(doc(db, "users", user.uid), {
-            name: user.displayName
-        });
+await setDoc(doc(db, "users", user.uid), {
+    name: user.displayName || "No Name"
+}, { merge: true });
 
         // THEN LOAD USERS
         await loadUsers();
 
         // ✅ SHOW NAME IN HEADER
-        document.querySelector("header div:last-child").innerText = user.displayName;
+       document.getElementById("userName").innerText = user.displayName;
     }
 });
     
@@ -544,15 +553,15 @@ let currentChatUser = "";
 function openChat(uid){
     currentChatUser = uid;
 
-    // find user name
     const user = allUsers.find(u => u.uid === uid);
 
-    // hide empty, show chat
     document.getElementById("emptyState").style.display = "none";
     document.getElementById("chatUI").style.display = "flex";
 
-    // set header name
-    document.getElementById("chatHeader").innerText = user ? user.name : "User";
+    document.getElementById("chatHeader").innerText =
+        uid === auth.currentUser.uid
+        ? "Saved Messages (You)"
+        : (user ? user.name : "User");
 
     loadMessages();
 }
@@ -573,6 +582,12 @@ async function sendMsg(){
 
     input.value="";
 }
+
+document.getElementById("msgInput").addEventListener("keypress", function(e){
+    if(e.key === "Enter"){
+        sendMsg();
+    }
+});
 
 /* INDICATOR */
 const links = document.querySelectorAll(".sidebar a");
@@ -660,18 +675,26 @@ function loadMessages(){
                 (m.from === auth.currentUser.uid && m.to === currentChatUser) ||
                 (m.from === currentChatUser && m.to === auth.currentUser.uid)
             ){
-                box.innerHTML += `
-                    <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}">
-                        ${m.text}
-                    </div>
-                `;
+box.innerHTML += `
+    <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}">
+        ${m.text}
+        <div style="font-size:10px;opacity:.6;margin-top:4px;">
+            ${new Date(m.time).toLocaleTimeString()}
+        </div>
+    </div>
+`;
             }
         });
 
         box.scrollTop = box.scrollHeight;
     });
 }
-    
+
+// 🔥 MAKE FUNCTIONS GLOBAL (IMPORTANT)
+window.openChat = openChat;
+window.toggleSidebar = toggleSidebar;
+window.openGroupPanel = openGroupPanel;
+window.sendMsg = sendMsg;
 </script>
 
 </body>
