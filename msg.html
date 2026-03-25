@@ -2,151 +2,336 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ChatPH | Building</title>
-<link rel="icon" type="image/png" href="image/chatph-logo.png">
-<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Messages - ChatPH</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-/* Remove all scrolling and fix height */
-html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden; /* Strict no-scroll */
+:root{
+--bg:#0f1115;
+--card:#171a21;
+--border:#23262f;
+--text:#ffffff;
+--accent:#4da3ff;
 }
 
-body {
-    font-family: 'Inter', sans-serif;
-    background: linear-gradient(180deg, #0f1115, #141821);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between; /* Spreads content: top, middle, bottom */
+body{
+margin:0;
+font-family:'Inter',sans-serif;
+background:var(--bg);
+color:var(--text);
 }
 
-.back-btn {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    padding: 6px 14px;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    background: rgba(255, 255, 255, 0.05);
-    color: white;
-    font-size: 12px;
-    cursor: pointer;
-    backdrop-filter: blur(6px);
-    z-index: 10;
+/* HEADER */
+header {
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 24px;
+border-bottom:1px solid var(--border);
+background:var(--bg);
+position:sticky;
+top:0;
+z-index:100;
 }
 
-.container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 90%;
-    max-width: 400px;
+.header-left{
+display:flex;
+align-items:center;
+gap:12px;
 }
 
-/* Scalable Animation */
-lottie-player {
-    width: 50vh; /* Scaled based on screen height to prevent pushing text off */
-    max-width: 240px;
-    height: auto;
-    margin: 0 auto;
+.menu-icon{
+font-size:26px;
+cursor:pointer;
 }
 
-h1 {
-    font-size: clamp(20px, 5vh, 26px); /* Scales based on height */
-    margin: 10px 0 5px 0;
+.logo{
+width:32px;
+height:32px;
+border-radius:6px;
 }
 
-p {
-    opacity: .7;
-    font-size: clamp(13px, 4vh, 15px);
-    margin: 0;
-    line-height: 1.4;
+.brand{
+font-weight:700;
+font-size:1.2rem;
 }
 
-.note {
-    margin-top: 12px;
-    font-size: 13px;
-    color: #4da3ff;
-    font-weight: 600;
-    min-height: 1.2em; /* Prevents layout jump when text changes */
+/* SIDEBAR */
+.sidebar{
+position:fixed;
+top:0;
+left:-260px;
+width:240px;
+height:100%;
+background:rgba(21,25,33,0.75);
+backdrop-filter: blur(12px);
+border-right:1px solid rgba(255,255,255,0.08);
+padding-top:70px;
+transition:.3s;
+z-index:999;
 }
 
-/* Fixed Footer at the very bottom */
-footer {
-    padding-bottom: 20px;
-    width: 100%;
-    text-align: center;
+.sidebar.open{
+left:0;
 }
 
-footer div {
-    font-size: 12px;
-    opacity: 0.6;
+.sidebar a{
+display:block;
+padding:14px 20px;
+text-decoration:none;
+color:white;
+position:relative;
+overflow:hidden;
+z-index:1;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+.sidebar a::before{
+content:"";
+position:absolute;
+left:-100%;
+top:0;
+width:100%;
+height:100%;
+background:rgba(59,130,246,0.1);
+transition:left 0.25s ease;
+z-index:0;
 }
 
-.container { animation: fadeIn 0.8s ease; }
+.sidebar a:hover::before{
+left:0;
+}
+
+.sidebar a:hover{
+color:var(--accent);
+}
+
+.sidebar a.active{
+background:rgba(59,130,246,0.15);
+color:var(--accent);
+border-left:3px solid var(--accent);
+}
+
+/* INDICATOR */
+.indicator{
+position:absolute;
+left:0;
+width:4px;
+height:44px;
+background:var(--accent);
+border-radius:4px;
+transition:.3s;
+}
+
+/* OVERLAY */
+.overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.5);
+opacity:0;
+pointer-events:none;
+transition:.3s;
+z-index:998;
+}
+
+.overlay.active{
+opacity:1;
+pointer-events:auto;
+}
+
+/* MAIN CHAT LAYOUT */
+.main{
+display:flex;
+height:calc(100vh - 70px);
+}
+
+/* LEFT: USERS */
+.chat-list{
+width:260px;
+border-right:1px solid var(--border);
+background:#11141a;
+overflow-y:auto;
+}
+
+.chat-user{
+padding:14px;
+border-bottom:1px solid var(--border);
+cursor:pointer;
+}
+
+.chat-user:hover{
+background:#1a1f29;
+}
+
+/* RIGHT: CHAT BOX */
+.chat-box{
+flex:1;
+display:flex;
+flex-direction:column;
+}
+
+.messages{
+flex:1;
+padding:16px;
+overflow-y:auto;
+}
+
+.msg{
+margin-bottom:10px;
+padding:10px 14px;
+border-radius:14px;
+max-width:60%;
+}
+
+.msg.me{
+background:var(--accent);
+color:#000;
+margin-left:auto;
+}
+
+.msg.other{
+background:#1f2937;
+}
+
+/* INPUT */
+.chat-input{
+display:flex;
+padding:12px;
+border-top:1px solid var(--border);
+}
+
+.chat-input input{
+flex:1;
+padding:10px;
+border-radius:20px;
+border:none;
+background:#1f2937;
+color:white;
+outline:none;
+}
+
+.chat-input button{
+margin-left:10px;
+padding:10px 16px;
+border:none;
+border-radius:20px;
+background:var(--accent);
+font-weight:600;
+cursor:pointer;
+}
+
+/* FOOTER */
+footer{
+text-align:center;
+padding:15px;
+font-size:13px;
+opacity:.6;
+}
 </style>
 </head>
 
 <body>
-<button class="back-btn" onclick="goBack()">← Back</button>
 
-<div class="container">
-    <lottie-player
-        src="https://assets10.lottiefiles.com/packages/lf20_jtbfg2nb.json"
-        background="transparent"
-        speed="1"
-        loop
-        autoplay>
-    </lottie-player>
-
-    <h1>🚧 Building...</h1>
-    <p>We’re crafting something new for you.<br>Stay tuned!</p>
-
-    <div class="note">Coming soon on ChatPH 👀</div>
+<!-- HEADER -->
+<header>
+<div class="header-left">
+<span class="menu-icon" onclick="toggleSidebar()">☰</span>
+<img src="image/chatph-logo.png" class="logo">
+<span class="brand">ChatPH</span>
 </div>
 
+<div>Messages</div>
+</header>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+<a href="home.html">Home</a>
+<a href="#" class="active">Messages</a>
+<a href="frnd.html">Friends</a>
+<a href="srch.html">Search User</a>
+<a href="prfl.html">Profile</a>
+<div class="indicator" id="indicator"></div>
+</div>
+
+<div class="overlay" id="overlay" onclick="toggleSidebar(true)"></div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- USERS -->
+<div class="chat-list">
+<div class="chat-user">John Doe</div>
+<div class="chat-user">Jane Smith</div>
+<div class="chat-user">Alex</div>
+</div>
+
+<!-- CHAT -->
+<div class="chat-box">
+<div class="messages" id="messages"></div>
+
+<div class="chat-input">
+<input type="text" id="msgInput" placeholder="Type a message...">
+<button onclick="sendMsg()">Send</button>
+</div>
+</div>
+
+</div>
+
+<!-- FOOTER -->
 <footer>
-    <div>© 2026 ChatPH • All Rights Reserved</div>
-    <div style="margin-top:4px; font-size:11px; opacity:0.5;">
-        Made with ❤️ in the Philippines
-    </div>
+© 2026 ChatPH
 </footer>
 
 <script>
-const messages = [
-    "Building something awesome...",
-    "Almost ready...",
-    "Stay tuned 🚀",
-    "New features coming soon 👀",
-    "Polishing the code..."
-];
+/* SIDEBAR */
+function toggleSidebar(forceClose=false){
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
 
-setInterval(() => {
-    const noteEl = document.querySelector(".note");
-    noteEl.innerText = messages[Math.floor(Math.random() * messages.length)];
-}, 3000);
-
-function goBack() {
-    if (document.referrer) {
-        history.back();
-    } else {
-        window.location.href = "home.html"; 
-    }
+if(forceClose){
+sidebar.classList.remove("open");
+overlay.classList.remove("active");
+}else{
+sidebar.classList.toggle("open");
+overlay.classList.toggle("active");
 }
+}
+
+/* CHAT DEMO FUNCTION */
+function sendMsg(){
+const input = document.getElementById("msgInput");
+const text = input.value.trim();
+if(!text) return;
+
+const msgBox = document.getElementById("messages");
+
+msgBox.innerHTML += `<div class="msg me">${text}</div>`;
+
+input.value="";
+msgBox.scrollTop = msgBox.scrollHeight;
+}
+
+/* INDICATOR */
+const links = document.querySelectorAll(".sidebar a");
+const indicator = document.getElementById("indicator");
+
+links.forEach(link=>{
+link.onclick=()=>{
+links.forEach(l=>l.classList.remove("active"));
+link.classList.add("active");
+
+indicator.style.top = link.offsetTop+"px";
+indicator.style.height = link.offsetHeight+"px";
+};
+});
+
+window.addEventListener("load",()=>{
+const active = document.querySelector(".sidebar a.active");
+indicator.style.top = active.offsetTop+"px";
+indicator.style.height = active.offsetHeight+"px";
+});
 </script>
+
 </body>
 </html>
