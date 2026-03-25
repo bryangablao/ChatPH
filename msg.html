@@ -389,14 +389,21 @@ font-weight:700;
 }
 
 .member-chip{
-    display:inline-block;
-    padding:5px 10px;
-    margin:3px;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 10px;
+    margin:4px;
     border-radius:20px;
     background:#1f2937;
     font-size:12px;
+    cursor:pointer;
+    transition:.2s;
 }
 
+.member-chip:hover{
+    background:#2a3342;
+}
 .menu-icon{
     position:relative;
     z-index:1001;
@@ -416,6 +423,10 @@ font-weight:700;
     
 #logoutBtn:hover {
     color: #ff4b4b;
+}
+
+#groupUsers .chat-user{
+    font-size:13px;
 }
     
 </style>
@@ -881,6 +892,9 @@ function addMember(uid, name){
 
     selectedMembers.push(uid);
     renderMembers();
+
+    document.getElementById("groupSearch").value = "";
+    document.getElementById("groupUsers").innerHTML = "";
 }
 
 function renderMembers(){
@@ -972,6 +986,9 @@ document.getElementById("logoutBtn").onclick = async () => {
 };
 
 // 🔥 MAKE FUNCTIONS GLOBAL (IMPORTANT)
+window.createGroup = createGroup;
+window.addMember = addMember;
+window.removeMember = removeMember;
 window.openGroup = openGroup;
 window.openChat = openChat;
 window.toggleSidebar = toggleSidebar;
