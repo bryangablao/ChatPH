@@ -615,7 +615,8 @@ function listenChatList(){
 
     onSnapshot(collection(db, "messages"), async (snap)=>{
         let chatMap = {};
-        const myId = auth.currentUser.uid;
+        const myId = auth.currentUser?.uid;
+        if(!myId) return;
 
         snap.forEach(doc=>{
             const m = doc.data();
@@ -646,7 +647,7 @@ function listenChatList(){
         // GROUPS
         box.innerHTML += `<div class="not-found">Groups</div>`;
 
-        const groupSnap = await getDocs(collection(db, "groups"));
+        onSnapshot(collection(db, "groups"), (groupSnap)=>{
         groupSnap.forEach(doc=>{
             const g = doc.data();
 
@@ -661,7 +662,7 @@ function listenChatList(){
     });
 }
 
-import { setDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 onAuthStateChanged(auth, async (user) => {
     if(user){
@@ -873,8 +874,6 @@ if(selectedMembers.length === 0){
     document.getElementById("groupName").value = "";
     document.getElementById("selectedMembers").innerHTML = "";
     selectedMembers = [];
-
-    loadChatList(); // refresh sidebar
 }
 
 function addMember(uid, name){
@@ -940,8 +939,6 @@ function loadMessages(){
         box.scrollTop = box.scrollHeight;
     });
 }
-
-import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 async function loadGroupMessages(){
     const box = document.getElementById("messages");
