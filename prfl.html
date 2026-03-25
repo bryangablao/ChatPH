@@ -99,13 +99,48 @@
 
         /* --- Feed --- */
         .feed { max-width: 550px; margin: auto; padding: 0 20px 60px; }
-        .post { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 16px; margin-top: 15px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; width: 100%; }
+        .post { 
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            padding: 20px; 
+            border-radius: 16px; 
+            margin-top: 15px; 
+            word-wrap: break-word; 
+            overflow-wrap: break-word; 
+            word-break: break-word; 
+            width: 100%;
+            min-width: 300px;
+            max-width: 300px;
+            flex-shrink: 0;
+            scroll-snap-align: start;
+        }
+        
         .post div:last-child { white-space: pre-wrap; }
-        .post-text { margin-top: 10px; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; max-width: 100%; white-space: pre-wrap; }
+        
+        .post-text { 
+            margin-top: 10px; 
+            line-height: 1.6; 
+            word-wrap: break-word; 
+            overflow-wrap: break-word; 
+            word-break: break-word; 
+            max-width: 100%; 
+            white-space: pre-wrap; 
+        }
+        
         .post-header {
             display: flex;
             align-items: center;
             gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        #postList {
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            padding-bottom: 10px;
         }
 
         .avatar {
@@ -258,12 +293,6 @@
         
     #imageViewer.active {
         opacity: 1;
-    }
-
-    #postList {
-        display: block;
-        flex-direction: column;
-        gap: 15px;
     }
     
     </style>
@@ -548,14 +577,21 @@ const q = query(
             document.getElementById("statPosts").innerText = snap.size;
             snap.forEach(doc => {
                 const p = doc.data();
-    list.innerHTML += `
-<div class="post-header">
-    <img src="${p.photo}" class="avatar">
-    <div class="post-info">
-             <div class="username">${p.name || "User"}</div>
-             <div class="time">${p.time?.toDate().toLocaleString() || "Recent"}</div>
+list.innerHTML += `
+<div class="post">
+
+    <div class="post-header">
+        <img src="${p.photo}" class="avatar">
+        <div class="post-info">
+            <div class="username">${p.name || "User"}</div>
+            <div class="time">${p.time?.toDate().toLocaleString() || "Recent"}</div>
         </div>
-    <div class="post-text"> ${p.text} </div>
+    </div>
+
+    <div class="post-text">
+        ${p.text}
+    </div>
+
 </div>
 `;
             });
