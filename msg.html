@@ -391,6 +391,20 @@ font-weight:700;
 .dropdown.blocked{
     color:#ff4b4b;
 }
+
+.important-user{
+    background: rgba(255,215,0,0.15);
+    border-left: 3px solid gold;
+}
+
+.mute-user{
+    opacity: 0.5;
+}
+
+.blocked-user{
+    background: rgba(255,0,0,0.15);
+    border-left: 3px solid red;
+}
     
 #chatHeader{
     font-size:15px;
@@ -553,7 +567,9 @@ import {
     query,
     where,
     addDoc,
-    onSnapshot
+    onSnapshot,
+    updateDoc,
+    getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import {
@@ -575,6 +591,7 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 let allUsers = [];
+let userLabels = {};
 
 async function loadUsers(){
     const q = query(collection(db, "users"));
@@ -602,6 +619,7 @@ onAuthStateChanged(auth, async (user) => {
         }, { merge: true });
 
         await loadUsers();
+        await loadLabels();
 
         document.getElementById("userName").innerText = user.displayName;
 
@@ -718,8 +736,15 @@ document.getElementById("userSearch").addEventListener("input", function(){
     }
 
 filtered.forEach(user=>{
+    const label = userLabels[user.uid] || "";
+
+    let extraClass = "";
+    if(label === "important") extraClass = "important-user";
+    if(label === "mute") extraClass = "mute-user";
+    if(label === "blocked") extraClass = "blocked-user";
+
     results.innerHTML += `
-        <div class="chat-user"
+        <div class="chat-user ${extraClass}"
              onclick="openChat('${user.uid}')"
              oncontextmenu="openOptions('${user.uid}'); return false;">
             ${user.name}
@@ -800,28 +825,51 @@ function filterLabel(label){
     loadMessages();
 }
 
-function openOptions(uid){
-const action = prompt("Type: important / mute / blocked");
-if(!action) return;
+async function openOptions(uid){
+    const action = prompt("Type: important / mute / blocked");
+    if(!action) return;
 
-const clean = action.toLowerCase().trim();
+    const clean = action.toLowerCase().trim();
+    const valid = ["important", "mute", "blocked"];
+    if(!valid.includes(clean)){
+        console.log("Invalid action");
+        return;
+    }
 
-const valid = ["important", "mute", "blocked"];
-if(!valid.includes(clean)){
-    console.log("Invalid action");
-    return;
-}
+    const myId = auth.currentUser.uid;
 
-console.log("Saved:", clean, "for user:", uid);
+    // 🔥 SAVE TO FIREBASE
+    await setDoc(doc(db, "userLabels", myId), {
+        [uid]: clean
+    }, { merge: true });
 
+    console.log("Saved:", clean, "for user:", uid);
+
+    // UI feedback
     const header = document.getElementById("chatHeader");
     const oldText = header.innerText;
-
-header.innerText = "✔ " + clean + " applied";
-
+    header.innerText = "✔ " + clean + " applied";
     setTimeout(() => {
         header.innerText = oldText;
     }, 1500);
+
+    loadUserList(); // refresh UI
+}
+
+async function loadLabels(){
+    const myId = auth.currentUser.uid;
+    const ref = doc(db, "userLabels", myId);
+    const snap = await getDoc(ref);
+
+    if(snap.exists()){
+        userLabels = snap.data();
+    } else {
+        userLabels = {};
+    }
+}
+
+function loadUserList(){
+    document.getElementById("userSearch").dispatchEvent(new Event("input"));
 }
     
 import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
