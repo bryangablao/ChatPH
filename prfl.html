@@ -316,12 +316,14 @@
 }
 
 #postList {
-    display: block !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
 }
 
 .post {
-    display: block !important;
     width: 100% !important;
+    display: block !important;
 }
         
     </style>
@@ -600,33 +602,33 @@ const q = query(
   where("email", "==", user.email)
 );
         
-        onSnapshot(q, (snap) => {
-            const list = document.getElementById("postList");
-            list.innerHTML = "";
-            document.getElementById("statPosts").innerText = snap.size;
-            snap.forEach(doc => {
-                const p = doc.data();
-list.innerHTML += `
-<div class="post">
+onSnapshot(q, (snap) => {
+    const list = document.getElementById("postList");
+    list.innerHTML = "";
 
-    <div class="post-header">
-        <img src="${p.photo}" class="avatar">
-        <div class="post-info">
-            <div class="username">${p.name || "User"}</div>
-            <div class="time">${p.time?.toDate().toLocaleString() || "Recent"}</div>
-        </div>
-    </div>
+    document.getElementById("statPosts").innerText = snap.size;
 
-    <div class="post-text">
-        ${p.text}
-    </div>
+    snap.forEach(doc => {
+        const p = doc.data();
 
-</div>
-`;
-            });
-        });
+        const postEl = document.createElement("div");
+        postEl.className = "post";
+
+        postEl.innerHTML = `
+            <div class="post-header">
+                <img src="${p.photo}" class="avatar">
+                <div class="post-info">
+                    <div class="username">${p.name || "User"}</div>
+                    <div class="time">${p.time?.toDate().toLocaleString() || "Recent"}</div>
+                </div>
+            </div>
+            <div class="post-text">${p.text}</div>
+        `;
+
+        list.appendChild(postEl);
     });
-
+});
+        
     document.getElementById('logoutBtn').onclick = () => signOut(auth);
 
     window.toggleSidebar = (forceClose = false) => {
