@@ -98,21 +98,20 @@
         .btn-secondary { background: transparent; color: var(--dim); border: none; cursor: pointer; padding: 10px; }
 
         /* --- Feed --- */
-        .feed { max-width: 600px; margin: auto; padding: 0 20px 60px; }
+        .feed { max-width: 600px; margin: auto; padding: 0 20px 60px; display: block; }
         .post { 
             background: var(--card); 
             border: 1px solid var(--border); 
             padding: 20px; 
             border-radius: 16px; 
             margin-top: 15px; 
+            margin-bottom: 15px;
             word-wrap: break-word; 
             overflow-wrap: break-word; 
             word-break: break-word; 
             width: 100%;
-            width: 100%;
             max-width: 100%;
-            flex-shrink: 0;
-            scroll-snap-align: start;
+            display: block;
         }
         
         .post div:last-child { white-space: pre-wrap; }
@@ -314,6 +313,15 @@
 * {
     scrollbar-width: thin;
     scrollbar-color: var(--card) var(--bg);
+}
+
+#postList {
+    display: block !important;
+}
+
+.post {
+    display: block !important;
+    width: 100% !important;
 }
         
     </style>
@@ -723,5 +731,3 @@ Made with ❤️ in the Philippines
     
 </body>
 </html>
-
-
