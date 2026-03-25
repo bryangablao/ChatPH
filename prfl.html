@@ -105,14 +105,12 @@
             padding: 20px; 
             border-radius: 16px; 
             margin-top: 15px; 
+            margin-bottom: 15px;
             word-wrap: break-word; 
             overflow-wrap: break-word; 
             word-break: break-word; 
             width: 100%;
-            width: 100%;
             max-width: 100%;
-            flex-shrink: 0;
-            scroll-snap-align: start;
         }
         
         .post div:last-child { white-space: pre-wrap; }
@@ -135,9 +133,7 @@
         }
 
         #postList {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            display: block;
         }
 
         .avatar {
