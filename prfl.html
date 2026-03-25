@@ -600,6 +600,7 @@ imageViewer.onclick = () => {
 const q = query(
   collection(db, "posts"),
   where("email", "==", user.email)
+  orderBy("time", "desc")
 );
         
 onSnapshot(q, (snap) => {
