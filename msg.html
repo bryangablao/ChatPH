@@ -22,7 +22,7 @@ margin:0;
 font-family:'Inter',sans-serif;
 background:var(--bg);
 color:var(--text);
-overflow:hidden;
+overflow:auto;
 display:flex;
 flex-direction:column;
 height:100vh;
@@ -534,17 +534,19 @@ import { setDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase
 
 onAuthStateChanged(auth, async (user) => {
     if(user){
+        await setDoc(doc(db, "users", user.uid), {
+            name: user.displayName || "No Name"
+        }, { merge: true });
 
-        // 🔥 SAVE USER TO FIRESTORE
-await setDoc(doc(db, "users", user.uid), {
-    name: user.displayName || "No Name"
-}, { merge: true });
-
-        // THEN LOAD USERS
         await loadUsers();
 
-        // ✅ SHOW NAME IN HEADER
-       document.getElementById("userName").innerText = user.displayName;
+        document.getElementById("userName").innerText = user.displayName;
+
+        // ✅ RESTORE LAST CHAT AFTER LOGIN
+        const last = localStorage.getItem("lastChatUser");
+        if(last){
+            openChat(last);
+        }
     }
 });
     
@@ -567,8 +569,10 @@ let currentChatUser = "";
 function openChat(uid){
     currentChatUser = uid;
 
-    const user = allUsers.find(u => u.uid === uid);
+    // ✅ SAVE LAST CHAT
+    localStorage.setItem("lastChatUser", uid);
 
+    const user = allUsers.find(u => u.uid === uid);
     document.getElementById("emptyState").style.display = "none";
     document.getElementById("chatUI").style.display = "flex";
 
@@ -579,7 +583,6 @@ function openChat(uid){
 
     loadMessages();
 }
-
 async function sendMsg(){
     const input = document.getElementById("msgInput");
     const text = input.value.trim();
