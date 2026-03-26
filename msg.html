@@ -496,7 +496,17 @@ font-weight:700;
     <div id="chatUI" style="display:none;flex-direction:column;height:100%;">
         
         <!-- HEADER -->
-        <div id="chatHeader" style="padding:12px;border-bottom:1px solid var(--border);font-weight:600;"></div>
+<div id="chatHeader" style="
+    padding:12px;
+    border-bottom:1px solid var(--border);
+    font-weight:600;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+">
+    <span id="chatTitle"></span>
+    <span id="closeChat" style="cursor:pointer;font-size:18px;">✕</span>
+</div>
 
         <!-- MESSAGES -->
         <div class="messages" id="messages"></div>
@@ -709,10 +719,10 @@ function openChat(uid){
     document.getElementById("emptyState").style.display = "none";
     document.getElementById("chatUI").style.display = "flex";
 
-    document.getElementById("chatHeader").innerText =
-        uid === auth.currentUser.uid
-        ? "Saved Messages (You)"
-        : (user ? user.name : "User");
+    document.getElementById("chatTitle").innerText =
+    uid === auth.currentUser.uid
+    ? "Saved Messages (You)"
+    : (user ? user.name : "User");
 
     loadMessages();
 }
@@ -728,7 +738,7 @@ function openGroup(id, name, theme){
 
     document.getElementById("emptyState").style.display = "none";
     document.getElementById("chatUI").style.display = "flex";
-    document.getElementById("chatHeader").innerText = name;
+    document.getElementById("chatTitle").innerText = name;
 
     loadGroupMessages();
 }
@@ -908,12 +918,14 @@ function removeMember(uid){
 function loadMessages(){
     const box = document.getElementById("messages");
 
-    if(unsubscribe) unsubscribe(); // 🔥 stop old listener
+    if(unsubscribe) unsubscribe();
 
     const q = query(collection(db, "messages"));
 
     unsubscribe = onSnapshot(q, (snap)=>{
         box.innerHTML = "";
+
+        const messages = [];
 
         snap.forEach(doc=>{
             const m = doc.data();
@@ -923,15 +935,23 @@ function loadMessages(){
                 (m.from === currentChatUser && m.to === auth.currentUser.uid);
 
             if(isChat){
-                box.innerHTML += `
-                    <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}">
-                        ${m.text}
-                        <div style="font-size:10px;opacity:.6;margin-top:4px;">
-                            ${new Date(m.time).toLocaleTimeString()}
-                        </div>
-                    </div>
-                `;
+                messages.push(m); // ✅ collect first
             }
+        });
+
+        // ✅ SORT OLDEST → NEWEST
+        messages.sort((a,b)=> a.time - b.time);
+
+        // ✅ DISPLAY AFTER SORT
+        messages.forEach(m=>{
+            box.innerHTML += `
+                <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}">
+                    ${m.text}
+                    <div style="font-size:10px;opacity:.6;margin-top:4px;">
+                        ${new Date(m.time).toLocaleDateString()} • ${new Date(m.time).toLocaleTimeString()}
+                    </div>
+                </div>
+            `;
         });
 
         box.scrollTop = box.scrollHeight;
@@ -951,34 +971,41 @@ async function loadGroupMessages(){
     unsubscribe = onSnapshot(q, (snap)=>{
         box.innerHTML = "";
 
-        snap.forEach(doc=>{
-            const m = doc.data();
-            if(m.groupId !== currentGroup) return;
+        const messages = [];
 
-            const user = allUsers.find(u => u.uid === m.from);
+snap.forEach(doc=>{
+    const m = doc.data();
+    if(m.groupId === currentGroup){
+        messages.push(m); // collect first
+    }
+});
 
-            box.innerHTML += `
-                <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
-                     style="
-                        background:${m.from === auth.currentUser.uid ? groupTheme : groupTheme + "33"};
-                        color:${m.from === auth.currentUser.uid ? "#000" : "#fff"};
-                     ">
-                     
-                    <div style="font-size:11px;opacity:.7;">
-                        ${user ? user.name : "User"}
-                    </div>
+// ✅ SORT OLDEST → NEWEST
+messages.sort((a,b)=> a.time - b.time);
 
-                    ${m.text}
+// ✅ DISPLAY
+messages.forEach(m=>{
+    const user = allUsers.find(u => u.uid === m.from);
 
-                    <div style="font-size:10px;opacity:.6;margin-top:4px;">
-                        ${new Date(m.time).toLocaleString()}
-                    </div>
-                </div>
-            `;
-        });
+    box.innerHTML += `
+        <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
+             style="
+                background:${m.from === auth.currentUser.uid ? groupTheme : groupTheme + "33"};
+                color:${m.from === auth.currentUser.uid ? "#000" : "#fff"};
+             ">
+             
+            <div style="font-size:11px;opacity:.7;">
+                ${user ? user.name : "User"}
+            </div>
 
-        box.scrollTop = box.scrollHeight;
-    });
+            ${m.text}
+
+            <div style="font-size:10px;opacity:.6;margin-top:4px;">
+                ${new Date(m.time).toLocaleDateString()} • ${new Date(m.time).toLocaleTimeString()}
+            </div>
+        </div>
+    `;
+});
 }
 
 function showEmptyState(){
@@ -991,6 +1018,18 @@ import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-aut
 document.getElementById("logoutBtn").onclick = async () => {
     await signOut(auth);
     window.location.href = "index.html";
+};
+
+document.getElementById("closeChat").onclick = () => {
+    currentChatUser = null;
+    currentGroup = null;
+
+    if(unsubscribe) unsubscribe();
+
+    document.getElementById("chatUI").style.display = "none";
+    document.getElementById("emptyState").style.display = "block";
+
+    document.getElementById("messages").innerHTML = "";
 };
 
 // 🔥 MAKE FUNCTIONS GLOBAL (IMPORTANT)
