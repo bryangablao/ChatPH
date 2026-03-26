@@ -965,7 +965,6 @@ async function loadGroupMessages(){
 
     const q = query(collection(db, "messages"));
 
-    // 🎨 set chat background
     document.getElementById("chatBox").style.background = groupTheme + "22";
 
     unsubscribe = onSnapshot(q, (snap)=>{
@@ -973,39 +972,43 @@ async function loadGroupMessages(){
 
         const messages = [];
 
-snap.forEach(doc=>{
-    const m = doc.data();
-    if(m.groupId === currentGroup){
-        messages.push(m); // collect first
-    }
-});
+        snap.forEach(doc=>{
+            const m = doc.data();
+            if(m.groupId === currentGroup){
+                messages.push(m);
+            }
+        });
 
-// ✅ SORT OLDEST → NEWEST
-messages.sort((a,b)=> a.time - b.time);
+        // ✅ SORT
+        messages.sort((a,b)=> a.time - b.time);
 
-// ✅ DISPLAY
-messages.forEach(m=>{
-    const user = allUsers.find(u => u.uid === m.from);
+        // ✅ DISPLAY
+        messages.forEach(m=>{
+            const user = allUsers.find(u => u.uid === m.from);
 
-    box.innerHTML += `
-        <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
-             style="
-                background:${m.from === auth.currentUser.uid ? groupTheme : groupTheme + "33"};
-                color:${m.from === auth.currentUser.uid ? "#000" : "#fff"};
-             ">
-             
-            <div style="font-size:11px;opacity:.7;">
-                ${user ? user.name : "User"}
-            </div>
+            box.innerHTML += `
+                <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
+                     style="
+                        background:${m.from === auth.currentUser.uid ? groupTheme : groupTheme + "33"};
+                        color:${m.from === auth.currentUser.uid ? "#000" : "#fff"};
+                     ">
+                     
+                    <div style="font-size:11px;opacity:.7;">
+                        ${user ? user.name : "User"}
+                    </div>
 
-            ${m.text}
+                    ${m.text}
 
-            <div style="font-size:10px;opacity:.6;margin-top:4px;">
-                ${new Date(m.time).toLocaleDateString()} • ${new Date(m.time).toLocaleTimeString()}
-            </div>
-        </div>
-    `;
-});
+                    <div style="font-size:10px;opacity:.6;margin-top:4px;">
+                        ${new Date(m.time).toLocaleDateString()} • ${new Date(m.time).toLocaleTimeString()}
+                    </div>
+                </div>
+            `;
+        });
+
+        box.scrollTop = box.scrollHeight;
+
+    });
 }
 
 function showEmptyState(){
