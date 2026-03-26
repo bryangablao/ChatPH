@@ -941,33 +941,48 @@ function loadMessages(){
     });
 }
 
-function loadGroupMessages(){
+async function loadGroupMessages(){
     const box = document.getElementById("messages");
 
-    if(unsubscribe) unsubscribe(); // 🔥 stop old listener
+    if(unsubscribe) unsubscribe();
 
     const q = query(collection(db, "messages"));
+
+    // 🎨 set chat background
+    document.getElementById("chatBox").style.background = groupTheme + "22";
 
     unsubscribe = onSnapshot(q, (snap)=>{
         box.innerHTML = "";
 
         snap.forEach(doc=>{
             const m = doc.data();
-
             if(m.groupId !== currentGroup) return;
+
+            const user = allUsers.find(u => u.uid === m.from);
 
             box.innerHTML += `
                 <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
-                     style="background:${m.from === auth.currentUser.uid ? groupTheme : ''}">
+                     style="
+                        background:${m.from === auth.currentUser.uid ? groupTheme : groupTheme + "33"};
+                        color:${m.from === auth.currentUser.uid ? "#000" : "#fff"};
+                     ">
+                     
+                    <div style="font-size:11px;opacity:.7;">
+                        ${user ? user.name : "User"}
+                    </div>
+
                     ${m.text}
+
+                    <div style="font-size:10px;opacity:.6;margin-top:4px;">
+                        ${new Date(m.time).toLocaleString()}
+                    </div>
                 </div>
             `;
         });
 
         box.scrollTop = box.scrollHeight;
     });
-}
-    
+}    
 
 import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
