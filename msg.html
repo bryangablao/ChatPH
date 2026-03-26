@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,loadChatList initial-scale=1.0">
 <title>ChatPH | Message</title>
 <link rel="icon" type="image/png" href="image/chatph-logo.png">
 
@@ -610,65 +610,56 @@ async function loadUsers(){
     });
 }
 
-async function loadChatList(){
+function loadChatList(){
     const box = document.getElementById("userResults");
-    const snap = await getDocs(collection(db, "messages"));
 
-    let chatMap = {};
-
-    snap.forEach(doc=>{
-        const m = doc.data();
+    onSnapshot(collection(db, "messages"), async (snap)=>{
+        let chatMap = {};
         const myId = auth.currentUser.uid;
 
-        // only chats involving me
-        if(m.from === myId || m.to === myId){
-            const otherUser = m.from === myId ? m.to : m.from;
+        snap.forEach(doc=>{
+            const m = doc.data();
 
-            // store latest message time
-            if(!chatMap[otherUser] || chatMap[otherUser] < m.time){
-                chatMap[otherUser] = m.time;
+            if(m.from === myId || m.to === myId){
+                const otherUser = m.from === myId ? m.to : m.from;
+
+                if(!chatMap[otherUser] || chatMap[otherUser] < m.time){
+                    chatMap[otherUser] = m.time;
+                }
             }
-        }
+        });
+
+        const sorted = Object.entries(chatMap).sort((a,b)=>b[1]-a[1]);
+
+        box.innerHTML = "";
+
+        sorted.forEach(([uid])=>{
+            const user = allUsers.find(u => u.uid === uid);
+
+            box.innerHTML += `
+                <div class="chat-user" onclick="openChat('${uid}')">
+                    ${user ? user.name : "Unknown User"}
+                </div>
+            `;
+        });
+
+        // GROUPS (REALTIME FIX)
+        box.innerHTML += `<div class="not-found">Groups</div>`;
+
+        const groupSnap = await getDocs(collection(db, "groups"));
+
+        groupSnap.forEach(doc=>{
+            const g = doc.data();
+
+            if(g.members.includes(myId)){
+                box.innerHTML += `
+                    <div class="chat-user" onclick="openGroup('${doc.id}', '${g.name}', '${g.theme}')">
+                        👥 ${g.name}
+                    </div>
+                `;
+            }
+        });
     });
-
-    // convert to array and sort (latest first)
-    const sorted = Object.entries(chatMap)
-        .sort((a,b)=>b[1]-a[1]);
-
-    box.innerHTML = "";
-
-    if(sorted.length === 0){
-        box.innerHTML = `<div class="not-found">No conversations yet</div>`;
-        return;
-    }
-
-    sorted.forEach(([uid])=>{
-        const user = allUsers.find(u => u.uid === uid);
-
-        box.innerHTML += `
-            <div class="chat-user" onclick="openChat('${uid}')">
-                ${user ? user.name : "Unknown User"}
-            </div>
-        `;
-    });
-
-// 🔥 LOAD GROUPS
-box.innerHTML += `<div class="not-found">Groups</div>`; 
-
-const groupSnap = await getDocs(collection(db, "groups"));
-
-groupSnap.forEach(doc=>{
-    const g = doc.data();
-
-    if(g.members.includes(auth.currentUser.uid)){
-        box.innerHTML += `
-            <div class="chat-user" onclick="openGroup('${doc.id}', '${g.name}', '${g.theme}')">
-                👥 ${g.name}
-            </div>
-        `;
-    }
-});
-    
 }
 
 import { setDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
