@@ -592,6 +592,7 @@ let selectedMembers = [];
 let currentGroup = null;
 let unsubscribe = null;
 let groupTheme = "";
+let chatListUnsubscribe = null;
     
 async function loadUsers(){
     const q = query(collection(db, "users"));
@@ -613,16 +614,17 @@ async function loadUsers(){
 function loadChatList(){
     const box = document.getElementById("userResults");
 
-    onSnapshot(collection(db, "messages"), async (snap)=>{
+    // 🔥 stop old listener
+    if(chatListUnsubscribe) chatListUnsubscribe();
+
+    chatListUnsubscribe = onSnapshot(collection(db, "messages"), async (snap)=>{
         let chatMap = {};
         const myId = auth.currentUser.uid;
 
         snap.forEach(doc=>{
             const m = doc.data();
-
             if(m.from === myId || m.to === myId){
                 const otherUser = m.from === myId ? m.to : m.from;
-
                 if(!chatMap[otherUser] || chatMap[otherUser] < m.time){
                     chatMap[otherUser] = m.time;
                 }
@@ -630,12 +632,10 @@ function loadChatList(){
         });
 
         const sorted = Object.entries(chatMap).sort((a,b)=>b[1]-a[1]);
-
         box.innerHTML = "";
 
         sorted.forEach(([uid])=>{
             const user = allUsers.find(u => u.uid === uid);
-
             box.innerHTML += `
                 <div class="chat-user" onclick="openChat('${uid}')">
                     ${user ? user.name : "Unknown User"}
@@ -643,14 +643,12 @@ function loadChatList(){
             `;
         });
 
-        // GROUPS (REALTIME FIX)
+        // GROUPS
         box.innerHTML += `<div class="not-found">Groups</div>`;
 
         const groupSnap = await getDocs(collection(db, "groups"));
-
         groupSnap.forEach(doc=>{
             const g = doc.data();
-
             if(g.members.includes(myId)){
                 box.innerHTML += `
                     <div class="chat-user" onclick="openGroup('${doc.id}', '${g.name}', '${g.theme}')">
@@ -796,10 +794,10 @@ document.getElementById("userSearch").addEventListener("input", function(){
     const results = document.getElementById("userResults");
     results.innerHTML = "";
 
-    if(!value){
-        results.innerHTML = `<div class="not-found">Search for users...</div>`;
-        return;
-    }
+if(!value){
+    loadChatList(); // 🔥 restore chats
+    return;
+}
 
     const filtered = allUsers.filter(u => u.name.toLowerCase().includes(value));
 
