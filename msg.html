@@ -564,7 +564,6 @@ import {
     collection,
     getDocs,
     query,
-    where,
     addDoc,
     onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -610,22 +609,23 @@ async function loadUsers(){
     });
 }
 
-function loadChatList(){
+async function loadChatList(){
     const box = document.getElementById("userResults");
 
-    onSnapshot(collection(db, "messages"), async (snap)=>{
-        let chatMap = {};
-        const user = auth.currentUser;
-        if(!user) return;
+    const user = auth.currentUser;
+    if (!user) return;
+    const myId = user.uid;
 
-        const myId = user.uid;
+    // ✅ LOAD GROUPS ONCE
+    const groupSnap = await getDocs(collection(db, "groups"));
+
+    onSnapshot(collection(db, "messages"), (snap)=>{
+        let chatMap = {};
 
         snap.forEach(doc=>{
             const m = doc.data();
-
             if(m.from === myId || m.to === myId){
                 const otherUser = m.from === myId ? m.to : m.from;
-
                 if(!chatMap[otherUser] || chatMap[otherUser] < m.time){
                     chatMap[otherUser] = m.time;
                 }
@@ -633,12 +633,10 @@ function loadChatList(){
         });
 
         const sorted = Object.entries(chatMap).sort((a,b)=>b[1]-a[1]);
-
         box.innerHTML = "";
 
         sorted.forEach(([uid])=>{
             const user = allUsers.find(u => u.uid === uid);
-
             box.innerHTML += `
                 <div class="chat-user" onclick="openChat('${uid}')">
                     ${user ? user.name : "Unknown User"}
@@ -646,15 +644,12 @@ function loadChatList(){
             `;
         });
 
-        // GROUPS (REALTIME FIX)
+        // ✅ GROUPS
         box.innerHTML += `<div class="not-found">Groups</div>`;
 
-        const groupSnap = await getDocs(collection(db, "groups"));
-
-        groupSnap.forEach(doc=>{
+        groupSnap.forEach(doc => {
             const g = doc.data();
-
-            if(g.members.includes(myId)){
+            if (g.members && g.members.includes(myId)) {
                 box.innerHTML += `
                     <div class="chat-user" onclick="openGroup('${doc.id}')">
                         👥 ${g.name}
@@ -668,16 +663,18 @@ function loadChatList(){
 import { setDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 onAuthStateChanged(auth, async (user) => {
-    if(user){
-        await setDoc(doc(db, "users", user.uid), {
-            name: user.displayName || "No Name"
-        }, { merge: true });
-
-        await loadUsers(); // ✅ VERY IMPORTANT
-        loadChatList();    // no await needed
-
-        document.getElementById("userName").innerText = user.displayName;
+    if(!user){
+        window.location.href = "index.html";
+        return;
     }
+
+    await setDoc(doc(db, "users", user.uid), {
+        name: user.displayName || "No Name"
+    }, { merge: true });
+
+await loadUsers();
+document.getElementById("userName").innerText = user.displayName;
+loadChatList();
 });
     
 /* SIDEBAR */
@@ -836,6 +833,7 @@ async function openGroup(id, name){
 
     // 🔥 ALWAYS FETCH GROUP DATA
     const groupSnap = await getDoc(doc(db, "groups", id));
+    if (!groupSnap.exists()) return;
     const g = groupSnap.data();
 
     groupTheme = g.theme; // ✅ now works for ALL users
