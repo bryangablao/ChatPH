@@ -623,7 +623,7 @@ function loadChatList(){
 
         snap.forEach(doc=>{
             const m = doc.data();
-            if(m.from === myId || m.to === myId){
+            if((m.from === myId || m.to === myId) && !m.groupId){
                 const otherUser = m.from === myId ? m.to : m.from;
                 if(!chatMap[otherUser] || chatMap[otherUser] < m.time){
                     chatMap[otherUser] = m.time;
@@ -671,12 +671,6 @@ onAuthStateChanged(auth, async (user) => {
         await loadUsers();
         await loadChatList();
         document.getElementById("userName").innerText = user.displayName;
-
-        // ✅ RESTORE LAST CHAT AFTER LOGIN
-        const last = localStorage.getItem("lastChatUser");
-        if(last){
-            openChat(last);
-        }
     }
 });
     
@@ -717,6 +711,19 @@ function openChat(uid){
         : (user ? user.name : "User");
 
     loadMessages();
+
+    function openChat(uid){
+    document.querySelectorAll(".chat-user").forEach(el=>{
+        el.classList.remove("active-chat");
+    });
+
+    currentChatUser = uid;
+    currentGroup = null;
+
+    // ✅ ADD THIS LINE
+    document.getElementById("chatBox").style.background = "";
+
+    localStorage.setItem("lastChatUser", uid);
 }
 
 function openGroup(id, name, theme){
@@ -982,7 +989,11 @@ async function loadGroupMessages(){
         box.scrollTop = box.scrollHeight;
     });
 }
-    
+
+function showEmptyState(){
+    document.getElementById("emptyState").style.display = "block";
+    document.getElementById("chatUI").style.display = "none";
+}
 
 import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
