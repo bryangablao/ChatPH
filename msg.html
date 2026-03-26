@@ -644,7 +644,9 @@ snap.forEach(doc=>{
     const m = doc.data();
 
     if((m.from === myId || m.to === myId) && !m.groupId){
-        const otherUser = m.from === myId ? m.to : m.from;
+    const otherUser = m.from === myId ? m.to : m.from;
+
+    if(otherUser === myId) return;
 
         // last message time
         if(!chatMap[otherUser] || chatMap[otherUser] < m.time){
@@ -699,6 +701,8 @@ onAuthStateChanged(auth, async (user) => {
         await loadUsers();
         await loadChatList();
         document.getElementById("userName").innerText = user.displayName;
+
+        showEmptyState(); 
     }
 });
     
@@ -729,8 +733,6 @@ function openChat(uid){
     // ✅ RESET GROUP BACKGROUND (FIX THEME BUG)
     document.getElementById("chatBox").style.background = "";
 
-    localStorage.setItem("lastChatUser", uid);
-
     const user = allUsers.find(u => u.uid === uid);
 
     document.getElementById("emptyState").style.display = "none";
@@ -742,6 +744,7 @@ function openChat(uid){
         : (user ? user.name : "User");
 
     loadMessages();
+    loadChatList();
 }
 
 function openGroup(id, name, theme){
@@ -940,29 +943,39 @@ function loadMessages(){
     const q = query(collection(db, "messages"));
 
     unsubscribe = onSnapshot(q, (snap)=>{
-        box.innerHTML = "";
+    box.innerHTML = "";
 
-        snap.forEach(doc=>{
-            const m = doc.data();
+    const messages = [];
 
-            const isChat =
-                (m.from === auth.currentUser.uid && m.to === currentChatUser) ||
-                (m.from === currentChatUser && m.to === auth.currentUser.uid);
+    snap.forEach(doc=>{
+        const m = doc.data();
 
-            if(isChat){
-                box.innerHTML += `
-                    <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}">
-                        ${m.text}
-                        <div style="font-size:10px;opacity:.6;margin-top:4px;">
-                            ${new Date(m.time).toLocaleTimeString()}
-                        </div>
-                    </div>
-                `;
-            }
-        });
+        const isChat =
+            (m.from === auth.currentUser.uid && m.to === currentChatUser) ||
+            (m.from === currentChatUser && m.to === auth.currentUser.uid);
 
-        box.scrollTop = box.scrollHeight;
+        if(isChat){
+            messages.push(m); // ✅ collect first
+        }
     });
+
+    // ✅ SORT OLDEST → NEWEST
+    messages.sort((a,b)=> a.time - b.time);
+
+    // ✅ DISPLAY AFTER SORT
+    messages.forEach(m=>{
+        box.innerHTML += `
+            <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}">
+                ${m.text}
+                <div style="font-size:10px;opacity:.6;margin-top:4px;">
+                    ${new Date(m.time).toLocaleTimeString()}
+                </div>
+            </div>
+        `;
+    });
+
+    box.scrollTop = box.scrollHeight;
+});
 }
 
 async function loadGroupMessages(){
@@ -975,37 +988,43 @@ async function loadGroupMessages(){
     // 🎨 set chat background
     document.getElementById("chatBox").style.background = groupTheme + "22";
 
-    unsubscribe = onSnapshot(q, (snap)=>{
-        box.innerHTML = "";
+unsubscribe = onSnapshot(q, (snap)=>{
+    box.innerHTML = "";
 
-        snap.forEach(doc=>{
-            const m = doc.data();
-            if(m.groupId !== currentGroup) return;
+    const messages = [];
 
-            const user = allUsers.find(u => u.uid === m.from);
+snap.forEach(doc=>{
+    const m = doc.data();
+    if(m.groupId === currentGroup){
+        messages.push(m);
+    }
+});
 
-            box.innerHTML += `
-                <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
-                     style="
-                        background:${m.from === auth.currentUser.uid ? groupTheme : groupTheme + "33"};
-                        color:${m.from === auth.currentUser.uid ? "#000" : "#fff"};
-                     ">
-                     
-                    <div style="font-size:11px;opacity:.7;">
-                        ${user ? user.name : "User"}
-                    </div>
+messages.sort((a,b)=> a.time - b.time);
 
-                    ${m.text}
+messages.forEach(m=>{
+    const user = allUsers.find(u => u.uid === m.from);
 
-                    <div style="font-size:10px;opacity:.6;margin-top:4px;">
-                        ${new Date(m.time).toLocaleString()}
-                    </div>
-                </div>
-            `;
-        });
+    box.innerHTML += `
+        <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
+             style="
+                background:${m.from === auth.currentUser.uid ? groupTheme : groupTheme + "33"};
+                color:${m.from === auth.currentUser.uid ? "#000" : "#fff"};
+             ">
+             
+            <div style="font-size:11px;opacity:.7;">
+                ${user ? user.name : "User"}
+            </div>
+            ${m.text}
+            <div style="font-size:10px;opacity:.6;margin-top:4px;">
+                ${new Date(m.time).toLocaleString()}
+            </div>
+        </div>
+    `;
+});
 
-        box.scrollTop = box.scrollHeight;
-    });
+    box.scrollTop = box.scrollHeight;
+});
 }
 
 function showEmptyState(){
