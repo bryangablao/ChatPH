@@ -670,15 +670,10 @@ onAuthStateChanged(auth, async (user) => {
             name: user.displayName || "No Name"
         }, { merge: true });
 
-        await loadUsers();
-        await loadChatList();
-        document.getElementById("userName").innerText = user.displayName;
+        await loadUsers(); // ✅ VERY IMPORTANT
+        loadChatList();    // no await needed
 
-        // ✅ RESTORE LAST CHAT AFTER LOGIN
-        const last = localStorage.getItem("lastChatUser");
-        if(last){
-            openChat(last);
-        }
+        document.getElementById("userName").innerText = user.displayName;
     }
 });
     
@@ -753,6 +748,7 @@ async function sendMsg(){
         time: Date.now()
     });
 
+    loadChatList();
     input.value="";
 }
 
@@ -837,8 +833,27 @@ document.getElementById("groupSearch").addEventListener("input", function(){
     
 
 /* GROUP PANEL */
-function openGroupPanel(){
-    document.getElementById("groupPanel").classList.toggle("open");
+import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+async function openGroup(id, name){
+    document.querySelectorAll(".chat-user").forEach(el=>{
+        el.classList.remove("active-chat");
+    });
+
+    currentGroup = id;
+    currentChatUser = null;
+
+    // 🔥 ALWAYS FETCH GROUP DATA
+    const groupSnap = await getDoc(doc(db, "groups", id));
+    const g = groupSnap.data();
+
+    groupTheme = g.theme; // ✅ now works for ALL users
+
+    document.getElementById("emptyState").style.display = "none";
+    document.getElementById("chatUI").style.display = "flex";
+    document.getElementById("chatHeader").innerText = g.name;
+
+    loadGroupMessages();
 }
 
 /* CREATE GROUP (demo only) */
@@ -942,14 +957,14 @@ function loadMessages(){
     });
 }
 
-async function loadGroupMessages(){
+function loadGroupMessages(){
     const box = document.getElementById("messages");
 
     if(unsubscribe) unsubscribe();
 
     const q = query(collection(db, "messages"));
 
-    // 🎨 set chat background
+    // 🎨 ALWAYS apply background
     document.getElementById("chatBox").style.background = groupTheme + "22";
 
     unsubscribe = onSnapshot(q, (snap)=>{
@@ -963,13 +978,10 @@ async function loadGroupMessages(){
 
             box.innerHTML += `
                 <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
-                     style="
-                        background:${m.from === auth.currentUser.uid ? groupTheme : groupTheme + "33"};
-                        color:${m.from === auth.currentUser.uid ? "#000" : "#fff"};
-                     ">
+                     style="background:${m.from === auth.currentUser.uid ? groupTheme : groupTheme + "33"}">
                      
                     <div style="font-size:11px;opacity:.7;">
-                        ${user ? user.name : "User"}
+                        ${user ? user.name : "Loading..."}
                     </div>
 
                     ${m.text}
@@ -983,7 +995,7 @@ async function loadGroupMessages(){
 
         box.scrollTop = box.scrollHeight;
     });
-}    
+} 
 
 import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
