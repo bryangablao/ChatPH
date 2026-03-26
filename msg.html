@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,loadChatList initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ChatPH | Message</title>
 <link rel="icon" type="image/png" href="image/chatph-logo.png">
 
@@ -653,7 +653,7 @@ function loadChatList(){
 
             if(g.members.includes(myId)){
                 box.innerHTML += `
-                    <div class="chat-user" onclick="openGroup('${doc.id}', '${g.name}', '${g.theme}')">
+                    <div class="chat-user" onclick="openGroup('${doc.id}')">
                         👥 ${g.name}
                     </div>
                 `;
@@ -716,20 +716,8 @@ function openChat(uid){
     loadMessages();
 }
 
-function openGroup(id, name, theme){
-    document.querySelectorAll(".chat-user").forEach(el=>{
-        el.classList.remove("active-chat");
-    });
-
-    groupTheme = theme;
-    currentGroup = id;
-    currentChatUser = null;
-
-    document.getElementById("emptyState").style.display = "none";
-    document.getElementById("chatUI").style.display = "flex";
-    document.getElementById("chatHeader").innerText = name;
-
-    loadGroupMessages();
+function openGroupPanel(){
+    document.getElementById("groupPanel").classList.toggle("open");
 }
     
 async function sendMsg(){
