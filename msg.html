@@ -410,6 +410,23 @@ font-weight:700;
     z-index:1001;
 }
 
+/* 🔴 NOTIFICATION BADGE */
+.badge{
+    background:#ff3b3b;
+    color:#fff;
+    font-size:11px;
+    font-weight:600;
+    padding:2px 7px;
+    border-radius:20px;
+    margin-left:auto;
+}
+
+.chat-user{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+    
 #chatHeader{
     font-size:15px;
     background:#11141a;
@@ -620,28 +637,38 @@ function loadChatList(){
 
     chatListUnsubscribe = onSnapshot(collection(db, "messages"), async (snap)=>{
         let chatMap = {};
+        let unreadCount = {};
         const myId = auth.currentUser.uid;
 
-        snap.forEach(doc=>{
-            const m = doc.data();
-            if((m.from === myId || m.to === myId) && !m.groupId){
-                const otherUser = m.from === myId ? m.to : m.from;
-                if(!chatMap[otherUser] || chatMap[otherUser] < m.time){
-                    chatMap[otherUser] = m.time;
-                }
-            }
-        });
+snap.forEach(doc=>{
+    const m = doc.data();
+
+    if((m.from === myId || m.to === myId) && !m.groupId){
+        const otherUser = m.from === myId ? m.to : m.from;
+
+        // last message time
+        if(!chatMap[otherUser] || chatMap[otherUser] < m.time){
+            chatMap[otherUser] = m.time;
+        }
+
+        // 🔴 COUNT UNREAD (only if NOT opened chat)
+        if(m.to === myId && currentChatUser !== m.from){
+            unreadCount[m.from] = (unreadCount[m.from] || 0) + 1;
+        }
+    }
+});
 
         const sorted = Object.entries(chatMap).sort((a,b)=>b[1]-a[1]);
         box.innerHTML = "";
 
         sorted.forEach(([uid])=>{
             const user = allUsers.find(u => u.uid === uid);
-            box.innerHTML += `
-                <div class="chat-user" onclick="openChat('${uid}')">
-                    ${user ? user.name : "Unknown User"}
-                </div>
-            `;
+box.innerHTML += `
+    <div class="chat-user" onclick="openChat('${uid}')">
+        <span>${user ? user.name : "Unknown User"}</span>
+        ${unreadCount[uid] ? `<span class="badge">${unreadCount[uid]}</span>` : ""}
+    </div>
+`;
         });
 
         // GROUPS
