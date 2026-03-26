@@ -615,7 +615,10 @@ function loadChatList(){
 
     onSnapshot(collection(db, "messages"), async (snap)=>{
         let chatMap = {};
-        const myId = auth.currentUser.uid;
+        const user = auth.currentUser;
+        if(!user) return;
+
+        const myId = user.uid;
 
         snap.forEach(doc=>{
             const m = doc.data();
@@ -736,7 +739,6 @@ async function sendMsg(){
         time: Date.now()
     });
 
-    loadChatList();
     input.value="";
 }
 
@@ -824,6 +826,7 @@ document.getElementById("groupSearch").addEventListener("input", function(){
 import { getDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 async function openGroup(id, name){
+    console.log("Opening group:", id);
     document.querySelectorAll(".chat-user").forEach(el=>{
         el.classList.remove("active-chat");
     });
@@ -870,7 +873,7 @@ if(selectedMembers.length === 0){
     };
 
     const docRef = await addDoc(collection(db, "groups"), groupData);
-    openGroup(docRef.id, name, theme); // ✅ OPEN AFTER CREATE
+    openGroup(docRef.id);
     
     // reset UI
     document.getElementById("groupPanel").classList.remove("open");
@@ -920,6 +923,7 @@ function loadMessages(){
     const q = query(collection(db, "messages"));
 
     unsubscribe = onSnapshot(q, (snap)=>{
+        console.log("Messages loaded:", snap.size);
         box.innerHTML = "";
 
         snap.forEach(doc=>{
@@ -962,7 +966,7 @@ function loadGroupMessages(){
             const m = doc.data();
             if(m.groupId !== currentGroup) return;
 
-            const user = allUsers.find(u => u.uid === m.from);
+            const user = allUsers.find(u => u.uid === m.from) || { name: "Unknown" };
 
             box.innerHTML += `
                 <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
