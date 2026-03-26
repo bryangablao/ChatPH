@@ -577,7 +577,9 @@ import {
     query,
     where,
     addDoc,
-    onSnapshot
+    onSnapshot,
+    deleteDoc,
+    doc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import {
@@ -611,14 +613,16 @@ async function loadUsers(){
 
     allUsers = [];
 
-    snap.forEach(doc=>{
-        const data = doc.data();
-        if(data.name){
-            allUsers.push({
-    name: data.name,
-    uid: doc.id
-});
-        }
+    snap.forEach(docSnap=>{
+const data = docSnap.data();
+const id = docSnap.id;
+
+if(data.name){
+    allUsers.push({
+        name: data.name,
+        uid: id
+    });
+}
     });
 }
 
@@ -917,35 +921,33 @@ function removeMember(uid){
 
 function loadMessages(){
     const box = document.getElementById("messages");
-
     if(unsubscribe) unsubscribe();
 
     const q = query(collection(db, "messages"));
 
     unsubscribe = onSnapshot(q, (snap)=>{
         box.innerHTML = "";
-
         const messages = [];
 
-        snap.forEach(doc=>{
-            const m = doc.data();
+        snap.forEach(docSnap=>{
+            const m = docSnap.data();
+            const id = docSnap.id;
 
             const isChat =
                 (m.from === auth.currentUser.uid && m.to === currentChatUser) ||
                 (m.from === currentChatUser && m.to === auth.currentUser.uid);
 
             if(isChat){
-                messages.push(m); // ✅ collect first
+                messages.push({ ...m, id }); // ✅ FIXED
             }
         });
 
-        // ✅ SORT OLDEST → NEWEST
         messages.sort((a,b)=> a.time - b.time);
 
-        // ✅ DISPLAY AFTER SORT
         messages.forEach(m=>{
             box.innerHTML += `
-                <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}">
+                <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
+                     oncontextmenu="openMsgMenu(event, '${m.id}'); return false;">
                     ${m.text}
                     <div style="font-size:10px;opacity:.6;margin-top:4px;">
                         ${new Date(m.time).toLocaleDateString()} • ${new Date(m.time).toLocaleTimeString()}
@@ -972,8 +974,9 @@ async function loadGroupMessages(){
 
         const messages = [];
 
-        snap.forEach(doc=>{
-            const m = doc.data();
+        snap.forEach(docSnap=>{
+            const m = docSnap.data();
+            const id = docSnap.id;
             if(m.groupId === currentGroup){
                 messages.push(m);
             }
@@ -1035,6 +1038,29 @@ document.getElementById("closeChat").onclick = () => {
     document.getElementById("chatBox").style.background = "";
 };
 
+let selectedMsgId = null;
+
+function openMsgMenu(e, id){
+    selectedMsgId = id;
+    const menu = document.getElementById("msgMenu");
+
+    menu.style.display = "block";
+    menu.style.left = e.pageX + "px";
+    menu.style.top = e.pageY + "px";
+}
+
+document.addEventListener("click", () => {
+    document.getElementById("msgMenu").style.display = "none";
+});
+
+async function deleteMessage(){
+    if(!selectedMsgId) return;
+
+    await deleteDoc(doc(db, "messages", selectedMsgId));
+
+    document.getElementById("msgMenu").style.display = "none";
+}
+
 // 🔥 MAKE FUNCTIONS GLOBAL (IMPORTANT)
 window.createGroup = createGroup;
 window.addMember = addMember;
@@ -1046,6 +1072,19 @@ window.openGroupPanel = openGroupPanel;
 window.sendMsg = sendMsg;
 </script>
 
+<div id="msgMenu" style="
+    position:fixed;
+    background:#1f2937;
+    padding:10px;
+    border-radius:10px;
+    display:none;
+    z-index:2000;
+">
+    <div onclick="deleteMessage()" style="cursor:pointer;color:#ff4b4b;">
+        Delete Message
+    </div>
+</div>
+    
 </body>
 </html>
 
