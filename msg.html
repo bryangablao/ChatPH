@@ -696,12 +696,15 @@ function openChat(uid){
     });
 
     currentChatUser = uid;
-    currentGroup = null; // 🔥 add this (important)
+    currentGroup = null;
 
-    // ✅ SAVE LAST CHAT
+    // ✅ RESET GROUP BACKGROUND (FIX THEME BUG)
+    document.getElementById("chatBox").style.background = "";
+
     localStorage.setItem("lastChatUser", uid);
 
     const user = allUsers.find(u => u.uid === uid);
+
     document.getElementById("emptyState").style.display = "none";
     document.getElementById("chatUI").style.display = "flex";
 
@@ -711,19 +714,6 @@ function openChat(uid){
         : (user ? user.name : "User");
 
     loadMessages();
-
-    function openChat(uid){
-    document.querySelectorAll(".chat-user").forEach(el=>{
-        el.classList.remove("active-chat");
-    });
-
-    currentChatUser = uid;
-    currentGroup = null;
-
-    // ✅ ADD THIS LINE
-    document.getElementById("chatBox").style.background = "";
-
-    localStorage.setItem("lastChatUser", uid);
 }
 
 function openGroup(id, name, theme){
