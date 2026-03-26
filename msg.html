@@ -879,6 +879,7 @@ if(selectedMembers.length === 0){
 }
 
 function addMember(uid, name){
+    if(uid === auth.currentUser.uid) return; // 🚫 block yourself
     if(selectedMembers.includes(uid)) return;
 
     selectedMembers.push(uid);
