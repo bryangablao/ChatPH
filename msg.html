@@ -715,18 +715,18 @@ font-weight:700;
     <div class="option">
         Change Theme <span onclick="toggleSection('theme')">▾</span>
         <div id="theme" class="dropdown">
-            <div onclick="changeTheme('#4da3ff')">Blue</div>
-            <div onclick="changeTheme('#ff4b4b')">Red</div>
-            <div onclick="changeTheme('#facc15')">Yellow</div>
-            <div onclick="changeTheme('#22c55e')">Green</div>
-            <div onclick="changeTheme('#a855f7')">Purple</div>
-            <div onclick="changeTheme('#92400e')">Brown</div>
-            <div onclick="changeTheme('#ec4899')">Pink</div>
-            <div onclick="changeTheme('#06b6d4')">Cyan</div>
-            <div onclick="changeTheme('#f97316')">Orange</div>
-            <div onclick="changeTheme('#10b981')">Emerald</div>
-            <div onclick="changeTheme('#eab308')">Gold</div>
-            <div onclick="changeTheme('#6366f1')">Indigo</div>
+            <div onclick="changeTheme('#4da3ff')" style="color:#4da3ff">Blue</div>
+            <div onclick="changeTheme('#ff4b4b')" style="color:#ff4b4b">Red</div>
+            <div onclick="changeTheme('#facc15')" style="color:#facc15">Yellow</div>
+            <div onclick="changeTheme('#22c55e')" style="color:#22c55e">Green</div>
+            <div onclick="changeTheme('#a855f7')" style="color:#a855f7">Purple</div>
+            <div onclick="changeTheme('#92400e')" style="color:#92400e">Brown</div>
+            <div onclick="changeTheme('#ec4899')" style="color:#ec4899">Pink</div>
+            <div onclick="changeTheme('#06b6d4')" style="color:#06b6d4">Cyan</div>
+            <div onclick="changeTheme('#f97316')" style="color:#f97316">Orange</div>
+            <div onclick="changeTheme('#10b981')" style="color:#10b981">Emerald</div>
+            <div onclick="changeTheme('#eab308')" style="color:#eab308">Gold</div>
+            <div onclick="changeTheme('#6366f1')" style="color:#6366f1">Indigo</div>
         </div>
     </div>
 
@@ -1197,15 +1197,26 @@ async function loadGroupMessages(){
 
         messages.sort((a,b)=> a.time - b.time);
 
-        messages.forEach(m => {
-            if(m.system){
-                box.innerHTML += `
-                    <div style="text-align:center;font-size:12px;opacity:.6;margin:10px 0;">
-                        ${m.text} • ${new Date(m.time).toLocaleString()}
-                    </div>
-                `;
-                return;
-            }
+messages.forEach(m => {
+
+    if(m.system){
+
+        const colorName = themeNames[groupTheme] || "Theme";
+
+        box.innerHTML += `
+            <div style="text-align:center;font-size:12px;opacity:.8;margin:10px 0;">
+                <span style="color:${groupTheme};font-weight:600;">
+                    ${auth.currentUser.displayName}
+                </span>
+                changed the Background Theme to 
+                <span style="color:${groupTheme};font-weight:600;">
+                    (${colorName})
+                </span>
+                • ${new Date(m.time).toLocaleString()}
+            </div>
+        `;
+        return;
+    }
 
             const user = allUsers.find(u => u.uid === m.from);
 
@@ -1411,33 +1422,80 @@ function loadPinned(){
 
     onSnapshot(collection(db, "messages"), (snap)=>{
         box.innerHTML = "";
-
         let hasPinned = false;
 
         snap.forEach(docSnap=>{
             const m = docSnap.data();
+            const id = docSnap.id;
 
             if(m.groupId === currentGroup && m.pinned){
                 hasPinned = true;
 
                 box.innerHTML += `
                     <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        align-items:center;
                         padding:8px;
                         margin-bottom:6px;
                         background:#1f2937;
                         border-radius:8px;
                         font-size:12px;
+                        cursor:pointer;
                     ">
-                        📌 ${m.text}
+                        <span onclick="scrollToMsg('${id}')">📌 ${m.text}</span>
+                        <span onclick="unpinMessage('${id}')" style="color:#ff4b4b;cursor:pointer;">✕</span>
                     </div>
                 `;
             }
         });
 
         if(!hasPinned){
-         box.innerHTML = `<div style="padding:8px;opacity:.6;">No Pinned Messages</div>`;
+            box.innerHTML = `<div style="padding:8px;opacity:.6;">No Pinned Messages</div>`;
         }
     });
+}
+
+async function unpinMessage(id){
+    await updateDoc(doc(db, "messages", id), {
+        pinned: false
+    });
+}
+
+async function togglePin(){
+    if(!selectedMsgId) return;
+
+    const ref = doc(db, "messages", selectedMsgId);
+    const snap = await getDoc(ref);
+
+    if(!snap.exists()) return;
+
+    const data = snap.data();
+
+    await updateDoc(ref, {
+        pinned: !data.pinned
+    });
+
+    document.getElementById("msgMenu").style.display = "none";
+}
+
+function scrollToMsg(id){
+    const msgs = document.querySelectorAll(".msg");
+
+    msgs.forEach(el=>{
+        el.classList.remove("selected");
+    });
+
+    const target = [...msgs].find(el => el.getAttribute("data-id") === id);
+
+    if(target){
+        target.scrollIntoView({ behavior:"smooth", block:"center" });
+        target.classList.add("selected");
+
+        setTimeout(()=>{
+            target.classList.remove("selected");
+        }, 2000);
+    }
 }
 
 async function loadMembers(){
@@ -1515,7 +1573,7 @@ window.toggleSection = toggleSection;
     min-width:160px;
 ">
     <div class="menu-item" onclick="editMessage()">Edit Message</div>
-    <div class="menu-item" onclick="pinMessage()">Pin Message</div>
+    <div class="menu-item" onclick="togglePin()">Pin Message</div>
     <div class="menu-item delete" onclick="deleteMessage()">Delete Message</div>
 </div>
     
