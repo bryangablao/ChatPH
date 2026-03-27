@@ -634,7 +634,8 @@ function loadChatList(){
 
     chatListUnsubscribe = onSnapshot(collection(db, "messages"), async (snap)=>{
         let chatMap = {};
-        const myId = auth.currentUser.uid;
+        const myId = auth.currentUser?.uid;
+        if(!myId) return;
 
         snap.forEach(doc=>{
             const m = doc.data();
@@ -664,7 +665,7 @@ function loadChatList(){
         const groupSnap = await getDocs(collection(db, "groups"));
         groupSnap.forEach(doc=>{
             const g = doc.data();
-            if(g.members.includes(myId)){
+            if(g.members && g.members.includes(myId))
                 box.innerHTML += `
                     <div class="chat-user" onclick="openGroup('${doc.id}', '${g.name}', '${g.theme}')">
                         👥 ${g.name}
@@ -684,7 +685,11 @@ onAuthStateChanged(auth, async (user) => {
         }, { merge: true });
 
         await loadUsers();
-        await loadChatList();
+
+        setTimeout(() => {
+            loadChatList();
+        }, 200);
+        
         document.getElementById("userName").innerText = user.displayName;
     }
 });
@@ -754,6 +759,7 @@ async function sendMsg(){
     if(!text || (!currentChatUser && !currentGroup)) return;
 
     const user = auth.currentUser;
+    if(!user) return;
 
     await addDoc(collection(db, "messages"), {
         text: text,
@@ -933,9 +939,12 @@ function loadMessages(){
             const m = docSnap.data();
             const id = docSnap.id;
 
+            const myId = auth.currentUser?.uid;
+            if(!myId) return;
+
             const isChat =
-                (m.from === auth.currentUser.uid && m.to === currentChatUser) ||
-                (m.from === currentChatUser && m.to === auth.currentUser.uid);
+                (m.from === myId && m.to === currentChatUser) ||
+                (m.from === currentChatUser && m.to === myId);
 
             if(isChat){
                 messages.push({ ...m, id }); // ✅ FIXED
@@ -1051,7 +1060,7 @@ function openMsgMenu(e, id){
 
 document.addEventListener("click", (e) => {
     const menu = document.getElementById("msgMenu");
-    if(!menu.contains(e.target)){
+    if(menu && !menu.contains(e.target)){
         menu.style.display = "none";
     }
 });
