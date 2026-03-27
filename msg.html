@@ -204,6 +204,11 @@ margin-left:auto;
 background:#1f2937;
 }
 
+.msg.selected {
+    box-shadow: 0 0 0 2px #4da3ff;
+    transform: scale(1.02);
+}
+
 /* INPUT */
 .chat-input{
     display:flex;
@@ -948,7 +953,7 @@ function loadMessages(){
         messages.forEach(m=>{
             box.innerHTML += `
                 <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
-                     oncontextmenu="openMsgMenu(event, '${m.id}'); return false;">
+                     oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;">
                     ${m.text}
                     <div style="font-size:10px;opacity:.6;margin-top:4px;">
                         ${new Date(m.time).toLocaleDateString()} • ${new Date(m.time).toLocaleTimeString()}
@@ -992,6 +997,11 @@ async function loadGroupMessages(){
 
             box.innerHTML += `
                 <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
+     oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;"
+     style="
+        background:${m.from === auth.currentUser.uid ? groupTheme : groupTheme + "33"};
+        color:${m.from === auth.currentUser.uid ? "#000" : "#fff"};
+     ">
                      style="
                         background:${m.from === auth.currentUser.uid ? groupTheme : groupTheme + "33"};
                         color:${m.from === auth.currentUser.uid ? "#000" : "#fff"};
@@ -1041,10 +1051,23 @@ document.getElementById("closeChat").onclick = () => {
 
 let selectedMsgId = null;
 
-function openMsgMenu(e, id){
-    selectedMsgId = id;
-    const menu = document.getElementById("msgMenu");
+function openMsgMenu(e, id, senderId){
+    const myId = auth.currentUser.uid;
 
+    // ❌ block other users' messages
+    if(senderId !== myId) return;
+
+    selectedMsgId = id;
+
+    // 🔥 remove old highlight
+    document.querySelectorAll(".msg").forEach(m=>{
+        m.classList.remove("selected");
+    });
+
+    // 🔥 highlight selected message
+    e.currentTarget.classList.add("selected");
+
+    const menu = document.getElementById("msgMenu");
     menu.style.display = "block";
     menu.style.left = e.pageX + "px";
     menu.style.top = e.pageY + "px";
@@ -1052,8 +1075,13 @@ function openMsgMenu(e, id){
 
 document.addEventListener("click", (e) => {
     const menu = document.getElementById("msgMenu");
+
     if(menu && !menu.contains(e.target)){
         menu.style.display = "none";
+
+        document.querySelectorAll(".msg").forEach(m=>{
+            m.classList.remove("selected");
+        });
     }
 });
 
