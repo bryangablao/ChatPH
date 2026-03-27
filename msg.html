@@ -1293,6 +1293,10 @@ document.addEventListener("click", (e) => {
     }
 });
 
+document.getElementById("chatOptionsPanel").onclick = (e) => {
+    e.stopPropagation();
+};
+
 async function deleteMessage(){
     if(!selectedMsgId) return;
 
