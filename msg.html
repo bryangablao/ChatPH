@@ -1089,62 +1089,53 @@ async function loadGroupMessages(){
 
     unsubscribe = onSnapshot(q, (snap)=>{
         box.innerHTML = "";
-
         const messages = [];
 
         snap.forEach(docSnap=>{
             const m = docSnap.data();
             const id = docSnap.id;
+
             if(m.groupId === currentGroup){
                 messages.push({ ...m, id });
             }
         });
 
-        // ✅ SORT
         messages.sort((a,b)=> a.time - b.time);
 
-        // ✅ DISPLAY
-messages.forEach(m => {
+        messages.forEach(m => {
+            if(m.system){
+                box.innerHTML += `
+                    <div style="text-align:center;font-size:12px;opacity:.6;margin:10px 0;">
+                        ${m.text} • ${new Date(m.time).toLocaleString()}
+                    </div>
+                `;
+                return;
+            }
 
-    // ✅ SYSTEM MESSAGE
-    if(m.system){
-        box.innerHTML += `
-            <div style="
-                text-align:center;
-                font-size:12px;
-                opacity:.6;
-                margin:10px 0;
-            ">
-                ${m.text} • ${new Date(m.time).toLocaleString()}
+            const user = allUsers.find(u => u.uid === m.from);
+
+            box.innerHTML += `
+            <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
+                 oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;"
+                 ontouchstart="startPress(event, '${m.id}', '${m.from}')"
+                 ontouchend="cancelPress()"
+                 style="
+                    background:${m.from === auth.currentUser.uid ? groupTheme : groupTheme + "33"};
+                    color:${m.from === auth.currentUser.uid ? "#000" : "#fff"};
+                 ">
+                <div style="font-size:11px;opacity:.7;">
+                    ${user ? user.name : "User"} ${m.edited ? '(edited)' : ''}
+                </div>
+                ${m.text}
+                <div style="font-size:10px;opacity:.6;margin-top:4px;">
+                    ${new Date(m.edited ? m.editedTime : m.time).toLocaleDateString()} • 
+                    ${new Date(m.edited ? m.editedTime : m.time).toLocaleTimeString()}
+                </div>
             </div>
-        `;
-        return;
-    }
+            `;
+        });
 
-    const user = allUsers.find(u => u.uid === m.from);
-
-    box.innerHTML += `
-    <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
-         oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;"
-         ontouchstart="startPress(event, '${m.id}', '${m.from}')"
-         ontouchend="cancelPress()"
-         style="
-            background:${m.from === auth.currentUser.uid ? groupTheme : groupTheme + "33"};
-            color:${m.from === auth.currentUser.uid ? "#000" : "#fff"};
-         ">
-        <div style="font-size:11px;opacity:.7;">
-            ${user ? user.name : "User"} ${m.edited ? '(edited)' : ''}
-        </div>
-        ${m.text}
-        <div style="font-size:10px;opacity:.6;margin-top:4px;">
-            ${new Date(m.edited ? m.editedTime : m.time).toLocaleDateString()} • 
-            ${new Date(m.edited ? m.editedTime : m.time).toLocaleTimeString()}
-        </div>
-    </div>
-    `;
-});
-    });
-    box.scrollTop = box.scrollHeight;
+        box.scrollTop = box.scrollHeight;
     });
 }
 
