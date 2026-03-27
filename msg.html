@@ -669,7 +669,7 @@ function loadChatList(){
             const g = doc.data();
             if(g.members && g.members.includes(myId))
                 box.innerHTML += `
-                    <div class="chat-user" onclick="openGroup('${doc.id}', '${g.name}', '${g.theme}')">
+                    <div class="chat-user" onclick='openGroup(${JSON.stringify(doc.id)}, ${JSON.stringify(g.name)}, ${JSON.stringify(g.theme)})'>
                         👥 ${g.name}
                     </div>
                 `;
