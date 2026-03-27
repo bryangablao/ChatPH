@@ -676,6 +676,20 @@ text-decoration:underline;
     <h2 id="groupNameTitle"></h2>
 
     <div class="option">
+    <div style="display:flex;gap:6px;">
+        <input type="text" id="addMemberSearch" placeholder="Search users..." style="flex:1;">
+        <button onclick="confirmAddMembers()" style="
+            padding:6px 10px;
+            border:none;
+            border-radius:8px;
+            background:#4da3ff;
+            cursor:pointer;
+        ">＋</button>
+    </div>
+    <div id="addMemberResults"></div>
+</div>
+    
+    <div class="option">
         Pinned Messages <span onclick="toggleSection('pinned')">▾</span>
         <div id="pinned" class="dropdown"></div>
     </div>
@@ -702,6 +716,13 @@ text-decoration:underline;
         Group Members <span onclick="toggleSection('members')">▾</span>
         <div id="members" class="dropdown"></div>
     </div>
+
+    <div class="option">
+        <div onclick="changeGroupNamePrompt()" style="cursor:pointer;">
+            ✏️ Change Group Chat Name
+        </div>
+    </div>
+    
 </div>
   
 </div>
@@ -1124,19 +1145,33 @@ function loadMessages(){
 
         messages.sort((a,b)=> a.time - b.time);
 
-        messages.forEach(m=>{
-            box.innerHTML += `
-                <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
-                     data-id="${m.id}"
-                    oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;">
-                    ${m.text}
-                    <div style="font-size:10px;opacity:.6;margin-top:4px;">
-                        ${new Date(m.edited ? m.editedTime : m.time).toLocaleDateString()} • 
-                        ${new Date(m.edited ? m.editedTime : m.time).toLocaleTimeString()}
-                    </div>
+messages.forEach(m => {
+
+    if(m.system){
+        box.innerHTML += `
+            <div style="text-align:center;font-size:12px;opacity:.7;margin:10px 0;">
+                ${m.text}
+                <div style="font-size:10px;opacity:.5;">
+                    ${new Date(m.time).toLocaleString()}
                 </div>
-            `;
-        });
+            </div>
+        `;
+        return;
+    }
+
+    // normal messages
+    box.innerHTML += `
+        <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
+             data-id="${m.id}"
+             oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;">
+            ${m.text}
+            <div style="font-size:10px;opacity:.6;margin-top:4px;">
+                ${new Date(m.edited ? m.editedTime : m.time).toLocaleDateString()} • 
+                ${new Date(m.edited ? m.editedTime : m.time).toLocaleTimeString()}
+            </div>
+        </div>
+    `;
+});
 
         box.scrollTop = box.scrollHeight;
     });
@@ -1536,6 +1571,100 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
+let tempAddMembers = [];
+
+document.getElementById("addMemberSearch").addEventListener("input", async function(){
+    const value = this.value.toLowerCase();
+    const box = document.getElementById("addMemberResults");
+    box.innerHTML = "";
+
+    if(!value || !currentGroup) return;
+
+    const docSnap = await getDoc(doc(db, "groups", currentGroup));
+    const groupData = docSnap.data();
+
+    const filtered = allUsers.filter(u =>
+        u.name.toLowerCase().includes(value)
+    );
+
+    filtered.forEach(user=>{
+        if(groupData.members.includes(user.uid)){
+            box.innerHTML += `
+                <div class="not-found">⚠ ${user.name} already in group</div>
+            `;
+        } else {
+            box.innerHTML += `
+                <div class="chat-user" onclick="selectToAdd('${user.uid}', '${user.name}')">
+                    ${user.name}
+                </div>
+            `;
+        }
+    });
+});
+    
+function selectToAdd(uid, name){
+    if(!tempAddMembers.includes(uid)){
+        tempAddMembers.push(uid);
+    }
+}
+
+async function confirmAddMembers(){
+    if(!currentGroup || tempAddMembers.length === 0) return;
+
+    const ref = doc(db, "groups", currentGroup);
+    const snap = await getDoc(ref);
+    const data = snap.data();
+
+    const newMembers = [...data.members, ...tempAddMembers];
+
+    await updateDoc(ref, {
+        members: newMembers
+    });
+
+    // 🔥 LOG MESSAGE
+    const names = tempAddMembers.map(uid=>{
+        const u = allUsers.find(x=>x.uid===uid);
+        return u ? u.name : "User";
+    });
+
+    await addDoc(collection(db, "messages"), {
+        groupId: currentGroup,
+        system: true,
+        text: `${auth.currentUser.displayName} added new member(s): ${names.join(", ")}`,
+        time: Date.now()
+    });
+
+    tempAddMembers = [];
+    document.getElementById("addMemberSearch").value = "";
+    document.getElementById("addMemberResults").innerHTML = "";
+}
+
+async function changeGroupNamePrompt(){
+    if(!currentGroup) return;
+
+    const newName = prompt("Enter new group name:");
+    if(!newName) return;
+
+    const ref = doc(db, "groups", currentGroup);
+    const snap = await getDoc(ref);
+    const oldName = snap.data().name;
+
+    await updateDoc(ref, {
+        name: newName
+    });
+
+    // update UI instantly
+    document.getElementById("chatTitle").innerText = newName;
+
+    // 🔥 LOG MESSAGE
+    await addDoc(collection(db, "messages"), {
+        groupId: currentGroup,
+        system: true,
+        text: `${auth.currentUser.displayName} changed group name from "${oldName}" to "${newName}"`,
+        time: Date.now()
+    });
+}
+    
 // 🔥 MAKE FUNCTIONS GLOBAL (IMPORTANT)
 
 window.deleteMessage = deleteMessage;
