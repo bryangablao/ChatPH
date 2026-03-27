@@ -456,6 +456,7 @@ font-weight:700;
     padding:16px;
     transition:.3s;
     z-index:999;
+    overflow-y:auto;
 }
 
 .side-panel.open{
@@ -500,7 +501,7 @@ font-weight:700;
 }
 
 .dropdown.open{
- max-height:300px;
+ max-height:500px;
  margin-top:8px;
  padding:6px 0;
 }
@@ -541,6 +542,19 @@ font-weight:700;
 
 #groupUsers .chat-user{
     font-size:13px;
+}
+
+#theme div{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+#theme div::after{
+    content:"";
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:currentColor;
 }
 
 /* 🔥 CUSTOM SCROLLBAR */
@@ -673,6 +687,12 @@ font-weight:700;
         <option value="#22c55e">Green</option>
         <option value="#a855f7">Purple</option>
         <option value="#92400e">Brown</option>
+        <option value="#ec4899">Pink</option>
+        <option value="#06b6d4">Cyan</option>
+        <option value="#f97316">Orange</option>
+        <option value="#10b981">Emerald</option>
+        <option value="#eab308">Gold</option>
+        <option value="#6366f1">Indigo</option>
     </select>
 
     <label>Add Members</label>
@@ -697,8 +717,16 @@ font-weight:700;
         <div id="theme" class="dropdown">
             <div onclick="changeTheme('#4da3ff')">Blue</div>
             <div onclick="changeTheme('#ff4b4b')">Red</div>
+            <div onclick="changeTheme('#facc15')">Yellow</div>
             <div onclick="changeTheme('#22c55e')">Green</div>
             <div onclick="changeTheme('#a855f7')">Purple</div>
+            <div onclick="changeTheme('#92400e')">Brown</div>
+            <div onclick="changeTheme('#ec4899')">Pink</div>
+            <div onclick="changeTheme('#06b6d4')">Cyan</div>
+            <div onclick="changeTheme('#f97316')">Orange</div>
+            <div onclick="changeTheme('#10b981')">Emerald</div>
+            <div onclick="changeTheme('#eab308')">Gold</div>
+            <div onclick="changeTheme('#6366f1')">Indigo</div>
         </div>
     </div>
 
@@ -769,6 +797,20 @@ let unsubscribe = null;
 let groupTheme = "";
 let chatListUnsubscribe = null;
 
+const themeNames = {
+    "#4da3ff": "Blue",
+    "#ff4b4b": "Red",
+    "#facc15": "Yellow",
+    "#22c55e": "Green",
+    "#a855f7": "Purple",
+    "#92400e": "Brown",
+    "#ec4899": "Pink",
+    "#06b6d4": "Cyan",
+    "#f97316": "Orange",
+    "#10b981": "Emerald",
+    "#eab308": "Gold",
+    "#6366f1": "Indigo"
+};
     
 async function loadUsers(){
     const q = query(collection(db, "users"));
@@ -1434,8 +1476,10 @@ async function changeTheme(color){
 
     document.getElementById("chatBox").style.background = color + "22";
 
+    const colorName = themeNames[color] || "Custom";
+
     await addDoc(collection(db, "messages"), {
-        text: `${auth.currentUser.displayName} changed the theme`,
+        text: `${auth.currentUser.displayName} changed the Background Theme to (${colorName})`,
         groupId: currentGroup,
         system: true,
         time: Date.now()
