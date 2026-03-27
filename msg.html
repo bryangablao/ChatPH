@@ -579,7 +579,9 @@ import {
     addDoc,
     onSnapshot,
     deleteDoc,
-    doc
+    doc,
+    setDoc,
+    getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import {
@@ -675,8 +677,6 @@ function loadChatList(){
         });
     });
 }
-
-import { setDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 onAuthStateChanged(auth, async (user) => {
     if(user){
