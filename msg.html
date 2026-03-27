@@ -1199,24 +1199,23 @@ async function loadGroupMessages(){
 
 messages.forEach(m => {
 
-    if(m.system){
+if(m.system){
+    const colorName = themeNames[m.theme] || "Theme";
 
-        const colorName = themeNames[groupTheme] || "Theme";
-
-        box.innerHTML += `
-            <div style="text-align:center;font-size:12px;opacity:.8;margin:10px 0;">
-                <span style="color:${groupTheme};font-weight:600;">
-                    ${auth.currentUser.displayName}
-                </span>
-                changed the Background Theme to 
-                <span style="color:${groupTheme};font-weight:600;">
-                    (${colorName})
-                </span>
-                • ${new Date(m.time).toLocaleString()}
-            </div>
-        `;
-        return;
-    }
+    box.innerHTML += `
+        <div style="text-align:center;font-size:12px;opacity:.8;margin:10px 0;">
+            <span style="color:${m.theme};font-weight:600;">
+                ${m.userName || "User"}
+            </span>
+            changed the Background Theme to 
+            <span style="color:${m.theme};font-weight:600;">
+                (${colorName})
+            </span>
+            • ${new Date(m.time).toLocaleString()}
+        </div>
+    `;
+    return;
+}
 
             const user = allUsers.find(u => u.uid === m.from);
 
@@ -1540,6 +1539,8 @@ async function changeTheme(color){
         text: "theme-change",
         groupId: currentGroup,
         system: true,
+        theme: color,
+        userName: auth.currentUser.displayName,
         time: Date.now()
     });
 }
