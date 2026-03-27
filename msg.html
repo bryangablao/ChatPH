@@ -981,7 +981,7 @@ function loadMessages(){
             box.innerHTML += `
                 <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
                     oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;">
-                    ${m.text} ${m.edited ? '<span style="font-size:10px;opacity:.6;">(edited)</span>' : ''}
+                    ${m.text}
                     <div style="font-size:10px;opacity:.6;margin-top:4px;">
                         ${new Date(m.edited ? m.editedTime : m.time).toLocaleDateString()} • 
                         ${new Date(m.edited ? m.editedTime : m.time).toLocaleTimeString()}
@@ -1037,7 +1037,7 @@ box.innerHTML += `
         ${user ? user.name : "User"} ${m.edited ? '(edited)' : ''}
     </div>
 
-    ${m.text} ${m.edited ? '<span style="font-size:10px;opacity:.6;">(edited)</span>' : ''}
+    ${m.text}
 
     <div style="font-size:10px;opacity:.6;margin-top:4px;">
         ${new Date(m.edited ? m.editedTime : m.time).toLocaleDateString()} • 
