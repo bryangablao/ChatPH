@@ -1159,6 +1159,7 @@ function loadMessages(){
         messages.forEach(m=>{
             box.innerHTML += `
                 <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
+                     data-id="${m.id}"
                     oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;">
                     ${m.text}
                     <div style="font-size:10px;opacity:.6;margin-top:4px;">
@@ -1221,6 +1222,7 @@ if(m.system){
 
             box.innerHTML += `
             <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
+                 data-id="${m.id}"
                  oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;"
                  ontouchstart="startPress(event, '${m.id}', '${m.from}')"
                  ontouchend="cancelPress()"
