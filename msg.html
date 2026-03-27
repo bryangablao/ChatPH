@@ -1537,7 +1537,7 @@ async function changeTheme(color){
     const colorName = themeNames[color] || "Custom";
 
     await addDoc(collection(db, "messages"), {
-        text: `${auth.currentUser.displayName} changed the Background Theme to (${colorName})`,
+        text: "theme-change",
         groupId: currentGroup,
         system: true,
         time: Date.now()
