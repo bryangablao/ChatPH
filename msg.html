@@ -410,9 +410,26 @@ font-weight:700;
 .member-chip:hover{
     background:#2a3342;
 }
+    
 .menu-icon{
     position:relative;
     z-index:1001;
+}
+
+.menu-item{
+    padding:10px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:13px;
+    transition:.2s;
+}
+
+.menu-item:hover{
+    background:#2a3342;
+}
+
+.menu-item.delete{
+    color:#ff4b4b;
 }
 
 #chatHeader{
@@ -585,8 +602,9 @@ import {
     onSnapshot,
     deleteDoc,
     doc,
+    updateDoc,
     setDoc,
-    getDoc
+    getDoc,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import {
@@ -1107,8 +1125,27 @@ async function deleteMessage(){
     });
 }
 
+async function editMessage(){
+    if(!selectedMsgId) return;
+
+    const newText = prompt("Edit your message:");
+    if(!newText) return;
+
+    await updateDoc(doc(db, "messages", selectedMsgId), {
+        text: newText
+    });
+
+    document.getElementById("msgMenu").style.display = "none";
+}
+
+function pinMessage(){
+    alert("Pin feature coming soon 📌");
+}
+
 // 🔥 MAKE FUNCTIONS GLOBAL (IMPORTANT)
 window.deleteMessage = deleteMessage;
+window.editMessage = editMessage;
+window.pinMessage = pinMessage;
 window.openMsgMenu = openMsgMenu;
 window.createGroup = createGroup;
 window.addMember = addMember;
@@ -1123,14 +1160,15 @@ window.sendMsg = sendMsg;
 <div id="msgMenu" style="
     position:fixed;
     background:#1f2937;
-    padding:10px;
-    border-radius:10px;
+    padding:8px;
+    border-radius:12px;
     display:none;
     z-index:2000;
+    min-width:160px;
 ">
-    <div onclick="deleteMessage()" style="cursor:pointer;color:#ff4b4b;">
-        Delete Message
-    </div>
+    <div class="menu-item" onclick="editMessage()">Edit Message</div>
+    <div class="menu-item" onclick="pinMessage()">Pin Message</div>
+    <div class="menu-item delete" onclick="deleteMessage()">Delete Message</div>
 </div>
     
 </body>
