@@ -475,6 +475,35 @@ font-weight:700;
     cursor:pointer;
 }
 
+.option div{
+    padding:8px;
+    border-radius:8px;
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+    transition:.3s;
+}
+
+.option div::before{
+    content:"";
+    position:absolute;
+    left:-100%;
+    top:0;
+    width:100%;
+    height:100%;
+    background:linear-gradient(90deg,transparent,rgba(77,163,255,0.3),transparent);
+    transition:.4s;
+}
+
+.option div:hover::before{
+    left:100%;
+}
+
+.option div:hover{
+    transform:translateX(5px) scale(1.05);
+    background:#2a3342;
+}
+
 .dropdown{
     max-height:0;
     overflow:hidden;
@@ -849,7 +878,7 @@ function openGroup(id, name, theme){
         el.classList.remove("active-chat");
     });
 
-    groupTheme = theme;
+    groupTheme = theme || "#4da3ff";
     currentGroup = id;
     currentChatUser = null;
 
@@ -1213,6 +1242,17 @@ document.addEventListener("click", (e) => {
     }
 });
 
+document.addEventListener("click", (e) => {
+    const panel = document.getElementById("chatOptionsPanel");
+    const btn = document.getElementById("moreBtn");
+
+    if(panel.classList.contains("open")){
+        if(!panel.contains(e.target) && e.target !== btn){
+            panel.classList.remove("open");
+        }
+    }
+});
+
 async function deleteMessage(){
     if(!selectedMsgId) return;
 
@@ -1266,8 +1306,14 @@ await updateDoc(doc(db, "messages", selectedMsgId), {
     document.getElementById("msgMenu").style.display = "none";
 }
 
-function pinMessage(){
-    alert("Pin feature coming soon 📌");
+async function pinMessage(){
+    if(!selectedMsgId || !currentGroup) return;
+
+    await updateDoc(doc(db, "messages", selectedMsgId), {
+        pinned: true
+    });
+
+    document.getElementById("msgMenu").style.display = "none";
 }
 
 document.getElementById("moreBtn").onclick = () => {
@@ -1288,7 +1334,36 @@ function toggleSection(id){
 
 function loadPinned(){
     const box = document.getElementById("pinned");
-    box.innerHTML = "No Pinned Messages Yet";
+
+    onSnapshot(collection(db, "messages"), (snap)=>{
+        box.innerHTML = "";
+
+        let hasPinned = false;
+
+        snap.forEach(docSnap=>{
+            const m = docSnap.data();
+
+            if(m.groupId === currentGroup && m.pinned){
+                hasPinned = true;
+
+                box.innerHTML += `
+                    <div style="
+                        padding:8px;
+                        margin-bottom:6px;
+                        background:#1f2937;
+                        border-radius:8px;
+                        font-size:12px;
+                    ">
+                        📌 ${m.text}
+                    </div>
+                `;
+            }
+        });
+
+        if(!hasPinned){
+            box.innerHTML = "No Pinned Messages Yet";
+        }
+    });
 }
 
 async function loadMembers(){
@@ -1302,19 +1377,33 @@ async function loadMembers(){
 
     data.members.forEach(uid=>{
         const user = allUsers.find(u=>u.uid===uid);
-        box.innerHTML += `<div>${user ? user.name : "User"}</div>`;
+
+        box.innerHTML += `
+            <div style="
+                padding:8px;
+                margin-bottom:6px;
+                background:#1f2937;
+                border-radius:8px;
+            ">
+                👤 ${user ? user.name : "User"}
+            </div>
+        `;
     });
 }
 
 async function changeTheme(color){
+    if(!currentGroup) return;
+
     groupTheme = color;
 
-    // update UI background
+    await updateDoc(doc(db, "groups", currentGroup), {
+        theme: color
+    });
+
     document.getElementById("chatBox").style.background = color + "22";
 
-    // send system message
     await addDoc(collection(db, "messages"), {
-        text: `${auth.currentUser.displayName} changed the background theme`,
+        text: `${auth.currentUser.displayName} changed the theme`,
         groupId: currentGroup,
         system: true,
         time: Date.now()
