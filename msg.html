@@ -1288,7 +1288,7 @@ function cancelPress(){
 let selectedMsgId = null;
 let isEditing = false;
 
-function openMsgMenu(e, id, senderId){
+async function openMsgMenu(e, id, senderId){
     const myId = auth.currentUser.uid;
     if(senderId !== myId) return;
 
@@ -1297,12 +1297,18 @@ function openMsgMenu(e, id, senderId){
     document.querySelectorAll(".msg").forEach(m=>{
         m.classList.remove("selected");
     });
-
     e.currentTarget.classList.add("selected");
 
     const menu = document.getElementById("msgMenu");
 
-    // ✅ FIX POSITION FOR BOTH PC + MOBILE
+    // 🔥 GET MESSAGE DATA
+    const snap = await getDoc(doc(db, "messages", id));
+    const data = snap.data();
+
+    // 🔥 CHANGE TEXT
+    const pinBtn = menu.querySelector(".menu-item:nth-child(2)");
+    pinBtn.innerText = data.pinned ? "Unpin Message" : "Pin Message";
+
     let x = e.pageX || (e.touches ? e.touches[0].pageX : 100);
     let y = e.pageY || (e.touches ? e.touches[0].pageY : 100);
 
