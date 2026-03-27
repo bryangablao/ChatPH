@@ -980,10 +980,11 @@ function loadMessages(){
         messages.forEach(m=>{
             box.innerHTML += `
                 <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
-                     oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;">
-                    ${m.text}
+                    oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;">
+                    ${m.text} ${m.edited ? '<span style="font-size:10px;opacity:.6;">(edited)</span>' : ''}
                     <div style="font-size:10px;opacity:.6;margin-top:4px;">
-                        ${new Date(m.time).toLocaleDateString()} • ${new Date(m.time).toLocaleTimeString()}
+                        ${new Date(m.edited ? m.editedTime : m.time).toLocaleDateString()} • 
+                        ${new Date(m.edited ? m.editedTime : m.time).toLocaleTimeString()}
                     </div>
                 </div>
             `;
@@ -1033,13 +1034,14 @@ box.innerHTML += `
      ">
 
     <div style="font-size:11px;opacity:.7;">
-        ${user ? user.name : "User"}
+        ${user ? user.name : "User"} ${m.edited ? '(edited)' : ''}
     </div>
 
-    ${m.text}
+    ${m.text} ${m.edited ? '<span style="font-size:10px;opacity:.6;">(edited)</span>' : ''}
 
     <div style="font-size:10px;opacity:.6;margin-top:4px;">
-        ${new Date(m.time).toLocaleDateString()} • ${new Date(m.time).toLocaleTimeString()}
+        ${new Date(m.edited ? m.editedTime : m.time).toLocaleDateString()} • 
+        ${new Date(m.edited ? m.editedTime : m.time).toLocaleTimeString()}
     </div>
 
 </div>
@@ -1159,9 +1161,11 @@ btn.onclick = async () => {
     const newText = input.value.trim();
     if(!newText) return;
 
-    await updateDoc(doc(db, "messages", selectedMsgId), {
-        text: newText
-    });
+await updateDoc(doc(db, "messages", selectedMsgId), {
+    text: newText,
+    edited: true,
+    editedTime: Date.now()
+});
 
     input.value = "";
     btn.innerText = "Send";
