@@ -47,6 +47,17 @@ align-items:center;
 gap:12px;
 }
 
+.header-btn{
+    cursor:pointer;
+    font-size:18px;
+    transition:.2s;
+}
+
+.header-btn:hover{
+    transform:scale(1.2);
+    color:var(--accent);
+}
+    
 .menu-icon{
     font-size:26px;
     cursor:pointer;
@@ -432,6 +443,51 @@ font-weight:700;
     color:#ff4b4b;
 }
 
+.side-panel{
+    position:fixed;
+    right:-320px;
+    top:70px;
+    width:300px;
+    height:100%;
+    background:#11141a;
+    border-left:1px solid var(--border);
+    padding:16px;
+    transition:.3s;
+    z-index:999;
+}
+
+.side-panel.open{
+    right:0;
+}
+
+.side-panel h2{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.option{
+    margin-bottom:15px;
+    font-size:14px;
+}
+
+.option span{
+    float:right;
+    cursor:pointer;
+}
+
+.dropdown{
+    max-height:0;
+    overflow:hidden;
+    transition:.3s ease;
+    font-size:13px;
+    opacity:.8;
+}
+
+.dropdown.open{
+    max-height:200px;
+    margin-top:8px;
+}
+    
 #chatHeader{
     font-size:15px;
     background:#11141a;
@@ -527,7 +583,11 @@ font-weight:700;
     align-items:center;
 ">
     <span id="chatTitle"></span>
-    <span id="closeChat" style="cursor:pointer;font-size:18px;">✕</span>
+
+    <div style="display:flex;gap:12px;align-items:center;">
+        <span id="moreBtn" class="header-btn">•••</span>
+        <span id="closeChat" class="header-btn">✕</span>
+    </div>
 </div>
 
         <!-- MESSAGES -->
@@ -569,6 +629,30 @@ font-weight:700;
     <div id="selectedMembers" style="margin-top:10px;"></div>
 
     <button onclick="createGroup()">Create Group</button>
+</div>
+
+<div id="chatOptionsPanel" class="side-panel">
+    <h2 id="groupNameTitle"></h2>
+
+    <div class="option">
+        Pinned Messages <span onclick="toggleSection('pinned')">▾</span>
+        <div id="pinned" class="dropdown"></div>
+    </div>
+
+    <div class="option">
+        Change Theme <span onclick="toggleSection('theme')">▾</span>
+        <div id="theme" class="dropdown">
+            <div onclick="changeTheme('#4da3ff')">Blue</div>
+            <div onclick="changeTheme('#ff4b4b')">Red</div>
+            <div onclick="changeTheme('#22c55e')">Green</div>
+            <div onclick="changeTheme('#a855f7')">Purple</div>
+        </div>
+    </div>
+
+    <div class="option">
+        Group Members <span onclick="toggleSection('members')">▾</span>
+        <div id="members" class="dropdown"></div>
+    </div>
 </div>
   
 </div>
@@ -1020,32 +1104,45 @@ async function loadGroupMessages(){
         messages.sort((a,b)=> a.time - b.time);
 
         // ✅ DISPLAY
-        messages.forEach(m=>{
-            const user = allUsers.find(u => u.uid === m.from);
+messages.forEach(m => {
 
-box.innerHTML += `
-<div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
-     oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;"
-     ontouchstart="startPress(event, '${m.id}', '${m.from}')"
-     ontouchend="cancelPress()"
-     style="
-        background:${m.from === auth.currentUser.uid ? groupTheme : groupTheme + "33"};
-        color:${m.from === auth.currentUser.uid ? "#000" : "#fff"};
-     ">
+    // ✅ SYSTEM MESSAGE
+    if(m.system){
+        box.innerHTML += `
+            <div style="
+                text-align:center;
+                font-size:12px;
+                opacity:.6;
+                margin:10px 0;
+            ">
+                ${m.text} • ${new Date(m.time).toLocaleString()}
+            </div>
+        `;
+        return;
+    }
 
-    <div style="font-size:11px;opacity:.7;">
-        ${user ? user.name : "User"} ${m.edited ? '(edited)' : ''}
+    const user = allUsers.find(u => u.uid === m.from);
+
+    box.innerHTML += `
+    <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
+         oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;"
+         ontouchstart="startPress(event, '${m.id}', '${m.from}')"
+         ontouchend="cancelPress()"
+         style="
+            background:${m.from === auth.currentUser.uid ? groupTheme : groupTheme + "33"};
+            color:${m.from === auth.currentUser.uid ? "#000" : "#fff"};
+         ">
+        <div style="font-size:11px;opacity:.7;">
+            ${user ? user.name : "User"} ${m.edited ? '(edited)' : ''}
+        </div>
+        ${m.text}
+        <div style="font-size:10px;opacity:.6;margin-top:4px;">
+            ${new Date(m.edited ? m.editedTime : m.time).toLocaleDateString()} • 
+            ${new Date(m.edited ? m.editedTime : m.time).toLocaleTimeString()}
+        </div>
     </div>
-
-    ${m.text}
-
-    <div style="font-size:10px;opacity:.6;margin-top:4px;">
-        ${new Date(m.edited ? m.editedTime : m.time).toLocaleDateString()} • 
-        ${new Date(m.edited ? m.editedTime : m.time).toLocaleTimeString()}
-    </div>
-
-</div>
-`;
+    `;
+});
     });
     box.scrollTop = box.scrollHeight;
     });
@@ -1180,6 +1277,57 @@ await updateDoc(doc(db, "messages", selectedMsgId), {
 
 function pinMessage(){
     alert("Pin feature coming soon 📌");
+}
+
+document.getElementById("moreBtn").onclick = () => {
+    document.getElementById("chatOptionsPanel").classList.toggle("open");
+
+    // set group name
+    document.getElementById("groupNameTitle").innerText =
+        document.getElementById("chatTitle").innerText;
+
+    loadMembers();
+    loadPinned();
+};
+
+function toggleSection(id){
+    const el = document.getElementById(id);
+    el.classList.toggle("open");
+}
+
+function loadPinned(){
+    const box = document.getElementById("pinned");
+    box.innerHTML = "No Pinned Messages Yet";
+}
+
+async function loadMembers(){
+    if(!currentGroup) return;
+
+    const box = document.getElementById("members");
+    box.innerHTML = "";
+
+    const docSnap = await getDoc(doc(db, "groups", currentGroup));
+    const data = docSnap.data();
+
+    data.members.forEach(uid=>{
+        const user = allUsers.find(u=>u.uid===uid);
+        box.innerHTML += `<div>${user ? user.name : "User"}</div>`;
+    });
+}
+
+async function changeTheme(color){
+    groupTheme = color;
+
+    // update UI background
+    document.getElementById("chatBox").style.background = color + "22";
+
+    // send system message
+    await addDoc(collection(db, "messages"), {
+        text: `${auth.currentUser.displayName} changed the background theme`,
+        groupId: currentGroup,
+        system: true,
+        time: Date.now()
+    });
 }
 
 // 🔥 MAKE FUNCTIONS GLOBAL (IMPORTANT)
