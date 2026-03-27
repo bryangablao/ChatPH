@@ -488,7 +488,7 @@ font-weight:700;
 }
 
 .option div:hover{
-    background:#2a3342;
+    background:#374151;
 }
 
 .dropdown{
@@ -496,8 +496,11 @@ font-weight:700;
  overflow:hidden;
  transition:.3s ease;
  font-size:13px;
- opacity:.8;
  padding:0;
+ background:rgba(15,17,21,0.95);
+ backdrop-filter: blur(10px);
+ border-radius:10px;
+ margin-top:4px;
 }
 
 .dropdown.open{
@@ -1547,11 +1550,26 @@ async function changeTheme(color){
     });
 }
 
+document.addEventListener("keydown", (e) => {
+    if(e.key === "Escape" && isEditing){
+        const input = document.getElementById("msgInput");
+        const btn = document.querySelector(".chat-input button");
+
+        input.value = "";
+        btn.innerText = "Send";
+        btn.onclick = sendMsg;
+
+        selectedMsgId = null;
+        isEditing = false;
+    }
+});
+
 // 🔥 MAKE FUNCTIONS GLOBAL (IMPORTANT)
 
 window.deleteMessage = deleteMessage;
 window.editMessage = editMessage;
 window.pinMessage = pinMessage;
+window.togglePin = togglePin;
 window.openMsgMenu = openMsgMenu;
 window.createGroup = createGroup;
 window.addMember = addMember;
@@ -1562,7 +1580,6 @@ window.toggleSidebar = toggleSidebar;
 window.openGroupPanel = openGroupPanel;
 window.sendMsg = sendMsg;
 window.changeTheme = changeTheme;
-window.toggleSection = toggleSection;
 window.toggleSection = toggleSection;
 </script>
 
