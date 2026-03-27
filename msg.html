@@ -631,6 +631,7 @@ let currentGroup = null;
 let unsubscribe = null;
 let groupTheme = "";
 let chatListUnsubscribe = null;
+
     
 async function loadUsers(){
     const q = query(collection(db, "users"));
@@ -797,7 +798,15 @@ async function sendMsg(){
 
 document.getElementById("msgInput").addEventListener("keypress", function(e){
     if(e.key === "Enter"){
-        sendMsg();
+        e.preventDefault(); // 🔥 stop default behavior
+
+        const btn = document.querySelector(".chat-input button");
+
+        if(isEditing){
+            btn.click(); // ✅ trigger UPDATE
+        } else {
+            sendMsg(); // ✅ normal send
+        }
     }
 });
 
@@ -1077,6 +1086,7 @@ function cancelPress(){
 }
     
 let selectedMsgId = null;
+let isEditing = false;
 
 function openMsgMenu(e, id, senderId){
     const myId = auth.currentUser.uid;
@@ -1142,22 +1152,24 @@ async function editMessage(){
 
     // 🔥 change send button to UPDATE MODE
     const btn = document.querySelector(".chat-input button");
-    btn.innerText = "Update";
+isEditing = true;
 
-    btn.onclick = async () => {
-        const newText = input.value.trim();
-        if(!newText) return;
+btn.innerText = "Update";
+btn.onclick = async () => {
+    const newText = input.value.trim();
+    if(!newText) return;
 
-        await updateDoc(doc(db, "messages", selectedMsgId), {
-            text: newText
-        });
+    await updateDoc(doc(db, "messages", selectedMsgId), {
+        text: newText
+    });
 
-        input.value = "";
-        btn.innerText = "Send";
-        btn.onclick = sendMsg;
+    input.value = "";
+    btn.innerText = "Send";
+    btn.onclick = sendMsg;
 
-        selectedMsgId = null;
-    };
+    selectedMsgId = null;
+    isEditing = false; // 🔥 IMPORTANT
+};
 
     document.getElementById("msgMenu").style.display = "none";
 }
