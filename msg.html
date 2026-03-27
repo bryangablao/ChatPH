@@ -520,15 +520,28 @@ font-weight:700;
  margin-top:8px;
  padding:6px 0;
 }
+
+.chat-actions{
+ display:flex;
+ align-items:center;
+ gap:6px;
+}
+
+#closeChat{
+ font-size:18px;
+}
+    
+#moreBtn, #closeChat{
+ width:28px;
+ height:28px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+}
     
 #chatHeader{
     font-size:15px;
     background:#11141a;
-}
-
-#closeChat{
- margin-left:10px;
- font-size:20px;
 }
     
 #logoutBtn {
@@ -640,7 +653,7 @@ font-weight:700;
 ">
     <span id="chatTitle"></span>
 
-    <div style="display:flex;gap:12px;align-items:center;">
+    <div class="chat-actions">
         <span id="moreBtn" class="header-btn">•••</span>
         <span id="closeChat" class="header-btn">✕</span>
     </div>
