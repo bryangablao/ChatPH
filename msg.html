@@ -978,7 +978,7 @@ async function loadGroupMessages(){
             const m = docSnap.data();
             const id = docSnap.id;
             if(m.groupId === currentGroup){
-                messages.push(m);
+                messages.push({ ...m, id });
             }
         });
 
@@ -1049,8 +1049,11 @@ function openMsgMenu(e, id){
     menu.style.top = e.pageY + "px";
 }
 
-document.addEventListener("click", () => {
-    document.getElementById("msgMenu").style.display = "none";
+document.addEventListener("click", (e) => {
+    const menu = document.getElementById("msgMenu");
+    if(!menu.contains(e.target)){
+        menu.style.display = "none";
+    }
 });
 
 async function deleteMessage(){
@@ -1062,6 +1065,8 @@ async function deleteMessage(){
 }
 
 // 🔥 MAKE FUNCTIONS GLOBAL (IMPORTANT)
+window.deleteMessage = deleteMessage;
+window.openMsgMenu = openMsgMenu;
 window.createGroup = createGroup;
 window.addMember = addMember;
 window.removeMember = removeMember;
@@ -1087,5 +1092,3 @@ window.sendMsg = sendMsg;
     
 </body>
 </html>
-
-
