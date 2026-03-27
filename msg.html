@@ -995,33 +995,30 @@ async function loadGroupMessages(){
         messages.forEach(m=>{
             const user = allUsers.find(u => u.uid === m.from);
 
-            box.innerHTML += `
-                <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
+box.innerHTML += `
+<div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
      oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;"
+     ontouchstart="startPress(event, '${m.id}', '${m.from}')"
+     ontouchend="cancelPress()"
      style="
         background:${m.from === auth.currentUser.uid ? groupTheme : groupTheme + "33"};
         color:${m.from === auth.currentUser.uid ? "#000" : "#fff"};
      ">
-                     style="
-                        background:${m.from === auth.currentUser.uid ? groupTheme : groupTheme + "33"};
-                        color:${m.from === auth.currentUser.uid ? "#000" : "#fff"};
-                     ">
-                     
-                    <div style="font-size:11px;opacity:.7;">
-                        ${user ? user.name : "User"}
-                    </div>
 
-                    ${m.text}
+    <div style="font-size:11px;opacity:.7;">
+        ${user ? user.name : "User"}
+    </div>
 
-                    <div style="font-size:10px;opacity:.6;margin-top:4px;">
-                        ${new Date(m.time).toLocaleDateString()} • ${new Date(m.time).toLocaleTimeString()}
-                    </div>
-                </div>
-            `;
-        });
+    ${m.text}
 
-        box.scrollTop = box.scrollHeight;
+    <div style="font-size:10px;opacity:.6;margin-top:4px;">
+        ${new Date(m.time).toLocaleDateString()} • ${new Date(m.time).toLocaleTimeString()}
+    </div>
 
+</div>
+`;
+    });
+    box.scrollTop = box.scrollHeight;
     });
 }
 
@@ -1049,28 +1046,41 @@ document.getElementById("closeChat").onclick = () => {
     document.getElementById("chatBox").style.background = "";
 };
 
+let pressTimer;
+
+function startPress(e, id, senderId){
+    pressTimer = setTimeout(()=>{
+        openMsgMenu(e, id, senderId);
+    }, 600); // hold 600ms
+}
+
+function cancelPress(){
+    clearTimeout(pressTimer);
+}
+    
 let selectedMsgId = null;
 
 function openMsgMenu(e, id, senderId){
     const myId = auth.currentUser.uid;
-
-    // ❌ block other users' messages
     if(senderId !== myId) return;
 
     selectedMsgId = id;
 
-    // 🔥 remove old highlight
     document.querySelectorAll(".msg").forEach(m=>{
         m.classList.remove("selected");
     });
 
-    // 🔥 highlight selected message
     e.currentTarget.classList.add("selected");
 
     const menu = document.getElementById("msgMenu");
+
+    // ✅ FIX POSITION FOR BOTH PC + MOBILE
+    let x = e.pageX || (e.touches ? e.touches[0].pageX : 100);
+    let y = e.pageY || (e.touches ? e.touches[0].pageY : 100);
+
     menu.style.display = "block";
-    menu.style.left = e.pageX + "px";
-    menu.style.top = e.pageY + "px";
+    menu.style.left = x + "px";
+    menu.style.top = y + "px";
 }
 
 document.addEventListener("click", (e) => {
@@ -1091,6 +1101,10 @@ async function deleteMessage(){
     await deleteDoc(doc(db, "messages", selectedMsgId));
 
     document.getElementById("msgMenu").style.display = "none";
+
+    document.querySelectorAll(".msg").forEach(m=>{
+        m.classList.remove("selected");
+    });
 }
 
 // 🔥 MAKE FUNCTIONS GLOBAL (IMPORTANT)
