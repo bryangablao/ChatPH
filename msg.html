@@ -1128,12 +1128,36 @@ async function deleteMessage(){
 async function editMessage(){
     if(!selectedMsgId) return;
 
-    const newText = prompt("Edit your message:");
-    if(!newText) return;
+    const input = document.getElementById("msgInput");
 
-    await updateDoc(doc(db, "messages", selectedMsgId), {
-        text: newText
-    });
+    // 🔥 get current message text from UI
+    const selectedMsg = document.querySelector(".msg.selected");
+    if(!selectedMsg) return;
+
+    const text = selectedMsg.childNodes[0].textContent.trim();
+
+    // put text in input
+    input.value = text;
+    input.focus();
+
+    // 🔥 change send button to UPDATE MODE
+    const btn = document.querySelector(".chat-input button");
+    btn.innerText = "Update";
+
+    btn.onclick = async () => {
+        const newText = input.value.trim();
+        if(!newText) return;
+
+        await updateDoc(doc(db, "messages", selectedMsgId), {
+            text: newText
+        });
+
+        input.value = "";
+        btn.innerText = "Send";
+        btn.onclick = sendMsg;
+
+        selectedMsgId = null;
+    };
 
     document.getElementById("msgMenu").style.display = "none";
 }
