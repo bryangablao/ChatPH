@@ -138,6 +138,18 @@ margin:auto;
 padding:16px;
 }
 
+.main.centered .search-box{
+width:100%;
+max-width:650px; /* 👈 bigger */
+padding:25px; /* 👈 more space */
+border-radius:16px;
+}
+
+.main.centered input{
+padding:16px; /* bigger input */
+font-size:16px;
+}
+
 /* SEARCH BOX */
 .search-box{
 background:var(--card);
@@ -150,6 +162,7 @@ margin-bottom:15px;
 .search-box input{
 width:100%;
 padding:12px;
+padding-right:40px;
 box-sizing:border-box;
 border-radius:10px;
 border:none;
@@ -236,7 +249,10 @@ padding:20px;
 opacity:.6;
 font-size:14px;
 }
-
+footer a:hover{
+text-decoration:underline;
+}
+    
 .main.centered{
 display:flex;
 justify-content:center;
@@ -272,11 +288,12 @@ background:#4da3ff;
     
 #clearBtn{
 position:absolute;
-right:20px;
-top:50%;
+right:30px;
+top:35%;
 transform:translateY(-50%);
 cursor:pointer;
 display:none;
+font-size:14px;
 }
     
 #logoutBtn { cursor: pointer; color: var(--dim); font-weight: 600; font-size: 14px; }
@@ -341,7 +358,19 @@ Online: <span id="onlineUsers">0</span>
 </div>
 
 <footer>
-© 2026 ChatPH
+<div>© 2026 ChatPH • All Rights Reserved</div>
+<div style="margin-top:6px;font-size:13px;">
+<a href="#" style="color:#4da3ff;text-decoration:none;">About</a>
+&nbsp;|&nbsp;
+<a href="#" style="color:#4da3ff;text-decoration:none;">Privacy</a>
+&nbsp;|&nbsp;
+<a href="#" style="color:#4da3ff;text-decoration:none;">Terms</a>
+&nbsp;|&nbsp;
+<a href="#" style="color:#4da3ff;text-decoration:none;">Contact</a>
+</div>
+<div style="margin-top:6px;font-size:12px;opacity:.7;">
+Made with ❤️ in the Philippines
+</div>
 </footer>
 
 <script type="module">
