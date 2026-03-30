@@ -198,6 +198,10 @@ padding:20px;
 opacity:.6;
 font-size:14px;
 }
+
+#logoutBtn { cursor: pointer; color: var(--dim); font-weight: 600; font-size: 14px; }
+#logoutBtn:hover { color: #ff4b4b; }
+  
 </style>
 </head>
 
@@ -210,10 +214,10 @@ font-size:14px;
 <img src="image/chatph-logo.png" class="logo">
 <span class="brand">ChatPH</span>
 </div>
-<div>
-<span id="userDisplay">Loading...</span>
-<span id="logoutBtn" style="cursor:pointer;margin-left:10px;">Logout</span>
-</div>
+    <div style="display:flex;align-items:center;gap:16px;">
+        <span id="userDisplay">Guest</span>
+        <div id="logoutBtn">Logout</div>
+    </div>
 </header>
 
 <!-- SIDEBAR -->
@@ -221,7 +225,7 @@ font-size:14px;
 <a href="home.html">Home</a>
 <a href="msg.html">Messages</a>
 <a href="frnd.html">Friends</a>
-<a href="srch.html" class="active">Search User</a>
+<a href="#" class="active">Search User</a>
 <a href="prfl.html">Profile</a>
 </div>
 
@@ -295,15 +299,17 @@ o.classList.toggle("active");
 };
 
 /* AUTH */
-onAuthStateChanged(auth,user=>{
-if(user){
-document.getElementById("userDisplay").innerText = user.displayName;
-}else{
-window.location.href="index.html";
-}
+onAuthStateChanged(auth,(user)=>{
+    if(user){
+        document.getElementById("userDisplay").innerText =
+        user.displayName || user.email;
+        document.getElementById("logoutBtn").style.display="inline";
+    }else{
+        window.location.href="index.html";
+    }
 });
 
-document.getElementById("logoutBtn").onclick=async()=>{
+  document.getElementById("logoutBtn").onclick = async ()=>{
 await signOut(auth);
 window.location.href="index.html";
 };
