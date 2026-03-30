@@ -150,6 +150,7 @@ margin-bottom:15px;
 .search-box input{
 width:100%;
 padding:12px;
+box-sizing:border-box;
 border-radius:10px;
 border:none;
 outline:none;
@@ -236,6 +237,48 @@ opacity:.6;
 font-size:14px;
 }
 
+.main.centered{
+display:flex;
+justify-content:center;
+align-items:center;
+height:70vh;
+flex-direction:column;
+}
+
+.search-box.active{
+position:sticky;
+top:10px;
+transform:scale(.95);
+transition:.3s;
+}
+
+.search-box{
+position:relative;
+}
+
+::-webkit-scrollbar{
+width:8px;
+}
+::-webkit-scrollbar-track{
+background:#0f1115;
+}
+::-webkit-scrollbar-thumb{
+background:#2a2f3b;
+border-radius:10px;
+}
+::-webkit-scrollbar-thumb:hover{
+background:#4da3ff;
+}
+    
+#clearBtn{
+position:absolute;
+right:20px;
+top:50%;
+transform:translateY(-50%);
+cursor:pointer;
+display:none;
+}
+    
 #logoutBtn { cursor: pointer; color: var(--dim); font-weight: 600; font-size: 14px; }
 #logoutBtn:hover { color: #ff4b4b; }
   
@@ -275,8 +318,9 @@ font-size:14px;
 
 <div class="search-box">
 <input type="text" id="searchInput" placeholder="Search users...">
+<span id="clearBtn">✖</span>
 <div class="stats">
-Total Users: <span id="totalUsers">0</span> |
+Total Registered Accounts: <span id="totalUsers">0</span> |
 Online: <span id="onlineUsers">0</span>
 </div>
 </div>
@@ -383,7 +427,7 @@ snap.forEach(doc=>{
 users.push({id:doc.id,...doc.data()});
 });
 document.getElementById("totalUsers").innerText = users.length;
-renderUsers(users);
+renderUsers([]);
 }
 
 loadUsers();
@@ -408,8 +452,23 @@ listenOnlineUsers();
 document.getElementById("searchInput").addEventListener("input", e=>{
 const val = e.target.value.toLowerCase();
 
+const main = document.querySelector(".main");
+const searchBox = document.querySelector(".search-box");
+
+if(val){
+    main.classList.remove("centered");
+    searchBox.classList.add("active");
+}else{
+    main.classList.add("centered");
+    searchBox.classList.remove("active");
+    renderUsers([]);
+    return;
+}
+
 const filtered = users.filter(u =>
-(u.firstName + " " + u.lastName).toLowerCase().includes(val)
+((u.firstName || "") + " " + (u.lastName || ""))
+.toLowerCase()
+.includes(val)
 );
 
 renderUsers(filtered);
@@ -425,7 +484,9 @@ box.innerHTML += `
 <div class="user-card" onclick='openUser(${JSON.stringify(u.id)},${JSON.stringify(u.firstName + " " + u.lastName)},${JSON.stringify(u.photo)})'>
 <img src="${u.photo}" class="avatar">
 <div>
-<div class="username">${u.firstName} ${u.lastName}</div>
+<div class="username">
+${(u.firstName || "") + " " + (u.lastName || "") || "User"}
+</div>
 <div style="font-size:12px;color:#4ade80;" id="status-${u.id}">checking...</div>
 </div>
 </div>
@@ -434,7 +495,10 @@ box.innerHTML += `
 const statusRef = doc(db,"status",u.id);
 
 onSnapshot(statusRef,(snap)=>{
-if(!snap.exists()) return;
+if(!snap.exists()){
+document.getElementById("status-"+u.id).innerText = "⚪ Offline";
+return;
+}
 
 document.getElementById("status-"+u.id).innerText =
 snap.data().online ? "🟢 Online" : "⚪ Offline";
@@ -505,7 +569,27 @@ window.addEventListener("load", () => {
     indicator.style.top = active.offsetTop + "px";
     indicator.style.height = active.offsetHeight + "px";
 });
-  
+
+window.addEventListener("load", ()=>{
+document.querySelector(".main").classList.add("centered");
+});
+
+const input = document.getElementById("searchInput");
+const clearBtn = document.getElementById("clearBtn");
+
+input.addEventListener("input", ()=>{
+clearBtn.style.display = input.value ? "block" : "none";
+});
+
+clearBtn.onclick = ()=>{
+input.value = "";
+clearBtn.style.display = "none";
+renderUsers([]);
+
+document.querySelector(".main").classList.add("centered");
+document.querySelector(".search-box").classList.remove("active");
+};
+    
 </script>
 
 </body>
