@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ChatPH | Search Users</title>
 
+<link rel="icon" type="image/png" href="image/chatph-logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -12,10 +13,9 @@
 --bg:#0f1115;
 --card:#171a21;
 --border:#23262f;
---text:#fff;
+--text:#ffffff;
 --accent:#4da3ff;
 }
-
 body{
 margin:0;
 font-family:'Inter',sans-serif;
@@ -27,251 +27,346 @@ color:var(--text);
 header{
 display:flex;
 justify-content:space-between;
+align-items:center;
 padding:15px 24px;
 border-bottom:1px solid var(--border);
+position:sticky;
+top:0;
+z-index:100;
+}
+
+.header-left{
+display:flex;
+align-items:center;
+gap:12px;
+cursor:pointer;
+}
+
+.menu-icon{
+font-size:26px;
+}
+
+.logo{
+width:32px;
+border-radius:6px;
+}
+
+.brand{
+font-weight:700;
+}
+
+/* SIDEBAR */
+.sidebar{
+position:fixed;
+top:0;
+left:-260px;
+width:240px;
+height:100%;
+background:rgba(21,25,33,0.75);
+backdrop-filter:blur(12px);
+padding-top:70px;
+transition:.3s;
+z-index:999;
+}
+.sidebar.open{ left:0; }
+
+.sidebar a{
+display:block;
+padding:14px 20px;
+color:white;
+text-decoration:none;
+}
+.sidebar a:hover{
+background:rgba(255,255,255,0.05);
+color:var(--accent);
+}
+
+.overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.5);
+opacity:0;
+pointer-events:none;
+transition:.3s;
+}
+.overlay.active{
+opacity:1;
+pointer-events:auto;
 }
 
 /* MAIN */
-.container{
-padding:20px;
-max-width:700px;
+.main{
+max-width:520px;
 margin:auto;
+padding:16px;
+}
+
+/* SEARCH BOX */
+.search-box{
+background:var(--card);
+padding:15px;
+border-radius:12px;
+border:1px solid var(--border);
+margin-bottom:15px;
+}
+
+.search-box input{
+width:100%;
+padding:12px;
+border-radius:10px;
+border:none;
+outline:none;
+background:#0f1115;
+color:white;
 }
 
 /* STATS */
 .stats{
-display:flex;
-justify-content:space-between;
-margin-bottom:15px;
+margin-top:10px;
 font-size:14px;
 opacity:.8;
 }
 
-/* SEARCH */
-.search-box{
-display:flex;
-gap:10px;
-margin-bottom:15px;
-}
-.search-box input{
-flex:1;
-padding:12px;
-border-radius:25px;
-border:none;
-background:#1f2937;
-color:white;
-}
-
 /* USER CARD */
 .user-card{
-background:#171a21;
+background:var(--card);
+border:1px solid var(--border);
 padding:12px;
 border-radius:12px;
+display:flex;
+align-items:center;
+gap:10px;
 margin-bottom:10px;
 cursor:pointer;
 transition:.2s;
 }
+
 .user-card:hover{
 background:#1f2937;
 }
 
-/* PROFILE PREVIEW */
-.profile{
-margin-top:20px;
-padding:15px;
-background:#171a21;
-border-radius:12px;
-display:none;
-}
-
-.profile img{
-width:70px;
-height:70px;
+.avatar{
+width:40px;
+height:40px;
 border-radius:50%;
 }
 
-.actions{
-margin-top:10px;
-display:flex;
-gap:10px;
-}
-
-.actions button{
-padding:8px 12px;
-border:none;
-border-radius:8px;
-cursor:pointer;
+.username{
 font-weight:600;
 }
 
-.add{
-background:#22c55e;
+/* POPUP */
+.popup{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.6);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:9999;
 }
-.msg{
-background:#4da3ff;
+
+.popup-content{
+background:#171a21;
+padding:20px;
+border-radius:12px;
+text-align:center;
+width:300px;
+}
+
+.popup img{
+width:80px;
+height:80px;
+border-radius:50%;
+margin-bottom:10px;
+}
+
+.btn{
+margin-top:10px;
+padding:10px;
+border:none;
+border-radius:8px;
+background:var(--accent);
+color:black;
+cursor:pointer;
+}
+
+/* FOOTER */
+footer{
+text-align:center;
+padding:20px;
+opacity:.6;
+font-size:14px;
 }
 </style>
 </head>
 
 <body>
 
+<!-- HEADER -->
 <header>
-<h3>Search Users</h3>
+<div class="header-left">
+<span class="menu-icon" onclick="toggleSidebar()">☰</span>
+<img src="image/chatph-logo.png" class="logo">
+<span class="brand">ChatPH</span>
+</div>
+<div>
+<span id="userDisplay">Loading...</span>
+<span id="logoutBtn" style="cursor:pointer;margin-left:10px;">Logout</span>
+</div>
 </header>
 
-<div class="container">
-
-<div class="stats">
-<span id="totalUsers">Total: 0</span>
-<span id="onlineUsers">Online: 0</span>
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+<a href="home.html">Home</a>
+<a href="msg.html">Messages</a>
+<a href="frnd.html">Friends</a>
+<a href="srch.html" class="active">Search User</a>
+<a href="prfl.html">Profile</a>
 </div>
 
+<div class="overlay" id="overlay" onclick="toggleSidebar(true)"></div>
+
+<!-- MAIN -->
+<div class="main">
+
 <div class="search-box">
-<input type="text" id="searchInput" placeholder="Search user...">
+<input type="text" id="searchInput" placeholder="Search users...">
+<div class="stats">
+Total Users: <span id="totalUsers">0</span> |
+Online: <span id="onlineUsers">0</span>
+</div>
 </div>
 
 <div id="results"></div>
 
-<div class="profile" id="profileBox">
-<img id="avatar" src="">
-<h3 id="name"></h3>
-<p id="uid"></p>
-
-<div class="actions">
-<button class="add" onclick="addFriend()">Add Friend</button>
-<button class="msg" onclick="messageUser()">Message</button>
-</div>
 </div>
 
+<!-- POPUP -->
+<div class="popup" id="popup">
+<div class="popup-content">
+<img id="popupImg">
+<h3 id="popupName"></h3>
+<button class="btn" onclick="startChat()">Message</button>
+<button class="btn" onclick="closePopup()">Close</button>
 </div>
+</div>
+
+<footer>
+© 2026 ChatPH
+</footer>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
 getFirestore,
 collection,
-getDocs,
-onSnapshot,
-doc,
-setDoc
+getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import {
 getAuth,
-onAuthStateChanged
+onAuthStateChanged,
+signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-/* FIREBASE CONFIG */
+/* CONFIG */
 const firebaseConfig = {
-apiKey: "YOUR_KEY",
-authDomain: "YOUR_DOMAIN",
-projectId: "YOUR_ID",
+apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
+authDomain: "chatph-cc187.firebaseapp.com",
+projectId: "chatph-cc187"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-/* DATA */
-let users = [];
-let selectedUser = null;
+/* SIDEBAR */
+window.toggleSidebar = (close=false)=>{
+const s = document.getElementById("sidebar");
+const o = document.getElementById("overlay");
+if(close){
+s.classList.remove("open");
+o.classList.remove("active");
+}else{
+s.classList.toggle("open");
+o.classList.toggle("active");
+}
+};
+
+/* AUTH */
+onAuthStateChanged(auth,user=>{
+if(user){
+document.getElementById("userDisplay").innerText = user.displayName;
+}else{
+window.location.href="index.html";
+}
+});
+
+document.getElementById("logoutBtn").onclick=async()=>{
+await signOut(auth);
+window.location.href="index.html";
+};
 
 /* LOAD USERS */
+let users = [];
+
 async function loadUsers(){
 const snap = await getDocs(collection(db,"users"));
 users = [];
-
-snap.forEach(docSnap=>{
-users.push({
-uid: docSnap.id,
-...docSnap.data()
+snap.forEach(doc=>{
+users.push({id:doc.id,...doc.data()});
 });
-});
-
-/* TOTAL USERS */
-document.getElementById("totalUsers").innerText =
-"Total: " + users.length;
+document.getElementById("totalUsers").innerText = users.length;
+renderUsers(users);
 }
 
-/* ONLINE USERS (simple demo: logged in users) */
-onSnapshot(collection(db,"users"), snap=>{
-let online = 0;
-
-snap.forEach(doc=>{
-if(doc.data().online) online++;
-});
-
-document.getElementById("onlineUsers").innerText =
-"Online: " + online;
-});
+loadUsers();
 
 /* SEARCH */
-document.getElementById("searchInput").addEventListener("input", function(){
-const value = this.value.toLowerCase();
+document.getElementById("searchInput").addEventListener("input", e=>{
+const val = e.target.value.toLowerCase();
+
+const filtered = users.filter(u =>
+(u.firstName + " " + u.lastName).toLowerCase().includes(val)
+);
+
+renderUsers(filtered);
+});
+
+/* RENDER */
+function renderUsers(list){
 const box = document.getElementById("results");
 box.innerHTML = "";
 
-const filtered = users.filter(u =>
-u.name && u.name.toLowerCase().includes(value)
-);
-
-filtered.forEach(u=>{
+list.forEach(u=>{
 box.innerHTML += `
-<div class="user-card" onclick="showProfile('${u.uid}')">
-${u.name}
+<div class="user-card" onclick="openUser('${u.id}','${u.firstName} ${u.lastName}','${u.photo}')">
+<img src="${u.photo}" class="avatar">
+<div class="username">${u.firstName} ${u.lastName}</div>
 </div>
 `;
 });
-});
-
-/* SHOW PROFILE */
-window.showProfile = function(uid){
-const user = users.find(u=>u.uid === uid);
-if(!user) return;
-
-selectedUser = user;
-
-document.getElementById("profileBox").style.display = "block";
-document.getElementById("name").innerText = user.name;
-document.getElementById("uid").innerText = user.uid;
-
-/* avatar fallback */
-document.getElementById("avatar").src =
-user.photo || "https://via.placeholder.com/70";
 }
 
-/* ADD FRIEND */
-window.addFriend = async function(){
-if(!selectedUser) return;
+/* POPUP */
+window.openUser = (id,name,photo)=>{
+window.selectedUser = id;
+document.getElementById("popup").style.display="flex";
+document.getElementById("popupName").innerText=name;
+document.getElementById("popupImg").src=photo;
+};
 
-const myId = auth.currentUser.uid;
-
-await setDoc(doc(db,"friends", myId+"_"+selectedUser.uid),{
-users:[myId, selectedUser.uid]
-});
-
-alert("Friend added!");
-}
+window.closePopup = ()=>{
+document.getElementById("popup").style.display="none";
+};
 
 /* MESSAGE */
-window.messageUser = function(){
-if(!selectedUser) return;
-
-localStorage.setItem("chatUser", selectedUser.uid);
-window.location.href = "message.html";
+window.startChat = ()=>{
+if(window.selectedUser){
+window.location.href = "msg.html?uid=" + window.selectedUser;
 }
-
-/* AUTH */
-onAuthStateChanged(auth, async(user)=>{
-if(user){
-await loadUsers();
-
-/* SET ONLINE */
-await setDoc(doc(db,"users", user.uid),{
-online:true
-},{merge:true});
-}
-});
+};
 </script>
 
 </body>
