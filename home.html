@@ -364,14 +364,17 @@ font-weight:600;
   
 /* FOOTER */
 footer{
-text-align:center;
-padding:20px;
-opacity:.6;
-font-size:14px;
+    text-align:center;
+    padding:10px;
+    font-size:13px;
+    opacity:.6;
+    background:var(--bg);
 }
+    
 footer a:hover{
 text-decoration:underline;
 }
+    
 /* BADGES */
 .admin-badge{
 margin-left:2px;
@@ -866,8 +869,15 @@ header{
 <div id="postsFeed"></div>
 </div>
   
-<footer>
+<footer style="
+text-align:center;
+padding:30px 20px;
+color:#94a3b8;
+border-top:1px solid rgba(255,255,255,0.08);
+margin-top:40px;
+">
 <div>© 2026 ChatPH • All Rights Reserved</div>
+
 <div style="margin-top:6px;font-size:13px;">
 <a href="#" style="color:#4da3ff;text-decoration:none;">About</a>
 &nbsp;|&nbsp;
@@ -877,10 +887,12 @@ header{
 &nbsp;|&nbsp;
 <a href="#" style="color:#4da3ff;text-decoration:none;">Contact</a>
 </div>
+
 <div style="margin-top:6px;font-size:12px;opacity:.7;">
 Made with ❤️ in the Philippines
 </div>
 </footer>
+    
 <script type="module">
 import { initializeApp } from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
