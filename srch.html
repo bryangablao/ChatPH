@@ -218,10 +218,12 @@ font-weight:600;
 }
     
 .popup-content{
-background:#171a21;
-padding:20px;
-border-radius:12px;
-width:320px;
+    background:#171a21;
+    padding:20px;
+    border-radius:12px;
+    width:320px;
+    max-width:90%;
+    box-sizing:border-box;
 }
 
 .popup-row{
@@ -237,7 +239,8 @@ border-radius:50%;
 }
 
 .popup-info{
-flex:1;
+    flex:1;
+    min-width:0;
 }
 
 .popup-name{
@@ -252,15 +255,39 @@ gap:10px;
 }
 
 .action-btn{
-width:40px;
-height:40px;
-cursor:pointer;
-border-radius:8px;
-transition:.2s;
+    width:40px;
+    height:40px;
+    cursor:pointer;
+    border-radius:10px;
+    transition:.2s;
+    position:relative;
 }
 
 .action-btn:hover{
-background:#2a2f3b;
+    background:#2a2f3b;
+    transform:scale(1.15);
+}
+
+.action-btn::after{
+    content: attr(data-title);
+    position:absolute;
+    bottom:-28px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#111;
+    color:#fff;
+    font-size:11px;
+    padding:4px 8px;
+    border-radius:6px;
+    opacity:0;
+    pointer-events:none;
+    white-space:nowrap;
+    transition:.2s;
+}
+
+.action-btn:hover::after{
+    opacity:1;
+    bottom:-32px;
 }
     
 /* FOOTER */
@@ -377,9 +404,9 @@ Online: <span id="onlineUsers">0</span>
             <div id="popupName" class="popup-name"></div>
             
             <div class="popup-actions">
-                <img src="image/icon/viewprofile.png" class="action-btn" onclick="viewProfile()">
-                <img src="image/icon/directmessage.png" class="action-btn" onclick="startChat()">
-                <img src="image/icon/adduser.png" class="action-btn" onclick="addFriend()">
+                <img src="image/icon/viewprofile.png" class="action-btn" onclick="viewProfile()" data-title="View Profile">
+                <img src="image/icon/directmessage.png" class="action-btn" onclick="startChat()" data-title="Message">
+                <img src="image/icon/adduser.png" class="action-btn" onclick="addFriend()" data-title="Add Friend">
             </div>
         </div>
     </div>
