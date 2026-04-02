@@ -382,7 +382,8 @@ getDocs,
 doc,
 setDoc,
 updateDoc,
-onSnapshot
+onSnapshot,
+getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import {
@@ -452,9 +453,23 @@ let users = [];
 async function loadUsers(){
 const snap = await getDocs(collection(db,"users"));
 users = [];
-snap.forEach(doc=>{
-users.push({id:doc.id,...doc.data()});
-});
+
+for (const docSnap of snap.docs){
+    const userData = {id:docSnap.id,...docSnap.data()};
+    users.push(userData);
+
+    // ✅ CREATE STATUS IF MISSING
+    const statusRef = doc(db,"status",docSnap.id);
+    const statusSnap = await getDoc(statusRef);
+
+    if(!statusSnap.exists()){
+        await setDoc(statusRef,{
+            online:false,
+            lastSeen:new Date()
+        });
+    }
+}
+
 document.getElementById("totalUsers").innerText = users.length;
 renderUsers([]);
 }
@@ -534,7 +549,7 @@ box.innerHTML += `
 ${(u.firstName || "") + " " + (u.lastName || "") || "User"}
 </div>
 <div style="font-size:12px;color:#9ca3af;" id="status-${u.id}">
-● Checking...
+● Offline
 </div>
 </div>
 </div>
