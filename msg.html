@@ -738,6 +738,7 @@ import {
     where,
     addDoc,
     onSnapshot,
+    serverTimestamp,
     deleteDoc,
     doc,
     updateDoc,
@@ -856,16 +857,18 @@ function loadChatList(){
 
 onAuthStateChanged(auth, async (user) => {
     if(user){
+
+        setOnlineStatus(user);
+
         await setDoc(doc(db, "users", user.uid), {
             name: user.displayName || "No Name"
         }, { merge: true });
 
         await loadUsers();
-
         setTimeout(() => {
             loadChatList();
         }, 200);
-        
+
         document.getElementById("userName").innerText = user.displayName;
     }
 });
@@ -1541,6 +1544,24 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
+function setOnlineStatus(user){
+    const userRef = doc(db, "status", user.uid);
+
+    // SET ONLINE
+    setDoc(userRef, {
+        online: true,
+        lastSeen: serverTimestamp()
+    });
+
+    // WHEN USER CLOSES TAB / LEAVES PAGE
+    window.addEventListener("beforeunload", () => {
+        setDoc(userRef, {
+            online: false,
+            lastSeen: serverTimestamp()
+        });
+    });
+}
+    
 // 🔥 MAKE FUNCTIONS GLOBAL (IMPORTANT)
 
 window.deleteMessage = deleteMessage;
