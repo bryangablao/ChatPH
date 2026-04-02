@@ -454,6 +454,10 @@ z-index:3000;
     const auth = getAuth(app);
     setPersistence(auth, browserLocalPersistence);
 
+    // 🔥 GET UID FROM URL
+    const params = new URLSearchParams(window.location.search);
+    const profileUID = params.get("uid");
+
     // --- DOM Refs ---
     const bioModal = document.getElementById('bioModal');
     const bioInput = document.getElementById('bioInput');
@@ -570,54 +574,62 @@ imageViewer.onclick = () => {
 };
     
     // --- State & Feed ---
-    onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-            setTimeout(() => { if(!auth.currentUser) window.location.href="index.html" }, 800);
-            return;
-        }
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        setTimeout(() => { 
+            if(!auth.currentUser) window.location.href="index.html" 
+        }, 800);
+        return;
+    }
 
-        document.getElementById("userName").innerText = user.displayName || "User";
-        document.getElementById("userEmail").innerText = user.email;
+    // 🔥 USE URL UID OR FALLBACK TO CURRENT USER
+    const uidToLoad = profileUID || user.uid;
 
-        const snap = await getDoc(doc(db, "users", user.uid));
-        if (snap.exists()) {
-            const d = snap.data();
-            if (d.bio) document.getElementById("userBio").innerText = d.bio;
-            if (d.pfpBase64) document.getElementById("pfp").src = d.pfpBase64;
-            if (d.coverBase64) document.getElementById("coverImg").src = d.coverBase64;
-        }
+    const userRef = doc(db, "users", uidToLoad);
+    const snap = await getDoc(userRef);
 
-const q = query(
-  collection(db, "posts"),
-  where("email", "==", user.email)
-);
-        
-        onSnapshot(q, (snap) => {
-            const list = document.getElementById("postList");
-            list.innerHTML = "";
-            document.getElementById("statPosts").innerText = snap.size;
-            snap.forEach(doc => {
-                const p = doc.data();
-list.innerHTML += `
-<div class="post">
+    if (snap.exists()) {
+        const d = snap.data();
 
-    <div class="post-header">
-        <img src="${p.photo}" class="avatar">
-        <div class="post-info">
-            <div class="username">${p.name || "User"}</div>
-            <div class="time">${p.time?.toDate().toLocaleString() || "Recent"}</div>
-        </div>
-    </div>
+        document.getElementById("userName").innerText =
+            (d.firstName || "") + " " + (d.lastName || "") || "User";
 
-    <div class="post-text">
-        ${p.text}
-    </div>
+        document.getElementById("userEmail").innerText = d.email || "";
 
-</div>
-`;
-            });
+        if (d.bio) document.getElementById("userBio").innerText = d.bio;
+        if (d.pfpBase64) document.getElementById("pfp").src = d.pfpBase64;
+        if (d.coverBase64) document.getElementById("coverImg").src = d.coverBase64;
+    }
+
+    // 🔥 LOAD POSTS OF THAT USER
+    const q = query(
+        collection(db, "posts"),
+        where("uid", "==", uidToLoad)
+    );
+
+    onSnapshot(q, (snap) => {
+        const list = document.getElementById("postList");
+        list.innerHTML = "";
+        document.getElementById("statPosts").innerText = snap.size;
+
+        snap.forEach(doc => {
+            const p = doc.data();
+
+            list.innerHTML += `
+            <div class="post">
+                <div class="post-header">
+                    <img src="${p.photo}" class="avatar">
+                    <div class="post-info">
+                        <div class="username">${p.name || "User"}</div>
+                        <div class="time">${p.time?.toDate().toLocaleString() || "Recent"}</div>
+                    </div>
+                </div>
+                <div class="post-text">${p.text}</div>
+            </div>
+            `;
         });
     });
+});
 
     document.getElementById('logoutBtn').onclick = () => signOut(auth);
 
