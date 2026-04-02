@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChatPH | Search Users</title>
+
+<link rel="icon" type="image/png" href="image/chatph-logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+--bg:#0f1115;
+--card:#171a21;
+--border:#23262f;
+--text:#ffffff;
+--accent:#4da3ff;
+}
+body{
+margin:0;
+font-family:'Inter',sans-serif;
+background:var(--bg);
+color:var(--text);
+}
+
+/* HEADER */
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 24px;
+border-bottom:1px solid var(--border);
+position:sticky;
+top:0;
+z-index:100;
+}
+
+.header-left{
+display:flex;
+align-items:center;
+gap:12px;
+cursor:pointer;
+}
+
+.menu-icon{
+font-size:26px;
+}
+
+.logo{
+width:32px;
+border-radius:6px;
+}
+
+.brand{
+font-weight:700;
+}
+
+/* SIDEBAR */
+.sidebar{
+    position: fixed;
+    top: 0;
+    left: -260px;
+    width: 240px;
+    height: 100%;
+    background: rgba(21,25,33,0.75);
+    backdrop-filter: blur(12px);
+    border-right: 1px solid rgba(255,255,255,0.08);
+    padding-top: 70px;
+    transition: .3s;
+    z-index: 999;
+}
+.sidebar.open{
+    left:0;
+}
+.sidebar a {
+    display:block;
+    padding:14px 20px;
+    text-decoration:none;
+    color:white;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+.sidebar a::before {
+    content: "";
+    position: absolute;
+    left: -100%;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(59,130,246,0.1);
+    transition: left 0.25s ease;
+    z-index: 0;
+}
+.sidebar a:hover::before {
+    left: 0;
+}
+.sidebar a:hover {
+    background: rgba(255,255,255,0.05);
+    color: var(--accent);
+}
+.sidebar a.active {
+    background: rgba(59,130,246,0.15);
+    color: var(--accent);
+    border-left: 3px solid var(--accent);
+}
+
+/* INDICATOR */
+.indicator {
+    position: absolute;
+    left: 0;
+    width: 4px;
+    height: 44px;
+    background: var(--accent);
+    border-radius: 4px;
+    top: 0;
+    transition: 0.3s ease;
+    box-shadow: 0 0 10px rgba(59,130,246,0.7);
+}
+
+.overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.5);
+opacity:0;
+pointer-events:none;
+transition:.3s;
+}
+.overlay.active{
+opacity:1;
+pointer-events:auto;
+}
+
+/* MAIN */
+.main{
+max-width:520px;
+margin:auto;
+padding:16px;
+}
+
+.main.centered .search-box{
+width:100%;
+max-width:650px; /* 👈 bigger */
+padding:25px; /* 👈 more space */
+border-radius:16px;
+}
+
+.main.centered input{
+padding:16px; /* bigger input */
+font-size:16px;
+}
+
+/* SEARCH BOX */
+.search-box{
+background:var(--card);
+padding:15px;
+border-radius:12px;
+border:1px solid var(--border);
+margin-bottom:15px;
+}
+
+.search-box input{
+width:100%;
+padding:12px;
+padding-right:40px;
+box-sizing:border-box;
+border-radius:10px;
+border:none;
+outline:none;
+background:#0f1115;
+color:white;
+}
+
+/* STATS */
+.stats{
+margin-top:10px;
+font-size:14px;
+opacity:.8;
+}
+
+/* USER CARD */
+.user-card{
+background:var(--card);
+border:1px solid var(--border);
+padding:12px;
+border-radius:12px;
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:10px;
+cursor:pointer;
+transition:.2s;
+}
+
+.user-card:hover{
+background:#1f2937;
+}
+
+.avatar{
+width:40px;
+height:40px;
+border-radius:50%;
+}
+
+.username{
+font-weight:600;
+}
+
+/* POPUP */
+.popup{
+    position: fixed;
+    inset: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+}
+    
+.popup-content{
+    background:#171a21;
+    padding:20px;
+    border-radius:12px;
+    width:320px;
+    max-width:90%;
+    box-sizing:border-box;
+}
+
+.popup-row{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.popup-avatar{
+width:70px;
+height:70px;
+border-radius:50%;
+}
+
+.popup-info{
+    flex:1;
+    min-width:0;
+}
+
+.popup-name{
+font-size:16px;
+font-weight:600;
+margin-bottom:10px;
+}
+
+.popup-actions{
+display:flex;
+gap:10px;
+}
+
+.action-btn{
+    width:40px;
+    height:40px;
+    cursor:pointer;
+    border-radius:10px;
+    transition:.2s;
+    position:relative;
+}
+
+.action-btn:hover{
+    background:#2a2f3b;
+    transform:scale(1.15);
+}
+
+.action-btn::after{
+    content: attr(data-title);
+    position:absolute;
+    bottom:-28px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#111;
+    color:#fff;
+    font-size:11px;
+    padding:4px 8px;
+    border-radius:6px;
+    opacity:0;
+    pointer-events:none;
+    white-space:nowrap;
+    transition:.2s;
+}
+
+.action-btn:hover::after{
+    opacity:1;
+    bottom:-32px;
+}
+    
+/* FOOTER */
+footer{
+text-align:center;
+padding:20px;
+opacity:.6;
+font-size:14px;
+}
+footer a:hover{
+text-decoration:underline;
+}
+    
+.main.centered{
+display:flex;
+justify-content:center;
+align-items:center;
+height:70vh;
+flex-direction:column;
+}
+
+.search-box.active{
+position:sticky;
+top:10px;
+transform:scale(.95);
+transition:.3s;
+}
+
+.search-box{
+position:relative;
+}
+
+::-webkit-scrollbar{
+width:8px;
+}
+::-webkit-scrollbar-track{
+background:#0f1115;
+}
+::-webkit-scrollbar-thumb{
+background:#2a2f3b;
+border-radius:10px;
+}
+::-webkit-scrollbar-thumb:hover{
+background:#4da3ff;
+}
+    
+#clearBtn{
+position:absolute;
+right:30px;
+top:35%;
+transform:translateY(-50%);
+cursor:pointer;
+display:none;
+font-size:14px;
+}
+    
+#logoutBtn { cursor: pointer; color: var(--dim); font-weight: 600; font-size: 14px; }
+#logoutBtn:hover { color: #ff4b4b; }
+  
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header>
+<div class="header-left">
+<span class="menu-icon" onclick="toggleSidebar()">☰</span>
+<img src="image/chatph-logo.png" class="logo">
+<span class="brand">ChatPH</span>
+</div>
+    <div style="display:flex;align-items:center;gap:16px;">
+        <span id="userDisplay">Guest</span>
+        <div id="logoutBtn">Logout</div>
+    </div>
+</header>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+<a href="home.html">Home</a>
+<a href="msg.html">Messages</a>
+<a href="frnd.html">Friends</a>
+<a href="#" class="active" onclick="return false;">Search User</a>
+<a href="prfl.html">Profile</a>
+
+<div class="indicator" id="indicator"></div>
+</div>
+
+<div class="overlay" id="overlay" onclick="toggleSidebar(true)"></div>
+
+<!-- MAIN -->
+<div class="main">
+
+<div class="search-box">
+<input type="text" id="searchInput" placeholder="Search users...">
+<span id="clearBtn">✖</span>
+<div class="stats">
+Total Registered Accounts: <span id="totalUsers">0</span> |
+Online: <span id="onlineUsers">0</span>
+</div>
+</div>
+
+<div id="results"></div>
+
+</div>
+
+<!-- POPUP -->
+<div class="popup" id="popup">
+<div class="popup-content" id="popupContent">
+    <div class="popup-row">
+        <img id="popupImg" class="popup-avatar">
+        
+        <div class="popup-info">
+            <div id="popupName" class="popup-name"></div>
+            
+            <div class="popup-actions">
+                <img src="image/icon/viewprofile.png" class="action-btn" onclick="viewProfile()" data-title="View Profile" title="View Profile">
+                <img src="image/icon/directmessage.png" class="action-btn" onclick="startChat()" data-title="Message" title="Message">
+                <img src="image/icon/adduser.png" class="action-btn" onclick="addFriend()" data-title="Add Friend" title="Add Friend">
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<footer>
+<div>© 2026 ChatPH • All Rights Reserved</div>
+<div style="margin-top:6px;font-size:13px;">
+<a href="#" style="color:#4da3ff;text-decoration:none;">About</a>
+&nbsp;|&nbsp;
+<a href="#" style="color:#4da3ff;text-decoration:none;">Privacy</a>
+&nbsp;|&nbsp;
+<a href="#" style="color:#4da3ff;text-decoration:none;">Terms</a>
+&nbsp;|&nbsp;
+<a href="#" style="color:#4da3ff;text-decoration:none;">Contact</a>
+</div>
+<div style="margin-top:6px;font-size:12px;opacity:.7;">
+Made with ❤️ in the Philippines
+</div>
+</footer>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+getFirestore,
+collection,
+getDocs,
+doc,
+setDoc,
+updateDoc,
+onSnapshot,
+getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+import {
+getAuth,
+onAuthStateChanged,
+signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+/* CONFIG */
+const firebaseConfig = {
+apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
+authDomain: "chatph-cc187.firebaseapp.com",
+projectId: "chatph-cc187"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+/* SIDEBAR */
+window.toggleSidebar = (close=false)=>{
+const s = document.getElementById("sidebar");
+const o = document.getElementById("overlay");
+if(close){
+s.classList.remove("open");
+o.classList.remove("active");
+}else{
+s.classList.toggle("open");
+o.classList.toggle("active");
+}
+};
+
+/* AUTH */
+onAuthStateChanged(auth, async (user)=>{
+if(user){
+
+document.getElementById("userDisplay").innerText =
+user.displayName || user.email;
+
+// 🟢 SET ONLINE
+await setDoc(doc(db,"status",user.uid),{
+    lastSeen:new Date()
+});
+
+// 🔁 UPDATE LAST SEEN EVERY 10 SECONDS
+setInterval(async ()=>{
+    await updateDoc(doc(db,"status",user.uid),{
+        lastSeen:new Date()
+    });
+}, 10000);
+
+// 🔴 OFFLINE WHEN TAB CLOSE
+window.addEventListener("beforeunload", async ()=>{
+await updateDoc(doc(db,"status",user.uid),{
+    lastSeen:new Date()
+});
+});
+
+}else{
+window.location.href="index.html";
+}
+});
+
+  document.getElementById("logoutBtn").onclick = async ()=>{
+await signOut(auth);
+window.location.href="index.html";
+};
+
+/* LOAD USERS */
+let users = [];
+
+async function loadUsers(){
+const snap = await getDocs(collection(db,"users"));
+users = [];
+
+for (const docSnap of snap.docs){
+    const userData = {id:docSnap.id,...docSnap.data()};
+    users.push(userData);
+
+    // ✅ CREATE STATUS IF MISSING
+    const statusRef = doc(db,"status",docSnap.id);
+    const statusSnap = await getDoc(statusRef);
+
+if(!statusSnap.exists()){
+    await setDoc(statusRef,{
+        lastSeen:new Date()
+    });
+}
+}
+
+document.getElementById("totalUsers").innerText = users.length;
+renderUsers([]);
+}
+
+loadUsers();
+
+function listenOnlineUsers(){
+const statusRef = collection(db,"status");
+
+onSnapshot(statusRef,(snap)=>{
+let online = 0;
+
+snap.forEach(doc=>{
+    const data = doc.data();
+    const lastSeen = data.lastSeen?.toDate();
+    const now = new Date();
+
+    if(lastSeen && (now - lastSeen < 15000)){
+        online++;
+    }
+});
+
+document.getElementById("onlineUsers").innerText = online;
+});
+}
+
+listenOnlineUsers();
+
+/* SEARCH */
+document.getElementById("searchInput").addEventListener("input", e=>{
+const val = e.target.value.toLowerCase();
+
+const main = document.querySelector(".main");
+const searchBox = document.querySelector(".search-box");
+
+if(val){
+    main.classList.remove("centered");
+    searchBox.classList.add("active");
+}else{
+    main.classList.add("centered");
+    searchBox.classList.remove("active");
+    renderUsers([]);
+    return;
+}
+
+const filtered = users.filter(u =>
+((u.firstName || "") + " " + (u.lastName || ""))
+.toLowerCase()
+.includes(val)
+);
+
+renderUsers(filtered);
+});
+
+function timeAgo(date){
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(seconds / 3600);
+    const days = Math.floor(seconds / 86400);
+
+    if(seconds < 60) return "just now";
+    if(minutes < 60) return minutes + "m ago";
+    if(hours < 24) return hours + "h ago";
+    if(days === 1) return "yesterday";
+    if(days < 30) return days + "d ago";
+
+    return date.toLocaleDateString();
+}
+    
+/* RENDER */
+function renderUsers(list){
+const box = document.getElementById("results");
+box.innerHTML = "";
+
+list.forEach(u=>{
+box.innerHTML += `
+<div class="user-card" onclick="openUser('${u.id}', '${(u.firstName || '') + ' ' + (u.lastName || '')}', '${u.photo}')">
+<img src="${u.photo}" class="avatar">
+<div>
+<div class="username">
+${(u.firstName || "") + " " + (u.lastName || "") || "User"}
+</div>
+<div style="font-size:12px;color:#9ca3af;" id="status-${u.id}">
+● Offline
+</div>
+</div>
+</div>
+`;
+
+const statusRef = doc(db,"status",u.id);
+
+onSnapshot(statusRef,(snap)=>{
+const statusEl = document.getElementById("status-"+u.id);
+
+if(!snap.exists()){
+    statusEl.innerHTML = '<span style="color:#9ca3af;">● Offline</span>';
+    return;
+}
+
+const data = snap.data();
+const lastSeen = data.lastSeen?.toDate();
+const now = new Date();
+const isOnline = lastSeen && (now - lastSeen < 15000);
+
+if(isOnline){
+    statusEl.innerHTML = '<span style="color:#4ade80;">● Online</span>';
+}else{
+    const timeText = lastSeen ? timeAgo(lastSeen) : "offline";
+    const fullDate = lastSeen ? lastSeen.toLocaleString() : "";
+    statusEl.innerHTML = `
+    <span style="color:#9ca3af;" title="Last seen: ${fullDate}">
+    ● Offline (Last seen ${timeText})
+    </span>
+    `;
+}
+});
+});
+}
+
+/* POPUP */
+window.openUser = (id,name,photo)=>{
+window.selectedUser = id;
+document.getElementById("popup").style.display="flex";
+document.getElementById("popupName").innerText=name;
+document.getElementById("popupImg").src=photo;
+};
+
+window.closePopup = ()=>{
+document.getElementById("popup").style.display="none";
+};
+
+/* MESSAGE */
+window.startChat = ()=>{
+    if(window.selectedUser){
+        window.location.href = "msg.html?uid=" + window.selectedUser;
+    }
+};
+
+window.viewProfile = ()=>{
+    if(window.selectedUser){
+        window.location.href = "prfl.html?uid=" + window.selectedUser;
+    }
+};
+
+window.addFriend = ()=>{
+    alert("Add friend soon 👀");
+};
+
+const links = document.querySelectorAll(".sidebar a");
+const indicator = document.getElementById("indicator");
+
+links.forEach(link => {
+    link.onclick = () => {
+        links.forEach(l => l.classList.remove("active"));
+        link.classList.add("active");
+
+        indicator.style.top = link.offsetTop + "px";
+        indicator.style.height = link.offsetHeight + "px";
+    };
+});
+
+window.addEventListener("load", () => {
+    const active = document.querySelector(".sidebar a.active") || links[0];
+    indicator.style.top = active.offsetTop + "px";
+    indicator.style.height = active.offsetHeight + "px";
+});
+
+window.addEventListener("load", ()=>{
+document.querySelector(".main").classList.add("centered");
+});
+
+const input = document.getElementById("searchInput");
+const clearBtn = document.getElementById("clearBtn");
+
+input.addEventListener("input", ()=>{
+clearBtn.style.display = input.value ? "block" : "none";
+});
+
+clearBtn.onclick = ()=>{
+input.value = "";
+clearBtn.style.display = "none";
+renderUsers([]);
+
+document.querySelector(".main").classList.add("centered");
+document.querySelector(".search-box").classList.remove("active");
+};
+
+const popup = document.getElementById("popup");
+
+popup.addEventListener("click", (e)=>{
+    if(e.target.id === "popup"){
+        popup.style.display = "none";
+    }
+});
+    
+</script>
+
+</body>
+</html>
