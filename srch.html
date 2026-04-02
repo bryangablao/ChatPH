@@ -425,7 +425,6 @@ user.displayName || user.email;
 
 // 🟢 SET ONLINE
 await setDoc(doc(db,"status",user.uid),{
-    online:true,
     lastSeen:new Date()
 });
 
@@ -439,8 +438,7 @@ setInterval(async ()=>{
 // 🔴 OFFLINE WHEN TAB CLOSE
 window.addEventListener("beforeunload", async ()=>{
 await updateDoc(doc(db,"status",user.uid),{
-online:false,
-lastSeen:new Date()
+    lastSeen:new Date()
 });
 });
 
@@ -469,12 +467,11 @@ for (const docSnap of snap.docs){
     const statusRef = doc(db,"status",docSnap.id);
     const statusSnap = await getDoc(statusRef);
 
-    if(!statusSnap.exists()){
-        await setDoc(statusRef,{
-            online:false,
-            lastSeen:new Date()
-        });
-    }
+if(!statusSnap.exists()){
+    await setDoc(statusRef,{
+        lastSeen:new Date()
+    });
+}
 }
 
 document.getElementById("totalUsers").innerText = users.length;
@@ -490,7 +487,13 @@ onSnapshot(statusRef,(snap)=>{
 let online = 0;
 
 snap.forEach(doc=>{
-if(doc.data().online) online++;
+    const data = doc.data();
+    const lastSeen = data.lastSeen?.toDate();
+    const now = new Date();
+
+    if(lastSeen && (now - lastSeen < 15000)){
+        online++;
+    }
 });
 
 document.getElementById("onlineUsers").innerText = online;
@@ -575,21 +578,18 @@ if(!snap.exists()){
 const data = snap.data();
 const lastSeen = data.lastSeen?.toDate();
 const now = new Date();
-
-const isOnline = lastSeen && (now - lastSeen < 15000); // 15 seconds
+const isOnline = lastSeen && (now - lastSeen < 15000);
 
 if(isOnline){
     statusEl.innerHTML = '<span style="color:#4ade80;">● Online</span>';
 }else{
-    const lastSeen = data.lastSeen?.toDate();
     const timeText = lastSeen ? timeAgo(lastSeen) : "offline";
     const fullDate = lastSeen ? lastSeen.toLocaleString() : "";
-
-statusEl.innerHTML = `
-<span style="color:#9ca3af;" title="Last seen: ${fullDate}">
-● Offline (Last seen ${timeText})
-</span>
-`;
+    statusEl.innerHTML = `
+    <span style="color:#9ca3af;" title="Last seen: ${fullDate}">
+    ● Offline (Last seen ${timeText})
+    </span>
+    `;
 }
 });
 });
