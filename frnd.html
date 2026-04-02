@@ -240,7 +240,9 @@ import {
 getFirestore,
 doc,
 getDocs,
-collection
+collection,
+setDoc,
+serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
 getAuth,
@@ -279,10 +281,14 @@ o.classList.toggle("active");
 /* AUTH */
 onAuthStateChanged(auth, (user)=>{
 if(user){
-document.getElementById("userDisplay").innerText =
-user.displayName || user.email;
+
+    document.getElementById("userDisplay").innerText =
+    user.displayName || user.email;
+
+    setOnlineStatus(user);
+
 }else{
-window.location.href="index.html";
+    window.location.href="index.html";
 }
 });
 
@@ -309,6 +315,22 @@ window.addEventListener("load", () => {
     indicator.style.top = active.offsetTop + "px";
     indicator.style.height = active.offsetHeight + "px";
 });
+
+function setOnlineStatus(user){
+    const userRef = doc(db, "status", user.uid);
+
+    setDoc(userRef, {
+        online: true,
+        lastSeen: serverTimestamp()
+    });
+
+    window.addEventListener("beforeunload", () => {
+        setDoc(userRef, {
+            online: false,
+            lastSeen: serverTimestamp()
+        });
+    });
+}
     
 </script>
 
