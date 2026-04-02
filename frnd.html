@@ -2,151 +2,250 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ChatPH | Building</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChatPH | Friendlist</title>
+
 <link rel="icon" type="image/png" href="image/chatph-logo.png">
-<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-/* Remove all scrolling and fix height */
-html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden; /* Strict no-scroll */
+:root{
+--bg:#0f1115;
+--card:#171a21;
+--border:#23262f;
+--text:#ffffff;
+--accent:#4da3ff;
+--dim:#9ca3af;
 }
 
-body {
-    font-family: 'Inter', sans-serif;
-    background: linear-gradient(180deg, #0f1115, #141821);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between; /* Spreads content: top, middle, bottom */
+body{
+margin:0;
+font-family:'Inter',sans-serif;
+background:var(--bg);
+color:var(--text);
 }
 
-.back-btn {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    padding: 6px 14px;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    background: rgba(255, 255, 255, 0.05);
-    color: white;
-    font-size: 12px;
-    cursor: pointer;
-    backdrop-filter: blur(6px);
-    z-index: 10;
+/* HEADER */
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 24px;
+border-bottom:1px solid var(--border);
+position:sticky;
+top:0;
+z-index:100;
+}
+.header-left{
+display:flex;
+align-items:center;
+gap:12px;
+cursor:pointer;
+}
+.menu-icon{
+font-size:26px;
+}
+.logo{
+width:32px;
+border-radius:6px;
+}
+.brand{
+font-weight:700;
 }
 
-.container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 90%;
-    max-width: 400px;
+/* SIDEBAR */
+.sidebar{
+position: fixed;
+top: 0;
+left: -260px;
+width: 240px;
+height: 100%;
+background: rgba(21,25,33,0.75);
+backdrop-filter: blur(12px);
+border-right: 1px solid rgba(255,255,255,0.08);
+padding-top: 70px;
+transition: .3s;
+z-index: 999;
+}
+.sidebar.open{ left:0; }
+
+.sidebar a{
+display:block;
+padding:14px 20px;
+text-decoration:none;
+color:white;
 }
 
-/* Scalable Animation */
-lottie-player {
-    width: 50vh; /* Scaled based on screen height to prevent pushing text off */
-    max-width: 240px;
-    height: auto;
-    margin: 0 auto;
+.sidebar a:hover{
+background:rgba(255,255,255,0.05);
+color:var(--accent);
 }
 
-h1 {
-    font-size: clamp(20px, 5vh, 26px); /* Scales based on height */
-    margin: 10px 0 5px 0;
+.sidebar a.active{
+background:rgba(59,130,246,0.15);
+color:var(--accent);
+border-left:3px solid var(--accent);
 }
 
-p {
-    opacity: .7;
-    font-size: clamp(13px, 4vh, 15px);
-    margin: 0;
-    line-height: 1.4;
+/* OVERLAY */
+.overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.5);
+opacity:0;
+pointer-events:none;
+transition:.3s;
+}
+.overlay.active{
+opacity:1;
+pointer-events:auto;
 }
 
-.note {
-    margin-top: 12px;
-    font-size: 13px;
-    color: #4da3ff;
-    font-weight: 600;
-    min-height: 1.2em; /* Prevents layout jump when text changes */
+/* MAIN */
+.main{
+max-width:520px;
+margin:auto;
+padding:16px;
 }
 
-/* Fixed Footer at the very bottom */
-footer {
-    padding-bottom: 20px;
-    width: 100%;
-    text-align: center;
+/* FRIEND CARD (you will use later) */
+.friend-card{
+background:var(--card);
+border:1px solid var(--border);
+padding:12px;
+border-radius:12px;
+margin-bottom:10px;
 }
 
-footer div {
-    font-size: 12px;
-    opacity: 0.6;
+/* FOOTER */
+footer{
+text-align:center;
+padding:30px 20px;
+color:#94a3b8;
+border-top:1px solid rgba(255,255,255,0.08);
+margin-top:40px;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+footer a{
+color:#4da3ff;
+text-decoration:none;
 }
-
-.container { animation: fadeIn 0.8s ease; }
+footer a:hover{
+text-decoration:underline;
+}
 </style>
 </head>
 
 <body>
-<button class="back-btn" onclick="goBack()">← Back</button>
 
-<div class="container">
-    <lottie-player
-        src="https://assets10.lottiefiles.com/packages/lf20_jtbfg2nb.json"
-        background="transparent"
-        speed="1"
-        loop
-        autoplay>
-    </lottie-player>
-
-    <h1>🚧 Building...</h1>
-    <p>We’re crafting something new for you.<br>Stay tuned!</p>
-
-    <div class="note">Coming soon on ChatPH 👀</div>
+<!-- HEADER -->
+<header>
+<div class="header-left">
+<span class="menu-icon" onclick="toggleSidebar()">☰</span>
+<img src="image/chatph-logo.png" class="logo">
+<span class="brand">ChatPH</span>
 </div>
 
+<div style="display:flex;align-items:center;gap:16px;">
+<span id="userDisplay">Guest</span>
+<div id="logoutBtn">Logout</div>
+</div>
+</header>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+<a href="home.html">Home</a>
+<a href="msg.html">Messages</a>
+<a href="frnd.html" class="active">Friends</a>
+<a href="srch.html">Search User</a>
+<a href="prfl.html">Profile</a>
+</div>
+
+<div class="overlay" id="overlay" onclick="toggleSidebar(true)"></div>
+
+<!-- MAIN -->
+<div class="main">
+<h2>Your Friends</h2>
+
+<div id="friendsList">
+<!-- FRIENDS WILL GO HERE -->
+</div>
+
+</div>
+
+<!-- FOOTER -->
 <footer>
-    <div>© 2026 ChatPH • All Rights Reserved</div>
-    <div style="margin-top:4px; font-size:11px; opacity:0.5;">
-        Made with ❤️ in the Philippines
-    </div>
+<div>© 2026 ChatPH • All Rights Reserved</div>
+<div style="margin-top:6px;font-size:13px;">
+<a href="termsandprivacy.html">About</a> |
+<a href="termsandprivacy.html">Privacy</a> |
+<a href="termsandprivacy.html">Terms</a> |
+<a href="termsandprivacy.html">Contact</a>
+</div>
+<div style="margin-top:6px;font-size:12px;opacity:.7;">
+Made with ❤️ in the Philippines
+</div>
 </footer>
 
-<script>
-const messages = [
-    "Building something awesome...",
-    "Almost ready...",
-    "Stay tuned 🚀",
-    "New features coming soon 👀",
-    "Polishing the code..."
-];
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+getFirestore,
+doc,
+getDocs,
+collection
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+getAuth,
+onAuthStateChanged,
+signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-setInterval(() => {
-    const noteEl = document.querySelector(".note");
-    noteEl.innerText = messages[Math.floor(Math.random() * messages.length)];
-}, 3000);
+/* CONFIG */
+const firebaseConfig = {
+  apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
+  authDomain: "chatph-cc187.firebaseapp.com",
+  projectId: "chatph-cc187",
+  storageBucket: "chatph-cc187.firebasestorage.app",
+  messagingSenderId: "324012163441",
+  appId: "1:324012163441:web:7a54be2231ad2cae71f6d0"
+};
 
-function goBack() {
-    if (document.referrer) {
-        history.back();
-    } else {
-        window.location.href = "home.html"; 
-    }
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+/* SIDEBAR */
+window.toggleSidebar = (close=false)=>{
+const s = document.getElementById("sidebar");
+const o = document.getElementById("overlay");
+
+if(close){
+s.classList.remove("open");
+o.classList.remove("active");
+}else{
+s.classList.toggle("open");
+o.classList.toggle("active");
 }
+};
+
+/* AUTH */
+onAuthStateChanged(auth, (user)=>{
+if(user){
+document.getElementById("userDisplay").innerText =
+user.displayName || user.email;
+}else{
+window.location.href="index.html";
+}
+});
+
+document.getElementById("logoutBtn").onclick = async ()=>{
+await signOut(auth);
+window.location.href="index.html";
+};
+
+/* 👉 NEXT STEP: LOAD FRIENDS HERE */
 </script>
+
 </body>
 </html>
