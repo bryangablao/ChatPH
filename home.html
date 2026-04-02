@@ -1357,6 +1357,9 @@ onAuthStateChanged(auth,(user)=>{
         document.getElementById("userDisplay").innerText =
         user.displayName || user.email;
         document.getElementById("logoutBtn").style.display="inline";
+
+        setOnlineStatus(user);
+
     }else{
         window.location.href="index.html";
     }
@@ -1421,6 +1424,24 @@ window.addEventListener("load", () => {
     indicator.style.top = active.offsetTop + "px";
     indicator.style.height = active.offsetHeight + "px";
 });
+
+function setOnlineStatus(user){
+    const userRef = doc(db, "status", user.uid);
+
+    // SET ONLINE
+    setDoc(userRef, {
+        online: true,
+        lastSeen: serverTimestamp()
+    });
+
+    // WHEN USER CLOSES TAB / LEAVES PAGE
+    window.addEventListener("beforeunload", () => {
+        setDoc(userRef, {
+            online: false,
+            lastSeen: serverTimestamp()
+        });
+    });
+}
     
 </script>
 <div id="toast" class="toast"></div>
