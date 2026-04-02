@@ -462,7 +462,7 @@ z-index:3000;
     
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
@@ -595,14 +595,16 @@ imageViewer.onclick = () => {
 };
     
     // --- State & Feed ---
-    onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-            setTimeout(() => { if(!auth.currentUser) window.location.href="index.html" }, 800);
-            return;
-        }
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        setTimeout(() => { if(!auth.currentUser) window.location.href="index.html" }, 800);
+        return;
+    }
 
-        document.getElementById("userName").innerText = user.displayName || "User";
-        document.getElementById("userEmail").innerText = user.email;
+    setOnlineStatus(user);
+
+    document.getElementById("userName").innerText = user.displayName || "User";
+    document.getElementById("userEmail").innerText = user.email;
 
         const snap = await getDoc(doc(db, "users", user.uid));
         if (snap.exists()) {
@@ -719,6 +721,24 @@ if (active) {
     indicator.style.top = active.offsetTop + "px";
     indicator.style.height = active.offsetHeight + "px";
 });
+
+function setOnlineStatus(user){
+    const userRef = doc(db, "status", user.uid);
+
+    // SET ONLINE
+    setDoc(userRef, {
+        online: true,
+        lastSeen: serverTimestamp()
+    });
+
+    // WHEN USER CLOSES TAB / LEAVES PAGE
+    window.addEventListener("beforeunload", () => {
+        setDoc(userRef, {
+            online: false,
+            lastSeen: serverTimestamp()
+        });
+    });
+}
     
 </script>
 
