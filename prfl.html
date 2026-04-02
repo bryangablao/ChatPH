@@ -13,13 +13,21 @@
             --card: #1a212b;
             --border: rgba(255, 255, 255, .08);
             --text: #e6edf3;
-            --dim: #94a3b8;
+            --dim:#9ca3af;
             --accent: #3b82f6;
             --transition: all 0.2s ease-in-out;
         }
 
-        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.6; }
+body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+}
 
         /* --- UI Components --- */
         header {
@@ -314,6 +322,19 @@
 * {
     scrollbar-width: thin;
     scrollbar-color: var(--card) var(--bg);
+}
+
+/* FOOTER */
+footer{
+    text-align:center;
+    padding:10px;
+    font-size:13px;
+    opacity:.6;
+    background:var(--bg);
+}
+    
+footer a:hover{
+text-decoration:underline;
 }
         
     </style>
@@ -723,5 +744,3 @@ Made with ❤️ in the Philippines
     
 </body>
 </html>
-
-
