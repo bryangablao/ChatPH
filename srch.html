@@ -398,6 +398,7 @@ collection,
 getDocs,
 doc,
 setDoc,
+serverTimestamp,
 updateDoc,
 onSnapshot,
 getDoc
@@ -459,6 +460,7 @@ await updateDoc(doc(db,"status",user.uid),{
 });
 });
 
+    setOnlineStatus(user);
 }else{
 window.location.href="index.html";
 }
@@ -670,6 +672,24 @@ links.forEach(link => {
     };
 });
 
+function setOnlineStatus(user){
+    const userRef = doc(db, "status", user.uid);
+
+    // SET ONLINE
+    setDoc(userRef, {
+        online: true,
+        lastSeen: serverTimestamp()
+    });
+
+    // WHEN USER CLOSES TAB / LEAVES PAGE
+    window.addEventListener("beforeunload", () => {
+        setDoc(userRef, {
+            online: false,
+            lastSeen: serverTimestamp()
+        });
+    });
+}
+    
 window.addEventListener("load", () => {
     const active = document.querySelector(".sidebar a.active") || links[0];
     indicator.style.top = active.offsetTop + "px";
@@ -695,8 +715,23 @@ renderUsers([]);
 document.querySelector(".main").classList.add("centered");
 document.querySelector(".search-box").classList.remove("active");
 };
+
+function setOnlineStatus(user){
+    const userRef = doc(db, "status", user.uid);
+
+    setDoc(userRef, {
+        online: true,
+        lastSeen: serverTimestamp()
+    });
+
+    window.addEventListener("beforeunload", () => {
+        setDoc(userRef, {
+            online: false,
+            lastSeen: serverTimestamp()
+        });
+    });
+}
     
 </script>
-
 </body>
 </html>
