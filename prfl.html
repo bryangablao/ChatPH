@@ -13,13 +13,22 @@
             --card: #1a212b;
             --border: rgba(255, 255, 255, .08);
             --text: #e6edf3;
-            --dim: #94a3b8;
+            --dim:#9ca3af;
             --accent: #3b82f6;
             --transition: all 0.2s ease-in-out;
         }
 
         * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.6; }
+body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+}
 
         /* --- UI Components --- */
         header {
@@ -327,6 +336,14 @@ footer{
     
 footer a:hover{
 text-decoration:underline;
+}
+
+/* MAIN */
+.main{
+max-width:520px;
+margin:auto;
+padding:16px;
+flex:1;
 }
         
     </style>
