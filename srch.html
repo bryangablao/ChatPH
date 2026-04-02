@@ -503,6 +503,23 @@ const filtered = users.filter(u =>
 renderUsers(filtered);
 });
 
+function timeAgo(date){
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(seconds / 3600);
+    const days = Math.floor(seconds / 86400);
+
+    if(seconds < 60) return "just now";
+    if(minutes < 60) return minutes + "m ago";
+    if(hours < 24) return hours + "h ago";
+    if(days === 1) return "yesterday";
+    if(days < 30) return days + "d ago";
+
+    return date.toLocaleDateString();
+}
+    
 /* RENDER */
 function renderUsers(list){
 const box = document.getElementById("results");
@@ -526,18 +543,27 @@ ${(u.firstName || "") + " " + (u.lastName || "") || "User"}
 const statusRef = doc(db,"status",u.id);
 
 onSnapshot(statusRef,(snap)=>{
-if(!snap.exists()){
 const statusEl = document.getElementById("status-"+u.id);
-statusEl.innerHTML = '<span style="color:#9ca3af;">● Offline</span>';
-return;
+
+if(!snap.exists()){
+    statusEl.innerHTML = '<span style="color:#9ca3af;">● Offline</span>';
+    return;
 }
 
-const statusEl = document.getElementById("status-"+u.id);
+const data = snap.data();
 
-if(snap.data().online){
+if(data.online){
     statusEl.innerHTML = '<span style="color:#4ade80;">● Online</span>';
 }else{
-    statusEl.innerHTML = '<span style="color:#9ca3af;">● Offline</span>';
+    const lastSeen = data.lastSeen?.toDate();
+    const timeText = lastSeen ? timeAgo(lastSeen) : "offline";
+    const fullDate = lastSeen ? lastSeen.toLocaleString() : "";
+
+statusEl.innerHTML = `
+<span style="color:#9ca3af;" title="Last seen: ${fullDate}">
+● Offline (Last seen ${timeText})
+</span>
+`;
 }
 });
 });
