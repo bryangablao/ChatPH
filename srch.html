@@ -425,9 +425,16 @@ user.displayName || user.email;
 
 // 🟢 SET ONLINE
 await setDoc(doc(db,"status",user.uid),{
-online:true,
-lastSeen:new Date()
+    online:true,
+    lastSeen:new Date()
 });
+
+// 🔁 UPDATE LAST SEEN EVERY 10 SECONDS
+setInterval(async ()=>{
+    await updateDoc(doc(db,"status",user.uid),{
+        lastSeen:new Date()
+    });
+}, 10000);
 
 // 🔴 OFFLINE WHEN TAB CLOSE
 window.addEventListener("beforeunload", async ()=>{
@@ -566,8 +573,12 @@ if(!snap.exists()){
 }
 
 const data = snap.data();
+const lastSeen = data.lastSeen?.toDate();
+const now = new Date();
 
-if(data.online){
+const isOnline = lastSeen && (now - lastSeen < 15000); // 15 seconds
+
+if(isOnline){
     statusEl.innerHTML = '<span style="color:#4ade80;">● Online</span>';
 }else{
     const lastSeen = data.lastSeen?.toDate();
