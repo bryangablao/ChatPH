@@ -19,10 +19,14 @@
 }
 
 body{
-margin:0;
-font-family:'Inter',sans-serif;
-background:var(--bg);
-color:var(--text);
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
 }
 
 /* HEADER */
@@ -138,6 +142,7 @@ pointer-events:auto;
 max-width:520px;
 margin:auto;
 padding:16px;
+flex:1;
 }
 
 /* FRIEND CARD (you will use later) */
@@ -185,7 +190,7 @@ text-decoration:underline;
 <div class="sidebar" id="sidebar">
 <a href="home.html">Home</a>
 <a href="msg.html">Messages</a>
-<a href="frnd.html" class="active">Friends</a>
+<a href="#" class="active">Friends</a>
 <a href="srch.html">Search User</a>
 <a href="prfl.html">Profile</a>
 
