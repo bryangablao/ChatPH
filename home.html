@@ -15,10 +15,14 @@
 --accent:#4da3ff;
 }
 body{
-margin:0;
-font-family:'Inter',sans-serif;
-background:var(--bg);
-color:var(--text);
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
 }
 /* HEADER */
 header {
@@ -360,19 +364,6 @@ margin-top:4px;
 .like-btn.liked{
 color:#4da3ff;
 font-weight:600;
-}
-  
-/* FOOTER */
-footer{
-    text-align:center;
-    padding:10px;
-    font-size:13px;
-    opacity:.6;
-    background:var(--bg);
-}
-    
-footer a:hover{
-text-decoration:underline;
 }
     
 /* BADGES */
