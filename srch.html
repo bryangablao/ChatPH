@@ -207,41 +207,52 @@ font-weight:600;
 }
 
 /* POPUP */
-.popup{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,0.6);
-display:none;
-align-items:center;
-justify-content:center;
-z-index:9999;
-}
-
 .popup-content{
 background:#171a21;
 padding:20px;
 border-radius:12px;
-text-align:center;
-width:300px;
+width:320px;
 }
 
-.popup img{
-width:80px;
-height:80px;
+.popup-row{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.popup-avatar{
+width:70px;
+height:70px;
 border-radius:50%;
+}
+
+.popup-info{
+flex:1;
+}
+
+.popup-name{
+font-size:16px;
+font-weight:600;
 margin-bottom:10px;
 }
 
-.btn{
-margin-top:10px;
-padding:10px;
-border:none;
-border-radius:8px;
-background:var(--accent);
-color:black;
-cursor:pointer;
+.popup-actions{
+display:flex;
+gap:10px;
 }
 
+.action-btn{
+width:40px;
+height:40px;
+cursor:pointer;
+border-radius:8px;
+transition:.2s;
+}
+
+.action-btn:hover{
+background:#2a2f3b;
+}
+    
 /* FOOTER */
 footer{
 text-align:center;
@@ -348,12 +359,20 @@ Online: <span id="onlineUsers">0</span>
 
 <!-- POPUP -->
 <div class="popup" id="popup">
-<div class="popup-content">
-<img id="popupImg">
-<h3 id="popupName"></h3>
-<button class="btn" onclick="addFriend()">Add Friend</button>
-<button class="btn" onclick="startChat()">Message</button>
-<button class="btn" onclick="closePopup()">Close</button>
+<div class="popup-content" id="popupContent">
+    <div class="popup-row">
+        <img id="popupImg" class="popup-avatar">
+        
+        <div class="popup-info">
+            <div id="popupName" class="popup-name"></div>
+            
+            <div class="popup-actions">
+                <img src="image/icon/viewprofile.png" class="action-btn" onclick="viewProfile()">
+                <img src="image/icon/directmessage.png" class="action-btn" onclick="startChat()">
+                <img src="image/icon/adduser.png" class="action-btn" onclick="addFriend()">
+            </div>
+        </div>
+    </div>
 </div>
 </div>
 
@@ -614,30 +633,8 @@ window.location.href = "msg.html?uid=" + window.selectedUser;
 }
 };
 
-window.addFriend = async ()=>{
-const current = auth.currentUser;
-
-if(!current || !window.selectedUser) return;
-
-try{
-
-// YOU → THEM
-await setDoc(doc(db,"friends",current.uid,"list",window.selectedUser),{
-uid:window.selectedUser,
-createdAt:new Date()
-});
-
-// THEM → YOU (mutual)
-await setDoc(doc(db,"friends",window.selectedUser,"list",current.uid),{
-uid:current.uid,
-createdAt:new Date()
-});
-
-alert("Friend added!");
-
-}catch(err){
-console.error(err);
-}
+window.addFriend = ()=>{
+    alert("Add friend soon 👀");
 };
 
 const links = document.querySelectorAll(".sidebar a");
@@ -677,6 +674,20 @@ renderUsers([]);
 
 document.querySelector(".main").classList.add("centered");
 document.querySelector(".search-box").classList.remove("active");
+};
+
+const popup = document.getElementById("popup");
+
+popup.addEventListener("click", (e)=>{
+    if(e.target.id === "popup"){
+        popup.style.display = "none";
+    }
+});
+
+window.viewProfile = ()=>{
+    if(window.selectedUser){
+        window.location.href = "prfl.html?uid=" + window.selectedUser;
+    }
 };
     
 </script>
