@@ -18,14 +18,13 @@
 }
 
 body{
-margin:0;
-font-family:'Inter',sans-serif;
-background:var(--bg);
-color:var(--text);
-overflow:auto;
-display:flex;
-flex-direction:column;
-height:100vh;
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
 }
 
 /* HEADER */
@@ -164,6 +163,7 @@ pointer-events:auto;
     flex:1;
     display:flex;
     overflow:hidden;
+    min-height:0;
 }
 
 /* LEFT: USERS */
@@ -703,8 +703,6 @@ text-decoration:underline;
         <div id="members" class="dropdown"></div>
     </div>
 </div>
-  
-</div>
 
 <!-- FOOTER -->
 <footer style="
@@ -712,7 +710,6 @@ text-align:center;
 padding:30px 20px;
 color:#94a3b8;
 border-top:1px solid rgba(255,255,255,0.08);
-margin-top:40px;
 ">
 <div>© 2026 ChatPH • All Rights Reserved</div>
 
