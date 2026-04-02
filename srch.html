@@ -516,7 +516,9 @@ box.innerHTML += `
 <div class="username">
 ${(u.firstName || "") + " " + (u.lastName || "") || "User"}
 </div>
-<div style="font-size:12px;color:#4ade80;" id="status-${u.id}">checking...</div>
+<div style="font-size:12px;color:#9ca3af;" id="status-${u.id}">
+● Checking...
+</div>
 </div>
 </div>
 `;
@@ -525,12 +527,18 @@ const statusRef = doc(db,"status",u.id);
 
 onSnapshot(statusRef,(snap)=>{
 if(!snap.exists()){
-document.getElementById("status-"+u.id).innerText = "⚪ Offline";
+const statusEl = document.getElementById("status-"+u.id);
+statusEl.innerHTML = '<span style="color:#9ca3af;">● Offline</span>';
 return;
 }
 
-document.getElementById("status-"+u.id).innerText =
-snap.data().online ? "🟢 Online" : "⚪ Offline";
+const statusEl = document.getElementById("status-"+u.id);
+
+if(snap.data().online){
+    statusEl.innerHTML = '<span style="color:#4ade80;">● Online</span>';
+}else{
+    statusEl.innerHTML = '<span style="color:#9ca3af;">● Offline</span>';
+}
 });
 });
 }
