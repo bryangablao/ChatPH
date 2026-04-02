@@ -860,8 +860,19 @@ onAuthStateChanged(auth, async (user) => {
         setTimeout(() => {
             loadChatList();
         }, 200);
-        
+
         document.getElementById("userName").innerText = user.displayName;
+
+        // ✅ AUTO OPEN CHAT FROM SEARCH
+        const params = new URLSearchParams(window.location.search);
+        const chatUID = params.get("uid");
+
+        if(chatUID){
+            setTimeout(() => {
+                openChat(chatUID);
+            }, 500);
+        }
+
     }
 });
     
