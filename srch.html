@@ -207,6 +207,16 @@ font-weight:600;
 }
 
 /* POPUP */
+.popup{
+    position: fixed;
+    inset: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+}
+    
 .popup-content{
 background:#171a21;
 padding:20px;
@@ -571,7 +581,7 @@ box.innerHTML = "";
 
 list.forEach(u=>{
 box.innerHTML += `
-<div class="user-card" onclick='openUser(${JSON.stringify(u.id)},${JSON.stringify(u.firstName + " " + u.lastName)},${JSON.stringify(u.photo)})'>
+<div class="user-card" onclick="openUser('${u.id}', '${(u.firstName || '') + ' ' + (u.lastName || '')}', '${u.photo}')">
 <img src="${u.photo}" class="avatar">
 <div>
 <div class="username">
@@ -628,9 +638,15 @@ document.getElementById("popup").style.display="none";
 
 /* MESSAGE */
 window.startChat = ()=>{
-if(window.selectedUser){
-window.location.href = "msg.html?uid=" + window.selectedUser;
-}
+    if(window.selectedUser){
+        window.location.href = "msg.html?chat=" + window.selectedUser;
+    }
+};
+
+window.viewProfile = ()=>{
+    if(window.selectedUser){
+        window.location.href = "prfl.html?uid=" + window.selectedUser;
+    }
 };
 
 window.addFriend = ()=>{
@@ -683,12 +699,6 @@ popup.addEventListener("click", (e)=>{
         popup.style.display = "none";
     }
 });
-
-window.viewProfile = ()=>{
-    if(window.selectedUser){
-        window.location.href = "prfl.html?uid=" + window.selectedUser;
-    }
-};
     
 </script>
 
