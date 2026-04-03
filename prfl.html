@@ -478,6 +478,8 @@ z-index:3000;
     const db = getFirestore(app);
     const auth = getAuth(app);
     setPersistence(auth, browserLocalPersistence);
+    const params = new URLSearchParams(window.location.search);
+    const uid = params.get("uid");
 
     // --- DOM Refs ---
     const bioModal = document.getElementById('bioModal');
@@ -606,7 +608,8 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById("userName").innerText = user.displayName || "User";
     document.getElementById("userEmail").innerText = user.email;
 
-        const snap = await getDoc(doc(db, "users", user.uid));
+           const profileUID = uid || user.uid;
+           const snap = await getDoc(doc(db, "users", profileUID));
         if (snap.exists()) {
             const d = snap.data();
             if (d.bio) document.getElementById("userBio").innerText = d.bio;
@@ -616,7 +619,7 @@ onAuthStateChanged(auth, async (user) => {
 
 const q = query(
   collection(db, "posts"),
-  where("email", "==", user.email)
+  where("uid", "==", profileUID)
 );
         
         onSnapshot(q, (snap) => {
