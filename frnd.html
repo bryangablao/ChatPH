@@ -166,7 +166,82 @@ footer{
 footer a:hover{
 text-decoration:underline;
 }
-  
+
+.tabs{
+    display:flex;
+    justify-content:center;
+    background:var(--card);
+    border-radius:20px;
+    padding:6px;
+    margin-bottom:15px;
+}
+
+.tab{
+    padding:10px 20px;
+    cursor:pointer;
+    border-radius:16px;
+    color:var(--dim);
+    transition:.2s;
+}
+
+.tab.active{
+    background:var(--accent);
+    color:#000;
+}
+
+.panel-container{
+    position:relative;
+    overflow:hidden;
+}
+
+.panel{
+    display:none;
+}
+
+.panel.active{
+    display:block;
+    animation:slide .3s ease;
+}
+
+@keyframes slide{
+    from{transform:translateX(20px);opacity:0;}
+    to{transform:translateX(0);opacity:1;}
+}
+
+.menu-btn{
+    cursor:pointer;
+    margin-left:10px;
+}
+
+.dropdown{
+    position:absolute;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    display:none;
+}
+
+.dropdown{
+    position:absolute;
+    right:10px;
+    top:40px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    display:none;
+    min-width:140px;
+    z-index:10;
+}
+
+.dropdown div{
+    padding:10px;
+    cursor:pointer;
+}
+
+.dropdown div:hover{
+    background:#1f2937;
+}
+    
 </style>
 </head>
 
@@ -201,12 +276,17 @@ text-decoration:underline;
 
 <!-- MAIN -->
 <div class="main">
-<h2>Your Friends</h2>
-
-<div id="friendsList">
-<!-- FRIENDS WILL GO HERE -->
+<div class="tabs">
+    <div class="tab active" data-tab="friends">Friends</div>
+    <div class="tab" data-tab="pending">Pending</div>
+    <div class="tab" data-tab="requests">Requests</div>
 </div>
 
+<div class="panel-container">
+    <div id="friendsPanel" class="panel active"></div>
+    <div id="pendingPanel" class="panel"></div>
+    <div id="requestsPanel" class="panel"></div>
+</div>
 </div>
 
 <!-- FOOTER -->
@@ -242,7 +322,8 @@ doc,
 getDocs,
 collection,
 setDoc,
-serverTimestamp
+serverTimestamp,
+deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
 getAuth,
@@ -330,6 +411,119 @@ function setOnlineStatus(user){
             lastSeen: serverTimestamp()
         });
     });
+}
+
+const tabs = document.querySelectorAll(".tab");
+
+tabs.forEach(tab=>{
+    tab.onclick = ()=>{
+        tabs.forEach(t=>t.classList.remove("active"));
+        tab.classList.add("active");
+
+        document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+
+        document.getElementById(tab.dataset.tab + "Panel").classList.add("active");
+    };
+});
+
+function renderFriends(list){
+    const panel = document.getElementById("friendsPanel");
+    panel.innerHTML = "";
+
+    list.forEach(f=>{
+        panel.innerHTML += `
+        <div class="friend-card" style="position:relative;">
+            <img src="${f.photo}" class="avatar">
+
+            <div>
+                <div>${f.name}</div>
+                <div style="font-size:12px;color:#9ca3af">
+                    ${f.online ? "🟢 Online" : "⚪ Offline"}
+                </div>
+            </div>
+
+            <div style="margin-left:auto;font-size:12px;">
+                ${new Date(f.createdAt).toLocaleString()}
+            </div>
+
+            <!-- ⋮ BUTTON -->
+            <div class="menu-btn" onclick="toggleMenu(this)">⋮</div>
+
+            <!-- ✅ DROPDOWN -->
+            <div class="dropdown">
+                <div onclick="viewProfile('${f.id}')">View Profile</div>
+                <div onclick="sendMessage('${f.id}')">Message</div>
+                <div onclick="removeFriend('${f.id}')">Remove</div>
+            </div>
+        </div>
+        `;
+    });
+}
+
+function renderPending(list){
+    const panel = document.getElementById("pendingPanel");
+    panel.innerHTML = "";
+
+    list.forEach(u=>{
+        panel.innerHTML += `
+        <div class="friend-card">
+            <img src="${u.photo}" class="avatar">
+            <div>${u.name}</div>
+
+            <div style="margin-left:auto;">
+                <button onclick="cancelRequest('${u.id}')">❌</button>
+            </div>
+        </div>
+        `;
+    });
+}
+
+function renderRequests(list){
+    const panel = document.getElementById("requestsPanel");
+    panel.innerHTML = "";
+
+    list.forEach(u=>{
+        panel.innerHTML += `
+        <div class="friend-card">
+            <img src="${u.photo}" class="avatar">
+            <div>${u.name}</div>
+
+            <div style="margin-left:auto;">
+                <button onclick="reject('${u.id}')">❌</button>
+                <button onclick="accept('${u.id}')">✔</button>
+            </div>
+        </div>
+        `;
+    });
+}
+
+async function accept(uid){
+    const current = auth.currentUser;
+
+    // add both as friends
+    await setDoc(doc(db,"friends",current.uid,"list",uid),{
+        uid,
+        createdAt:new Date()
+    });
+
+    await setDoc(doc(db,"friends",uid,"list",current.uid),{
+        uid:current.uid,
+        createdAt:new Date()
+    });
+
+    // remove request
+    await deleteDoc(doc(db,"requests",current.uid,"received",uid));
+
+    // reload UI
+}
+
+async function cancelRequest(uid){
+    await deleteDoc(doc(db,"pending",auth.currentUser.uid,"sent",uid));
+}
+
+async function removeFriend(uid){
+    await deleteDoc(doc(db,"friends",auth.currentUser.uid,"list",uid));
+    await deleteDoc(doc(db,"friends",uid,"list",auth.currentUser.uid));
 }
     
 </script>
