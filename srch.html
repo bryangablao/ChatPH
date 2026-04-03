@@ -214,21 +214,65 @@ font-weight:600;
 
 /* POPUP */
 .popup{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,0.6);
-display:none;
-align-items:center;
-justify-content:center;
-z-index:9999;
+    position:fixed;
+    inset:0;
+    backdrop-filter: blur(8px); /* ✅ BLUR BACKGROUND */
+    background: rgba(0,0,0,0.5);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
 }
 
 .popup-content{
-background:#171a21;
-padding:20px;
-border-radius:12px;
-text-align:center;
-width:300px;
+    background:#171a21;
+    padding:18px;
+    border-radius:14px;
+    width:300px;
+}
+
+.popup-row{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+}
+
+.popup-row img{
+    width:55px;
+    height:55px;
+    border-radius:50%;
+}
+
+.popup-right{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end; /* ✅ RIGHT ALIGN */
+}
+
+.popup-name{
+    font-weight:600;
+    margin-bottom:10px;
+}
+
+.popup-actions{
+    display:flex;
+    gap:8px;
+}
+
+.popup-actions img{
+    width:30px;
+    height:30px;
+    border-radius:8px; /* ✅ CURVED SQUARE */
+    padding:6px;
+    background:#1f2937;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.popup-actions img:hover{
+    transform:scale(1.1);
+    background:#374151;
 }
 
 .popup img{
@@ -254,40 +298,6 @@ cursor:pointer;
     border-radius:12px;
 }
 
-.popup-row{
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
-
-.popup-row img{
-    width:50px;
-    height:50px;
-    border-radius:50%;
-}
-
-.popup-name{
-    flex:1;
-    font-weight:600;
-    font-size:15px;
-}
-
-.popup-actions{
-    display:flex;
-    gap:10px;
-}
-
-.popup-actions img{
-    width:28px;
-    height:28px;
-    cursor:pointer;
-    transition:.2s;
-}
-
-.popup-actions img:hover{
-    transform:scale(1.2);
-}
-    
 .user-info{
     display:flex;
     align-items:center;
@@ -431,21 +441,20 @@ Online: <span id="onlineUsers">0</span>
 
 <!-- POPUP -->
 <div class="popup" id="popup">
-<div class="popup-content modern">
-
-    <!-- MAIN ROW -->
+<div class="popup-content">
     <div class="popup-row">
         <img id="popupImg">
+        
+        <div class="popup-right">
+            <div class="popup-name" id="popupName"></div>
 
-        <div class="popup-name" id="popupName"></div>
-
-        <div class="popup-actions">
-            <img id="friendBtn" src="image/icon/adduser.png" onclick="handleFriendAction()">
-            <img src="image/icon/directmessage.png" title="Message" onclick="startChat()">
-            <img src="image/icon/viewprofile.png" title="View Profile" onclick="viewProfile()">
+            <div class="popup-actions">
+                <img id="friendBtn" onclick="handleFriendAction()">
+                <img src="image/icon/directmessage.png" onclick="startChat()">
+                <img src="image/icon/viewprofile.png" onclick="viewProfile()">
+            </div>
         </div>
     </div>
-
 </div>
 </div>
 
@@ -697,38 +706,32 @@ if(isOnline){
 }
 
 /* POPUP */
-window.openUser = (id,name,photo)=>{
-window.selectedUser = id;
-window.selectedUserData = {
-    id: id,
-    firstName: name.split(" ")[0],
-    lastName: name.split(" ")[1] || "",
-    photo: photo
-};
+window.openUser = async (id,name,photo)=>{
+    window.selectedUser = id;
 
-document.getElementById("popup").style.display="flex";
-document.getElementById("popupName").innerText=name;
-document.getElementById("popupImg").src=photo;
+    document.getElementById("popup").style.display="flex";
+    document.getElementById("popupName").innerText=name;
+    document.getElementById("popupImg").src=photo;
 
-async function checkFriendStatus(uid){
     const current = auth.currentUser;
+    const btn = document.getElementById("friendBtn");
 
-    // 1. CHECK FRIENDS
-    const friendDoc = await getDoc(doc(db,"friends",current.uid,"list",uid));
+    // 🔍 CHECK STATUS
+    const friendDoc = await getDoc(doc(db,"friends",current.uid,"list",id));
+    const requestDoc = await getDoc(doc(db,"requests",current.uid,"received",id));
+
     if(friendDoc.exists()){
-        return "friends";
-    }
+        window.friendStatus = "friends";
+        btn.src = "image/icon/unfriend.png";
 
-    // 2. CHECK IF THEY SENT YOU REQUEST
-    const requestDoc = await getDoc(doc(db,"requests",current.uid,"received",uid));
-    if(requestDoc.exists()){
-        return "request";
-    }
+    }else if(requestDoc.exists()){
+        window.friendStatus = "request";
+        btn.src = "image/icon/acceptfriend.png";
 
-    // 3. DEFAULT
-    return "none";
-}
-    
+    }else{
+        window.friendStatus = "none";
+        btn.src = "image/icon/adduser.png";
+    }
 };
 
 window.closePopup = ()=>{
@@ -853,28 +856,29 @@ window.handleFriendAction = async ()=>{
 
     if(!current || !uid) return;
 
+    // ❌ PREVENT SELF ADD
+    if(current.uid === uid){
+        showToast("You can't add yourself ❌", false);
+        return;
+    }
+
     // ✅ ACCEPT FRIEND
     if(window.friendStatus === "request"){
         await setDoc(doc(db,"friends",current.uid,"list",uid),{
             uid,
             createdAt:new Date()
         });
-
         await setDoc(doc(db,"friends",uid,"list",current.uid),{
             uid:current.uid,
             createdAt:new Date()
         });
-
-        // remove request
         await deleteDoc(doc(db,"requests",current.uid,"received",uid));
-
         showToast("Friend added ✅");
 
     // ❌ UNFRIEND
     }else if(window.friendStatus === "friends"){
         await deleteDoc(doc(db,"friends",current.uid,"list",uid));
         await deleteDoc(doc(db,"friends",uid,"list",current.uid));
-
         showToast("Unfriended ❌");
 
     // ➕ ADD FRIEND
@@ -883,16 +887,14 @@ window.handleFriendAction = async ()=>{
             id: uid,
             createdAt:new Date()
         });
-
         await setDoc(doc(db,"requests",uid,"received",current.uid),{
             id: current.uid,
             createdAt:new Date()
         });
-
         showToast("Request sent 📩");
     }
 
-    // 🔄 refresh button
+    // 🔄 refresh UI
     openUser(uid,
         document.getElementById("popupName").innerText,
         document.getElementById("popupImg").src
@@ -903,6 +905,7 @@ window.handleFriendAction = async ()=>{
 <div id="toast" style="
 position:fixed;
 bottom:20px;
+top:20px;
 left:50%;
 transform:translateX(-50%);
 background:#171a21;
