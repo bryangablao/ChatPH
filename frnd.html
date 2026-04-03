@@ -362,11 +362,14 @@ o.classList.toggle("active");
 /* AUTH */
 onAuthStateChanged(auth, (user)=>{
 if(user){
-
     document.getElementById("userDisplay").innerText =
     user.displayName || user.email;
 
     setOnlineStatus(user);
+
+    loadFriends(user.uid);
+    loadPending(user.uid);
+    loadRequests(user.uid);
 
 }else{
     window.location.href="index.html";
@@ -524,6 +527,58 @@ async function cancelRequest(uid){
 async function removeFriend(uid){
     await deleteDoc(doc(db,"friends",auth.currentUser.uid,"list",uid));
     await deleteDoc(doc(db,"friends",uid,"list",auth.currentUser.uid));
+}
+
+import { onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+function loadPending(uid){
+    const ref = collection(db,"pending",uid,"sent");
+
+    onSnapshot(ref,(snap)=>{
+        let list = [];
+        snap.forEach(doc=>{
+            list.push(doc.data());
+        });
+        renderPending(list);
+    });
+}
+
+function loadRequests(uid){
+    const ref = collection(db,"requests",uid,"received");
+
+    onSnapshot(ref,(snap)=>{
+        let list = [];
+        snap.forEach(doc=>{
+            list.push(doc.data());
+        });
+        renderRequests(list);
+    });
+}
+
+function loadFriends(uid){
+    const ref = collection(db,"friends",uid,"list");
+
+    onSnapshot(ref, async (snap)=>{
+        let list = [];
+
+        for (const d of snap.docs){
+            const data = d.data();
+
+            // 🔥 get user info
+            const userDoc = await getDoc(doc(db,"users",data.uid));
+            const userData = userDoc.data();
+
+            list.push({
+                id: data.uid,
+                name: (userData.firstName || "") + " " + (userData.lastName || ""),
+                photo: userData.photo || "",
+                createdAt: data.createdAt,
+                online: false
+            });
+        }
+
+        renderFriends(list);
+    });
 }
     
 </script>
