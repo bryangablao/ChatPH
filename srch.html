@@ -491,6 +491,7 @@ setDoc,
 updateDoc,
 onSnapshot,
 getDoc,
+addDoc,
 deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -882,34 +883,50 @@ window.handleFriendAction = async ()=>{
 
     // ✅ ACCEPT FRIEND
 if(window.friendStatus === "request"){
-    const now = new Date();
 
-    // ✅ add both as friends
+    // ✅ add to friends (same as yours)
     await setDoc(doc(db,"friends",current.uid,"list",uid),{
         uid,
-        createdAt:now
+        createdAt:new Date()
     });
 
     await setDoc(doc(db,"friends",uid,"list",current.uid),{
         uid:current.uid,
-        createdAt:now
+        createdAt:new Date()
     });
 
-    // ✅ remove request
     await deleteDoc(doc(db,"requests",current.uid,"received",uid));
 
-    // ✅ CREATE ONE SHARED CHAT ID (IMPORTANT)
+    // ✅ CREATE UNIQUE CHAT ID (VERY IMPORTANT)
     const chatId = [current.uid, uid].sort().join("_");
 
-    // ✅ ONLY CREATE MESSAGE IF NOT EXIST (PREVENT DUPLICATE)
-    const msgRef = doc(db, "chats", chatId, "messages", "friend_start");
-    const existing = await getDoc(msgRef);
+    // ✅ CHECK if system message already exists (PREVENT DUPLICATE)
+    const systemRef = doc(db, "systemMessages", chatId);
+    const systemSnap = await getDoc(systemRef);
 
-    if(!existing.exists()){
-        await setDoc(msgRef, {
-            text: `🎉 Congratulations! You are now friends (${now.toLocaleString()})`,
+    if(!systemSnap.exists()){
+        const messageText = `🎉 Congratulations! You have been friends (${new Date().toLocaleString()})`;
+
+        // 🔥 SEND MESSAGE TO CHAT
+        await addDoc(collection(db,"messages"),{
+            text: messageText,
+            from: "system",
+            to: uid,
             system: true,
-            createdAt: now
+            time: Date.now()
+        });
+
+        await addDoc(collection(db,"messages"),{
+            text: messageText,
+            from: "system",
+            to: current.uid,
+            system: true,
+            time: Date.now()
+        });
+
+        // ✅ MARK AS SENT (SO ONLY ONCE)
+        await setDoc(systemRef,{
+            created:true
         });
     }
 
