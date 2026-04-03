@@ -1053,6 +1053,7 @@ window.createPost = async () => {
 
     try {
         await addDoc(collection(db, "posts"), {
+            uid: user.uid,
             text: text,
             name: user.displayName || "User",
             email: user.email,
