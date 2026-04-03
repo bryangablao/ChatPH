@@ -610,8 +610,8 @@ onAuthStateChanged(auth, async (user) => {
         if (snap.exists()) {
             const d = snap.data();
 
-            document.getElementById("userName").innerText = user.displayName || "User";
-            document.getElementById("userEmail").innerText = user.email;
+            document.getElementById("userName").innerText = d.name || "User";
+            document.getElementById("userEmail").innerText = d.email || "";
             
             if (d.bio) document.getElementById("userBio").innerText = d.bio;
             if (d.pfpBase64) document.getElementById("pfp").src = d.pfpBase64;
