@@ -226,28 +226,29 @@ font-weight:600;
 
 .popup-content{
     background:#171a21;
-    padding:18px;
-    border-radius:14px;
-    width:300px;
+    padding:16px;
+    border-radius:12px;
+    width:260px;
 }
 
 .popup-row{
     display:flex;
     gap:12px;
-    align-items:flex-start;
-}
-
-.popup-row img{
-    width:55px;
-    height:55px;
-    border-radius:50%;
+    align-items:center;
 }
 
 .popup-right{
     flex:1;
     display:flex;
     flex-direction:column;
-    align-items:flex-start; /* LEFT */
+    align-items:flex-start;
+    justify-content:center;
+}
+
+#popupImg{
+    width:55px;
+    height:55px;
+    border-radius:50%;
 }
 
 .popup-name{
@@ -260,22 +261,14 @@ font-weight:600;
     gap:6px;
     margin-top:6px;
 }
-
-/* PROFILE IMAGE ONLY */
-#popupImg{
-    width:55px;
-    height:55px;
-    border-radius:50%;
-}
     
 .popup-actions img{
-    width:26px;
-    height:26px;
+    width:28px;
+    height:28px;
+    object-fit:contain; /* ✅ IMPORTANT */
     border-radius:8px;
-    padding:5px;
+    padding:6px;
     background:#1f2937;
-    cursor:pointer;
-    transition:.2s;
 }
 
 .popup-actions img:hover{
@@ -722,26 +715,35 @@ window.openUser = async (id,name,photo)=>{
     document.getElementById("popupName").innerText=name;
     document.getElementById("popupImg").src=photo;
 
+    // ✅ hide button if self
+    if(auth.currentUser.uid === id){
+        document.getElementById("friendBtn").style.display = "none";
+    }else{
+        document.getElementById("friendBtn").style.display = "inline-block";
+    }
+
+    // ✅ update button state
+    await updateFriendButton(id);
+};
+
+async function updateFriendButton(id){
     const current = auth.currentUser;
     const btn = document.getElementById("friendBtn");
 
-    // 🔍 CHECK STATUS
     const friendDoc = await getDoc(doc(db,"friends",current.uid,"list",id));
     const requestDoc = await getDoc(doc(db,"requests",current.uid,"received",id));
 
     if(friendDoc.exists()){
         window.friendStatus = "friends";
         btn.src = "image/icon/unfriend.png";
-
     }else if(requestDoc.exists()){
         window.friendStatus = "request";
         btn.src = "image/icon/acceptfriend.png";
-
     }else{
         window.friendStatus = "none";
         btn.src = "image/icon/adduser.png";
     }
-};
+}
 
 window.closePopup = ()=>{
 document.getElementById("popup").style.display="none";
@@ -903,11 +905,7 @@ window.handleFriendAction = async ()=>{
         showToast("Request sent 📩");
     }
 
-    // 🔄 refresh UI
-    openUser(uid,
-        document.getElementById("popupName").innerText,
-        document.getElementById("popupImg").src
-    );
+    await updateFriendButton(uid);
 };
     
 </script>a
