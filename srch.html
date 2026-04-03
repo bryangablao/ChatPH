@@ -249,47 +249,44 @@ cursor:pointer;
 }
 
 .popup-content.modern{
-    width:320px;
-    padding:20px;
+    width:280px; /* smaller */
+    padding:16px;
+    border-radius:12px;
 }
 
 .user-info{
     display:flex;
     align-items:center;
-    gap:12px;
-    margin-bottom:15px;
+    gap:10px;
+    margin-bottom:10px;
 }
-
 .user-info img{
-    width:60px;
-    height:60px;
-    border-radius:50%;
+    width:50px;
+    height:50px;
 }
-
 .user-info h3{
-    margin:0;
-    font-size:18px;
+    font-size:16px;
 }
 
 .action-buttons{
     display:flex;
-    justify-content:space-around;
+    justify-content:center;
+    gap:15px;
     margin-top:10px;
 }
 
 .action-buttons img{
-    width:40px;
-    height:40px;
-    padding:8px;
-    border-radius:10px;
-    background:#0f1115;
+    width:32px;
+    height:32px;
+    padding:0; /* ❌ remove padding */
+    background:none; /* ❌ remove black background */
+    border-radius:0; /* ❌ remove box */
     cursor:pointer;
     transition:.2s;
 }
 
 .action-buttons img:hover{
-    background:#1f2937;
-    transform:scale(1.1);
+    transform:scale(1.2);
 }
 
 /* FOOTER */
@@ -761,6 +758,14 @@ if(window.selectedUser){
     window.location.href = "prfl.html?uid=" + window.selectedUser;
 }
 };
+
+const popup = document.getElementById("popup");
+
+popup.addEventListener("click", (e) => {
+    if (e.target === popup) {
+        popup.style.display = "none";
+    }
+});
     
 </script>a
 
