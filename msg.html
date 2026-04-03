@@ -1144,19 +1144,35 @@ function loadMessages(){
 
         messages.sort((a,b)=> a.time - b.time);
 
-        messages.forEach(m=>{
-            box.innerHTML += `
-                <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
-                     data-id="${m.id}"
-                    oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;">
-                    ${m.text}
-                    <div style="font-size:10px;opacity:.6;margin-top:4px;">
-                        ${new Date(m.edited ? m.editedTime : m.time).toLocaleDateString()} • 
-                        ${new Date(m.edited ? m.editedTime : m.time).toLocaleTimeString()}
-                    </div>
-                </div>
-            `;
-        });
+messages.forEach(m=>{
+
+    // ✅ SYSTEM MESSAGE (CENTER STYLE)
+    if(m.system){
+        box.innerHTML += `
+            <div style="
+                text-align:center;
+                font-size:12px;
+                opacity:.7;
+                margin:10px 0;
+            ">
+                ${m.text}
+            </div>
+        `;
+        return;
+    }
+
+    // NORMAL MESSAGE
+    box.innerHTML += `
+        <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
+             data-id="${m.id}">
+            ${m.text}
+            <div style="font-size:10px;opacity:.6;margin-top:4px;">
+                ${new Date(m.time).toLocaleDateString()} • 
+                ${new Date(m.time).toLocaleTimeString()}
+            </div>
+        </div>
+    `;
+});
 
         box.scrollTop = box.scrollHeight;
     });
