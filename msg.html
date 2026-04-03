@@ -862,7 +862,7 @@ onAuthStateChanged(auth, async (user) => {
         setOnlineStatus(user);
 
         await setDoc(doc(db, "users", user.uid), {
-            name: user.displayName || "No Name"
+            name: userData.name || "No Name",
         }, { merge: true });
 
         await loadUsers();
