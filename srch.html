@@ -615,14 +615,6 @@ if(isOnline){
 /* POPUP */
 window.openUser = (id,name,photo)=>{
 window.selectedUser = id;
-
-window.selectedUserData = {
-    id: id,
-    firstName: name.split(" ")[0],
-    lastName: name.split(" ")[1] || "",
-    photo: photo
-};
-
 document.getElementById("popup").style.display="flex";
 document.getElementById("popupName").innerText=name;
 document.getElementById("popupImg").src=photo;
@@ -641,26 +633,25 @@ window.location.href = "msg.html?uid=" + window.selectedUser;
 
 window.addFriend = async ()=>{
 const current = auth.currentUser;
-if(!current || !window.selectedUserData) return;
 
-const u = window.selectedUserData;
+if(!current || !window.selectedUser) return;
 
 try{
-// YOU → pending
-await setDoc(doc(db,"pending",current.uid,"sent",u.id),{
-    id: u.id,
-    name: u.firstName + " " + u.lastName,
-    photo: u.photo
+
+// YOU → THEM
+await setDoc(doc(db,"friends",current.uid,"list",window.selectedUser),{
+uid:window.selectedUser,
+createdAt:new Date()
 });
 
-// THEM → request
-await setDoc(doc(db,"requests",u.id,"received",current.uid),{
-    id: current.uid,
-    name: current.displayName || current.email,
-    photo: current.photoURL || ""
+// THEM → YOU (mutual)
+await setDoc(doc(db,"friends",window.selectedUser,"list",current.uid),{
+uid:current.uid,
+createdAt:new Date()
 });
 
-alert("Friend request sent!");
+alert("Friend added!");
+
 }catch(err){
 console.error(err);
 }
