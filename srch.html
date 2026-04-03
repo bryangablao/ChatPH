@@ -689,28 +689,42 @@ window.location.href = "msg.html?uid=" + window.selectedUser;
 
 window.addFriend = async ()=>{
 const current = auth.currentUser;
-if(!current || !window.selectedUserData) return;
+if(!current || !window.selectedUserData){
+    showToast("User not ready", false);
+    return;
+}
 
 const u = window.selectedUserData;
 
 try{
-// YOU → pending
-await setDoc(doc(db,"pending",current.uid,"sent",u.id),{
-    id: u.id,
-    name: u.firstName + " " + u.lastName,
-    photo: u.photo
-});
+    // 🔍 check if already sent
+    const existing = await getDoc(doc(db,"pending",current.uid,"sent",u.id));
+    if(existing.exists()){
+        showToast("Already sent request");
+        return;
+    }
 
-// THEM → request
-await setDoc(doc(db,"requests",u.id,"received",current.uid),{
-    id: current.uid,
-    name: current.displayName || current.email,
-    photo: current.photoURL || ""
-});
+    // YOU → pending
+    await setDoc(doc(db,"pending",current.uid,"sent",u.id),{
+        id: u.id,
+        name: u.firstName + " " + u.lastName,
+        photo: u.photo,
+        createdAt: new Date()
+    });
 
-alert("Friend request sent!");
+    // THEM → request
+    await setDoc(doc(db,"requests",u.id,"received",current.uid),{
+        id: current.uid,
+        name: current.displayName || current.email,
+        photo: current.photoURL || "",
+        createdAt: new Date()
+    });
+
+    showToast("Friend request sent ✅");
+
 }catch(err){
-console.error(err);
+    console.error(err);
+    showToast("Failed to send request ❌", false);
 }
 };
 
@@ -766,8 +780,32 @@ popup.addEventListener("click", (e) => {
         popup.style.display = "none";
     }
 });
+
+function showToast(msg, success=true){
+    const t = document.getElementById("toast");
+    t.innerText = msg;
+    t.style.borderColor = success ? "#4ade80" : "#ff4b4b";
+    t.style.opacity = 1;
+
+    setTimeout(()=>{
+        t.style.opacity = 0;
+    }, 2500);
+}
     
 </script>a
-
+<div id="toast" style="
+position:fixed;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+background:#171a21;
+color:white;
+padding:12px 18px;
+border-radius:8px;
+border:1px solid #23262f;
+opacity:0;
+transition:.3s;
+z-index:99999;
+"></div>
 </body>
 </html>
