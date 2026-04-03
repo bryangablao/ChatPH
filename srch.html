@@ -882,18 +882,38 @@ window.handleFriendAction = async ()=>{
 
     // ✅ ACCEPT FRIEND
 if(window.friendStatus === "request"){
+    const now = new Date();
+
+    // ✅ add both as friends
     await setDoc(doc(db,"friends",current.uid,"list",uid),{
         uid,
-        createdAt:new Date()
+        createdAt:now
     });
+
     await setDoc(doc(db,"friends",uid,"list",current.uid),{
         uid:current.uid,
-        createdAt:new Date()
+        createdAt:now
     });
-    await deleteDoc(doc(db,"requests",current.uid,"received",uid));
-    showToast("Friend added ✅");
 
-// ❌ UNFRIEND
+    // ✅ remove request
+    await deleteDoc(doc(db,"requests",current.uid,"received",uid));
+
+    // ✅ CREATE ONE SHARED CHAT ID (IMPORTANT)
+    const chatId = [current.uid, uid].sort().join("_");
+
+    // ✅ ONLY CREATE MESSAGE IF NOT EXIST (PREVENT DUPLICATE)
+    const msgRef = doc(db, "chats", chatId, "messages", "friend_start");
+    const existing = await getDoc(msgRef);
+
+    if(!existing.exists()){
+        await setDoc(msgRef, {
+            text: `🎉 Congratulations! You are now friends (${now.toLocaleString()})`,
+            system: true,
+            createdAt: now
+        });
+    }
+
+    showToast("Friend added ✅");
 }else if(window.friendStatus === "friends"){
     await deleteDoc(doc(db,"friends",current.uid,"list",uid));
     await deleteDoc(doc(db,"friends",uid,"list",current.uid));
