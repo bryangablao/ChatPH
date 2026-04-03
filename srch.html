@@ -259,6 +259,7 @@ font-weight:600;
     padding:0;
     background:none;
     border-radius:0;
+    cursor:pointer;
 }
 
 .popup-name{
@@ -446,8 +447,8 @@ Online: <span id="onlineUsers">0</span>
 
             <div class="popup-actions">
                 <img id="friendBtn" onclick="handleFriendAction()">
-                <img src="image/icon/directmessage.png" onclick="startChat()">
-                <img src="image/icon/viewprofile.png" onclick="viewProfile()">
+                <img src="image/icon/directmessage.png" title="Message" onclick="startChat()">
+                <img src="image/icon/viewprofile.png" title="View Profile" onclick="viewProfile()">
             </div>
         </div>
     </div>
@@ -728,16 +729,21 @@ async function updateFriendButton(id){
     const friendDoc = await getDoc(doc(db,"friends",current.uid,"list",id));
     const requestDoc = await getDoc(doc(db,"requests",current.uid,"received",id));
 
-    if(friendDoc.exists()){
-        window.friendStatus = "friends";
-        btn.src = "image/icon/unfriend.png";
-    }else if(requestDoc.exists()){
-        window.friendStatus = "request";
-        btn.src = "image/icon/acceptfriend.png";
-    }else{
-        window.friendStatus = "none";
-        btn.src = "image/icon/adduser.png";
-    }
+if(friendDoc.exists()){
+    window.friendStatus = "friends";
+    btn.src = "image/icon/unfriend.png";
+    btn.title = "Unfriend";
+
+}else if(requestDoc.exists()){
+    window.friendStatus = "request";
+    btn.src = "image/icon/acceptfriend.png";
+    btn.title = "Accept Request";
+
+}else{
+    window.friendStatus = "none";
+    btn.src = "image/icon/adduser.png";
+    btn.title = "Add Friend";
+}
 }
 
 window.closePopup = ()=>{
