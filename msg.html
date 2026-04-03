@@ -861,17 +861,17 @@ onAuthStateChanged(auth, async (user) => {
     if(user){
         setOnlineStatus(user);
 
-        // ✅ AUTO OPEN CHAT FROM SEARCH PAGE
-        if(chatUID){
-            openChat(chatUID);
-        }
-
         await setDoc(doc(db, "users", user.uid), {
             name: user.displayName || "No Name"
         }, { merge: true });
 
         await loadUsers();
-
+        
+        // ✅ AUTO OPEN CHAT FROM SEARCH PAGE
+        if(chatUID){
+            openChat(chatUID);
+        }
+        
         setTimeout(() => {
             loadChatList();
         }, 200);
