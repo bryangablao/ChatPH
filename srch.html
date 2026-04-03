@@ -728,22 +728,28 @@ async function updateFriendButton(id){
 
     const friendDoc = await getDoc(doc(db,"friends",current.uid,"list",id));
     const requestDoc = await getDoc(doc(db,"requests",current.uid,"received",id));
+    const pendingDoc = await getDoc(doc(db,"pending",current.uid,"sent",id)); // ⭐ NEW
 
-if(friendDoc.exists()){
-    window.friendStatus = "friends";
-    btn.src = "image/icon/unfriend.png";
-    btn.title = "Unfriend";
+    if(friendDoc.exists()){
+        window.friendStatus = "friends";
+        btn.src = "image/icon/unfriend.png";
+        btn.title = "Unfriend";
 
-}else if(requestDoc.exists()){
-    window.friendStatus = "request";
-    btn.src = "image/icon/acceptfriend.png";
-    btn.title = "Accept Request";
+    }else if(requestDoc.exists()){
+        window.friendStatus = "request";
+        btn.src = "image/icon/acceptfriend.png";
+        btn.title = "Accept Request";
 
-}else{
-    window.friendStatus = "none";
-    btn.src = "image/icon/adduser.png";
-    btn.title = "Add Friend";
-}
+    }else if(pendingDoc.exists()){ // ⭐ NEW CONDITION
+        window.friendStatus = "pending";
+        btn.src = "image/icon/cancelrequest.png";
+        btn.title = "Cancel Request";
+
+    }else{
+        window.friendStatus = "none";
+        btn.src = "image/icon/adduser.png";
+        btn.title = "Add Friend";
+    }
 }
 
 window.closePopup = ()=>{
@@ -875,36 +881,42 @@ window.handleFriendAction = async ()=>{
     }
 
     // ✅ ACCEPT FRIEND
-    if(window.friendStatus === "request"){
-        await setDoc(doc(db,"friends",current.uid,"list",uid),{
-            uid,
-            createdAt:new Date()
-        });
-        await setDoc(doc(db,"friends",uid,"list",current.uid),{
-            uid:current.uid,
-            createdAt:new Date()
-        });
-        await deleteDoc(doc(db,"requests",current.uid,"received",uid));
-        showToast("Friend added ✅");
+if(window.friendStatus === "request"){
+    await setDoc(doc(db,"friends",current.uid,"list",uid),{
+        uid,
+        createdAt:new Date()
+    });
+    await setDoc(doc(db,"friends",uid,"list",current.uid),{
+        uid:current.uid,
+        createdAt:new Date()
+    });
+    await deleteDoc(doc(db,"requests",current.uid,"received",uid));
+    showToast("Friend added ✅");
 
-    // ❌ UNFRIEND
-    }else if(window.friendStatus === "friends"){
-        await deleteDoc(doc(db,"friends",current.uid,"list",uid));
-        await deleteDoc(doc(db,"friends",uid,"list",current.uid));
-        showToast("Unfriended ❌");
+// ❌ UNFRIEND
+}else if(window.friendStatus === "friends"){
+    await deleteDoc(doc(db,"friends",current.uid,"list",uid));
+    await deleteDoc(doc(db,"friends",uid,"list",current.uid));
+    showToast("Unfriended ❌");
 
-    // ➕ ADD FRIEND
-    }else{
-        await setDoc(doc(db,"pending",current.uid,"sent",uid),{
-            id: uid,
-            createdAt:new Date()
-        });
-        await setDoc(doc(db,"requests",uid,"received",current.uid),{
-            id: current.uid,
-            createdAt:new Date()
-        });
-        showToast("Request sent 📩");
-    }
+// ❌ CANCEL REQUEST ⭐ (PUT IT HERE)
+}else if(window.friendStatus === "pending"){
+    await deleteDoc(doc(db,"pending",current.uid,"sent",uid));
+    await deleteDoc(doc(db,"requests",uid,"received",current.uid));
+    showToast("Request cancelled ❌");
+
+// ➕ ADD FRIEND
+}else{
+    await setDoc(doc(db,"pending",current.uid,"sent",uid),{
+        id: uid,
+        createdAt:new Date()
+    });
+    await setDoc(doc(db,"requests",uid,"received",current.uid),{
+        id: current.uid,
+        createdAt:new Date()
+    });
+    showToast("Request sent 📩");
+}
 
     await updateFriendButton(uid);
 };
