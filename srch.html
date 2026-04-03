@@ -254,6 +254,40 @@ cursor:pointer;
     border-radius:12px;
 }
 
+.popup-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.popup-row img{
+    width:50px;
+    height:50px;
+    border-radius:50%;
+}
+
+.popup-name{
+    flex:1;
+    font-weight:600;
+    font-size:15px;
+}
+
+.popup-actions{
+    display:flex;
+    gap:10px;
+}
+
+.popup-actions img{
+    width:28px;
+    height:28px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.popup-actions img:hover{
+    transform:scale(1.2);
+}
+    
 .user-info{
     display:flex;
     align-items:center;
@@ -398,16 +432,18 @@ Online: <span id="onlineUsers">0</span>
 <!-- POPUP -->
 <div class="popup" id="popup">
 <div class="popup-content modern">
-    
-    <div class="user-info">
-        <img id="popupImg">
-        <h3 id="popupName"></h3>
-    </div>
 
-    <div class="action-buttons">
-        <img src="image/icon/adduser.png" title="Add Friend" onclick="addFriend()">
-        <img src="image/icon/directmessage.png" title="Message" onclick="startChat()">
-        <img src="image/icon/viewprofile.png" title="View Profile" onclick="viewProfile()">
+    <!-- MAIN ROW -->
+    <div class="popup-row">
+        <img id="popupImg">
+
+        <div class="popup-name" id="popupName"></div>
+
+        <div class="popup-actions">
+            <img id="friendBtn" src="image/icon/adduser.png" onclick="handleFriendAction()">
+            <img src="image/icon/directmessage.png" title="Message" onclick="startChat()">
+            <img src="image/icon/viewprofile.png" title="View Profile" onclick="viewProfile()">
+        </div>
     </div>
 
 </div>
@@ -663,7 +699,6 @@ if(isOnline){
 /* POPUP */
 window.openUser = (id,name,photo)=>{
 window.selectedUser = id;
-
 window.selectedUserData = {
     id: id,
     firstName: name.split(" ")[0],
@@ -674,6 +709,26 @@ window.selectedUserData = {
 document.getElementById("popup").style.display="flex";
 document.getElementById("popupName").innerText=name;
 document.getElementById("popupImg").src=photo;
+
+async function checkFriendStatus(uid){
+    const current = auth.currentUser;
+
+    // 1. CHECK FRIENDS
+    const friendDoc = await getDoc(doc(db,"friends",current.uid,"list",uid));
+    if(friendDoc.exists()){
+        return "friends";
+    }
+
+    // 2. CHECK IF THEY SENT YOU REQUEST
+    const requestDoc = await getDoc(doc(db,"requests",current.uid,"received",uid));
+    if(requestDoc.exists()){
+        return "request";
+    }
+
+    // 3. DEFAULT
+    return "none";
+}
+    
 };
 
 window.closePopup = ()=>{
@@ -791,6 +846,58 @@ function showToast(msg, success=true){
         t.style.opacity = 0;
     }, 2500);
 }
+
+window.handleFriendAction = async ()=>{
+    const current = auth.currentUser;
+    const uid = window.selectedUser;
+
+    if(!current || !uid) return;
+
+    // ✅ ACCEPT FRIEND
+    if(window.friendStatus === "request"){
+        await setDoc(doc(db,"friends",current.uid,"list",uid),{
+            uid,
+            createdAt:new Date()
+        });
+
+        await setDoc(doc(db,"friends",uid,"list",current.uid),{
+            uid:current.uid,
+            createdAt:new Date()
+        });
+
+        // remove request
+        await deleteDoc(doc(db,"requests",current.uid,"received",uid));
+
+        showToast("Friend added ✅");
+
+    // ❌ UNFRIEND
+    }else if(window.friendStatus === "friends"){
+        await deleteDoc(doc(db,"friends",current.uid,"list",uid));
+        await deleteDoc(doc(db,"friends",uid,"list",current.uid));
+
+        showToast("Unfriended ❌");
+
+    // ➕ ADD FRIEND
+    }else{
+        await setDoc(doc(db,"pending",current.uid,"sent",uid),{
+            id: uid,
+            createdAt:new Date()
+        });
+
+        await setDoc(doc(db,"requests",uid,"received",current.uid),{
+            id: current.uid,
+            createdAt:new Date()
+        });
+
+        showToast("Request sent 📩");
+    }
+
+    // 🔄 refresh button
+    openUser(uid,
+        document.getElementById("popupName").innerText,
+        document.getElementById("popupImg").src
+    );
+};
     
 </script>a
 <div id="toast" style="
