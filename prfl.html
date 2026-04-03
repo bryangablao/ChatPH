@@ -605,13 +605,14 @@ onAuthStateChanged(auth, async (user) => {
 
     setOnlineStatus(user);
 
-    document.getElementById("userName").innerText = user.displayName || "User";
-    document.getElementById("userEmail").innerText = user.email;
-
            const profileUID = uid || user.uid;
            const snap = await getDoc(doc(db, "users", profileUID));
         if (snap.exists()) {
             const d = snap.data();
+
+            document.getElementById("userName").innerText = user.displayName || "User";
+            document.getElementById("userEmail").innerText = user.email;
+            
             if (d.bio) document.getElementById("userBio").innerText = d.bio;
             if (d.pfpBase64) document.getElementById("pfp").src = d.pfpBase64;
             if (d.coverBase64) document.getElementById("coverImg").src = d.coverBase64;
