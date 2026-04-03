@@ -763,7 +763,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-
+const params = new URLSearchParams(window.location.search);
+const chatUID = params.get("uid");
+    
 let allUsers = [];
 let selectedMembers = [];
 let currentGroup = null;
@@ -857,14 +859,19 @@ function loadChatList(){
 
 onAuthStateChanged(auth, async (user) => {
     if(user){
-
         setOnlineStatus(user);
+
+        // ✅ AUTO OPEN CHAT FROM SEARCH PAGE
+        if(chatUID){
+            openChat(chatUID);
+        }
 
         await setDoc(doc(db, "users", user.uid), {
             name: user.displayName || "No Name"
         }, { merge: true });
 
         await loadUsers();
+
         setTimeout(() => {
             loadChatList();
         }, 200);
