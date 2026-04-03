@@ -861,9 +861,9 @@ onAuthStateChanged(auth, async (user) => {
     if(user){
         setOnlineStatus(user);
 
-        await setDoc(doc(db, "users", user.uid), {
-            name: userData.name || "No Name",
-        }, { merge: true });
+await setDoc(doc(db, "users", user.uid), {
+    name: user.displayName || "No Name",
+}, { merge: true });
 
         await loadUsers();
         
@@ -1003,7 +1003,8 @@ if(!value){
     return;
 }
 
-const myId = auth.currentUser.uid;
+const myId = auth.currentUser?.uid;
+if (!myId) return;
 
 const filtered = allUsers.filter(u => 
     u.uid !== myId && // 🔥 exclude yourself
