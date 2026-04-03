@@ -248,6 +248,50 @@ color:black;
 cursor:pointer;
 }
 
+.popup-content.modern{
+    width:320px;
+    padding:20px;
+}
+
+.user-info{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:15px;
+}
+
+.user-info img{
+    width:60px;
+    height:60px;
+    border-radius:50%;
+}
+
+.user-info h3{
+    margin:0;
+    font-size:18px;
+}
+
+.action-buttons{
+    display:flex;
+    justify-content:space-around;
+    margin-top:10px;
+}
+
+.action-buttons img{
+    width:40px;
+    height:40px;
+    padding:8px;
+    border-radius:10px;
+    background:#0f1115;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.action-buttons img:hover{
+    background:#1f2937;
+    transform:scale(1.1);
+}
+
 /* FOOTER */
 footer{
     text-align:center;
@@ -356,12 +400,19 @@ Online: <span id="onlineUsers">0</span>
 
 <!-- POPUP -->
 <div class="popup" id="popup">
-<div class="popup-content">
-<img id="popupImg">
-<h3 id="popupName"></h3>
-<button class="btn" onclick="addFriend()">Add Friend</button>
-<button class="btn" onclick="startChat()">Message</button>
-<button class="btn" onclick="closePopup()">Close</button>
+<div class="popup-content modern">
+    
+    <div class="user-info">
+        <img id="popupImg">
+        <h3 id="popupName"></h3>
+    </div>
+
+    <div class="action-buttons">
+        <img src="image/icon/adduser.png" title="Add Friend" onclick="addFriend()">
+        <img src="image/icon/directmessage.png" title="Message" onclick="startChat()">
+        <img src="image/icon/viewprofile.png" title="View Profile" onclick="viewProfile()">
+    </div>
+
 </div>
 </div>
 
@@ -703,6 +754,12 @@ renderUsers([]);
 
 document.querySelector(".main").classList.add("centered");
 document.querySelector(".search-box").classList.remove("active");
+};
+
+window.viewProfile = ()=>{
+if(window.selectedUser){
+    window.location.href = "prfl.html?uid=" + window.selectedUser;
+}
 };
     
 </script>a
