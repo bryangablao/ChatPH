@@ -786,7 +786,8 @@ try{
         id: u.id,
         name: u.firstName + " " + u.lastName,
         photo: u.photo,
-        createdAt: new Date()
+        createdAt: Date.now()
+
     });
 
     // THEM → request
@@ -794,7 +795,8 @@ try{
         id: current.uid,
         name: current.displayName || current.email,
         photo: current.photoURL || "",
-        createdAt: new Date()
+        createdAt: Date.now()
+
     });
 
     showToast("Friend request sent ✅");
