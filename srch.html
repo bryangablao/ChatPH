@@ -226,9 +226,9 @@ font-weight:600;
 
 .popup-content{
     background:#171a21;
-    padding:16px;
+    padding:14px;   /* smaller */
     border-radius:12px;
-    width:260px;
+    width:240px;    /* tighter */
 }
 
 .popup-row{
@@ -258,17 +258,25 @@ font-weight:600;
 
 .popup-actions{
     display:flex;
-    gap:6px;
+    gap:8px;
     margin-top:6px;
 }
     
 .popup-actions img{
-    width:28px;
-    height:28px;
-    object-fit:contain; /* ✅ IMPORTANT */
-    border-radius:8px;
-    padding:6px;
+    width:22px;
+    height:22px;
+    object-fit:contain;
+
+    padding:8px;              /* balanced click area */
+    border-radius:50%;       /* circle buttons */
+
     background:#1f2937;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+    transition:0.2s ease;
 }
 
 .popup-actions img:hover{
@@ -912,12 +920,12 @@ window.handleFriendAction = async ()=>{
 <div id="toast" style="
 position:fixed;
 bottom:20px;
-top:20px;
 left:50%;
 transform:translateX(-50%);
 background:#171a21;
 color:white;
-padding:12px 18px;
+padding:10px 14px;     /* smaller */
+font-size:13px;
 border-radius:8px;
 border:1px solid #23262f;
 opacity:0;
