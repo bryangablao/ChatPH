@@ -102,6 +102,7 @@ padding:20px;
 max-width:800px;
 margin:auto;
 animation:fadeSlide .4s ease;
+transition: all 0.3s ease;
 }
 
 .panel.active{
@@ -200,7 +201,7 @@ Version 0.0.1
 </div>
 </div>
 
-<div class="icon-btn" onclick="toggleTheme()" id="themeBtn">◑</div>
+<div class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Dark/Light Mode">◑</div>
 </header>
 
 <!-- TABS -->
@@ -294,19 +295,6 @@ Barranggay 22-C Poblacion District, Super Block #3 Piape Boulevard Davao City, 8
 </footer>
 
 <script>
-
-/* TAB SWITCH */
-const tabs = document.querySelectorAll(".tab");
-
-tabs.forEach(tab=>{
-tab.onclick = ()=>{
-tabs.forEach(t=>t.classList.remove("active"));
-tab.classList.add("active");
-
-document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
-document.getElementById(tab.dataset.tab).classList.add("active");
-};
-});
 
 /* BACK */
 function goHome(){
