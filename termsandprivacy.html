@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ChatPH | Friendlist</title>
+<title>ChatPH | Info</title>
 
 <link rel="icon" type="image/png" href="image/chatph-logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -203,6 +203,32 @@ opacity:0.9;
     line-height:1.4;
     word-break:break-word;
 }
+
+.card a{
+    color: inherit;
+    text-decoration: none;
+    position: relative;
+}
+
+.card a::after{
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 0%;
+    height: 2px;
+    background: var(--accent);
+    transition: width 0.3s ease;
+}
+
+.card a:hover::after{
+    width: 100%;
+}
+
+.card a:hover{
+    opacity: 0.8;
+    text-decoration: none;
+}
     
 </style>
 </head>
@@ -378,9 +404,11 @@ We are always open to improving ChatPH based on your suggestions.
 <p>
 You can contact us via email for support or inquiries:
 <br><br>
+
 <a href="mailto:ablaobryan4400@gmail.com" style="color:inherit; text-decoration:none;">
     ablaobryan4400@gmail.com
 </a>
+
 </p>
 </div>
 
