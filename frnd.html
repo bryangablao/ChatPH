@@ -569,14 +569,16 @@ async function accept(uid){
         createdAt:new Date()
     });
 
-    // remove request
+    // ✅ remove request (both sides)
     await deleteDoc(doc(db,"requests",current.uid,"received",uid));
-
-    // reload UI
+    await deleteDoc(doc(db,"pending",uid,"sent",current.uid));
 }
 
 async function cancelRequest(uid){
-    await deleteDoc(doc(db,"pending",auth.currentUser.uid,"sent",uid));
+    const current = auth.currentUser;
+
+    await deleteDoc(doc(db,"pending",current.uid,"sent",uid));
+    await deleteDoc(doc(db,"requests",uid,"received",current.uid));
 }
 
 async function removeFriend(uid){
@@ -593,7 +595,6 @@ async function loadPending(uid){
 
         for(const d of snap.docs){
             const data = d.data();
-
             const userDoc = await getDoc(doc(db,"users",data.uid));
             const userData = userDoc.data();
 
@@ -603,6 +604,10 @@ async function loadPending(uid){
                 photo: userData?.photo || ""
             });
         }
+
+        // ✅ COUNT UPDATE
+        document.querySelector('[data-tab="pending"]').innerText =
+            `Pending (${list.length})`;
 
         renderPending(list);
     });
@@ -615,7 +620,6 @@ async function loadRequests(uid){
 
         for(const d of snap.docs){
             const data = d.data();
-
             const userDoc = await getDoc(doc(db,"users",data.uid));
             const userData = userDoc.data();
 
@@ -625,6 +629,10 @@ async function loadRequests(uid){
                 photo: userData?.photo || ""
             });
         }
+
+        // ✅ COUNT UPDATE
+        document.querySelector('[data-tab="requests"]').innerText =
+            `Requests (${list.length})`;
 
         renderRequests(list);
     });
