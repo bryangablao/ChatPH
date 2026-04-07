@@ -145,15 +145,6 @@ padding:16px;
 flex:1;
 }
 
-/* FRIEND CARD (you will use later) */
-.friend-card{
-background:var(--card);
-border:1px solid var(--border);
-padding:12px;
-border-radius:12px;
-margin-bottom:10px;
-}
-
 /* FOOTER */
 footer{
     text-align:center;
@@ -173,7 +164,9 @@ text-decoration:underline;
     background:var(--card);
     border-radius:20px;
     padding:6px;
-    margin-bottom:15px;
+    margin-bottom:20px;
+    position: relative;
+    z-index: 5;
 }
 
 .tab{
@@ -191,7 +184,8 @@ text-decoration:underline;
 
 .panel-container{
     position:relative;
-    overflow:hidden;
+    overflow:visible;
+    padding-top:5px;
 }
 
 .panel{
@@ -223,14 +217,6 @@ text-decoration:underline;
 
 .dropdown{
     position:absolute;
-    background:var(--card);
-    border:1px solid var(--border);
-    border-radius:8px;
-    display:none;
-}
-
-.dropdown{
-    position:absolute;
     right:10px;
     top:40px;
     background:var(--card);
@@ -238,7 +224,7 @@ text-decoration:underline;
     border-radius:8px;
     display:none;
     min-width:140px;
-    z-index:10;
+    z-index:999;
 }
 
 .dropdown div{
@@ -257,11 +243,11 @@ text-decoration:underline;
     padding:12px;
     border-radius:14px;
     margin-bottom:10px;
-
+    position: relative;
+    overflow: visible;
     background:rgba(255,255,255,0.05);
     backdrop-filter:blur(10px);
     border:1px solid rgba(255,255,255,0.08);
-
     transition:.25s;
 }
 
@@ -308,6 +294,17 @@ text-decoration:underline;
     opacity: 0;
     transform: translateX(20px);
 }
+
+#logoutBtn {
+    cursor: pointer;
+    color: #aaa;
+    font-weight: 600;
+    font-size: 14px;
+}
+    
+#logoutBtn:hover {
+    color: #ff4b4b;
+}
     
 </style>
 </head>
@@ -322,9 +319,9 @@ text-decoration:underline;
 <span class="brand">ChatPH</span>
 </div>
 
-<div style="display:flex;align-items:center;gap:16px;">
-<span id="userDisplay">Guest</span>
-<div id="logoutBtn">Logout</div>
+<div style="display:flex;align-items:center;gap:12px;">
+    <span id="userName">Loading...</span>
+    <div id="logoutBtn">Logout</div>
 </div>
 </header>
 
@@ -444,9 +441,9 @@ if(user){
 }
 });
 
-document.getElementById("logoutBtn").onclick = async ()=>{
-await signOut(auth);
-window.location.href="index.html";
+document.getElementById("logoutBtn").onclick = async () => {
+    await signOut(auth);
+    window.location.href = "index.html";
 };
 
 const links = document.querySelectorAll(".sidebar a");
