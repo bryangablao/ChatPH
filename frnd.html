@@ -185,7 +185,7 @@ text-decoration:underline;
 .panel-container{
     position:relative;
     overflow:visible;
-    padding-top:5px;
+    padding-top:10px;
 }
 
 .panel{
@@ -224,7 +224,7 @@ text-decoration:underline;
     border-radius:8px;
     display:none;
     min-width:140px;
-    z-index:999;
+    z-index:9999;
 }
 
 .dropdown div{
@@ -427,7 +427,7 @@ o.classList.toggle("active");
 /* AUTH */
 onAuthStateChanged(auth, (user)=>{
 if(user){
-    document.getElementById("userDisplay").innerText =
+    document.getElementById("userName").innerText =
     user.displayName || user.email;
 
     setOnlineStatus(user);
