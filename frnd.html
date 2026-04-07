@@ -211,6 +211,14 @@ text-decoration:underline;
 .menu-btn{
     cursor:pointer;
     margin-left:10px;
+    font-size:18px;
+    font-weight:bold;
+    padding:6px 10px;
+    border-radius:8px;
+    transition:.2s;
+}
+.menu-btn:hover{
+    background:rgba(255,255,255,0.08);
 }
 
 .dropdown{
@@ -501,12 +509,26 @@ function renderFriends(list){
             <div>
                 <div>${f.name}</div>
                 <div style="font-size:12px;color:#9ca3af">
-                    ${f.online ? "🟢 Online" : "⚪ Offline"}
+<span style="color:${f.online ? '#22c55e' : '#9ca3af'}">●</span>
+<span style="color:#9ca3af;font-size:12px;">
+    ${f.online ? "Online" : "Offline"}
+</span>
                 </div>
             </div>
 
             <div style="margin-left:auto;font-size:12px;">
-                ${new Date(f.createdAt).toLocaleString()}
+${f.createdAt?.toDate().toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric'
+})}
+<br>
+<span style="font-size:11px;color:#9ca3af;">
+${f.createdAt?.toDate().toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit'
+})}
+</span>
             </div>
 
             <!-- ⋮ BUTTON -->
@@ -516,7 +538,8 @@ function renderFriends(list){
             <div class="dropdown">
                 <div onclick="viewProfile('${f.id}')">View Profile</div>
                 <div onclick="sendMessage('${f.id}')">Message</div>
-                <div onclick="removeFriend('${f.id}')">Remove</div>
+                <div onclick="pinFriend('${f.id}')">Pin Friend</div>
+                <div onclick="removeFriend('${f.id}')">Remove Friend</div>
             </div>
         </div>
         `;
@@ -601,19 +624,24 @@ import { onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-
 async function loadPending(uid){
     const ref = collection(db,"pending",uid,"sent");
     onSnapshot(ref, async (snap)=>{
-        let list = [];
+let list = [];
+for (const d of snap.docs){
+    const data = d.data();
+    const userDoc = await getDoc(doc(db,"users",data.uid));
+    const userData = userDoc.data();
 
-        for(const d of snap.docs){
-            const data = d.data();
-            const userDoc = await getDoc(doc(db,"users",data.uid));
-            const userData = userDoc.data();
+    list.push({
+        id: data.uid,
+        name: (userData?.firstName || "") + " " + (userData?.lastName || ""),
+        photo: userData?.photo || "",
+        createdAt: data.createdAt,
+        online: false,
+        pinned: data.pinned || false   // ✅ ADD THIS
+    });
+}
 
-            list.push({
-                id: data.uid,
-                name: (userData?.firstName || "") + " " + (userData?.lastName || ""),
-                photo: userData?.photo || ""
-            });
-        }
+// ✅ SORT HERE (before render)
+list.sort((a,b)=> (b.pinned === true) - (a.pinned === true));
 
         // ✅ COUNT UPDATE
         document.querySelector('[data-tab="pending"]').innerText =
@@ -665,7 +693,10 @@ function loadFriends(uid){
                 name: (userData?.firstName || "") + " " + (userData?.lastName || ""),
                 photo: userData?.photo || "",
                 createdAt: data.createdAt,
-                online: false
+                const statusDoc = await getDoc(doc(db,"status",data.uid));
+                const statusData = statusDoc.data();
+
+                online: statusData?.online || false
             });
         }
 
@@ -691,10 +722,46 @@ async function reject(uid, event){
     }, 200);
 }
 
+window.toggleMenu = (btn)=>{
+    const dropdown = btn.nextElementSibling;
+
+    // close others
+    document.querySelectorAll('.dropdown').forEach(d=>{
+        if(d !== dropdown) d.style.display = 'none';
+    });
+
+    dropdown.style.display =
+        dropdown.style.display === 'block' ? 'none' : 'block';
+};
+
+async function pinFriend(uid){
+    await setDoc(doc(db,"friends",auth.currentUser.uid,"list",uid),{
+        pinned: true
+    }, { merge:true });
+}
+window.pinFriend = pinFriend;
+    
+// click outside = close
+window.addEventListener('click', (e)=>{
+    if(!e.target.closest('.menu-btn') && !e.target.closest('.dropdown')){
+        document.querySelectorAll('.dropdown').forEach(d=>{
+            d.style.display = 'none';
+        });
+    }
+});
+    
 window.accept = accept;
 window.reject = reject;
 window.cancelRequest = cancelRequest;
 window.removeFriend = removeFriend;
+
+window.sendMessage = (uid)=>{
+    window.location.href = `msg.html?uid=${uid}`;
+};
+
+window.viewProfile = (uid)=>{
+    window.location.href = `prfl.html?uid=${uid}`;
+};
     
 </script>
 </body>
