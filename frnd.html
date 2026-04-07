@@ -249,11 +249,13 @@ text-decoration:underline;
     backdrop-filter:blur(10px);
     border:1px solid rgba(255,255,255,0.08);
     transition:.25s;
+    z-index: 1;
 }
 
 .friend-card:hover{
     transform:translateY(-2px);
     background:rgba(255,255,255,0.08);
+    z-index: 50;
 }
 
 .avatar{
@@ -304,6 +306,13 @@ text-decoration:underline;
     
 #logoutBtn:hover {
     color: #ff4b4b;
+}
+
+.pin-icon{
+    position:absolute;
+    top:6px;
+    right:6px;
+    font-size:14px;
 }
     
 </style>
@@ -501,6 +510,7 @@ function renderFriends(list){
     list.forEach(f=>{
         panel.innerHTML += `
         <div class="friend-card" style="position:relative;">
+            ${f.pinned ? '<div class="pin-icon">📌</div>' : ''}
             <img src="${f.photo}" class="avatar">
 
             <div>
@@ -535,7 +545,9 @@ ${f.createdAt?.toDate().toLocaleTimeString('en-US', {
             <div class="dropdown">
                 <div onclick="viewProfile('${f.id}')">View Profile</div>
                 <div onclick="sendMessage('${f.id}')">Message</div>
-                <div onclick="pinFriend('${f.id}')">Pin Friend</div>
+                <div onclick="pinFriend('${f.id}', ${f.pinned})">
+                    ${f.pinned ? 'Unpin Friend' : 'Pin Friend'}
+                </div>
                 <div onclick="removeFriend('${f.id}')">Remove Friend</div>
             </div>
         </div>
@@ -642,7 +654,12 @@ for (const d of snap.docs){
 }
 
 // ✅ SORT HERE (before render)
-list.sort((a,b)=> (b.pinned === true) - (a.pinned === true));
+list.sort((a,b)=>{
+    if (a.pinned !== b.pinned){
+        return b.pinned - a.pinned; // pinned first
+    }
+    return a.name.localeCompare(b.name); // A-Z
+});
 
         // ✅ COUNT UPDATE
         document.querySelector('[data-tab="pending"]').innerText =
@@ -743,9 +760,9 @@ window.toggleMenu = (btn)=>{
         dropdown.style.display === 'block' ? 'none' : 'block';
 };
 
-async function pinFriend(uid){
+async function pinFriend(uid, currentState){
     await setDoc(doc(db,"friends",auth.currentUser.uid,"list",uid),{
-        pinned: true
+        pinned: !currentState
     }, { merge:true });
 }
 window.pinFriend = pinFriend;
