@@ -782,22 +782,19 @@ try{
     }
 
     // YOU → pending
-    await setDoc(doc(db,"pending",current.uid,"sent",u.id),{
-        id: u.id,
-        name: u.firstName + " " + u.lastName,
-        photo: u.photo,
-        createdAt: Date.now()
+await setDoc(doc(db,"pending",current.uid,"sent",u.id),{
+    uid: u.id,
+    name: u.firstName + " " + u.lastName,
+    photo: u.photo,
+    createdAt: Date.now()
+});
 
-    });
-
-    // THEM → request
-    await setDoc(doc(db,"requests",u.id,"received",current.uid),{
-        id: current.uid,
-        name: current.displayName || current.email,
-        photo: current.photoURL || "",
-        createdAt: Date.now()
-
-    });
+await setDoc(doc(db,"requests",u.id,"received",current.uid),{
+    uid: current.uid,
+    name: current.displayName || current.email,
+    photo: current.photoURL || "",
+    createdAt: Date.now()
+});
 
     showToast("Friend request sent ✅");
 
@@ -947,11 +944,11 @@ if(window.friendStatus === "request"){
 // ➕ ADD FRIEND
 }else{
     await setDoc(doc(db,"pending",current.uid,"sent",uid),{
-        id: uid,
+        uid: uid,
         createdAt:new Date()
     });
     await setDoc(doc(db,"requests",uid,"received",current.uid),{
-        id: current.uid,
+        uid: current.uid,
         createdAt:new Date()
     });
     showToast("Request sent 📩");
