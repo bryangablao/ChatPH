@@ -295,6 +295,11 @@ text-decoration:underline;
 .reject:hover{
     background:#dc2626;
 }
+
+.friend-card.removing {
+    opacity: 0;
+    transform: translateX(20px);
+}
     
 </style>
 </head>
@@ -529,7 +534,7 @@ function renderPending(list){
             <div>${u.name}</div>
 
             <div style="margin-left:auto;">
-                <button class="action-btn reject" onclick="cancelRequest('${u.id}')">Cancel</button>
+                <button class="action-btn reject" onclick="cancelRequest('${u.id}', event)">Cancel</button>
             </div>
         </div>
         `;
@@ -547,7 +552,7 @@ function renderRequests(list){
             <div>${u.name}</div>
 
             <div style="margin-left:auto;">
-                <button class="action-btn reject" onclick="reject('${u.id}')">✕</button>
+                <button class="action-btn reject" onclick="reject('${u.id}', event)">✕</button>
                 <button class="action-btn accept" onclick="accept('${u.id}')">✔</button>
             </div>
         </div>
@@ -574,11 +579,16 @@ async function accept(uid){
     await deleteDoc(doc(db,"pending",uid,"sent",current.uid));
 }
 
-async function cancelRequest(uid){
+async function cancelRequest(uid, event){
     const current = auth.currentUser;
 
-    await deleteDoc(doc(db,"pending",current.uid,"sent",uid));
-    await deleteDoc(doc(db,"requests",uid,"received",current.uid));
+    const card = event.target.closest('.friend-card');
+    card.classList.add('removing');
+
+    setTimeout(async ()=>{
+        await deleteDoc(doc(db,"pending",current.uid,"sent",uid));
+        await deleteDoc(doc(db,"requests",uid,"received",current.uid));
+    }, 200);
 }
 
 async function removeFriend(uid){
@@ -667,8 +677,18 @@ function loadFriends(uid){
     });
 }
 
-async function reject(uid){
-    await deleteDoc(doc(db,"requests",auth.currentUser.uid,"received",uid));
+async function reject(uid, event){
+    const current = auth.currentUser;
+
+    // 🎬 animate removal FIRST
+    const card = event.target.closest('.friend-card');
+    card.classList.add('removing');
+
+    // ⏳ wait animation (optional but smooth)
+    setTimeout(async ()=>{
+        await deleteDoc(doc(db,"requests",current.uid,"received",uid));
+        await deleteDoc(doc(db,"pending",uid,"sent",current.uid));
+    }, 200);
 }
 
 window.accept = accept;
