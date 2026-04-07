@@ -5,20 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ChatPH | Info</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
 <style>
 :root{
 --bg:#0f1115;
 --card:#171a21;
---text:#fff;
+--text:#ffffff;
+--subtext:#9ca3af;
 --accent:#4da3ff;
 --border:#23262f;
 }
 
+.light{
+--bg:#f5f7fb;
+--card:#ffffff;
+--text:#111827;
+--subtext:#4b5563;
+--border:#e5e7eb;
+}
+
 body{
 margin:0;
-font-family:Arial;
+font-family:'Inter',sans-serif;
 background:var(--bg);
 color:var(--text);
+transition:.3s;
 }
 
 /* HEADER */
@@ -26,31 +38,33 @@ header{
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:12px 20px;
+padding:14px 20px;
 border-bottom:1px solid var(--border);
+background:var(--card);
+position:sticky;
+top:0;
+z-index:100;
 }
 
-/* LEFT */
 .left{
 display:flex;
 align-items:center;
-gap:10px;
+gap:12px;
 }
 
-/* BUTTONS */
 .icon-btn{
 cursor:pointer;
 padding:6px 10px;
 border-radius:8px;
+transition:.2s;
 }
 .icon-btn:hover{
-background:rgba(255,255,255,0.1);
+background:rgba(255,255,255,0.08);
 }
 
-/* VERSION */
 .version{
 font-size:12px;
-opacity:.7;
+color:var(--subtext);
 cursor:help;
 }
 
@@ -59,14 +73,23 @@ cursor:help;
 display:flex;
 justify-content:center;
 gap:10px;
-margin:20px;
+padding:15px;
+flex-wrap:wrap;
 }
+
 .tab{
-padding:10px 18px;
-border-radius:12px;
+padding:10px 16px;
+border-radius:20px;
 cursor:pointer;
 background:var(--card);
+color:var(--subtext);
+transition:.25s;
 }
+
+.tab:hover{
+transform:translateY(-2px);
+}
+
 .tab.active{
 background:var(--accent);
 color:#000;
@@ -76,15 +99,42 @@ color:#000;
 .panel{
 display:none;
 padding:20px;
-animation:slide .3s ease;
+max-width:800px;
+margin:auto;
+animation:fadeSlide .4s ease;
 }
+
 .panel.active{
 display:block;
 }
 
-@keyframes slide{
-from{transform:translateX(30px);opacity:0;}
-to{transform:translateX(0);opacity:1;}
+@keyframes fadeSlide{
+from{opacity:0; transform:translateY(20px);}
+to{opacity:1; transform:translateY(0);}
+}
+
+/* CARDS */
+.card{
+background:var(--card);
+border:1px solid var(--border);
+border-radius:16px;
+padding:20px;
+margin-bottom:16px;
+box-shadow:0 4px 20px rgba(0,0,0,0.2);
+transition:.2s;
+}
+
+.card:hover{
+transform:translateY(-3px);
+}
+
+/* TEXT */
+h2,h3{
+margin-top:0;
+}
+p{
+color:var(--subtext);
+line-height:1.6;
 }
 
 /* FOOTER */
@@ -95,12 +145,14 @@ left:0;
 width:100%;
 display:flex;
 justify-content:space-between;
-padding:8px 16px;
+padding:10px 16px;
 font-size:12px;
-background:rgba(0,0,0,0.3);
+background:var(--card);
+border-top:1px solid var(--border);
 }
 </style>
 </head>
+
 <body>
 
 <!-- HEADER -->
@@ -123,26 +175,75 @@ Version 0.0.1
 <div class="tab" data-tab="contact">Contact</div>
 </div>
 
-<!-- PANELS -->
+<!-- ABOUT -->
 <div id="about" class="panel active">
+<div class="card">
 <h2>About ChatPH</h2>
-<p>ChatPH is a modern social messaging platform designed for seamless communication and connection. Built with real-time features, user-friendly interface, and secure authentication.</p>
+<p>ChatPH is a modern messaging platform built for fast, secure, and real-time communication. It allows users to connect, chat, and manage friendships seamlessly.</p>
 </div>
 
+<div class="card">
+<h3>Features</h3>
+<p>
+• Real-time messaging<br>
+• Friend system<br>
+• Online status tracking<br>
+• Clean and responsive UI
+</p>
+</div>
+</div>
+
+<!-- PRIVACY -->
 <div id="privacy" class="panel">
+<div class="card">
 <h2>Privacy Policy</h2>
-<p>We respect your privacy. Your data is securely stored and never shared without your consent. We only collect necessary information to improve your experience.</p>
+<p>Your privacy is important to us. ChatPH ensures your personal data is handled securely.</p>
 </div>
 
+<div class="card">
+<h3>Data Collection</h3>
+<p>We only collect necessary information such as your name and email to improve your experience.</p>
+</div>
+
+<div class="card">
+<h3>Security</h3>
+<p>Your data is protected using modern security practices and is never shared without consent.</p>
+</div>
+</div>
+
+<!-- TERMS -->
 <div id="terms" class="panel">
+<div class="card">
 <h2>Terms & Conditions</h2>
-<p>By using ChatPH, you agree to use the platform responsibly. Any misuse, abuse, or harmful activity may result in account suspension.</p>
+<p>By using ChatPH, you agree to follow our platform rules.</p>
 </div>
 
+<div class="card">
+<h3>Usage Rules</h3>
+<p>
+• No harassment or abuse<br>
+• No illegal activity<br>
+• Respect all users
+</p>
+</div>
+
+<div class="card">
+<h3>Account Responsibility</h3>
+<p>You are responsible for keeping your account secure.</p>
+</div>
+</div>
+
+<!-- CONTACT -->
 <div id="contact" class="panel">
+<div class="card">
 <h2>Contact</h2>
+<p>If you need help, contact us anytime.</p>
+</div>
+
+<div class="card">
 <p>Email: support@chatph.com</p>
 <p>Location: Philippines</p>
+</div>
 </div>
 
 <!-- FOOTER -->
@@ -152,8 +253,10 @@ Version 0.0.1
 </footer>
 
 <script>
-/* TABS */
+
+/* TAB SWITCH */
 const tabs = document.querySelectorAll(".tab");
+
 tabs.forEach(tab=>{
 tab.onclick = ()=>{
 tabs.forEach(t=>t.classList.remove("active"));
@@ -164,26 +267,21 @@ document.getElementById(tab.dataset.tab).classList.add("active");
 };
 });
 
-/* BACK BUTTON */
+/* BACK */
 function goHome(){
 window.location.href = "home.html";
 }
 
-/* THEME TOGGLE */
-let dark = true;
-
+/* THEME */
 function toggleTheme(){
-dark = !dark;
+document.body.classList.toggle("light");
 
-if(dark){
-document.documentElement.style.setProperty('--bg','#0f1115');
-document.documentElement.style.setProperty('--card','#171a21');
-document.getElementById("themeBtn").innerText = "◑";
+const btn = document.getElementById("themeBtn");
+
+if(document.body.classList.contains("light")){
+btn.innerText = "◐";
 }else{
-document.documentElement.style.setProperty('--bg','#f5f5f5');
-document.documentElement.style.setProperty('--card','#ffffff');
-document.documentElement.style.setProperty('--text','#000');
-document.getElementById("themeBtn").innerText = "◐";
+btn.innerText = "◑";
 }
 }
 
@@ -207,8 +305,9 @@ document.getElementById("time").innerText =
 `Server Time ( ${dateStr} ) [${day}]`;
 }
 
-setInterval(updateTime, 1000);
+setInterval(updateTime,1000);
 updateTime();
+
 </script>
 
 </body>
