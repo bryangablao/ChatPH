@@ -145,11 +145,47 @@ left:0;
 width:100%;
 display:flex;
 justify-content:space-between;
+align-items:center;
 padding:10px 16px;
 font-size:12px;
 background:var(--card);
 border-top:1px solid var(--border);
+gap:10px;
 }
+
+/* LEFT */
+footer div:first-child{
+color:var(--subtext);
+}
+
+/* RIGHT (TIME) */
+#time{
+display:flex;
+gap:6px;
+flex-wrap:wrap;
+align-items:center;
+font-size:12px;
+}
+
+/* STYLED PARTS */
+.server-label{
+color:var(--accent);
+font-weight:600;
+}
+
+.server-value{
+color:var(--text);
+}
+
+.server-day{
+color:var(--subtext);
+}
+
+a:hover{
+text-decoration:underline;
+opacity:0.9;
+}
+
 </style>
 </head>
 
@@ -241,8 +277,13 @@ Version 0.0.1
 </div>
 
 <div class="card">
-<p>Email: support@chatph.com</p>
-<p>Location: Philippines</p>
+<p>Email: ablaobryan4400@gmail.com</p>
+<p>
+Location: 
+<a href="https://maps.app.goo.gl/fJqPDH6FmHom23qi9" target="_blank" style="color:var(--accent); text-decoration:none;">
+Barranggay 22-C Poblacion District, Super Block #3 Piape Boulevard Davao City, 8000 Davao Del Sur
+</a>
+</p>
 </div>
 </div>
 
@@ -289,25 +330,69 @@ btn.innerText = "◑";
 function updateTime(){
 const now = new Date();
 
-const options = {
-timeZone: "Asia/Manila",
-year: "numeric",
-month: "long",
-day: "numeric",
-hour: "numeric",
-minute: "2-digit"
-};
+const date = now.toLocaleDateString("en-US", {
+    timeZone: "Asia/Manila",
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+});
 
-const dateStr = now.toLocaleString("en-US", options);
-const day = now.toLocaleString("en-US", { weekday: "long", timeZone:"Asia/Manila" });
+const time = now.toLocaleTimeString("en-US", {
+    timeZone: "Asia/Manila",
+    hour: "numeric",
+    minute: "2-digit"
+});
 
-document.getElementById("time").innerText =
-`Server Time ( ${dateStr} ) [${day}]`;
+const day = now.toLocaleDateString("en-US", {
+    timeZone: "Asia/Manila",
+    weekday: "long"
+});
+
+document.getElementById("time").innerHTML =
+`<span class="server-label">Server Time</span> 
+<span class="server-value">${date} / ${time}</span> 
+<span class="server-day">[${day}]</span>`;
 }
 
 setInterval(updateTime,1000);
 updateTime();
 
+const tabs = document.querySelectorAll(".tab");
+
+function activateTab(tabName){
+    tabs.forEach(t=>t.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+
+    const selectedTab = document.querySelector(`[data-tab="${tabName}"]`);
+    const selectedPanel = document.getElementById(tabName);
+
+    if(selectedTab && selectedPanel){
+        selectedTab.classList.add("active");
+        selectedPanel.classList.add("active");
+    }
+}
+
+// click manually
+tabs.forEach(tab=>{
+    tab.onclick = ()=>{
+        const tabName = tab.dataset.tab;
+        activateTab(tabName);
+
+        // update URL (optional but clean)
+        history.replaceState(null, "", `?tab=${tabName}`);
+    };
+});
+
+// 🚀 AUTO LOAD FROM URL
+const params = new URLSearchParams(window.location.search);
+const tabFromURL = params.get("tab");
+
+if(tabFromURL){
+    activateTab(tabFromURL);
+}else{
+    activateTab("about"); // default
+}
+  
 </script>
 
 </body>
