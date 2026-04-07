@@ -689,25 +689,33 @@ function loadFriends(uid){
         for (const d of snap.docs){
             const data = d.data();
 
+            // 🔥 get user info
             const userDoc = await getDoc(doc(db,"users",data.uid));
             const userData = userDoc.data();
 
+            // 🔥 get online status (FIXED POSITION)
+            const statusDoc = await getDoc(doc(db,"status",data.uid));
+            const statusData = statusDoc.data();
+
+            // 🔥 push properly (NO const inside)
             list.push({
                 id: data.uid,
-                name: (userData?.firstName || "") + " " + (userData?.lastName || ""),
+                name: userData?.name || "User",
                 photo: userData?.photo || "",
                 createdAt: data.createdAt,
-                const statusDoc = await getDoc(doc(db,"status",data.uid));
-                const statusData = statusDoc.data();
-
-                online: statusData?.online || false
+                online: statusData?.online || false,
+                pinned: data.pinned || false
             });
         }
 
-        // 🔥 UPDATE TAB TITLE
+        // 🔥 sort pinned first
+        list.sort((a,b)=> (b.pinned === true) - (a.pinned === true));
+
+        // 🔥 update tab title
         document.querySelector('[data-tab="friends"]').innerText =
             `Friends (${list.length})`;
 
+        // 🔥 render UI
         renderFriends(list);
     });
 }
