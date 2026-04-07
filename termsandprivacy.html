@@ -140,18 +140,19 @@ line-height:1.6;
 
 /* FOOTER */
 footer{
-position:fixed;
-bottom:0;
-left:0;
-width:100%;
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:10px 16px;
-font-size:12px;
-background:var(--card);
-border-top:1px solid var(--border);
-gap:10px;
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 16px;
+    font-size:12px;
+    background:var(--card);
+    border-top:1px solid var(--border);
+    gap:10px;
+    box-sizing:border-box;
 }
 
 /* LEFT */
@@ -161,11 +162,14 @@ color:var(--subtext);
 
 /* RIGHT (TIME) */
 #time{
-display:flex;
-gap:6px;
-flex-wrap:wrap;
-align-items:center;
-font-size:12px;
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    align-items:center;
+    font-size:12px;
+    justify-content:flex-end;
+    max-width:60%;
+    text-align:right;
 }
 
 /* STYLED PARTS */
@@ -187,6 +191,18 @@ text-decoration:underline;
 opacity:0.9;
 }
 
+.footer-left{
+    color:var(--subtext);
+    white-space:nowrap;
+}
+
+.footer-right{
+    text-align:right;
+    max-width:65%;
+    line-height:1.4;
+    word-break:break-word;
+}
+    
 </style>
 </head>
 
@@ -290,15 +306,19 @@ Barranggay 22-C Poblacion District, Super Block #3 Piape Boulevard Davao City, 8
 
 <!-- FOOTER -->
 <footer>
-<div>© 2026 ChatPH • All Rights Reserved</div>
-<div id="time"></div>
+<div class="footer-left">© 2026 ChatPH • All Rights Reserved</div>
+<div id="time" class="footer-right"></div>
 </footer>
 
 <script>
 
 /* BACK */
 function goHome(){
-window.location.href = "home.html";
+    if(document.referrer){
+        history.back();
+    }else{
+        window.location.href = "home.html";
+    }
 }
 
 /* THEME */
@@ -345,41 +365,47 @@ document.getElementById("time").innerHTML =
 setInterval(updateTime,1000);
 updateTime();
 
-const tabs = document.querySelectorAll(".tab");
+window.addEventListener("DOMContentLoaded", () => {
 
-function activateTab(tabName){
-    tabs.forEach(t=>t.classList.remove("active"));
-    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+    const tabs = document.querySelectorAll(".tab");
 
-    const selectedTab = document.querySelector(`[data-tab="${tabName}"]`);
-    const selectedPanel = document.getElementById(tabName);
+    function activateTab(tabName){
+        tabs.forEach(t=>t.classList.remove("active"));
+        document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
 
-    if(selectedTab && selectedPanel){
-        selectedTab.classList.add("active");
-        selectedPanel.classList.add("active");
+        const selectedTab = document.querySelector(`[data-tab="${tabName}"]`);
+        const selectedPanel = document.getElementById(tabName);
+
+        if(selectedTab && selectedPanel){
+            selectedTab.classList.add("active");
+            selectedPanel.classList.add("active");
+        }
     }
-}
 
-// click manually
-tabs.forEach(tab=>{
-    tab.onclick = ()=>{
-        const tabName = tab.dataset.tab;
-        activateTab(tabName);
+    tabs.forEach(tab=>{
+        tab.onclick = ()=>{
+            const tabName = tab.dataset.tab;
+            activateTab(tabName);
+            history.replaceState(null, "", `?tab=${tabName}`);
+        };
+    });
 
-        // update URL (optional but clean)
-        history.replaceState(null, "", `?tab=${tabName}`);
-    };
+    const params = new URLSearchParams(window.location.search);
+    let tabFromURL = params.get("tab");
+
+    if(tabFromURL){
+        tabFromURL = tabFromURL.toLowerCase().trim();
+    }
+
+    const validTabs = ["about","privacy","terms","contact"];
+
+    if(validTabs.includes(tabFromURL)){
+        activateTab(tabFromURL);
+    }else{
+        activateTab("about");
+    }
+
 });
-
-// 🚀 AUTO LOAD FROM URL
-const params = new URLSearchParams(window.location.search);
-const tabFromURL = params.get("tab");
-
-if(tabFromURL){
-    activateTab(tabFromURL);
-}else{
-    activateTab("about"); // default
-}
   
 </script>
 
