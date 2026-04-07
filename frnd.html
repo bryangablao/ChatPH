@@ -627,16 +627,20 @@ async function loadPending(uid){
 let list = [];
 for (const d of snap.docs){
     const data = d.data();
+
     const userDoc = await getDoc(doc(db,"users",data.uid));
     const userData = userDoc.data();
+
+    // ✅ FIX HERE
+    const statusDoc = await getDoc(doc(db,"status",data.uid));
+    const statusData = statusDoc.data();
 
     list.push({
         id: data.uid,
         name: (userData?.firstName || "") + " " + (userData?.lastName || ""),
         photo: userData?.photo || "",
         createdAt: data.createdAt,
-        online: false,
-        pinned: data.pinned || false   // ✅ ADD THIS
+        online: statusData?.online || false
     });
 }
 
