@@ -32,6 +32,7 @@ font-family:'Inter',sans-serif;
 background:var(--bg);
 color:var(--text);
 transition:.3s;
+padding-bottom: 70px;
 }
 
 /* HEADER */
@@ -45,6 +46,15 @@ background:var(--card);
 position:sticky;
 top:0;
 z-index:100;
+}
+
+.header-logo{
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
 }
 
 .left{
@@ -207,7 +217,17 @@ opacity:0.9;
 .card a{
     color: inherit;
     text-decoration: none;
-    position: relative;
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-size: 0% 2px;
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    transition: background-size 0.3s ease;
+}
+
+.card a:hover{
+    background-size: 100% 2px;
+    opacity: 0.8;
+    text-decoration: none;
 }
 
 .card a::after{
@@ -225,9 +245,56 @@ opacity:0.9;
     width: 100%;
 }
 
-.card a:hover{
-    opacity: 0.8;
-    text-decoration: none;
+/* 📱 MOBILE */
+@media (max-width: 768px){
+
+    .tabs{
+        gap:6px;
+        padding:10px;
+    }
+
+    .tab{
+        padding:8px 12px;
+        font-size:13px;
+    }
+
+    .panel{
+        padding:15px;
+    }
+
+    .card{
+        padding:16px;
+    }
+
+    h2{
+        font-size:18px;
+    }
+
+    h3{
+        font-size:15px;
+    }
+
+    p{
+        font-size:13px;
+    }
+
+    footer{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:4px;
+    }
+
+    #time{
+        max-width:100%;
+        text-align:left;
+    }
+}
+
+/* 📲 TABLET */
+@media (max-width: 1024px){
+    .panel{
+        max-width:90%;
+    }
 }
     
 </style>
@@ -238,11 +305,14 @@ opacity:0.9;
 <!-- HEADER -->
 <header>
 <div class="left">
-<div class="icon-btn" onclick="goHome()">←</div>
-<div class="version" title="Version Updated on April 2026">
-Version 0.0.1
+    <div class="icon-btn" onclick="goHome()">←</div>
+    <div class="version" title="Version Updated on April 2026">
+        Version 0.0.1
+    </div>
 </div>
-</div>
+
+<!-- 🔥 CENTER LOGO -->
+<img src="image/chatph-logo.png" class="header-logo">
 
 <div class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Dark/Light Mode">◑</div>
 </header>
