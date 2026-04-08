@@ -38,7 +38,7 @@ body{
         #logoutBtn { cursor: pointer; color: var(--dim); font-weight: 600; font-size: 14px; }
         #logoutBtn:hover { color: #ff4b4b; }
 
-        .cover { position: relative; height: 150px; background: #1a1e26; }
+        .cover { position: relative; background: #1a1e26; width: 100%; height: 200px; }
         .cover img { width: 100%; height: 100%; object-fit: cover; }
 
         /* --- Modern Edit Icon Styling --- */
@@ -59,7 +59,8 @@ body{
 
         /* --- Profile Card --- */
         .card {
-            max-width: 700px; 
+            width: 90%;
+            max-width: 900px;
             margin: -60px auto 10px;
             background: var(--card);
             padding: 30px; 
@@ -598,7 +599,9 @@ onAuthStateChanged(auth, async (user) => {
     console.log("DATA:", d);
 
     // ✅ UI SET
-    document.getElementById("userName").innerText = d.name || "User";
+    document.getElementById("userName").innerText = (d.firstName && d.lastName)
+    ? d.firstName + " " + d.lastName
+    : "User";
     document.getElementById("usernameText").innerText = d.username || "@setusername";
     document.getElementById("userBio").innerText = d.bio || "No bio yet";
 
@@ -610,36 +613,45 @@ onAuthStateChanged(auth, async (user) => {
         d.coverBase64 || "https://images.unsplash.com/photo-1557683316-973673baf926";
 
     // ✅ OWNER FEATURES
-    if (isOwner) {
-        usernameBox.onclick = (e) => {
-            usernameMenu.style.display = "block";
-            usernameMenu.style.top = (e.pageY - 40) + "px";
-            usernameMenu.style.left = (e.pageX - 80) + "px";
-        };
+usernameBox.onclick = (e) => {
+    if (!isOwner) return; // only edit if owner
+if (isOwner) {
+    usernameBox.style.cursor = "pointer";
+}
+    usernameMenu.style.display = "block";
+    usernameMenu.style.top = (e.pageY - 40) + "px";
+    usernameMenu.style.left = (e.pageX - 80) + "px";
+};
 
         const bioBox = document.getElementById("userBio");
         bioBox.style.cursor = "pointer";
 
-        bioBox.onclick = () => {
-            if (bioBox.isContentEditable) return;
-            bioBox.contentEditable = true;
-            bioBox.focus();
+if (isOwner) {
+    const bioBox = document.getElementById("userBio");
+    bioBox.style.cursor = "pointer";
 
-            const saveBtn = document.createElement("button");
-            saveBtn.innerText = "Save";
-            saveBtn.className = "btn-primary";
-            bioBox.after(saveBtn);
+    bioBox.onclick = () => {
+        if (bioBox.isContentEditable) return;
 
-            saveBtn.onclick = async () => {
-                const text = bioBox.innerText.trim();
-                await updateDB({ bio: text });
-                bioBox.contentEditable = false;
-                saveBtn.remove();
-            };
+        bioBox.contentEditable = true;
+        bioBox.focus();
+
+        const saveBtn = document.createElement("button");
+        saveBtn.innerText = "Save";
+        saveBtn.className = "btn-primary";
+        bioBox.after(saveBtn);
+
+        saveBtn.onclick = async () => {
+            const text = bioBox.innerText.trim();
+            await updateDB({ bio: text });
+
+            bioBox.contentEditable = false;
+            saveBtn.remove();
         };
-    }
+    };
+}
 
-    loadFriends(profileUID);
+loadFriends(profileUID);
     
 });
 
@@ -705,8 +717,10 @@ const animateYear = (year) => {
     }, 60);
 };
 
-const currentYear = new Date().getFullYear();
-animateYear(currentYear);
+const created = d.createdAt?.toDate();
+if (created) {
+    animateYear(created.getFullYear());
+}
 
 window.addEventListener("load", () => {
 const active = document.querySelector(".sidebar a.active");
