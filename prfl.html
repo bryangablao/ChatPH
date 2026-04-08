@@ -23,7 +23,6 @@ body{
     font-family:'Inter',sans-serif;
     background:var(--bg);
     color:var(--text);
-
     display:flex;
     flex-direction:column;
     min-height:100vh;
@@ -336,7 +335,8 @@ text-decoration:underline;
 }
 
 main {
-    flex:1;
+    flex: 1;
+    margin-bottom: 10px; /* reduce space */
 }
         
     </style>
@@ -622,10 +622,41 @@ onAuthStateChanged(auth, async (user) => {
 
            const profileUID = uid || user.uid;
            const isOwner = user.uid === profileUID;
+           const usernameBox = document.getElementById("userUsername");
+           const usernameMenu = document.getElementById("usernameMenu");
+
+if (isOwner) {
+    usernameBox.onclick = (e) => {
+        usernameMenu.style.display = "block";
+        usernameMenu.style.top = e.pageY + "px";
+        usernameMenu.style.left = e.pageX + "px";
+    };
+}
+    
            loadFriends(profileUID);
            const snap = await getDoc(doc(db, "users", profileUID));
-if (snap.exists()) {
-    const d = snap.data();
+
+let d = {};
+
+if (!snap.exists()) {
+    // ✅ CREATE USER DOC IF NOT EXIST
+    const random = Math.random().toString(36).substring(2, 10);
+    const newUsername = "@" + random;
+
+    d = {
+        name: "User",
+        username: newUsername,
+        bio: ""
+    };
+
+    await setDoc(doc(db, "users", profileUID), d);
+} else {
+    d = snap.data();
+}
+
+document.getElementById("userName").innerText = d.name || "User";
+document.getElementById("usernameText").innerText = d.username || "@setusername";
+document.getElementById("userBio").innerText = d.bio || "No bio yet";
 
     // 🔥 AUTO USERNAME GENERATE
 if (!d.username) {
@@ -641,7 +672,6 @@ if (!d.username) {
 
     // ✅ username fix
     const username = d.username || "@setusername";
-    document.getElementById("userUsername").innerText = username;
     document.getElementById("usernameText").innerText = username;
 
     // ✅ bio
@@ -833,18 +863,6 @@ const loadFriends = async (uid) => {
     document.getElementById("friendCount").innerText = snap.size;
 };
 
-
-const usernameBox = document.getElementById("userUsername");
-const usernameMenu = document.getElementById("usernameMenu");
-
-if (isOwner) {
-    usernameBox.onclick = (e) => {
-        usernameMenu.style.display = "block";
-        usernameMenu.style.top = e.pageY + "px";
-        usernameMenu.style.left = e.pageX + "px";
-    };
-}
-
 document.addEventListener("click", () => {
     usernameMenu.style.display = "none";
 });
@@ -868,7 +886,7 @@ text-align:center;
 padding:30px 20px;
 color:#94a3b8;
 border-top:1px solid rgba(255,255,255,0.08);
-margin-top:40px;
+margin-top:10px;
 ">
 <div>© 2026 ChatPH • All Rights Reserved</div>
 
