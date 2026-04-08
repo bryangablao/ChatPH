@@ -60,14 +60,14 @@ body{
         /* --- Profile Card --- */
         .card {
             max-width: 700px; 
-            margin: -60px auto 30px;
+            margin: -60px auto 10px;
             background: var(--card);
             padding: 30px; 
             border-radius: 24px; 
             border: 1px solid var(--border);
             text-align: center; 
             position: relative;
-            
+            margin-bottom: 20px;
         }
 
         .pfp-wrap { position: relative; width: 120px; margin: -80px auto 15px; }
@@ -278,11 +278,10 @@ text-decoration:underline;
 }
 
 main {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    padding-bottom: 40px;
 }
         
     </style>
@@ -563,87 +562,86 @@ imageViewer.onclick = () => {
     // --- State & Feed ---
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
-        setTimeout(() => { if(!auth.currentUser) window.location.href="index.html" }, 800);
+        setTimeout(() => {
+            if (!auth.currentUser) window.location.href = "index.html";
+        }, 800);
         return;
     }
 
     setOnlineStatus(user);
 
-           const profileUID = uid || user.uid;
-           const isOwner = user.uid === profileUID;
+    const profileUID = uid || user.uid;
+    const isOwner = user.uid === profileUID;
 
-if (isOwner) {
-    usernameBox.onclick = (e) => {
-        usernameMenu.style.display = "block";
-        usernameMenu.style.top = e.pageY + "px";
-        usernameMenu.style.left = e.pageX + "px";
-    };
-}
-    
-           loadFriends(profileUID);
-           const snap = await getDoc(doc(db, "users", profileUID));
+    console.log("UID:", profileUID);
 
-let d = {};
-if (!snap.exists()) {
-    const random = Math.random().toString(36).substring(2, 10);
-    const newUsername = "@" + random;
+    let snap = await getDoc(doc(db, "users", profileUID));
 
-    d = {
-        name: "User",
-        username: newUsername,
-        bio: ""
-    };
+    // ✅ IF USER DOESN'T EXIST → CREATE
+    if (!snap.exists()) {
+        console.log("User doc missing, creating...");
 
-    await setDoc(doc(db, "users", profileUID), d);
-} else {
-    d = snap.data();
-}
-
-// ✅ SET UI ONCE ONLY
-document.getElementById("userName").innerText = d.name || "User";
-
-const username = d.username || "@setusername";
-document.getElementById("usernameText").innerText = username;
-
-document.getElementById("userBio").innerText = d.bio || "No bio yet";
-
-    
-    // 🔥 EDIT BIO ONLY IF OWNER
-if (isOwner) {
-    const bioBox = document.getElementById("userBio");
-
-    bioBox.style.cursor = "pointer";
-
-    bioBox.onclick = () => {
-        bioBox.contentEditable = true;
-        bioBox.focus();
-
-        const saveBtn = document.createElement("button");
-        saveBtn.innerText = "Save";
-        saveBtn.className = "btn-primary";
-
-        bioBox.after(saveBtn);
-
-        saveBtn.onclick = async () => {
-            const text = bioBox.innerText.trim();
-
-            await updateDB({ bio: text });
-
-            bioBox.contentEditable = false;
-            saveBtn.remove();
+        const newData = {
+            name: "User",
+            username: "@" + Math.random().toString(36).substring(2, 10),
+            bio: ""
         };
-    };
-}
 
-    // ✅ IMAGES (THIS FIXES YOUR PROBLEM)
+        await setDoc(doc(db, "users", profileUID), newData);
+
+        snap = await getDoc(doc(db, "users", profileUID)); // reload
+    }
+
+    const d = snap.data();
+
+    console.log("SNAP EXISTS:", snap.exists());
+    console.log("DATA:", d);
+
+    // ✅ UI SET
+    document.getElementById("userName").innerText = d.name || "User";
+    document.getElementById("usernameText").innerText = d.username || "@setusername";
+    document.getElementById("userBio").innerText = d.bio || "No bio yet";
+
+    // ✅ IMAGES
     document.getElementById("pfp").src =
         d.pfpBase64 || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
 
     document.getElementById("coverImg").src =
         d.coverBase64 || "https://images.unsplash.com/photo-1557683316-973673baf926";
-}
-        
-    });
+
+    // ✅ OWNER FEATURES
+    if (isOwner) {
+        usernameBox.onclick = (e) => {
+            usernameMenu.style.display = "block";
+            usernameMenu.style.top = (e.pageY - 40) + "px";
+            usernameMenu.style.left = (e.pageX - 80) + "px";
+        };
+
+        const bioBox = document.getElementById("userBio");
+        bioBox.style.cursor = "pointer";
+
+        bioBox.onclick = () => {
+            if (bioBox.isContentEditable) return;
+            bioBox.contentEditable = true;
+            bioBox.focus();
+
+            const saveBtn = document.createElement("button");
+            saveBtn.innerText = "Save";
+            saveBtn.className = "btn-primary";
+            bioBox.after(saveBtn);
+
+            saveBtn.onclick = async () => {
+                const text = bioBox.innerText.trim();
+                await updateDB({ bio: text });
+                bioBox.contentEditable = false;
+                saveBtn.remove();
+            };
+        };
+    }
+
+    loadFriends(profileUID);
+    
+});
 
     document.getElementById('logoutBtn').onclick = () => signOut(auth);
 
