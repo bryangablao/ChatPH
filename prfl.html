@@ -114,7 +114,6 @@ body{
             overflow-wrap: break-word; 
             word-break: break-word; 
             width: 100%;
-            width: 100%;
             max-width: 100%;
             flex-shrink: 0;
             scroll-snap-align: start;
@@ -610,6 +609,9 @@ document.querySelectorAll('.view-trigger').forEach(btn => {
 imageViewer.onclick = () => {
     imageViewer.classList.remove("active");
 };
+
+           const usernameBox = document.getElementById("userUsername");
+           const usernameMenu = document.getElementById("usernameMenu");
     
     // --- State & Feed ---
 onAuthStateChanged(auth, async (user) => {
@@ -622,8 +624,6 @@ onAuthStateChanged(auth, async (user) => {
 
            const profileUID = uid || user.uid;
            const isOwner = user.uid === profileUID;
-           const usernameBox = document.getElementById("userUsername");
-           const usernameMenu = document.getElementById("usernameMenu");
 
 if (isOwner) {
     usernameBox.onclick = (e) => {
@@ -637,9 +637,7 @@ if (isOwner) {
            const snap = await getDoc(doc(db, "users", profileUID));
 
 let d = {};
-
 if (!snap.exists()) {
-    // ✅ CREATE USER DOC IF NOT EXIST
     const random = Math.random().toString(36).substring(2, 10);
     const newUsername = "@" + random;
 
@@ -654,28 +652,15 @@ if (!snap.exists()) {
     d = snap.data();
 }
 
+// ✅ SET UI ONCE ONLY
 document.getElementById("userName").innerText = d.name || "User";
-document.getElementById("usernameText").innerText = d.username || "@setusername";
+
+const username = d.username || "@setusername";
+document.getElementById("usernameText").innerText = username;
+
 document.getElementById("userBio").innerText = d.bio || "No bio yet";
 
-    // 🔥 AUTO USERNAME GENERATE
-if (!d.username) {
-    const random = Math.random().toString(36).substring(2, 10);
-    const newUsername = "@" + random;
-
-    await updateDB({ username: newUsername });
-
-    document.getElementById("usernameText").innerText = newUsername;
-}
-
-    document.getElementById("userName").innerText = d.name || "User";
-
-    // ✅ username fix
-    const username = d.username || "@setusername";
-    document.getElementById("usernameText").innerText = username;
-
-    // ✅ bio
-    document.getElementById("userBio").innerText = d.bio || "No bio yet";
+    
     // 🔥 EDIT BIO ONLY IF OWNER
 if (isOwner) {
     const bioBox = document.getElementById("userBio");
