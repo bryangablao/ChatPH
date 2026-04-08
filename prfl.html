@@ -401,7 +401,18 @@ main {
             <h2 id="userName" style="margin: 0;">User</h2>
             <div id="userUsername" style="color:var(--dim); font-size:14px; display:flex; justify-content:center; align-items:center; gap:6px;">
                 <span id="usernameText">@setusername</span>
-                <span id="editUsername" style="cursor:pointer;">✏️</span>
+<div id="usernameMenu" style="
+    position:absolute;
+    background:#1a212b;
+    border:1px solid rgba(255,255,255,0.1);
+    padding:8px;
+    border-radius:10px;
+    display:none;
+    font-size:13px;
+">
+    <div id="editUserBtn">Edit Username</div>
+    <div id="copyUserBtn">Copy Username</div>
+</div>
             </div>
 
             <div class="stats">
@@ -414,7 +425,6 @@ main {
             </div>
 
             <div class="bio" id="userBio">No bio yet</div>
-            <button class="btn-primary" id="openBioModal">Edit Bio</button>
         </section>
 
     </main>
@@ -525,21 +535,6 @@ document.querySelectorAll('.menu').forEach(menu=>{
         }
     });
 
-    // --- Modal Handling ---
-    document.getElementById('openBioModal').onclick = () => {
-        bioInput.value = document.getElementById('userBio').innerText === "No bio yet" ? "" : document.getElementById('userBio').innerText;
-        bioModal.classList.add('active');
-    };
-
-    document.getElementById('closeBioModal').onclick = () => bioModal.classList.remove('active');
-
-    document.getElementById('saveBioBtn').onclick = async () => {
-        const text = bioInput.value.trim();
-        await updateDB({ bio: text });
-        document.getElementById('userBio').innerText = text || "No bio yet";
-        bioModal.classList.remove('active');
-    };
-
     // --- Uploads & Deletes ---
     document.querySelectorAll('.upload-trigger').forEach(btn => btn.onclick = () => document.getElementById(btn.dataset.input).click());
     
@@ -626,18 +621,64 @@ onAuthStateChanged(auth, async (user) => {
     setOnlineStatus(user);
 
            const profileUID = uid || user.uid;
+           const isOwner = user.uid === profileUID;
            loadFriends(profileUID);
            const snap = await getDoc(doc(db, "users", profileUID));
 if (snap.exists()) {
     const d = snap.data();
+
+    // 🔥 AUTO USERNAME GENERATE
+if (!d.username) {
+    const random = Math.random().toString(36).substring(2, 10);
+    const newUsername = "@" + random;
+
+    await updateDB({ username: newUsername });
+
+    document.getElementById("usernameText").innerText = newUsername;
+}
+
     document.getElementById("userName").innerText = d.name || "User";
 
-    document.getElementById("userUsername").innerText = d.username || "@setusername";
-    document.getElementById("usernameText").innerText = d.username || "@setusername";
+    // ✅ username fix
+    const username = d.username || "@setusername";
+    document.getElementById("userUsername").innerText = username;
+    document.getElementById("usernameText").innerText = username;
 
-    if (d.bio) document.getElementById("userBio").innerText = d.bio;
-    if (d.pfpBase64) document.getElementById("pfp").src = d.pfpBase64;
-    if (d.coverBase64) document.getElementById("coverImg").src = d.coverBase64;
+    // ✅ bio
+    document.getElementById("userBio").innerText = d.bio || "No bio yet";
+    // 🔥 EDIT BIO ONLY IF OWNER
+if (isOwner) {
+    const bioBox = document.getElementById("userBio");
+
+    bioBox.style.cursor = "pointer";
+
+    bioBox.onclick = () => {
+        bioBox.contentEditable = true;
+        bioBox.focus();
+
+        const saveBtn = document.createElement("button");
+        saveBtn.innerText = "Save";
+        saveBtn.className = "btn-primary";
+
+        bioBox.after(saveBtn);
+
+        saveBtn.onclick = async () => {
+            const text = bioBox.innerText.trim();
+
+            await updateDB({ bio: text });
+
+            bioBox.contentEditable = false;
+            saveBtn.remove();
+        };
+    };
+}
+
+    // ✅ IMAGES (THIS FIXES YOUR PROBLEM)
+    document.getElementById("pfp").src =
+        d.pfpBase64 || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+
+    document.getElementById("coverImg").src =
+        d.coverBase64 || "https://images.unsplash.com/photo-1557683316-973673baf926";
 }
 
 const q = query(
@@ -790,6 +831,33 @@ document.getElementById("saveUsernameBtn").onclick = async () => {
 const loadFriends = async (uid) => {
     const snap = await getDocs(collection(db, "users", uid, "friends"));
     document.getElementById("friendCount").innerText = snap.size;
+};
+
+
+const usernameBox = document.getElementById("userUsername");
+const usernameMenu = document.getElementById("usernameMenu");
+
+if (isOwner) {
+    usernameBox.onclick = (e) => {
+        usernameMenu.style.display = "block";
+        usernameMenu.style.top = e.pageY + "px";
+        usernameMenu.style.left = e.pageX + "px";
+    };
+}
+
+document.addEventListener("click", () => {
+    usernameMenu.style.display = "none";
+});
+
+// edit
+document.getElementById("editUserBtn").onclick = () => {
+    usernameModal.classList.add("active");
+};
+
+// copy
+document.getElementById("copyUserBtn").onclick = () => {
+    const text = document.getElementById("usernameText").innerText;
+    navigator.clipboard.writeText(text);
 };
     
 </script>
