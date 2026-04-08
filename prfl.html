@@ -624,6 +624,32 @@ onAuthStateChanged(auth, async (user) => {
 
            const profileUID = uid || user.uid;
            const isOwner = user.uid === profileUID;
+           const q = query(
+        collection(db, "posts"),
+        where("uid", "==", profileUID)
+    );
+
+    onSnapshot(q, (snap) => {
+        const list = document.getElementById("postList");
+        list.innerHTML = "";
+        document.getElementById("statPosts").innerText = snap.size;
+
+        snap.forEach(doc => {
+            const p = doc.data();
+            list.innerHTML += `
+            <div class="post">
+                <div class="post-header">
+                    <img src="${p.photo}" class="avatar">
+                    <div class="post-info">
+                        <div class="username">${p.name || "User"}</div>
+                        <div class="time">${p.time?.toDate().toLocaleString() || "Recent"}</div>
+                    </div>
+                </div>
+                <div class="post-text">${p.text}</div>
+            </div>
+            `;
+        });
+    });
 
 if (isOwner) {
     usernameBox.onclick = (e) => {
@@ -695,11 +721,6 @@ if (isOwner) {
     document.getElementById("coverImg").src =
         d.coverBase64 || "https://images.unsplash.com/photo-1557683316-973673baf926";
 }
-
-const q = query(
-  collection(db, "posts"),
-  where("uid", "==", profileUID)
-);
         
         onSnapshot(q, (snap) => {
             const list = document.getElementById("postList");
@@ -800,8 +821,6 @@ if (active) {
     indicator.style.height = active.offsetHeight + "px";
     active.classList.add("active");
 }
-    indicator.style.top = active.offsetTop + "px";
-    indicator.style.height = active.offsetHeight + "px";
 });
 
 function setOnlineStatus(user){
@@ -824,10 +843,6 @@ function setOnlineStatus(user){
 
 const usernameModal = document.getElementById("usernameModal");
 const usernameInput = document.getElementById("usernameInput");
-
-document.getElementById("editUsername").onclick = () => {
-    usernameModal.classList.add("active");
-};
 
 document.getElementById("closeUsernameModal").onclick = () => {
     usernameModal.classList.remove("active");
