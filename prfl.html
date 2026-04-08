@@ -68,7 +68,7 @@ body{
             border: 1px solid var(--border);
             text-align: center; 
             position: relative;
-            margin-bottom: 20px;
+            margin-bottom: 0px;
         }
 
         .pfp-wrap { position: relative; width: 120px; margin: -80px auto 15px; }
@@ -279,10 +279,30 @@ text-decoration:underline;
 }
 
 main {
-    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
+}
+
+#usernameMenu {
+    position: absolute;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: none;
+    min-width: 140px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 20;
+}
+#usernameMenu div {
+    padding: 12px 16px;
+    cursor: pointer;
+}
+#usernameMenu div:hover {
+    background: rgba(255,255,255,.05);
+    color: var(--accent);
 }
         
     </style>
@@ -559,6 +579,11 @@ imageViewer.onclick = () => {
 
            const usernameBox = document.getElementById("userUsername");
            const usernameMenu = document.getElementById("usernameMenu");
+
+const loadFriends = async (uid) => {
+    const snap = await getDocs(collection(db, "users", uid, "friends"));
+    document.getElementById("friendCount").innerText = snap.size;
+};
     
     // --- State & Feed ---
 onAuthStateChanged(auth, async (user) => {
@@ -595,6 +620,11 @@ onAuthStateChanged(auth, async (user) => {
 
     const d = snap.data();
 
+    const created = d.createdAt?.toDate();
+    if (created) {
+        animateYear(created.getFullYear());
+    }
+
     console.log("SNAP EXISTS:", snap.exists());
     console.log("DATA:", d);
 
@@ -613,14 +643,15 @@ onAuthStateChanged(auth, async (user) => {
         d.coverBase64 || "https://images.unsplash.com/photo-1557683316-973673baf926";
 
     // ✅ OWNER FEATURES
+usernameBox.style.position = "relative";
+
 usernameBox.onclick = (e) => {
-    if (!isOwner) return; // only edit if owner
-if (isOwner) {
-    usernameBox.style.cursor = "pointer";
-}
+    e.stopPropagation();
+    if (!isOwner) return;
+
     usernameMenu.style.display = "block";
-    usernameMenu.style.top = (e.pageY - 40) + "px";
-    usernameMenu.style.left = (e.pageX - 80) + "px";
+    usernameMenu.style.top = "25px";
+    usernameMenu.style.left = "0px";
 };
 
         const bioBox = document.getElementById("userBio");
@@ -630,26 +661,20 @@ if (isOwner) {
     const bioBox = document.getElementById("userBio");
     bioBox.style.cursor = "pointer";
 
-    bioBox.onclick = () => {
-        if (bioBox.isContentEditable) return;
+bioBox.onclick = () => {
+    if (!isOwner) return;
+    if (bioBox.isContentEditable) return;
 
-        bioBox.contentEditable = true;
-        bioBox.focus();
+    bioBox.contentEditable = true;
+    bioBox.focus();
+};
 
-        const saveBtn = document.createElement("button");
-        saveBtn.innerText = "Save";
-        saveBtn.className = "btn-primary";
-        bioBox.after(saveBtn);
-
-        saveBtn.onclick = async () => {
-            const text = bioBox.innerText.trim();
-            await updateDB({ bio: text });
-
-            bioBox.contentEditable = false;
-            saveBtn.remove();
-        };
-    };
-}
+bioBox.addEventListener("blur", async () => {
+    if (!isOwner) return;
+    const text = bioBox.innerText.trim();
+    await updateDB({ bio: text });
+    bioBox.contentEditable = false;
+});
 
 loadFriends(profileUID);
     
@@ -690,16 +715,6 @@ loadFriends(profileUID);
 const links = document.querySelectorAll(".sidebar a");
 const indicator = document.getElementById("indicator");
 
-links.forEach(link => {
-    link.onclick = () => {
-        links.forEach(l => l.classList.remove("active"));
-        link.classList.add("active");
-
-        indicator.style.top = link.offsetTop + "px";
-        indicator.style.height = link.offsetHeight + "px";
-    };
-});
-
 const animateYear = (year) => {
     const el = document.getElementById("yearAnim");
     const target = year.toString().slice(-2); // last 2 digits
@@ -716,11 +731,6 @@ const animateYear = (year) => {
         }
     }, 60);
 };
-
-const created = d.createdAt?.toDate();
-if (created) {
-    animateYear(created.getFullYear());
-}
 
 window.addEventListener("load", () => {
 const active = document.querySelector(".sidebar a.active");
@@ -766,13 +776,10 @@ document.getElementById("saveUsernameBtn").onclick = async () => {
     usernameModal.classList.remove("active");
 };
 
-const loadFriends = async (uid) => {
-    const snap = await getDocs(collection(db, "users", uid, "friends"));
-    document.getElementById("friendCount").innerText = snap.size;
-};
-
-document.addEventListener("click", () => {
-    usernameMenu.style.display = "none";
+document.addEventListener("click", (e) => {
+    if (!e.target.closest("#userUsername")) {
+        usernameMenu.style.display = "none";
+    }
 });
 
 // edit
