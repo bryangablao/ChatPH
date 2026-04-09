@@ -655,7 +655,8 @@ onAuthStateChanged(auth, async (user) => {
             (d.firstName && d.lastName)
             ? d.firstName + " " + d.lastName
             : "User";
-            document.getElementById("userEmail").innerText = d.email || "";
+
+            document.getElementById("userEmail").innerText = "UID: " + profileUID;
             
             if (d.bio) document.getElementById("userBio").innerText = d.bio;
             if (d.pfpBase64) document.getElementById("pfp").src = d.pfpBase64;
