@@ -376,6 +376,37 @@ main {
     transform: scale(1.05);
     opacity: 0.9;
 }
+
+/* VIEW ONLY BADGE */
+.view-badge {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(59,130,246,0.15);
+    color: var(--accent);
+    border: 1px solid rgba(59,130,246,0.3);
+    font-weight: 600;
+    display: none;
+}
+
+/* MY PROFILE BUTTON */
+.my-profile-btn {
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    color: white;
+    background: linear-gradient(120deg, #3b82f6, #2563eb, #3b82f6);
+    background-size: 200% 100%;
+    transition: 0.4s ease;
+}
+
+/* 🔥 sliding gradient effect */
+.my-profile-btn:hover {
+    background-position: 100% 0;
+    transform: scale(1.05);
+}
         
     </style>
 </head>
@@ -383,17 +414,25 @@ main {
 <body>
 
 <header>
-<div class="header-left">
-<span class="menu-icon" onclick="toggleSidebar()">☰</span>
+    <div class="header-left">
+        <span class="menu-icon" onclick="toggleSidebar()">☰</span>
 
-<div onclick="window.location.href='home.html'" style="display:flex;align-items:center;gap:12px;cursor:pointer;">
-    <img src="image/chatph-logo.png" class="logo">
-    <span class="brand">ChatPH</span>
-</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+            <div onclick="window.location.href='home.html'" style="display:flex;align-items:center;gap:12px;cursor:pointer;">
+                <img src="image/chatph-logo.png" class="logo">
+                <span class="brand">ChatPH</span>
+            </div>
 
-</div>
+            <!-- 👇 VIEW ONLY BADGE -->
+            <div id="viewOnlyBadge" class="view-badge">View Only</div>
+        </div>
+    </div>
 
+    <!-- 👇 MY PROFILE BUTTON -->
+    <div style="display:flex;align-items:center;gap:12px;">
+        <button id="myProfileBtn" class="my-profile-btn">My Profile</button>
         <div id="logoutBtn">Logout</div>
+    </div>
 </header>
 
     <div class="sidebar" id="sidebar">
@@ -671,6 +710,23 @@ onAuthStateChanged(auth, async (user) => {
 
            const profileUID = uid || user.uid;
            const isOwner = user.uid === profileUID;
+
+const myProfileBtn = document.getElementById("myProfileBtn");
+const viewBadge = document.getElementById("viewOnlyBadge");
+
+if (!isOwner) {
+    // 👇 SHOW when visiting OTHER user
+    myProfileBtn.style.display = "inline-block";
+    viewBadge.style.display = "inline-block";
+
+    myProfileBtn.onclick = () => {
+        window.location.href = "profile.html";
+    };
+} else {
+    // 👇 HIDE when it's YOUR profile
+    myProfileBtn.style.display = "none";
+    viewBadge.style.display = "none";
+}
 
            if (!isOwner) {
                 document.querySelectorAll('.edit-trigger').forEach(el => el.style.display = "none");
