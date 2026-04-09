@@ -633,6 +633,21 @@ document.querySelectorAll('.view-trigger').forEach(btn => {
 imageViewer.onclick = () => {
     imageViewer.classList.remove("active");
 };
+
+const cancelEdit = (el, currentUsername) => {
+    const editBox = document.getElementById("editBox");
+
+    if (editBox) {
+        editBox.style.opacity = "0";
+        editBox.style.transform = "translateY(-5px)";
+
+        setTimeout(() => {
+            el.innerHTML = `<b>@</b>${currentUsername}`;
+        }, 150);
+    } else {
+        el.innerHTML = `<b>@</b>${currentUsername}`;
+    }
+};
     
     // --- State & Feed ---
 onAuthStateChanged(auth, async (user) => {
@@ -672,12 +687,23 @@ setTimeout(() => {
         const currentUsername = el.textContent.replace("@", "").trim();
 
 el.innerHTML = `
-<div style="
-    display:flex; 
-    align-items:center; 
+<div id="editBox" style="
+    display:flex;
+    align-items:center;
     justify-content:center;
     gap:6px;
+    opacity:0;
+    transform:translateY(-5px);
+    transition: all 0.2s ease;
 ">
+
+const editBox = document.getElementById("editBox");
+
+setTimeout(() => {
+    editBox.style.opacity = "1";
+    editBox.style.transform = "translateY(0)";
+}, 10);
+
     <!-- SMALLER ? -->
     <span id="helpIcon" style="
         cursor:pointer;
@@ -833,18 +859,26 @@ if (taken) {
         saveBtn.onclick = save;
 
         // press enter
-        input.onkeydown = (e) => {
-            if (e.key === "Enter") save();
-        };
+input.onkeydown = (e) => {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        save();
+    }
+
+    if (e.key === "Escape") {
+        cancelEdit(el, currentUsername);
+    }
+};
 
         setTimeout(() => {
             document.addEventListener("click", function handler(e) {
+                if (
+                    e.target.closest("#usernameText") ||
+                    e.target.closest("#helpBox")
+                ) return;
 
-                if (e.target.closest("#usernameText")) return;
-
-                el.innerHTML = `<b>@</b>${currentUsername}`;
+                cancelEdit(el, currentUsername);
                 document.removeEventListener("click", handler);
-
             });
         }, 0);
     };
