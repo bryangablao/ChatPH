@@ -656,7 +656,36 @@ onAuthStateChanged(auth, async (user) => {
             ? d.firstName + " " + d.lastName
             : "User";
 
-            document.getElementById("userEmail").innerText = "UID: " + profileUID;
+            document.getElementById("userEmail").innerHTML =
+            `<span id="usernameText" style="cursor:pointer;">
+            Username: ${d.username || profileUID}
+            </span>`;
+
+setTimeout(() => {
+    const el = document.getElementById("usernameText");
+    if (el) {
+        el.onclick = async () => {
+            const currentUsername = el.innerText.replace("Username: ", "");
+            const newUsername = prompt("Enter new username:", currentUsername);
+            if (!newUsername) return;
+
+            // ✅ VALIDATION
+            const valid = /^[a-zA-Z._*\-]{6,15}$/.test(newUsername);
+            if (!valid) {
+                alert("Username must be 6-15 characters and only use:\na-z A-Z . _ * -");
+                return;
+            }
+
+            // ✅ SAVE TO FIREBASE
+            await setDoc(doc(db, "users", auth.currentUser.uid), {
+                username: newUsername
+            }, { merge: true });
+
+            // ✅ UPDATE UI
+            el.innerText = "Username: " + newUsername;
+        };
+    }
+}, 300);
             
             if (d.bio) document.getElementById("userBio").innerText = d.bio;
             if (d.pfpBase64) document.getElementById("pfp").src = d.pfpBase64;
