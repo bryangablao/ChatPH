@@ -705,6 +705,13 @@ el.innerHTML = `
                 text-align:left;
             ">
 
+    <div id="usernameStatus" style="
+        font-size:12px;
+        margin-top:4px;
+        text-align:left;
+        color:var(--dim);
+    "></div>
+
     <button id="saveUsernameBtn" style="
         background: var(--accent);
         border: none;
@@ -736,6 +743,45 @@ el.innerHTML = `
         const saveBtn = document.getElementById("saveUsernameBtn");
         const helpIcon = document.getElementById("helpIcon");
         const helpBox = document.getElementById("helpBox");
+        const status = document.getElementById("usernameStatus");
+
+let debounceTimer;
+
+input.addEventListener("input", () => {
+    const value = input.value.trim();
+
+    clearTimeout(debounceTimer);
+
+    // basic validation first
+    if (!/^[a-zA-Z0-9._*\-]{6,15}$/.test(value)) {
+        status.innerText = "❌ Invalid format";
+        status.style.color = "red";
+        return;
+    }
+
+    status.innerText = "⏳ Checking...";
+    status.style.color = "gray";
+
+    debounceTimer = setTimeout(async () => {
+        const q = query(collection(db, "users"), where("username", "==", value));
+        const snap = await getDocs(q);
+
+        let taken = false;
+        snap.forEach(docSnap => {
+            if (docSnap.id !== auth.currentUser.uid) {
+                taken = true;
+            }
+        });
+
+        if (taken) {
+            status.innerText = "❌ Username taken";
+            status.style.color = "red";
+        } else {
+            status.innerText = "✅ Available";
+            status.style.color = "limegreen";
+        }
+    }, 400); // debounce (important 🔥)
+});
 
         input.focus();
 
@@ -750,7 +796,7 @@ const save = async () => {
     const newUsername = input.value.trim();
 
     const valid = /^[a-zA-Z0-9._*\-]{6,15}$/.test(newUsername);
-    if (!valid) {
+    if (status.innerText !== "✅ Available") {
         input.style.border = "1px solid red";
         return;
     }
@@ -774,7 +820,8 @@ if (taken) {
 }
 
     // ✅ SAVE
-    await setDoc(doc(db, "users", auth.currentUser.uid), {
+    await setDoc(doc(db, "users", profileUID), {
+
         username: newUsername
     }, { merge: true });
 
