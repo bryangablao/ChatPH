@@ -918,7 +918,8 @@ onSnapshot,
 serverTimestamp,
 doc,
 setDoc,
-deleteDoc
+deleteDoc,
+getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
 getAuth,
@@ -1037,7 +1038,6 @@ if(e.ctrlKey && e.key === "Enter"){
     createPost();
 }
 });
-import { getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   
 /* CREATE POST */
 window.createPost = async () => {
@@ -1275,7 +1275,7 @@ onSnapshot(q, (snapshot) => {
             </div>
             <div class="comment-box" id="comment-${postId}" style="display:none">
                 <div class="comment-input">
-                    <img class="comment-avatar" src="${currentUserData?.photo || 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}">
+                    <img class="comment-avatar" src="${(currentUserData && currentUserData.photo) ? currentUserData.photo : 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}">
                     <input type="text" class="comment-field" placeholder="Write a comment..." 
                            onkeydown="if(event.key==='Enter'){addComment('${postId}',this)}">
                 </div>
@@ -1346,7 +1346,8 @@ onSnapshot(commentsRef, async (snap) => {
         </div>`;
     }
 });
-});
+        });
+    });
   
 /* AUTH USER */
 let currentUserData = null;
