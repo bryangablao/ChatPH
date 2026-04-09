@@ -428,6 +428,13 @@ main {
     color: var(--accent);
     transform: scale(1.05);
 }
+
+.post-img {
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 12px;
+    object-fit: cover;
+}
         
     </style>
 </head>
@@ -1002,40 +1009,37 @@ const q = query(
             const list = document.getElementById("postList");
             list.innerHTML = "";
             document.getElementById("statPosts").innerText = snap.size;
-            snap.forEach(doc => {
-                const p = doc.data();
-list.innerHTML += `
-<div class="post">
+snap.forEach(postDoc => {
+    const p = postDoc.data();
 
-    <div class="post-header">
-        <img id="avatar-${doc.id}" class="avatar">
-        <div class="post-info">
-            <div class="username">${p.name || "User"}</div>
-            <div class="time">${p.time?.toDate().toLocaleString() || "Recent"}</div>
+    list.innerHTML += `
+    <div class="post">
+        <div class="post-header">
+            <img id="avatar-${postDoc.id}" class="avatar">
+            <div class="post-info">
+                <div class="username">${p.name || "User"}</div>
+                <div class="time">${p.time?.toDate().toLocaleString() || "Recent"}</div>
+            </div>
         </div>
+        <div class="post-text">${p.text || ""}</div>
+        ${p.image ? `<img src="${p.image}" class="post-img">` : ""}
     </div>
+    `;
 
-    <div class="post-text">
-        ${p.text}
-    </div>
+    if (p.uid) {
+        const userRef = doc(db, "users", p.uid);
 
-</div>
-`;
+        onSnapshot(userRef, (userSnap) => {
+            const userData = userSnap.data();
+            const img = document.getElementById("avatar-" + postDoc.id);
 
-if (p.uid) {
-    const userRef = doc(db, "users", p.uid);
-
-    onSnapshot(userRef, (userSnap) => {
-        const userData = userSnap.data();
-        const img = document.getElementById("avatar-" + doc.id);
-
-        if (img) {
-            img.src = userData?.pfpBase64 
-                || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
-        }
-    });
-}
-            });
+            if (img) {
+                img.src = userData?.pfpBase64 
+                    || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+            }
+        });
+    }
+});
         });
     });
 
