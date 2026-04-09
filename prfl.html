@@ -610,6 +610,12 @@ onAuthStateChanged(auth, async (user) => {
     setOnlineStatus(user);
 
            const profileUID = uid || user.uid;
+
+           const friendsRef = collection(db, "friends", profileUID, "list");
+           onSnapshot(friendsRef, (snap) => {
+                document.querySelector(".stats div:nth-child(2) b").innerText = snap.size;
+           });
+    
            const snap = await getDoc(doc(db, "users", profileUID));
         if (snap.exists()) {
             const d = snap.data();
