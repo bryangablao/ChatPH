@@ -1008,7 +1008,7 @@ list.innerHTML += `
 <div class="post">
 
     <div class="post-header">
-        <img src="${p.photo}" class="avatar">
+        <img id="avatar-${doc.id}" class="avatar">
         <div class="post-info">
             <div class="username">${p.name || "User"}</div>
             <div class="time">${p.time?.toDate().toLocaleString() || "Recent"}</div>
@@ -1021,6 +1021,20 @@ list.innerHTML += `
 
 </div>
 `;
+
+if (p.uid) {
+    const userRef = doc(db, "users", p.uid);
+
+    onSnapshot(userRef, (userSnap) => {
+        const userData = userSnap.data();
+        const img = document.getElementById("avatar-" + doc.id);
+
+        if (img) {
+            img.src = userData?.pfpBase64 
+                || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+        }
+    });
+}
             });
         });
     });
