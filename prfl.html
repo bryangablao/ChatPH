@@ -371,6 +371,11 @@ text-decoration:underline;
 main {
     flex:1;
 }
+
+#saveUsernameBtn:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
         
     </style>
 </head>
@@ -687,7 +692,7 @@ onAuthStateChanged(auth, async (user) => {
             : "User";
 
             document.getElementById("userEmail").innerHTML =
-            `<span id="usernameText" style="cursor:pointer;">
+            `<span id="usernameText" style="${isOwner ? 'cursor:pointer;' : 'cursor:default;'}">
             <b>@</b>${d.username || profileUID}
             </span>`;
 
@@ -696,6 +701,7 @@ setTimeout(() => {
     if (!el) return;
 
     el.onclick = () => {
+        if (!isOwner) return;
         const currentUsername = el.textContent.replace("@", "").trim();
 
 el.innerHTML = `
@@ -711,7 +717,19 @@ el.innerHTML = `
     <span id="helpIcon">?</span>
     <input id="usernameInput" value="${currentUsername}">
     <div id="usernameStatus"></div>
-    <button id="saveUsernameBtn">Save</button>
+    <button id="saveUsernameBtn" style="
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        border: none;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+    ">
+        Save
+    </button>
 </div>
 <div id="helpBox" style="display:none;">...</div>
 `;
