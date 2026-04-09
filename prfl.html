@@ -839,10 +839,18 @@ if (taken) {
 
         setTimeout(() => {
             document.addEventListener("click", function handler(e) {
-                if (!el.contains(e.target)) {
-                    el.innerHTML = `<b>@</b>${currentUsername}`;
-                    document.removeEventListener("click", handler);
+
+                const inputBox = document.getElementById("usernameInput");
+
+        // ✅ if clicking inside input OR container → DO NOTHING
+                if (el.contains(e.target) || (inputBox && inputBox.contains(e.target))) {
+                    return;
                 }
+
+        // ❌ otherwise close edit mode
+                el.innerHTML = `<b>@</b>${currentUsername}`;
+                document.removeEventListener("click", handler);
+
             });
         }, 0);
     };
