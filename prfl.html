@@ -696,6 +696,13 @@ el.innerHTML = `
     transform:translateY(-5px);
     transition: all 0.2s ease;
 ">
+    <span id="helpIcon">?</span>
+    <input id="usernameInput" value="${currentUsername}">
+    <div id="usernameStatus"></div>
+    <button id="saveUsernameBtn">Save</button>
+</div>
+<div id="helpBox" style="display:none;">...</div>
+`;
 
 const editBox = document.getElementById("editBox");
 
@@ -993,8 +1000,6 @@ if (active) {
     indicator.style.height = active.offsetHeight + "px";
     active.classList.add("active");
 }
-    indicator.style.top = active.offsetTop + "px";
-    indicator.style.height = active.offsetHeight + "px";
 });
 
 function setOnlineStatus(user){
