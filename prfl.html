@@ -668,50 +668,111 @@ setTimeout(() => {
     el.onclick = () => {
         const currentUsername = el.innerText.replace("@", "");
 
-        // 👇 replace text with input
         el.innerHTML = `
+        <div style="display:flex; align-items:center; gap:6px;">
+
+            <!-- ❓ Help icon -->
+            <span id="helpIcon" style="
+                cursor:pointer;
+                font-size:14px;
+                border:1px solid var(--border);
+                border-radius:50%;
+                width:18px;
+                height:18px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+            ">?</span>
+
+            <!-- INPUT -->
             <input id="usernameInput" 
-                   value="${currentUsername}" 
-                   style="
-                        background: transparent;
-                        border: 1px solid var(--border);
-                        color: white;
-                        padding: 4px 8px;
-                        border-radius: 6px;
-                        outline: none;
-                        width: 140px;
-                   ">
+                value="${currentUsername}" 
+                style="
+                    background: transparent;
+                    border: 1px solid var(--border);
+                    color: white;
+                    padding: 4px 8px;
+                    border-radius: 6px;
+                    outline: none;
+                    width: 140px;
+                ">
+
+            <!-- SAVE BUTTON -->
+            <button id="saveUsernameBtn" style="
+                background: var(--accent);
+                border: none;
+                color: white;
+                padding: 4px 10px;
+                border-radius: 6px;
+                cursor: pointer;
+            ">Save</button>
+
+        </div>
+
+        <!-- HOVER MESSAGE -->
+        <div id="helpBox" style="
+            display:none;
+            position:absolute;
+            margin-top:5px;
+            background:var(--card);
+            border:1px solid var(--border);
+            padding:8px;
+            border-radius:8px;
+            font-size:12px;
+            width:220px;
+            z-index:100;
+        ">
+            6-15 characters<br>
+            Allowed: a-z A-Z 0-9 . _ * - \\
+        </div>
         `;
 
         const input = document.getElementById("usernameInput");
+        const saveBtn = document.getElementById("saveUsernameBtn");
+        const helpIcon = document.getElementById("helpIcon");
+        const helpBox = document.getElementById("helpBox");
+
         input.focus();
 
-        // 👇 SAVE on Enter
-        input.onkeydown = async (e) => {
-            if (e.key === "Enter") {
-                const newUsername = input.value.trim();
+        // ❓ toggle help
+        helpIcon.onclick = (e) => {
+            e.stopPropagation();
+            helpBox.style.display = helpBox.style.display === "none" ? "block" : "none";
+        };
 
-                // ✅ VALIDATION
-                const valid = /^[a-zA-Z0-9._*\-]{6,15}$/.test(newUsername);
-                if (!valid) {
-                    input.style.border = "1px solid red";
-                    return;
-                }
+        // ✅ SAVE FUNCTION
+        const save = async () => {
+            const newUsername = input.value.trim();
 
-                // ✅ SAVE
-                await setDoc(doc(db, "users", auth.currentUser.uid), {
-                    username: newUsername
-                }, { merge: true });
-
-                // ✅ UPDATE UI
-                el.innerHTML = "<b>@</b>" + newUsername;
+            const valid = /^[a-zA-Z0-9._*\-]{6,15}$/.test(newUsername);
+            if (!valid) {
+                input.style.border = "1px solid red";
+                return;
             }
+
+            await setDoc(doc(db, "users", auth.currentUser.uid), {
+                username: newUsername
+            }, { merge: true });
+
+            el.innerHTML = "<b>@</b>" + newUsername;
         };
 
-        // 👇 cancel if click outside
-        input.onblur = () => {
-            el.innerText = "Username: " + currentUsername;
+        // click save
+        saveBtn.onclick = save;
+
+        // press enter
+        input.onkeydown = (e) => {
+            if (e.key === "Enter") save();
         };
+
+        setTimeout(() => {
+            document.addEventListener("click", function handler(e) {
+                if (!el.contains(e.target)) {
+                    el.innerHTML = "<b>@</b>" + currentUsername;
+                    document.removeEventListener("click", handler);
+                }
+            });
+        }, 0);
     };
 }, 300);
             
