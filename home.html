@@ -1346,22 +1346,6 @@ onSnapshot(commentsRef, async (snap) => {
         </div>`;
     }
 });
-
-            // Clean up old buttons before adding new one
-            const existingBtn = commentBox.querySelector(".more-comments");
-            if (existingBtn) existingBtn.remove();
-
-            if (total > 1) {
-                const btn = document.createElement("div");
-                btn.className = "more-comments";
-                btn.id = "btn-" + postId;
-                btn.innerText = isOpen ? "Hide comments..." : `💬 View ${total} comments...`;
-                btn.onclick = () => window.showAllComments(postId, total);
-                commentBox.appendChild(btn);
-            }
-        });
-    });
-});
   
 /* AUTH USER */
 let currentUserData = null;
