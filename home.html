@@ -1050,7 +1050,6 @@ window.createPost = async () => {
         showToast("Write something.", "info");
         return;
     }
-
     if (!user) {
         showToast("You must be logged in.", "error");
         return;
@@ -1060,14 +1059,16 @@ window.createPost = async () => {
     btn.innerText = "Posting..."; 
 
     try {
+        // ✅ FETCH USER DATA FIRST
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const userData = userDoc.data();
+
+        // ✅ THEN SAVE POST
         await addDoc(collection(db, "posts"), {
             uid: user.uid,
             text: text,
             name: user.displayName || "User",
             email: user.email,
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-            const userData = userDoc.data();
-
             photo: userData?.photo || user.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
             time: serverTimestamp()
         });
