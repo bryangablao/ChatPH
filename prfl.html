@@ -23,6 +23,7 @@ body{
     font-family:'Inter',sans-serif;
     background:var(--bg);
     color:var(--text);
+
     display:flex;
     flex-direction:column;
     min-height:100vh;
@@ -38,7 +39,7 @@ body{
         #logoutBtn { cursor: pointer; color: var(--dim); font-weight: 600; font-size: 14px; }
         #logoutBtn:hover { color: #ff4b4b; }
 
-        .cover { position: relative; background: #1a1e26; width: 100%; height: 200px; }
+        .cover { position: relative; height: 220px; background: #1a1e26; }
         .cover img { width: 100%; height: 100%; object-fit: cover; }
 
         /* --- Modern Edit Icon Styling --- */
@@ -59,16 +60,9 @@ body{
 
         /* --- Profile Card --- */
         .card {
-            width: 90%;
-            max-width: 900px;
-            margin: -60px auto 10px;
-            background: var(--card);
-            padding: 30px; 
-            border-radius: 24px; 
-            border: 1px solid var(--border);
-            text-align: center; 
-            position: relative;
-            margin-bottom: 0px;
+            max-width: 700px; margin: -60px auto 30px; background: var(--card);
+            padding: 30px; border-radius: 24px; border: 1px solid var(--border);
+            text-align: center; position: relative;
         }
 
         .pfp-wrap { position: relative; width: 120px; margin: -80px auto 15px; }
@@ -110,7 +104,72 @@ body{
         }
         .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
         .btn-secondary { background: transparent; color: var(--dim); border: none; cursor: pointer; padding: 10px; }
+
+        /* --- Feed --- */
+        .feed { max-width: 600px; margin: auto; padding: 0 20px 60px; }
+        .post { 
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            padding: 20px; 
+            border-radius: 16px; 
+            margin-top: 15px; 
+            word-wrap: break-word; 
+            overflow-wrap: break-word; 
+            word-break: break-word; 
+            width: 100%;
+            width: 100%;
+            max-width: 100%;
+            flex-shrink: 0;
+            scroll-snap-align: start;
+        }
         
+        .post div:last-child { white-space: pre-wrap; }
+        
+        .post-text { 
+            margin-top: 10px; 
+            line-height: 1.6; 
+            word-wrap: break-word; 
+            overflow-wrap: break-word; 
+            word-break: break-word; 
+            max-width: 100%; 
+            white-space: pre-wrap; 
+        }
+        
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        #postList {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .post-info {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .username {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .time {
+            font-size: 12px;
+            color: var(--dim);
+        }
         
         /* --- Sidebar --- */
         .sidebar{
@@ -279,30 +338,7 @@ text-decoration:underline;
 }
 
 main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-}
-
-#usernameMenu {
-    position: absolute;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    display: none;
-    min-width: 140px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    z-index: 20;
-}
-#usernameMenu div {
-    padding: 12px 16px;
-    cursor: pointer;
-}
-#usernameMenu div:hover {
-    background: rgba(255,255,255,.05);
-    color: var(--accent);
+    flex:1;
 }
         
     </style>
@@ -365,25 +401,11 @@ main {
             </div>
 
             <h2 id="userName" style="margin: 0;">User</h2>
-            <div id="userUsername" style="color:var(--dim); font-size:14px; display:flex; justify-content:center; align-items:center; gap:6px;">
-                <span id="usernameText">@setusername</span>
-<div id="usernameMenu" style="
-    position:absolute;
-    background:#1a212b;
-    border:1px solid rgba(255,255,255,0.1);
-    padding:8px;
-    border-radius:10px;
-    display:none;
-    font-size:13px;
-">
-    <div id="editUserBtn">Edit Username</div>
-    <div id="copyUserBtn">Copy Username</div>
-</div>
-            </div>
+            <div id="userEmail" style="color:var(--dim); font-size: 14px;"></div>
 
             <div class="stats">
-                <div><b id="statFollowers">0</b><span>Followers</span></div>
-                <div><b id="friendCount">0</b><span>Friends</span></div>
+                <div><b id="statPosts">0</b><span>Posts</span></div>
+                <div><b>0</b><span>Friends</span></div>
                 <div>
                     <b>20<span id="yearAnim">00</span></b>
                     <span>Joined</span>
@@ -391,8 +413,13 @@ main {
             </div>
 
             <div class="bio" id="userBio">No bio yet</div>
+            <button class="btn-primary" id="openBioModal">Edit Bio</button>
         </section>
 
+        <section class="feed">
+            <h4 style="color: var(--dim); text-transform: uppercase; font-size: 11px; letter-spacing: 1.5px;">Activity</h4>
+            <div id="postList"></div>
+        </section>
     </main>
 
     <div class="modal-overlay" id="bioModal">
@@ -405,25 +432,6 @@ main {
             </div>
         </div>
     </div>
-
-<div class="modal-overlay" id="usernameModal">
-    <div class="modal">
-        <h3>Set Username</h3>
-        <input id="usernameInput" placeholder="@yourname" style="
-            width:100%;
-            padding:10px;
-            border-radius:10px;
-            border:1px solid var(--border);
-            background:var(--bg);
-            color:white;
-            margin:10px 0;
-        ">
-        <div class="modal-actions">
-            <button class="btn-secondary" id="closeUsernameModal">Cancel</button>
-            <button class="btn-primary" id="saveUsernameBtn">Save</button>
-        </div>
-    </div>
-</div>
 
     <input type="file" id="pfpInput" hidden accept="image/*">
     <input type="file" id="coverInput" hidden accept="image/*">
@@ -458,7 +466,7 @@ z-index:3000;
     
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, serverTimestamp, onSnapshot, getDocs }  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
@@ -500,6 +508,21 @@ document.querySelectorAll('.menu').forEach(menu=>{
             document.querySelectorAll('.menu').forEach(m => m.classList.remove('active'));
         }
     });
+
+    // --- Modal Handling ---
+    document.getElementById('openBioModal').onclick = () => {
+        bioInput.value = document.getElementById('userBio').innerText === "No bio yet" ? "" : document.getElementById('userBio').innerText;
+        bioModal.classList.add('active');
+    };
+
+    document.getElementById('closeBioModal').onclick = () => bioModal.classList.remove('active');
+
+    document.getElementById('saveBioBtn').onclick = async () => {
+        const text = bioInput.value.trim();
+        await updateDB({ bio: text });
+        document.getElementById('userBio').innerText = text || "No bio yet";
+        bioModal.classList.remove('active');
+    };
 
     // --- Uploads & Deletes ---
     document.querySelectorAll('.upload-trigger').forEach(btn => btn.onclick = () => document.getElementById(btn.dataset.input).click());
@@ -576,109 +599,60 @@ document.querySelectorAll('.view-trigger').forEach(btn => {
 imageViewer.onclick = () => {
     imageViewer.classList.remove("active");
 };
-
-           const usernameBox = document.getElementById("userUsername");
-           const usernameMenu = document.getElementById("usernameMenu");
-
-const loadFriends = async (uid) => {
-    const snap = await getDocs(collection(db, "users", uid, "friends"));
-    document.getElementById("friendCount").innerText = snap.size;
-};
     
     // --- State & Feed ---
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
-        setTimeout(() => {
-            if (!auth.currentUser) window.location.href = "index.html";
-        }, 800);
+        setTimeout(() => { if(!auth.currentUser) window.location.href="index.html" }, 800);
         return;
     }
 
     setOnlineStatus(user);
 
-    const profileUID = uid || user.uid;
-    const isOwner = user.uid === profileUID;
+           const profileUID = uid || user.uid;
+           const snap = await getDoc(doc(db, "users", profileUID));
+        if (snap.exists()) {
+            const d = snap.data();
 
-    console.log("UID:", profileUID);
+            document.getElementById("userName").innerText = d.name || "User";
+            document.getElementById("userEmail").innerText = d.email || "";
+            
+            if (d.bio) document.getElementById("userBio").innerText = d.bio;
+            if (d.pfpBase64) document.getElementById("pfp").src = d.pfpBase64;
+            if (d.coverBase64) document.getElementById("coverImg").src = d.coverBase64;
+        }
 
-    let snap = await getDoc(doc(db, "users", profileUID));
+const q = query(
+  collection(db, "posts"),
+  where("uid", "==", profileUID)
+);
+        
+        onSnapshot(q, (snap) => {
+            const list = document.getElementById("postList");
+            list.innerHTML = "";
+            document.getElementById("statPosts").innerText = snap.size;
+            snap.forEach(doc => {
+                const p = doc.data();
+list.innerHTML += `
+<div class="post">
 
-    // ✅ IF USER DOESN'T EXIST → CREATE
-    if (!snap.exists()) {
-        console.log("User doc missing, creating...");
+    <div class="post-header">
+        <img src="${p.photo}" class="avatar">
+        <div class="post-info">
+            <div class="username">${p.name || "User"}</div>
+            <div class="time">${p.time?.toDate().toLocaleString() || "Recent"}</div>
+        </div>
+    </div>
 
-        const newData = {
-            name: "User",
-            username: "@" + Math.random().toString(36).substring(2, 10),
-            bio: ""
-        };
+    <div class="post-text">
+        ${p.text}
+    </div>
 
-        await setDoc(doc(db, "users", profileUID), newData);
-
-        snap = await getDoc(doc(db, "users", profileUID)); // reload
-    }
-
-    const d = snap.data();
-
-    const created = d.createdAt?.toDate();
-    if (created) {
-        animateYear(created.getFullYear());
-    }
-
-    console.log("SNAP EXISTS:", snap.exists());
-    console.log("DATA:", d);
-
-    // ✅ UI SET
-    document.getElementById("userName").innerText = (d.firstName && d.lastName)
-    ? d.firstName + " " + d.lastName
-    : "User";
-    document.getElementById("usernameText").innerText = d.username || "@setusername";
-    document.getElementById("userBio").innerText = d.bio || "No bio yet";
-
-    // ✅ IMAGES
-    document.getElementById("pfp").src =
-        d.pfpBase64 || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
-
-    document.getElementById("coverImg").src =
-        d.coverBase64 || "https://images.unsplash.com/photo-1557683316-973673baf926";
-
-    // ✅ OWNER FEATURES
-usernameBox.style.position = "relative";
-
-usernameBox.onclick = (e) => {
-    e.stopPropagation();
-    if (!isOwner) return;
-
-    usernameMenu.style.display = "block";
-    usernameMenu.style.top = "25px";
-    usernameMenu.style.left = "0px";
-};
-
-        const bioBox = document.getElementById("userBio");
-        bioBox.style.cursor = "pointer";
-
-if (isOwner) {
-    const bioBox = document.getElementById("userBio");
-    bioBox.style.cursor = "pointer";
-
-bioBox.onclick = () => {
-    if (!isOwner) return;
-    if (bioBox.isContentEditable) return;
-
-    bioBox.contentEditable = true;
-    bioBox.focus();
-};
-
-bioBox.addEventListener("blur", async () => {
-    if (!isOwner) return;
-    const text = bioBox.innerText.trim();
-    await updateDB({ bio: text });
-    bioBox.contentEditable = false;
-});
-
-loadFriends(profileUID);
-    
-});
+</div>
+`;
+            });
+        });
+    });
 
     document.getElementById('logoutBtn').onclick = () => signOut(auth);
 
@@ -715,6 +689,16 @@ loadFriends(profileUID);
 const links = document.querySelectorAll(".sidebar a");
 const indicator = document.getElementById("indicator");
 
+links.forEach(link => {
+    link.onclick = () => {
+        links.forEach(l => l.classList.remove("active"));
+        link.classList.add("active");
+
+        indicator.style.top = link.offsetTop + "px";
+        indicator.style.height = link.offsetHeight + "px";
+    };
+});
+
 const animateYear = (year) => {
     const el = document.getElementById("yearAnim");
     const target = year.toString().slice(-2); // last 2 digits
@@ -732,6 +716,9 @@ const animateYear = (year) => {
     }, 60);
 };
 
+const currentYear = new Date().getFullYear();
+animateYear(currentYear);
+
 window.addEventListener("load", () => {
 const active = document.querySelector(".sidebar a.active");
 if (active) {
@@ -739,6 +726,8 @@ if (active) {
     indicator.style.height = active.offsetHeight + "px";
     active.classList.add("active");
 }
+    indicator.style.top = active.offsetTop + "px";
+    indicator.style.height = active.offsetHeight + "px";
 });
 
 function setOnlineStatus(user){
@@ -758,40 +747,6 @@ function setOnlineStatus(user){
         });
     });
 }
-
-const usernameModal = document.getElementById("usernameModal");
-const usernameInput = document.getElementById("usernameInput");
-
-document.getElementById("closeUsernameModal").onclick = () => {
-    usernameModal.classList.remove("active");
-};
-
-document.getElementById("saveUsernameBtn").onclick = async () => {
-    let username = usernameInput.value.trim();
-    if (!username.startsWith("@")) username = "@" + username;
-
-    await updateDB({ username });
-
-    document.getElementById("usernameText").innerText = username;
-    usernameModal.classList.remove("active");
-};
-
-document.addEventListener("click", (e) => {
-    if (!e.target.closest("#userUsername")) {
-        usernameMenu.style.display = "none";
-    }
-});
-
-// edit
-document.getElementById("editUserBtn").onclick = () => {
-    usernameModal.classList.add("active");
-};
-
-// copy
-document.getElementById("copyUserBtn").onclick = () => {
-    const text = document.getElementById("usernameText").innerText;
-    navigator.clipboard.writeText(text);
-};
     
 </script>
 
@@ -801,7 +756,7 @@ text-align:center;
 padding:30px 20px;
 color:#94a3b8;
 border-top:1px solid rgba(255,255,255,0.08);
-margin-top:10px;
+margin-top:40px;
 ">
 <div>© 2026 ChatPH • All Rights Reserved</div>
 
@@ -818,7 +773,8 @@ margin-top:10px;
 <div style="margin-top:6px;font-size:12px;opacity:.7;">
 Made with ❤️ in the Philippines
 </div>
-    
 </footer>
+    
 </body>
 </html>
+
