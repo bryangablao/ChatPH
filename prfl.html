@@ -526,6 +526,12 @@ z-index:3000;
     // --- Helpers ---
     const updateDB = async (data) => {
         if (!auth.currentUser) return;
+
+        const profileUID = uid || auth.currentUser.uid;
+
+        // ❌ block if not owner
+        if (auth.currentUser.uid !== profileUID) return;
+
         await setDoc(doc(db, "users", auth.currentUser.uid), data, { merge: true });
     };
 
@@ -659,7 +665,13 @@ onAuthStateChanged(auth, async (user) => {
     setOnlineStatus(user);
 
            const profileUID = uid || user.uid;
+           const isOwner = user.uid === profileUID;
 
+           if (!isOwner) {
+                document.querySelectorAll('.edit-trigger').forEach(el => el.style.display = "none");
+                document.getElementById('openBioModal').style.display = "none";
+           }
+    
            const friendsRef = collection(db, "friends", profileUID, "list");
            onSnapshot(friendsRef, (snap) => {
                 document.querySelector(".stats div:nth-child(2) b").innerText = snap.size;
@@ -836,11 +848,12 @@ if (taken) {
 }
 
     // ✅ SAVE
-    await setDoc(doc(db, "users", profileUID), {
+    if (!isOwner) return;
 
+    await setDoc(doc(db, "users", user.uid), {
         username: newUsername
     }, { merge: true });
-
+    
     // ✅ CLEAN UI RESET
     el.innerHTML = `<b>@</b>${newUsername}`;
 };
