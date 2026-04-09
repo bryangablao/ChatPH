@@ -614,7 +614,10 @@ onAuthStateChanged(auth, async (user) => {
         if (snap.exists()) {
             const d = snap.data();
 
-            document.getElementById("userName").innerText = d.name || "User";
+            document.getElementById("userName").innerText =
+            (d.firstName && d.lastName)
+            ? d.firstName + " " + d.lastName
+            : "User";
             document.getElementById("userEmail").innerText = d.email || "";
             
             if (d.bio) document.getElementById("userBio").innerText = d.bio;
