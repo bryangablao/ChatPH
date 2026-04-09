@@ -1129,11 +1129,11 @@ const text = input.value.trim();
 if(!text) return;
 const user = auth.currentUser;
 await addDoc(collection(db,"posts",postId,"comments"),{
-text:text,
-name:user.displayName || "User",
-email:user.email,
-photo:user.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
-time:serverTimestamp()
+    uid: user.uid,
+    text: text,
+    name: user.displayName || "User",
+    email: user.email,
+    time: serverTimestamp()
 });
 input.value="";
 }
@@ -1275,7 +1275,7 @@ onSnapshot(q, (snapshot) => {
             </div>
             <div class="comment-box" id="comment-${postId}" style="display:none">
                 <div class="comment-input">
-                    <img class="comment-avatar" src="${userData?.photo || 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}">
+                    <img class="comment-avatar" src="${currentUserData?.photo || 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}">
                     <input type="text" class="comment-field" placeholder="Write a comment..." 
                            onkeydown="if(event.key==='Enter'){addComment('${postId}',this)}">
                 </div>
@@ -1339,17 +1339,19 @@ snap.forEach(c => {
         minute: '2-digit'  // Adds 18
     }) : "";
 
-    list.innerHTML += `
-        <div class="comment-item">
-            <img class="comment-avatar" src="${data.photo}">
-            <div style="flex:1;">
-                <div class="comment-name">${data.name} ${getBadge(data.email)}</div>
-                <div class="comment-text">${data.text}</div>
-            </div>
-            <div class="comment-time">
-                ${formattedDate}
-            </div>
-        </div>`;
+const commentUserDoc = await getDoc(doc(db, "users", data.uid));
+const commentUserData = commentUserDoc.data();
+
+list.innerHTML += `
+<div class="comment-item">
+    <img class="comment-avatar" src="${commentUserData?.photo || 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}">
+    <div style="flex:1;">
+        <div class="comment-name">${data.name} ${getBadge(data.email)}</div>
+        <div class="comment-text">${data.text}</div>
+    </div>
+    <div class="comment-time">${formattedDate}</div>
+</div>`;
+    
 });
 
             // Clean up old buttons before adding new one
@@ -1369,16 +1371,22 @@ snap.forEach(c => {
 });
   
 /* AUTH USER */
-onAuthStateChanged(auth,(user)=>{
-    if(user){
+let currentUserData = null;
+
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
         document.getElementById("userDisplay").innerText =
-        user.displayName || user.email;
-        document.getElementById("logoutBtn").style.display="inline";
+            user.displayName || user.email;
+
+        document.getElementById("logoutBtn").style.display = "inline";
+
+        // ✅ FETCH CURRENT USER DATA HERE
+        const currentUserDoc = await getDoc(doc(db, "users", user.uid));
+        currentUserData = currentUserDoc.data();
 
         setOnlineStatus(user);
-
-    }else{
-        window.location.href="index.html";
+    } else {
+        window.location.href = "index.html";
     }
 });
 document.getElementById("logoutBtn").onclick = async ()=>{
