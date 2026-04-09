@@ -1065,7 +1065,10 @@ window.createPost = async () => {
             text: text,
             name: user.displayName || "User",
             email: user.email,
-            photo: user.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            const userData = userDoc.data();
+
+            photo: userData?.photo || user.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
             time: serverTimestamp()
         });
 
@@ -1229,15 +1232,19 @@ const q = query(collection(db, "posts"), orderBy("time", "desc"));
 onSnapshot(q, (snapshot) => {
     feed.innerHTML = ""; 
     
-    snapshot.forEach((postDoc) => {
+    snapshot.forEach(async (postDoc) => {
         const p = postDoc.data();
+
+    // 🔥 FETCH USER PROFILE FROM FIRESTORE
+        const userDoc = await getDoc(doc(db, "users", p.uid));
+        const userData = userDoc.data();
         const postId = postDoc.id;
         const postElement = document.createElement("div");
         postElement.className = "post";
         
         postElement.innerHTML = `
             <div class="post-top">
-                <img class="avatar" src="${p.photo}">
+                <img class="avatar" src="${userData?.photo || 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}">
                 <div>
                     <div class="username">${p.name || "User"} ${getBadge(p.email)}</div>
                     <div class="time">${p.time?.toDate().toLocaleString() || ""}</div>
@@ -1267,7 +1274,7 @@ onSnapshot(q, (snapshot) => {
             </div>
             <div class="comment-box" id="comment-${postId}" style="display:none">
                 <div class="comment-input">
-                    <img class="comment-avatar" src="${auth.currentUser?.photoURL || 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}">
+                    <img class="comment-avatar" src="${userData?.photo || 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}">
                     <input type="text" class="comment-field" placeholder="Write a comment..." 
                            onkeydown="if(event.key==='Enter'){addComment('${postId}',this)}">
                 </div>
