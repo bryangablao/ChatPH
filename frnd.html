@@ -651,7 +651,7 @@ for (const d of snap.docs){
     list.push({
         id: data.uid,
         name: (userData?.firstName || "") + " " + (userData?.lastName || ""),
-        photo: userData?.photo || "",
+        photo: userData?.pfpBase64 || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
         createdAt: data.createdAt,
         online: statusData?.online || false
     });
@@ -686,7 +686,7 @@ async function loadRequests(uid){
             list.push({
                 id: data.uid,
                 name: (userData?.firstName || "") + " " + (userData?.lastName || ""),
-                photo: userData?.photo || ""
+                photo: userData?.pfpBase64 || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png"
             });
         }
 
@@ -718,8 +718,8 @@ function loadFriends(uid){
             // 🔥 push properly (NO const inside)
             list.push({
                 id: data.uid,
-                name: userData?.name || "User",
-                photo: userData?.photo || "",
+                name: (userData?.firstName || "") + " " + (userData?.lastName || ""),
+                photo: userData?.pfpBase64 || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
                 createdAt: data.createdAt,
                 online: statusData?.online || false,
                 pinned: data.pinned || false
