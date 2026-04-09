@@ -658,7 +658,7 @@ onAuthStateChanged(auth, async (user) => {
 
             document.getElementById("userEmail").innerHTML =
             `<span id="usernameText" style="cursor:pointer;">
-            Username: ${d.username || profileUID}
+            <b>@</b>${d.username || profileUID}
             </span>`;
 
 setTimeout(() => {
@@ -666,7 +666,7 @@ setTimeout(() => {
     if (!el) return;
 
     el.onclick = () => {
-        const currentUsername = el.innerText.replace("Username: ", "");
+        const currentUsername = el.innerText.replace("@", "");
 
         // 👇 replace text with input
         el.innerHTML = `
@@ -704,7 +704,7 @@ setTimeout(() => {
                 }, { merge: true });
 
                 // ✅ UPDATE UI
-                el.innerText = "Username: " + newUsername;
+                el.innerHTML = "<b>@</b>" + newUsername;
             }
         };
 
