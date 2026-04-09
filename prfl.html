@@ -497,7 +497,10 @@ z-index:3000;
     
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, query, where, orderBy, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { 
+          getFirestore, doc, setDoc, getDoc, getDocs,
+          collection, query, where, orderBy, serverTimestamp, onSnapshot 
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
@@ -666,7 +669,7 @@ setTimeout(() => {
     if (!el) return;
 
     el.onclick = () => {
-        const currentUsername = el.innerText.replace("@", "");
+        const currentUsername = el.textContent.replace("@", "").trim();
 
 el.innerHTML = `
 <div style="
@@ -689,17 +692,18 @@ el.innerHTML = `
     ">?</span>
 
     <input id="usernameInput" 
-        value="${currentUsername}" 
-        style="
-            background: transparent;
-            border: 1px solid var(--border);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 6px;
-            outline: none;
-            width: 140px;
-            text-align:center;
-        ">
+            value="${currentUsername}" 
+            maxlength="15"
+            style="
+                background: transparent;
+                border: 1px solid var(--border);
+                color: white;
+                padding: 4px 6px;
+                border-radius: 6px;
+                outline: none;
+                width: 120px;
+                text-align:left;
+            ">
 
     <button id="saveUsernameBtn" style="
         background: var(--accent);
@@ -752,15 +756,22 @@ const save = async () => {
     }
 
     // 🔥 CHECK IF TAKEN
-    const q = query(collection(db, "users"), where("username", "==", newUsername));
-    const snap = await getDocs(q);
+const q = query(collection(db, "users"), where("username", "==", newUsername));
+const snap = await getDocs(q);
 
-    if (!snap.empty && snap.docs[0].id !== auth.currentUser.uid) {
-        input.style.border = "1px solid red";
-        input.value = "";
-        input.placeholder = "Username taken";
-        return;
+let taken = false;
+snap.forEach(docSnap => {
+    if (docSnap.id !== auth.currentUser.uid) {
+        taken = true;
     }
+});
+
+if (taken) {
+    input.style.border = "1px solid red";
+    input.value = "";
+    input.placeholder = "Username taken";
+    return;
+}
 
     // ✅ SAVE
     await setDoc(doc(db, "users", auth.currentUser.uid), {
@@ -781,7 +792,7 @@ const save = async () => {
 
         setTimeout(() => {
             document.addEventListener("click", function handler(e) {
-                if (!e.target.closest("#usernameText")) {
+                if (!el.contains(e.target)) {
                     el.innerHTML = `<b>@</b>${currentUsername}`;
                     document.removeEventListener("click", handler);
                 }
@@ -933,7 +944,13 @@ margin-top:40px;
 ">
 <div>© 2026 ChatPH • All Rights Reserved</div>
 
-<div style="margin-top:6px;font-size:13px;">
+<div style="
+    display:flex; 
+    align-items:center; 
+    justify-content:center;
+    gap:6px;
+    width:100%;
+">
 <a href="termsandprivacy.html?tab=about" style="color:#4da3ff;text-decoration:none;">About</a>
 &nbsp;|&nbsp;
 <a href="termsandprivacy.html?tab=privacy" style="color:#4da3ff;text-decoration:none;">Privacy</a>
