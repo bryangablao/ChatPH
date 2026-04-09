@@ -1061,7 +1061,7 @@ await addDoc(collection(db, "posts"), {
     text: text,
     name: user.displayName || "User",
     email: user.email,
-    photo: userData?.pfpBase64 || user.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
+    uid: user.uid,
     time: serverTimestamp()
 });
 
@@ -1236,7 +1236,7 @@ onSnapshot(q, (snapshot) => {
         
         postElement.innerHTML = `
             <div class="post-top">
-                <img class="avatar" src="${p.photo}">
+                <img class="avatar" id="avatar-${postId}">
                 <div>
                     <div class="username">${p.name || "User"} ${getBadge(p.email)}</div>
                     <div class="time">${p.time?.toDate().toLocaleString() || ""}</div>
@@ -1275,6 +1275,20 @@ onSnapshot(q, (snapshot) => {
         `;
         
         feed.appendChild(postElement);
+
+if (p.uid) {
+    const userRef = doc(db, "users", p.uid);
+
+    onSnapshot(userRef, (userSnap) => {
+        const userData = userSnap.data();
+        const img = document.getElementById("avatar-" + postId);
+
+        if (img) {
+            img.src = userData?.pfpBase64 
+                || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+        }
+    });
+}
 
         // PERSIST USER REACTION
         if (auth.currentUser) {
