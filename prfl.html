@@ -711,48 +711,31 @@ setTimeout(() => {
     editBox.style.transform = "translateY(0)";
 }, 10);
 
-    <!-- SMALLER ? -->
-    <span id="helpIcon" style="
-        cursor:pointer;
-        font-size:11px;
-        border:1px solid var(--border);
-        border-radius:50%;
-        width:16px;
-        height:16px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-    ">?</span>
+el.innerHTML = `
+<div id="editBox" style="
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+">
+    <span id="helpIcon">?</span>
 
     <input id="usernameInput" 
-            value="${currentUsername}" 
-            maxlength="15"
-            style="
-                background: transparent;
-                border: 1px solid var(--border);
-                color: white;
-                padding: 4px 6px;
-                border-radius: 6px;
-                outline: none;
-                width: 120px;
-                text-align:left;
-            ">
+        value="${currentUsername}" 
+        maxlength="15"
+        style="
+            background: transparent;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 4px 6px;
+            border-radius: 6px;
+            outline: none;
+            width: 120px;
+        ">
 
-    <div id="usernameStatus" style="
-        font-size:12px;
-        margin-top:4px;
-        text-align:left;
-        color:var(--dim);
-    "></div>
+    <div id="usernameStatus"></div>
 
-    <button id="saveUsernameBtn" style="
-        background: var(--accent);
-        border: none;
-        color: white;
-        padding: 4px 10px;
-        border-radius: 6px;
-        cursor: pointer;
-    ">Save</button>
+    <button id="saveUsernameBtn">Save</button>
 </div>
 
 <div id="helpBox" style="
@@ -771,7 +754,7 @@ setTimeout(() => {
     Allowed: a-z A-Z 0-9 . _ * -
 </div>
 `;
-
+        
         const input = document.getElementById("usernameInput");
         const saveBtn = document.getElementById("saveUsernameBtn");
         const helpIcon = document.getElementById("helpIcon");
