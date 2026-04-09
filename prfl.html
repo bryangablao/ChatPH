@@ -663,28 +663,56 @@ onAuthStateChanged(auth, async (user) => {
 
 setTimeout(() => {
     const el = document.getElementById("usernameText");
-    if (el) {
-        el.onclick = async () => {
-            const currentUsername = el.innerText.replace("Username: ", "");
-            const newUsername = prompt("Enter new username:", currentUsername);
-            if (!newUsername) return;
+    if (!el) return;
 
-            // ✅ VALIDATION
-            const valid = /^[a-zA-Z._*\-]{6,15}$/.test(newUsername);
-            if (!valid) {
-                alert("Username must be 6-15 characters and only use:\na-z A-Z . _ * -");
-                return;
+    el.onclick = () => {
+        const currentUsername = el.innerText.replace("Username: ", "");
+
+        // 👇 replace text with input
+        el.innerHTML = `
+            <input id="usernameInput" 
+                   value="${currentUsername}" 
+                   style="
+                        background: transparent;
+                        border: 1px solid var(--border);
+                        color: white;
+                        padding: 4px 8px;
+                        border-radius: 6px;
+                        outline: none;
+                        width: 140px;
+                   ">
+        `;
+
+        const input = document.getElementById("usernameInput");
+        input.focus();
+
+        // 👇 SAVE on Enter
+        input.onkeydown = async (e) => {
+            if (e.key === "Enter") {
+                const newUsername = input.value.trim();
+
+                // ✅ VALIDATION
+                const valid = /^[a-zA-Z0-9._*\-]{6,15}$/.test(newUsername);
+                if (!valid) {
+                    input.style.border = "1px solid red";
+                    return;
+                }
+
+                // ✅ SAVE
+                await setDoc(doc(db, "users", auth.currentUser.uid), {
+                    username: newUsername
+                }, { merge: true });
+
+                // ✅ UPDATE UI
+                el.innerText = "Username: " + newUsername;
             }
-
-            // ✅ SAVE TO FIREBASE
-            await setDoc(doc(db, "users", auth.currentUser.uid), {
-                username: newUsername
-            }, { merge: true });
-
-            // ✅ UPDATE UI
-            el.innerText = "Username: " + newUsername;
         };
-    }
+
+        // 👇 cancel if click outside
+        input.onblur = () => {
+            el.innerText = "Username: " + currentUsername;
+        };
+    };
 }, 300);
             
             if (d.bio) document.getElementById("userBio").innerText = d.bio;
