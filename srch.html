@@ -568,6 +568,8 @@ window.location.href="index.html";
 
 /* LOAD USERS */
 let users = [];
+let avatarUnsubs = [];
+let popupUnsub = null;
 
 async function loadUsers(){
 const snap = await getDocs(collection(db,"users"));
@@ -662,12 +664,16 @@ function timeAgo(date){
 /* RENDER */
 function renderUsers(list){
 const box = document.getElementById("results");
+
+avatarUnsubs.forEach(unsub => unsub());
+avatarUnsubs = [];
 box.innerHTML = "";
 
 list.forEach(u=>{
 box.innerHTML += `
-<div class="user-card" onclick='openUser(${JSON.stringify(u.id)},${JSON.stringify(u.firstName + " " + u.lastName)},${JSON.stringify(u.photo)})'>
-<img src="${u.photo}" class="avatar">
+<div class="user-card" onclick='openUser(${JSON.stringify(u.id)},${JSON.stringify(u.firstName + " " + u.lastName)})'>
+<img id="avatar-${u.id}" class="avatar" 
+     src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png">
 <div>
 <div class="username">
 ${(u.firstName || "") + " " + (u.lastName || "") || "User"}
@@ -679,53 +685,72 @@ ${(u.firstName || "") + " " + (u.lastName || "") || "User"}
 </div>
 `;
 
-const statusRef = doc(db,"status",u.id);
 
-onSnapshot(statusRef,(snap)=>{
-const statusEl = document.getElementById("status-"+u.id);
+// ✅ REALTIME AVATAR LISTENER
+const userRef = doc(db, "users", u.id);
+const unsub = onSnapshot(userRef, (snap) => {
+    const data = snap.data();
+    const img = document.getElementById("avatar-" + u.id);
 
-if(!snap.exists()){
-    statusEl.innerHTML = '<span style="color:#9ca3af;">● Offline</span>';
-    return;
-}
-
-const data = snap.data();
-const lastSeen = data.lastSeen?.toDate();
-const now = new Date();
-const isOnline = lastSeen && (now - lastSeen < 15000);
-
-if(isOnline){
-    statusEl.innerHTML = '<span style="color:#4ade80;">● Online</span>';
-}else{
-    const timeText = lastSeen ? timeAgo(lastSeen) : "offline";
-    const fullDate = lastSeen ? lastSeen.toLocaleString() : "";
-    statusEl.innerHTML = `
-    <span style="color:#9ca3af;" title="Last seen: ${fullDate}">
-    ● Offline (Last seen ${timeText})
-    </span>
-    `;
-}
+    if (img) {
+        img.src = data?.pfpBase64 ||
+        "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+    }
 });
+
+avatarUnsubs.push(unsub);
+
+// ✅ STATUS LISTENER (keep yours)
+const statusRef = doc(db,"status",u.id);
+onSnapshot(statusRef,(snap)=>{
+    const statusEl = document.getElementById("status-"+u.id);
+    if(!snap.exists()){
+        statusEl.innerHTML = '<span style="color:#9ca3af;">● Offline</span>';
+        return;
+    }
+
+    const data = snap.data();
+    const lastSeen = data.lastSeen?.toDate();
+    const now = new Date();
+    const isOnline = lastSeen && (now - lastSeen < 15000);
+
+    if(isOnline){
+        statusEl.innerHTML = '<span style="color:#4ade80;">● Online</span>';
+    }else{
+        const timeText = lastSeen ? timeAgo(lastSeen) : "offline";
+        const fullDate = lastSeen ? lastSeen.toLocaleString() : "";
+
+        statusEl.innerHTML = `
+        <span style="color:#9ca3af;" title="Last seen: ${fullDate}">
+        ● Offline (Last seen ${timeText})
+        </span>
+        `;
+    }
+});
+
 });
 }
 
 /* POPUP */
-window.openUser = async (id,name,photo)=>{
+window.openUser = async (id,name)=>{
     window.selectedUser = id;
 
     document.getElementById("popup").style.display="flex";
     document.getElementById("popupName").innerText=name;
-    document.getElementById("popupImg").src=photo;
 
-    // ✅ hide button if self
-    if(auth.currentUser.uid === id){
-        document.getElementById("friendBtn").style.display = "none";
-    }else{
-        document.getElementById("friendBtn").style.display = "inline-block";
-    }
+    const img = document.getElementById("popupImg");
 
-    // ✅ update button state
-    await updateFriendButton(id);
+    // ❌ REMOVE old listener
+    if (popupUnsub) popupUnsub();
+
+    const userRef = doc(db, "users", id);
+
+    // ✅ SAVE new listener
+    popupUnsub = onSnapshot(userRef, (snap) => {
+        const data = snap.data();
+        img.src = data?.pfpBase64 ||
+        "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+    });
 };
 
 async function updateFriendButton(id){
