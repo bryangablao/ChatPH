@@ -938,6 +938,8 @@ const db = getFirestore(app);
 const auth = getAuth(app);  
 const storage = getStorage(app);
 const commentState = {};
+
+let currentUserPhoto = "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
 function getBadge(email){
 if(email === "ablaobryan4400@gmail.com"){
 return `<span class="admin-badge">💠 Admin</span>`;
@@ -1052,13 +1054,16 @@ window.createPost = async () => {
     btn.innerText = "Posting..."; 
 
     try {
-        await addDoc(collection(db, "posts"), {
-            text: text,
-            name: user.displayName || "User",
-            email: user.email,
-            photo: user.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
-            time: serverTimestamp()
-        });
+const userDoc = await getDoc(doc(db, "users", user.uid));
+const userData = userDoc.data();
+
+await addDoc(collection(db, "posts"), {
+    text: text,
+    name: user.displayName || "User",
+    email: user.email,
+    photo: userData?.pfpBase64 || user.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
+    time: serverTimestamp()
+});
 
         editor.innerHTML = "";
         showToast("Post created!", "success");
@@ -1115,12 +1120,15 @@ window.addComment = async (postId,input)=>{
 const text = input.value.trim();
 if(!text) return;
 const user = auth.currentUser;
+const userDoc = await getDoc(doc(db, "users", user.uid));
+const userData = userDoc.data();
+
 await addDoc(collection(db,"posts",postId,"comments"),{
-text:text,
-name:user.displayName || "User",
-email:user.email,
-photo:user.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
-time:serverTimestamp()
+    text:text,
+    name:user.displayName || "User",
+    email:user.email,
+    photo:userData?.pfpBase64 || user.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
+    time:serverTimestamp()
 });
 input.value="";
 }
@@ -1258,7 +1266,7 @@ onSnapshot(q, (snapshot) => {
             </div>
             <div class="comment-box" id="comment-${postId}" style="display:none">
                 <div class="comment-input">
-                    <img class="comment-avatar" src="${auth.currentUser?.photoURL || 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}">
+                    <img class="comment-avatar" src="${currentUserPhoto}">
                     <input type="text" class="comment-field" placeholder="Write a comment..." 
                            onkeydown="if(event.key==='Enter'){addComment('${postId}',this)}">
                 </div>
@@ -1352,10 +1360,15 @@ snap.forEach(c => {
 });
   
 /* AUTH USER */
-onAuthStateChanged(auth,(user)=>{
+onAuthStateChanged(auth, async (user)=>{
     if(user){
         document.getElementById("userDisplay").innerText =
         user.displayName || user.email;
+
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const userData = userDoc.data();
+
+        currentUserPhoto = userData?.pfpBase64 || user.photoURL || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
         document.getElementById("logoutBtn").style.display="inline";
 
         setOnlineStatus(user);
