@@ -464,6 +464,11 @@ in a simple and meaningful way.
 Sign in with Google
 </button>
 
+<button type="button" id="facebookLogin" class="google-btn" style="background:#1877f2;color:white;">
+<i class="fab fa-facebook-f"></i>
+Sign in with Facebook
+</button>
+  
 <div class="links">
 <span class="link" onclick="showForm('register')">Register</span>
 <span class="link" onclick="showForm('forgot')">Forgot Password</span>
@@ -567,6 +572,7 @@ getAuth,
 createUserWithEmailAndPassword,
 signInWithEmailAndPassword,
 GoogleAuthProvider,
+FacebookAuthProvider,
 signInWithPopup,
 sendEmailVerification,
 sendPasswordResetEmail,
@@ -602,6 +608,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
+const facebookProvider = new FacebookAuthProvider();
 
 import { signOut } from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -780,6 +787,39 @@ status.style.display="block"
 status.style.color="#ef4444"
 status.textContent=error.message
 
+}
+});
+
+/* FACEBOOK LOGIN */
+document.getElementById("facebookLogin").addEventListener("click", async () => {
+try{
+const result = await signInWithPopup(auth, facebookProvider);
+const user = result.user;
+
+const userRef = doc(db,"users",user.uid);
+const userSnap = await getDoc(userRef);
+
+if(!userSnap.exists()){
+const nameParts = (user.displayName || "").split(" ");
+await setDoc(userRef,{
+firstName:nameParts[0] || "",
+lastName:nameParts.slice(1).join(" ") || "",
+phone:"",
+pin:"",
+email:user.email || "",
+photo:user.photoURL || "https://i.imgur.com/6VBx3io.png",
+loginType:"facebook",
+createdAt:new Date()
+});
+}
+
+window.location.href="home.html";
+
+}catch(error){
+const status = document.querySelector(".loginStatus");
+status.style.display="block";
+status.style.color="#ef4444";
+status.textContent=error.message;
 }
 });
 
