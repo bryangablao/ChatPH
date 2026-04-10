@@ -834,19 +834,51 @@ function loadChatList(){
         });
 
         const sorted = Object.entries(chatMap).sort((a,b)=>b[1]-a[1]);
-        box.innerHTML = "";
+box.innerHTML = "";
 
-        sorted.forEach(([uid])=>{
-            const user = allUsers.find(u => u.uid === uid);
-            box.innerHTML += `
-                <div class="chat-user" onclick="openChat('${uid}')">
-                    ${user ? user.name : "Unknown User"}
-                </div>
-            `;
-        });
+// ✅ DIRECT MESSAGES HEADER
+if (sorted.length > 0) {
+    box.innerHTML += `<div class="not-found">Direct Messages</div>`;
+}
 
-        // GROUPS
-        box.innerHTML += `<div class="not-found">Groups</div>`;
+sorted.forEach(([uid])=>{
+    const user = allUsers.find(u => u.uid === uid);
+    box.innerHTML += `
+        <div class="chat-user" onclick="openChat('${uid}')">
+            ${user ? user.name : "Unknown User"}
+        </div>
+    `;
+});
+
+// ✅ FAVORITES (placeholder for future)
+box.innerHTML += `<div class="not-found">Favorites</div>`;
+box.innerHTML += `
+    <div class="not-found" style="font-size:12px;">
+        No favorites yet
+    </div>
+`;
+
+// ✅ LOAD GROUPS
+const groupSnap = await getDocs(collection(db, "groups"));
+
+let hasGroup = false;
+
+groupSnap.forEach(doc=>{
+    const g = doc.data();
+    if(g.members && g.members.includes(myId)){
+        if(!hasGroup){
+            // 🔥 SHOW HEADER ONLY ONCE
+            box.innerHTML += `<div class="not-found">Groups</div>`;
+            hasGroup = true;
+        }
+
+        box.innerHTML += `
+            <div class="chat-user" onclick="openGroup('${doc.id}', '${g.name}', '${g.theme}')">
+                👥 ${g.name}
+            </div>
+        `;
+    }
+});
 
         const groupSnap = await getDocs(collection(db, "groups"));
         groupSnap.forEach(doc=>{
