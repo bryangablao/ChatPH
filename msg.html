@@ -299,11 +299,11 @@ text-decoration:underline;
     font-size:20px;
     font-weight:bold;
     cursor:pointer;
-    transition:transform .25s ease, background .25s;
+    transition:transform .25s ease;
 }
+
 .create-btn.active{
     transform:rotate(45deg);
-    background:#ff4b4b;
 }
 
 /* NOT FOUND */
@@ -597,6 +597,19 @@ text-decoration:underline;
     max-height:500px;
     opacity:1;
 }
+
+.chat-user{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.avatar{
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    object-fit:cover;
+}
     
 </style>
 </head>
@@ -650,19 +663,19 @@ text-decoration:underline;
 
     <!-- FAVORITES -->
     <div class="category" onclick="toggleCategory('fav')">
-        Favorites <span id="icon-fav">▾</span>
+        ⭐ Favorites <span id="icon-fav">▾</span>
     </div>
     <div id="fav" class="category-content"></div>
 
     <!-- GROUP CHATS -->
     <div class="category" onclick="toggleCategory('groups')">
-        GroupChats <span id="icon-groups">▾</span>
+        👥 GroupChats <span id="icon-groups">▾</span>
     </div>
     <div id="groups" class="category-content"></div>
 
     <!-- DIRECT MESSAGES -->
     <div class="category" onclick="toggleCategory('dm')">
-        Direct Messages <span id="icon-dm">▾</span>
+        💬 Direct Messages <span id="icon-dm">▾</span>
     </div>
     <div id="dm" class="category-content"></div>
 
@@ -930,29 +943,48 @@ function loadChatList(){
 sorted.forEach(([uid])=>{
     const user = allUsers.find(u => u.uid === uid);
 
-    dmBox.innerHTML += `
+dmBox.innerHTML += `
     <div class="chat-user" onclick="openChat('${uid}')">
+        <img id="avatar-${uid}" class="avatar"
+        src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png">
+        
         <span>${user ? user.name : "Unknown User"}</span>
-        <span id="status-${uid}" style="float:right;font-size:11px;opacity:.6;">
+
+        <span id="status-${uid}" style="margin-left:auto;font-size:11px;opacity:.6;">
             ...
         </span>
     </div>
-    `;
+`;
 });
 
-// 🔥 LISTEN TO ONLINE STATUS (PUT HERE)
+// 🔥 LISTEN TO ONLINE STATUS
 sorted.forEach(([uid])=>{
     const statusRef = doc(db, "status", uid);
-
     onSnapshot(statusRef, (snap)=>{
         const data = snap.data();
         const el = document.getElementById("status-" + uid);
+
         if(!el) return;
 
         if(data?.online){
             el.innerHTML = `<span style="color:#22c55e;">●</span> Online`;
         } else {
             el.innerHTML = `<span style="color:#6b7280;">●</span> Offline`;
+        }
+    });
+});
+
+
+sorted.forEach(([uid])=>{
+    const userRef = doc(db, "users", uid);
+
+    onSnapshot(userRef, (snap)=>{
+        const data = snap.data();
+        const img = document.getElementById("avatar-" + uid);
+
+        if(img){
+            img.src = data?.pfpBase64 
+                || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
         }
     });
 });
@@ -1215,11 +1247,9 @@ function toggleCreate(){
 
     if(isOpen){
         panel.classList.remove("open");
-        btn.innerText = "+";
         btn.classList.remove("active");
     } else {
         panel.classList.add("open");
-        btn.innerText = "✕";
         btn.classList.add("active");
     }
 }
