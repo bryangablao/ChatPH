@@ -168,10 +168,11 @@ pointer-events:auto;
 
 /* LEFT: USERS */
 .chat-list{
-width:260px;
-border-right:1px solid var(--border);
-background:#11141a;
-overflow-y:auto;
+    width:260px;
+    border-right:1px solid var(--border);
+    background:#11141a;
+    overflow-y:auto;
+    overflow-x:hidden;
 }
 
 /* USER ITEM */
@@ -567,6 +568,7 @@ text-decoration:underline;
     height:100%;
     background:linear-gradient(120deg,transparent,rgba(77,163,255,0.15),transparent);
     transition:0.4s;
+    pointer-events:none;
 }
 
 .category:hover::before{
@@ -576,7 +578,7 @@ text-decoration:underline;
 /* 🔥 slight move + glow */
 .category:hover{
     background:#1a1f29;
-    transform:translateX(5px);
+    transform:translateX(3px);
 }
 
 .category-content{
