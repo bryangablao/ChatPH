@@ -1008,7 +1008,9 @@ sorted.forEach(([uid])=>{
                 hasGroup = true;
                 groupBox.innerHTML += `
                     <div class="chat-user" onclick="openGroup('${doc.id}', '${g.name}', '${g.theme}')">
-                        👥 ${g.name}
+                        <img class="avatar"
+                        src="https://cdn-icons-png.flaticon.com/512/166/166258.png">
+                        <span>${g.name}</span>
                     </div>
                 `;
             }
@@ -1157,6 +1159,18 @@ onSnapshot(statusRef, (snap)=>{
         statusEl.innerHTML = `<span style="color:#6b7280;">●</span> Offline`;
     }
 });
+
+const chatId = [auth.currentUser.uid, uid].sort().join("_");
+
+const themeRef = doc(db, "dmThemes", chatId);
+onSnapshot(themeRef, (snap)=>{
+    const data = snap.data();
+    if(data?.theme){
+        document.getElementById("chatBox").style.background = data.theme + "22";
+    } else {
+        document.getElementById("chatBox").style.background = "";
+    }
+});
     
 }
 
@@ -1172,6 +1186,8 @@ function openGroup(id, name, theme){
     document.getElementById("emptyState").style.display = "none";
     document.getElementById("chatUI").style.display = "flex";
     document.getElementById("chatTitle").innerText = name;
+    document.getElementById("chatStatus").innerText = "";
+    document.getElementById("typingIndicator").innerText = "";
 
     loadGroupMessages();
 }
@@ -1441,7 +1457,10 @@ messages.forEach(m=>{
     // NORMAL MESSAGE
     box.innerHTML += `
         <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
-             data-id="${m.id}">
+             data-id="${m.id}"
+             oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;"
+             ontouchstart="startPress(event, '${m.id}', '${m.from}')"
+             ontouchend="cancelPress()">
             ${m.text}
             <div style="font-size:10px;opacity:.6;margin-top:4px;">
                 ${new Date(m.time).toLocaleDateString()} • 
@@ -1686,57 +1705,37 @@ async function pinMessage(){
 }
 
 document.getElementById("moreBtn").onclick = async () => {
-    const panel = document.getElementById("chatOptionsPanel");
-    panel.classList.toggle("open");
+    const panel = document.getElementById("chatOptionsPanel");
+    panel.classList.toggle("open");
 
-    const title = document.getElementById("chatTitle").innerText;
-    document.getElementById("groupNameTitle").innerText = title;
+    const membersSection = document.querySelector(".option:nth-child(3)");
+    const title = document.getElementById("chatTitle").innerText;
 
-    const membersSection = document.querySelector(".option:nth-child(3)");
+    // ✅ GROUP CHAT
+    if(currentGroup){
+        document.getElementById("groupNameTitle").innerText = title;
+        membersSection.style.display = "block";
+        loadMembers();
+    } 
 
-    // ✅ IF GROUP CHAT
-    if(currentGroup){
-        membersSection.style.display = "block";
-        loadMembers();
-    } 
-    
-    // ✅ IF 1-ON-1 CHAT
-    else if(currentChatUser){
-        membersSection.style.display = "none";
+    // ✅ DIRECT MESSAGE
+    else if(currentChatUser){
+        membersSection.style.display = "none";
 
-        // 🔥 GET USER DATA
-        const userRef = doc(db, "users", currentChatUser);
-        const snap = await getDoc(userRef);
-        const data = snap.data();
+        const userRef = doc(db, "users", currentChatUser);
+        const snap = await getDoc(userRef);
+        const data = snap.data();
 
-        // 🔥 INSERT PROFILE HEADER
-const panelHeader = `
-    <div style="
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        justify-content:center;
-        margin-bottom:15px;
-    ">
-        <img src="${data?.pfpBase64 || 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}"
-        style="
-            width:48px;
-            height:48px;
-            border-radius:50%;
-            object-fit:cover;
-            display:block;
-        ">
-        <div style="font-weight:600;margin-top:6px;">
-            ${data?.name || "User"}
-        </div>
-    </div>
-`;
+        document.getElementById("groupNameTitle").innerHTML = `
+            <div style="text-align:center;">
+                <img src="${data?.pfpBase64 || 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}"
+                style="width:48px;height:48px;border-radius:50%;">
+                <div>${data?.name || "User"}</div>
+            </div>
+        `;
+    }
 
-        document.getElementById("groupNameTitle").innerHTML = panelHeader;
-    }
-
-    // ✅ ALWAYS LOAD PINNED
-    loadPinned();
+    loadPinned();
 };
 
 function toggleSection(id){
@@ -1861,28 +1860,27 @@ async function loadMembers(){
 }
 
 async function changeTheme(color){
-    if(!currentGroup) return;
-
     groupTheme = color;
 
+    // ✅ GROUP
     if(currentGroup){
-    await updateDoc(doc(db, "groups", currentGroup), {
-        theme: color
-    });
-}
+        await updateDoc(doc(db, "groups", currentGroup), {
+            theme: color
+        });
 
-    document.getElementById("chatBox").style.background = color + "22";
+        document.getElementById("chatBox").style.background = color + "22";
+    }
 
-    const colorName = themeNames[color] || "Custom";
+    // ✅ DIRECT MESSAGE
+    else if(currentChatUser){
+        const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
 
-    await addDoc(collection(db, "messages"), {
-        text: "theme-change",
-        groupId: currentGroup,
-        system: true,
-        theme: color,
-        userName: auth.currentUser.displayName,
-        time: Date.now()
-    });
+        await setDoc(doc(db, "dmThemes", chatId), {
+            theme: color
+        });
+
+        document.getElementById("chatBox").style.background = color + "22";
+    }
 }
 
 document.addEventListener("keydown", (e) => {
