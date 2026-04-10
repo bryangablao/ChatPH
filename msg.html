@@ -299,6 +299,11 @@ text-decoration:underline;
     font-size:20px;
     font-weight:bold;
     cursor:pointer;
+    transition:transform .25s ease, background .25s;
+}
+.create-btn.active{
+    transform:rotate(45deg);
+    background:#ff4b4b;
 }
 
 /* NOT FOUND */
@@ -637,7 +642,7 @@ text-decoration:underline;
     <!-- SEARCH + CREATE -->
     <div class="chat-top">
         <input type="text" id="userSearch" placeholder="Search user...">
-        <button class="create-btn" onclick="openGroupPanel()">+</button>
+        <button class="create-btn" id="createBtn" onclick="toggleCreate()">+</button>
     </div>
 
     <!-- USER RESULTS -->
@@ -1202,10 +1207,22 @@ document.getElementById("groupSearch").addEventListener("input", function(){
     
 
 /* GROUP PANEL */
-function openGroupPanel(){
-    document.getElementById("groupPanel").classList.toggle("open");
-}
+function toggleCreate(){
+    const panel = document.getElementById("groupPanel");
+    const btn = document.getElementById("createBtn");
 
+    const isOpen = panel.classList.contains("open");
+
+    if(isOpen){
+        panel.classList.remove("open");
+        btn.innerText = "+";
+        btn.classList.remove("active");
+    } else {
+        panel.classList.add("open");
+        btn.innerText = "✕";
+        btn.classList.add("active");
+    }
+}
 /* CREATE GROUP (demo only) */
 async function createGroup(){
     const name = document.getElementById("groupName").value.trim();
@@ -1792,6 +1809,7 @@ window.sendMsg = sendMsg;
 window.changeTheme = changeTheme;
 window.toggleSection = toggleSection;
 window.toggleCategory = toggleCategory;
+window.toggleCreate = toggleCreate;
 </script>
 
 <div id="msgMenu" style="
