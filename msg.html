@@ -806,6 +806,16 @@ text-decoration:underline;
         Group Members <span onclick="toggleSection('members')">▾</span>
         <div id="members" class="dropdown"></div>
     </div>
+
+    <div class="option">
+        Group Image
+        <div style="margin-top:10px;">
+            <input type="file" id="groupImgInput" accept="image/*">
+            <button onclick="uploadGroupImage()">Upload</button>
+            <button onclick="removeGroupImage()" style="background:#ff4b4b;margin-top:6px;">Remove</button>
+        </div>
+    </div>
+    
 </div>
 
 <!-- FOOTER -->
@@ -1008,11 +1018,20 @@ sorted.forEach(([uid])=>{
                 hasGroup = true;
                 groupBox.innerHTML += `
                     <div class="chat-user" onclick="openGroup('${doc.id}', '${g.name}', '${g.theme}')">
-                        <img class="avatar"
-                        src="https://cdn-icons-png.flaticon.com/512/166/166258.png">
+                        <img class="avatar" id="group-${doc.id}">
                         <span>${g.name}</span>
                     </div>
                 `;
+                // 🔥 REALTIME GROUP IMAGE
+const groupRef = doc(db, "groups", doc.id);
+onSnapshot(groupRef, (snap)=>{
+    const data = snap.data();
+    const img = document.getElementById("group-" + doc.id);
+
+    if(img){
+        img.src = data?.image || createGroupDefault(data?.theme, data?.name);
+    }
+});
             }
         });
 
@@ -1186,6 +1205,16 @@ function openGroup(id, name, theme){
     document.getElementById("emptyState").style.display = "none";
     document.getElementById("chatUI").style.display = "flex";
     document.getElementById("chatTitle").innerText = name;
+    // 🔥 LISTEN TO GROUP IMAGE (REALTIME)
+const groupRef = doc(db, "groups", id);
+onSnapshot(groupRef, (snap)=>{
+    const data = snap.data();
+    const avatar = document.getElementById("chatAvatar");
+
+    if(avatar){
+        avatar.src = data?.image || createGroupDefault(data?.theme, name);
+    }
+});
     document.getElementById("chatStatus").innerText = "";
     document.getElementById("typingIndicator").innerText = "";
 
@@ -1363,6 +1392,7 @@ if(selectedMembers.length === 0){
         theme: theme,
         members: [myId, ...selectedMembers],
         type: "group",
+        image: "", 
         createdAt: Date.now()
     };
 
@@ -1939,6 +1969,59 @@ function toggleCategory(id){
         }
     });
 }
+
+async function uploadGroupImage(){
+    if(!currentGroup) return;
+
+    const file = document.getElementById("groupImgInput").files[0];
+    if(!file) return alert("Select image");
+
+    const reader = new FileReader();
+
+    reader.onload = async function(e){
+        const base64 = e.target.result;
+
+        await updateDoc(doc(db, "groups", currentGroup), {
+            image: base64
+        });
+    };
+
+    reader.readAsDataURL(file);
+}
+
+async function removeGroupImage(){
+    if(!currentGroup) return;
+
+    await updateDoc(doc(db, "groups", currentGroup), {
+        image: ""
+    });
+}
+
+function createGroupDefault(color = "#4da3ff", name = "G"){
+    const canvas = document.createElement("canvas");
+    canvas.width = 100;
+    canvas.height = 100;
+
+    const ctx = canvas.getContext("2d");
+
+    // circle
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(50, 50, 50, 0, Math.PI * 2);
+    ctx.fill();
+
+    // text (first letter)
+    ctx.fillStyle = "#fff";
+    ctx.font = "bold 40px Inter";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    const letter = name ? name.charAt(0).toUpperCase() : "G";
+    ctx.fillText(letter, 50, 52);
+
+    return canvas.toDataURL();
+}
+    
     
 // 🔥 MAKE FUNCTIONS GLOBAL (IMPORTANT)
 
