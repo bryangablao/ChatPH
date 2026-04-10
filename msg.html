@@ -1680,15 +1680,44 @@ async function pinMessage(){
     document.getElementById("msgMenu").style.display = "none";
 }
 
-document.getElementById("moreBtn").onclick = () => {
-    document.getElementById("chatOptionsPanel").classList.toggle("open");
+document.getElementById("moreBtn").onclick = async () => {
+    const panel = document.getElementById("chatOptionsPanel");
+    panel.classList.toggle("open");
 
-    // set group name
-    document.getElementById("groupNameTitle").innerText =
-        document.getElementById("chatTitle").innerText;
+    const title = document.getElementById("chatTitle").innerText;
+    document.getElementById("groupNameTitle").innerText = title;
 
-    loadMembers();
-    loadPinned();
+    const membersSection = document.querySelector(".option:nth-child(3)");
+
+    // ✅ IF GROUP CHAT
+    if(currentGroup){
+        membersSection.style.display = "block";
+        loadMembers();
+    } 
+    
+    // ✅ IF 1-ON-1 CHAT
+    else if(currentChatUser){
+        membersSection.style.display = "none";
+
+        // 🔥 GET USER DATA
+        const userRef = doc(db, "users", currentChatUser);
+        const snap = await getDoc(userRef);
+        const data = snap.data();
+
+        // 🔥 INSERT PROFILE HEADER
+        const panelHeader = `
+            <div style="text-align:center;margin-bottom:15px;">
+                <img src="${data?.pfpBase64 || 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}"
+                style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:8px;">
+                <div style="font-weight:600;">${data?.name || "User"}</div>
+            </div>
+        `;
+
+        document.getElementById("groupNameTitle").innerHTML = panelHeader;
+    }
+
+    // ✅ ALWAYS LOAD PINNED
+    loadPinned();
 };
 
 function toggleSection(id){
@@ -1710,8 +1739,13 @@ function loadPinned(){
         snap.forEach(docSnap=>{
             const m = docSnap.data();
             const id = docSnap.id;
+            const isGroup = m.groupId === currentGroup;
+            const isDM =
+                !m.groupId &&
+                ((m.from === auth.currentUser.uid && m.to === currentChatUser) ||
+                 (m.from === currentChatUser && m.to === auth.currentUser.uid));
 
-            if(m.groupId === currentGroup && m.pinned){
+                if((isGroup || isDM) && m.pinned){
                 hasPinned = true;
 
                 box.innerHTML += `
@@ -1783,7 +1817,7 @@ function scrollToMsg(id){
 }
 
 async function loadMembers(){
-    if(!currentGroup) return;
+    if(!currentGroup && !currentChatUser) return;
 
     const box = document.getElementById("members");
     box.innerHTML = "";
@@ -1812,9 +1846,11 @@ async function changeTheme(color){
 
     groupTheme = color;
 
-    await updateDoc(doc(db, "groups", currentGroup), {
-        theme: color
-    });
+    if(currentGroup){
+    await updateDoc(doc(db, "groups", currentGroup), {
+        theme: color
+    });
+}
 
     document.getElementById("chatBox").style.background = color + "22";
 
