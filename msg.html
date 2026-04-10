@@ -689,7 +689,10 @@ text-decoration:underline;
     justify-content:space-between;
     align-items:center;
 ">
-    <span id="chatTitle"></span>
+    <div style="display:flex;flex-direction:column;">
+        <span id="chatTitle"></span>
+        <span id="typingIndicator" style="font-size:11px;opacity:.6;"></span>
+    </div>
 
     <div class="chat-actions">
         <span id="moreBtn" class="header-btn">•••</span>
@@ -917,14 +920,36 @@ function loadChatList(){
         if(sorted.length === 0){
             dmBox.innerHTML = `<div class="not-found">No messages yet</div>`;
         } else {
-            sorted.forEach(([uid])=>{
-                const user = allUsers.find(u => u.uid === uid);
-                dmBox.innerHTML += `
-                    <div class="chat-user" onclick="openChat('${uid}')">
-                        ${user ? user.name : "Unknown User"}
-                    </div>
-                `;
-            });
+sorted.forEach(([uid])=>{
+    const user = allUsers.find(u => u.uid === uid);
+
+    dmBox.innerHTML += `
+    <div class="chat-user" onclick="openChat('${uid}')">
+        <span>${user ? user.name : "Unknown User"}</span>
+        <span id="status-${uid}" style="float:right;font-size:11px;opacity:.6;">
+            ...
+        </span>
+    </div>
+    `;
+});
+
+// 🔥 LISTEN TO ONLINE STATUS (PUT HERE)
+sorted.forEach(([uid])=>{
+    const statusRef = doc(db, "status", uid);
+
+    onSnapshot(statusRef, (snap)=>{
+        const data = snap.data();
+        const el = document.getElementById("status-" + uid);
+        if(!el) return;
+
+        if(data?.online){
+            el.innerHTML = `<span style="color:#22c55e;">●</span> Online`;
+        } else {
+            el.innerHTML = `<span style="color:#6b7280;">●</span> Offline`;
+        }
+    });
+});
+    
         }
 
         // ✅ GROUP CHATS (ALWAYS VISIBLE)
@@ -964,11 +989,6 @@ onAuthStateChanged(auth, async (user) => {
 
         setTimeout(() => {
             loadChatList();
-
-            setTimeout(()=>{
-                toggleCategory('dm');
-            }, 300);
-
         }, 200);
 
         document.getElementById("userName").innerText = user.displayName;
@@ -1013,6 +1033,20 @@ function openChat(uid){
     : (user ? user.name : "User");
 
     loadMessages();
+
+// 🔥 TYPING LISTENER (PUT HERE)
+const typingRef = doc(db, "typing", uid);
+
+onSnapshot(typingRef, (snap)=>{
+    const data = snap.data();
+    const el = document.getElementById("typingIndicator");
+
+    if(data?.typing && data.typingTo === auth.currentUser.uid){
+        el.innerText = "Typing...";
+    } else {
+        el.innerText = "";
+    }
+});
 }
 
 function openGroup(id, name, theme){
@@ -1063,6 +1097,34 @@ document.getElementById("msgInput").addEventListener("keypress", function(e){
             sendMsg(); // ✅ normal send
         }
     }
+});
+
+const msgInput = document.getElementById("msgInput");
+
+msgInput.addEventListener("input", async () => {
+    if(!currentChatUser) return;
+
+    const user = auth.currentUser;
+
+    await setDoc(doc(db, "typing", user.uid), {
+        typingTo: currentChatUser,
+        typing: true
+    });
+});
+
+// STOP typing after delay
+let typingTimeout;
+msgInput.addEventListener("input", () => {
+    clearTimeout(typingTimeout);
+
+    typingTimeout = setTimeout(async ()=>{
+        const user = auth.currentUser;
+
+        await setDoc(doc(db, "typing", user.uid), {
+            typingTo: currentChatUser,
+            typing: false
+        });
+    }, 1500);
 });
 
 /* INDICATOR */
