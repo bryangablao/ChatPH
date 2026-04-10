@@ -609,6 +609,7 @@ text-decoration:underline;
     height:32px;
     border-radius:50%;
     object-fit:cover;
+    flex-shrink:0;
 }
     
 </style>
@@ -712,7 +713,7 @@ text-decoration:underline;
 <div style="display:flex;align-items:center;gap:10px;">
     
     <img id="chatAvatar" class="avatar"
-    src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png">
+    style="width:36px;height:36px;border-radius:50%;">
 
     <div style="display:flex;flex-direction:column;">
         <span id="chatTitle"></span>
@@ -1029,8 +1030,12 @@ onAuthStateChanged(auth, async (user) => {
 
         await loadUsers();
 
-        // ✅ FORCE EMPTY STATE
-        showEmptyState();
+        // 🔥 AUTO OPEN CHAT IF REDIRECTED
+        if(chatUID){
+            openChat(chatUID);
+        } else {
+            showEmptyState(); // ✅ default empty
+        }
 
         setTimeout(() => {
             loadChatList();
