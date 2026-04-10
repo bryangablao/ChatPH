@@ -860,14 +860,12 @@ box.innerHTML += `
 
 // ✅ LOAD GROUPS
 const groupSnap = await getDocs(collection(db, "groups"));
-
 let hasGroup = false;
 
 groupSnap.forEach(doc=>{
     const g = doc.data();
     if(g.members && g.members.includes(myId)){
         if(!hasGroup){
-            // 🔥 SHOW HEADER ONLY ONCE
             box.innerHTML += `<div class="not-found">Groups</div>`;
             hasGroup = true;
         }
@@ -879,18 +877,6 @@ groupSnap.forEach(doc=>{
         `;
     }
 });
-
-        const groupSnap = await getDocs(collection(db, "groups"));
-        groupSnap.forEach(doc=>{
-            const g = doc.data();
-            if(g.members && g.members.includes(myId)){
-                box.innerHTML += `
-                    <div class="chat-user" onclick="openGroup('${doc.id}', '${g.name}', '${g.theme}')">
-                        👥 ${g.name}
-                    </div>
-                `;
-            }
-        });
     });
 }
 
