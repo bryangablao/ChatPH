@@ -542,6 +542,31 @@ text-decoration:underline;
 ::-webkit-scrollbar-thumb:hover{
  background:linear-gradient(180deg,#6bb8ff,#3b82f6);
 }
+
+.category{
+    padding:12px;
+    font-weight:600;
+    cursor:pointer;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#0f1115;
+}
+
+.category:hover{
+    background:#1a1f29;
+}
+
+.category-content{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .3s ease;
+}
+
+.category-content.open{
+    max-height:500px;
+}
     
 </style>
 </head>
@@ -591,7 +616,27 @@ text-decoration:underline;
     </div>
 
     <!-- USER RESULTS -->
-    <div id="userResults"></div>
+<div id="userResults">
+
+    <!-- FAVORITES -->
+    <div class="category" onclick="toggleCategory('fav')">
+        Favorites <span id="icon-fav">▾</span>
+    </div>
+    <div id="fav" class="category-content"></div>
+
+    <!-- GROUP CHATS -->
+    <div class="category" onclick="toggleCategory('groups')">
+        GroupChats <span id="icon-groups">▾</span>
+    </div>
+    <div id="groups" class="category-content"></div>
+
+    <!-- DIRECT MESSAGES -->
+    <div class="category" onclick="toggleCategory('dm')">
+        Direct Messages <span id="icon-dm">▾</span>
+    </div>
+    <div id="dm" class="category-content"></div>
+
+</div>
 
 </div>
 
@@ -813,15 +858,13 @@ if(data.name){
 }
 
 function loadChatList(){
-    const box = document.getElementById("userResults");
-
-    // 🔥 stop old listener
     if(chatListUnsubscribe) chatListUnsubscribe();
 
     chatListUnsubscribe = onSnapshot(collection(db, "messages"), async (snap)=>{
-        let chatMap = {};
         const myId = auth.currentUser?.uid;
         if(!myId) return;
+
+        let chatMap = {};
 
         snap.forEach(doc=>{
             const m = doc.data();
@@ -834,49 +877,52 @@ function loadChatList(){
         });
 
         const sorted = Object.entries(chatMap).sort((a,b)=>b[1]-a[1]);
-box.innerHTML = "";
 
-// ✅ DIRECT MESSAGES HEADER
-if (sorted.length > 0) {
-    box.innerHTML += `<div class="not-found">Direct Messages</div>`;
-}
+        const favBox = document.getElementById("fav");
+        const groupBox = document.getElementById("groups");
+        const dmBox = document.getElementById("dm");
 
-sorted.forEach(([uid])=>{
-    const user = allUsers.find(u => u.uid === uid);
-    box.innerHTML += `
-        <div class="chat-user" onclick="openChat('${uid}')">
-            ${user ? user.name : "Unknown User"}
-        </div>
-    `;
-});
+        // RESET
+        favBox.innerHTML = "";
+        groupBox.innerHTML = "";
+        dmBox.innerHTML = "";
 
-// ✅ FAVORITES (placeholder for future)
-box.innerHTML += `<div class="not-found">Favorites</div>`;
-box.innerHTML += `
-    <div class="not-found" style="font-size:12px;">
-        No favorites yet
-    </div>
-`;
+        // ✅ FAVORITES (EMPTY FOR NOW)
+        favBox.innerHTML = `<div class="not-found">No favorites yet</div>`;
 
-// ✅ LOAD GROUPS
-const groupSnap = await getDocs(collection(db, "groups"));
-let hasGroup = false;
-
-groupSnap.forEach(doc=>{
-    const g = doc.data();
-    if(g.members && g.members.includes(myId)){
-        if(!hasGroup){
-            box.innerHTML += `<div class="not-found">Groups</div>`;
-            hasGroup = true;
+        // ✅ DIRECT MESSAGES
+        if(sorted.length === 0){
+            dmBox.innerHTML = `<div class="not-found">No messages yet</div>`;
+        } else {
+            sorted.forEach(([uid])=>{
+                const user = allUsers.find(u => u.uid === uid);
+                dmBox.innerHTML += `
+                    <div class="chat-user" onclick="openChat('${uid}')">
+                        ${user ? user.name : "Unknown User"}
+                    </div>
+                `;
+            });
         }
 
-        box.innerHTML += `
-            <div class="chat-user" onclick="openGroup('${doc.id}', '${g.name}', '${g.theme}')">
-                👥 ${g.name}
-            </div>
-        `;
-    }
-});
+        // ✅ GROUP CHATS (ALWAYS VISIBLE)
+        const groupSnap = await getDocs(collection(db, "groups"));
+        let hasGroup = false;
+
+        groupSnap.forEach(doc=>{
+            const g = doc.data();
+            if(g.members && g.members.includes(myId)){
+                hasGroup = true;
+                groupBox.innerHTML += `
+                    <div class="chat-user" onclick="openGroup('${doc.id}', '${g.name}', '${g.theme}')">
+                        👥 ${g.name}
+                    </div>
+                `;
+            }
+        });
+
+        if(!hasGroup){
+            groupBox.innerHTML = `<div class="not-found">No groupchats</div>`;
+        }
     });
 }
 
@@ -1611,6 +1657,31 @@ function setOnlineStatus(user){
             online: false,
             lastSeen: serverTimestamp()
         });
+    });
+}
+
+function toggleCategory(id){
+    const sections = ["fav","groups","dm"];
+
+    sections.forEach(sec=>{
+        const el = document.getElementById(sec);
+        const icon = document.getElementById("icon-"+sec);
+
+        if(sec === id){
+            const isOpen = el.classList.contains("open");
+
+            // close all first
+            sections.forEach(s=>{
+                document.getElementById(s).classList.remove("open");
+                document.getElementById("icon-"+s).innerText = "▾";
+            });
+
+            // open if it was closed
+            if(!isOpen){
+                el.classList.add("open");
+                icon.innerText = "▴";
+            }
+        }
     });
 }
     
