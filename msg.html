@@ -1710,13 +1710,27 @@ document.getElementById("moreBtn").onclick = async () => {
         const data = snap.data();
 
         // 🔥 INSERT PROFILE HEADER
-        const panelHeader = `
-            <div style="text-align:center;margin-bottom:15px;">
-                <img src="${data?.pfpBase64 || 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}"
-                style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:8px;">
-                <div style="font-weight:600;">${data?.name || "User"}</div>
-            </div>
-        `;
+const panelHeader = `
+    <div style="
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        margin-bottom:15px;
+    ">
+        <img src="${data?.pfpBase64 || 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}"
+        style="
+            width:48px;
+            height:48px;
+            border-radius:50%;
+            object-fit:cover;
+            display:block;
+        ">
+        <div style="font-weight:600;margin-top:6px;">
+            ${data?.name || "User"}
+        </div>
+    </div>
+`;
 
         document.getElementById("groupNameTitle").innerHTML = panelHeader;
     }
