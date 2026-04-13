@@ -203,20 +203,15 @@ overflow-y:auto;
 }
 
 .msg{
-margin-bottom:10px;
-padding:10px 14px;
-border-radius:14px;
-max-width:60%;
+    margin-bottom:10px;
+    padding:10px 14px;
+    border-radius:14px;
+    max-width:60%;
 }
 
 .msg.me{
-background:var(--accent);
 color:#000;
 margin-left:auto;
-}
-
-.msg.other{
-background:#1f2937;
 }
 
 .msg.selected {
@@ -1597,19 +1592,31 @@ if(m.system){
 }
 
     // NORMAL MESSAGE
-    box.innerHTML += `
-        <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
-             data-id="${m.id}"
-             oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;"
-             ontouchstart="startPress(event, '${m.id}', '${m.from}')"
-             ontouchend="cancelPress()">
-            ${m.text}
-            <div style="font-size:10px;opacity:.6;margin-top:4px;">
-                ${new Date(m.time).toLocaleDateString()} • 
-                ${new Date(m.time).toLocaleTimeString()}
-            </div>
+const isMe = m.from === auth.currentUser.uid;
+
+// get current theme
+const bg = document.getElementById("chatBox").style.background;
+const themeColor = bg ? bg.replace("22", "") : "#4da3ff";
+
+box.innerHTML += `
+    <div class="msg"
+         data-id="${m.id}"
+         style="
+            background:${isMe ? themeColor : themeColor + "33"};
+            color:${isMe ? "#000" : "#fff"};
+            margin-left:${isMe ? "auto" : "0"};
+         "
+         oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;"
+         ontouchstart="startPress(event, '${m.id}', '${m.from}')"
+         ontouchend="cancelPress()"
+    >
+        ${m.text}
+        <div style="font-size:10px;opacity:.6;margin-top:4px;">
+            ${new Date(m.time).toLocaleDateString()} • 
+            ${new Date(m.time).toLocaleTimeString()}
         </div>
-    `;
+    </div>
+`;
 });
 
         box.scrollTop = box.scrollHeight;
