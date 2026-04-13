@@ -1427,9 +1427,52 @@ indicator.style.height = active.offsetHeight+"px";
 
 /* SEARCH USER */
 document.getElementById("userSearch").addEventListener("input", function(){
-    const value = this.value.toLowerCase();
-    const results = document.getElementById("userResults");
-    results.innerHTML = "";
+    const value = this.value.toLowerCase();
+
+    const results = document.getElementById("userResults");
+
+    // 🔥 CREATE SEARCH BOX (if not exist)
+    let searchBox = document.getElementById("searchResults");
+
+    if(!searchBox){
+        searchBox = document.createElement("div");
+        searchBox.id = "searchResults";
+        results.parentNode.insertBefore(searchBox, results);
+    }
+
+    searchBox.innerHTML = "";
+
+    // ✅ IF EMPTY → SHOW CATEGORIES AGAIN
+    if(!value){
+        searchBox.style.display = "none";
+        results.style.display = "block";
+        return;
+    }
+
+    results.style.display = "none";
+    searchBox.style.display = "block";
+
+    const myId = auth.currentUser?.uid;
+    if (!myId) return;
+
+    const filtered = allUsers.filter(u => 
+        u.uid !== myId &&
+        u.name.toLowerCase().includes(value)
+    );
+
+    if(filtered.length === 0){
+        searchBox.innerHTML = `<div class="not-found">User not found</div>`;
+        return;
+    }
+
+    filtered.forEach(user=>{
+        searchBox.innerHTML += `
+            <div class="chat-user" onclick="openChat('${user.uid}')">
+                ${user.name}
+            </div>
+        `;
+    });
+});
 
 if(!value){
     loadChatList(); // 🔥 restore chats
