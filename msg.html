@@ -626,22 +626,54 @@ text-decoration:underline;
 
 .hover-text{
     opacity:.7;
-    margin-bottom:10px;
+    margin-bottom:12px;
     transition: all 0.3s ease;
+    cursor:pointer;
+    display:inline-block;
+}
+
+.hover-text:hover{
+    opacity:1;
+    transform:translateY(-4px) scale(1.06);
+    color:var(--accent);
+    text-shadow:0 0 12px rgba(77,163,255,0.7);
+}
+
+.modal-btn{
+    flex:1;
+    padding:8px;
+    border:none;
+    border-radius:8px;
+    background:#6b7280;
+    color:white;
+    transition: all .3s ease;
     cursor:pointer;
 }
 
-/* ✨ Hover effect */
-.hover-text:hover{
-    opacity:1;
-    transform:translateY(-3px) scale(1.05);
-    color:var(--accent);
-    text-shadow:0 0 10px rgba(77,163,255,0.6);
+/* YES → GREEN */
+.modal-btn.yes:hover{
+    background:#22c55e;
+}
+
+/* NO → RED */
+.modal-btn.no:hover{
+    background:#ff4b4b;
+}
+
+#deleteChatBtn{
+    background:#1f2937;
+    transition: all .3s ease;
 }
 
 #deleteChatBtn:hover{
     background:#ff4b4b;
     color:white;
+    transform:scale(1.03);
+    box-shadow:0 0 10px rgba(255,75,75,0.6);
+}
+
+#deleteModal{
+    backdrop-filter: blur(6px);
 }
     
 </style>
@@ -1797,10 +1829,21 @@ else if(currentChatUser){
 
     // LOAD NICKNAMES (simple list)
     const nickBox = document.getElementById("nicknames");
-    nickBox.innerHTML = `
-        <div>You</div>
-        <div>${data?.name || "User"}</div>
-    `;
+nickBox.innerHTML = `
+    <div style="margin-bottom:10px;">
+        <input id="nick-${auth.currentUser.uid}" 
+               placeholder="Your nickname"
+               style="width:70%;padding:6px;border-radius:6px;border:none;background:#1f2937;color:white;">
+        <button onclick="saveNickname('${auth.currentUser.uid}')">Save</button>
+    </div>
+
+    <div>
+        <input id="nick-${currentChatUser}" 
+               placeholder="${data?.name || "User"}"
+               style="width:70%;padding:6px;border-radius:6px;border:none;background:#1f2937;color:white;">
+        <button onclick="saveNickname('${currentChatUser}')">Save</button>
+    </div>
+`;
 }
 
     loadPinned();
@@ -1941,14 +1984,23 @@ async function changeTheme(color){
 
     // ✅ DIRECT MESSAGE
     else if(currentChatUser){
-        const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
+    const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
 
-        await setDoc(doc(db, "dmThemes", chatId), {
-            theme: color
-        });
+    await setDoc(doc(db, "dmThemes", chatId), {
+        theme: color
+    });
 
-        document.getElementById("chatBox").style.background = color + "22";
-    }
+    // 🔥 ADD SYSTEM MESSAGE
+    await addDoc(collection(db, "messages"), {
+        system: true,
+        text: `${auth.currentUser.displayName} changed the theme`,
+        theme: color,
+        from: auth.currentUser.uid,
+        to: currentChatUser,
+        time: Date.now()
+    });
+
+    document.getElementById("chatBox").style.background = color + "22";
 }
 
 document.addEventListener("keydown", (e) => {
@@ -2023,10 +2075,9 @@ document.getElementById("confirmDelete").onclick = async () => {
     if(!currentChatUser) return;
 
     const myId = auth.currentUser.uid;
+    const chatId = [myId, currentChatUser].sort().join("_");
 
-    const q = query(collection(db, "messages"));
-    const snap = await getDocs(q);
-
+    const snap = await getDocs(collection(db, "messages"));
     const deletes = [];
 
     snap.forEach(docSnap=>{
@@ -2039,11 +2090,31 @@ document.getElementById("confirmDelete").onclick = async () => {
         }
     });
 
+    // 🔥 DELETE conversation metadata
+    deletes.push(deleteDoc(doc(db, "conversations", chatId)));
+
     await Promise.all(deletes);
 
     closeDeleteModal();
     document.getElementById("closeChat").click();
 };
+
+async function saveNickname(uid){
+    const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
+    const input = document.getElementById("nick-" + uid);
+
+    await setDoc(doc(db, "conversations", chatId), {
+        nicknames: {
+            [uid]: input.value
+        }
+    }, { merge:true });
+}
+
+document.getElementById("deleteModal").addEventListener("click", (e)=>{
+    if(e.target.id === "deleteModal"){
+        closeDeleteModal();
+    }
+});
     
 // 🔥 MAKE FUNCTIONS GLOBAL (IMPORTANT)
 
@@ -2098,15 +2169,8 @@ z-index:3000;
     ">
         <p>Do you want to delete this conversation?</p>
         <div style="display:flex;gap:10px;margin-top:15px;">
-            <button id="confirmDelete"
-                style="flex:1;background:#ff4b4b;color:white;border:none;padding:8px;border-radius:8px;">
-                Yes
-            </button>
-            <button onclick="closeDeleteModal()"
-                style="flex:1;background:#22c55e;color:white;border:none;padding:8px;border-radius:8px;">
-                No
-            </button>
-        </div>
+            <button id="confirmDelete" class="modal-btn yes">Yes</button>
+            <button onclick="closeDeleteModal()" class="modal-btn no">No</button>
     </div>
 </div>
     
