@@ -998,6 +998,7 @@ let currentGroup = null;
 let unsubscribe = null;
 let groupTheme = "";
 let chatListUnsubscribe = null;
+let typingUnsubscribe = null;
 
 const themeNames = {
     "#4da3ff": "Blue",
@@ -1085,20 +1086,19 @@ dmBox.innerHTML += `
 });
 
 // 🔥 LISTEN TO ONLINE STATUS
+if(!window.statusListeners) window.statusListeners = {};
+
 sorted.forEach(([uid])=>{
+    if(window.statusListeners[uid]) return;
+
     const statusRef = doc(db, "status", uid);
 
-    onSnapshot(statusRef, (snap)=>{
+    window.statusListeners[uid] = onSnapshot(statusRef, (snap)=>{
         const data = snap.data();
-
         const el = document.getElementById("status-" + uid);
         if(!el) return;
 
-        if(data?.online){
-            el.style.color = "#22c55e"; // 🟢 green
-        } else {
-            el.style.color = "#6b7280"; // ⚫ gray
-        }
+        el.style.color = data?.online ? "#22c55e" : "#6b7280";
     });
 });
 
@@ -1211,7 +1211,9 @@ function openChat(uid){
 // 🔥 TYPING LISTENER (PUT HERE)
 const typingRef = doc(db, "typing", uid);
 
-onSnapshot(typingRef, (snap)=>{
+if(typingUnsubscribe) typingUnsubscribe();
+
+typingUnsubscribe = onSnapshot(typingRef, (snap)=>{
     const data = snap.data();
     const el = document.getElementById("typingIndicator");
 
@@ -1323,25 +1325,15 @@ async function sendMsg(){
     const user = auth.currentUser;
     if(!user) return;
 
-const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
+    await addDoc(collection(db, "messages"), {
+        text: text,
+        from: user.uid,
+        to: currentChatUser || null,
+        groupId: currentGroup || null,
+        time: Date.now()
+    });
 
-const themeSnap = await getDoc(doc(db, "dmThemes", chatId));
-const oldTheme = themeSnap.exists() ? themeSnap.data().theme : null;
-
-await setDoc(doc(db, "dmThemes", chatId), {
-    theme: color
-});
-
-await addDoc(collection(db, "messages"), {
-    system: true,
-    from: auth.currentUser.uid,
-    to: currentChatUser,
-    oldTheme: oldTheme,
-    newTheme: color,
-    time: Date.now()
-});
-
-    input.value="";
+    input.value = "";
 }
 
 document.getElementById("msgInput").addEventListener("keypress", function(e){
@@ -2025,7 +2017,6 @@ async function changeTheme(color){
             theme: color
         });
 
-const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
 const themeSnap = await getDoc(doc(db, "dmThemes", chatId));
 const oldTheme = themeSnap.exists() ? themeSnap.data().theme : null;
 
