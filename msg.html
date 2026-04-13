@@ -1080,8 +1080,21 @@ function loadChatList(){
 
         // ✅ DIRECT MESSAGES
         if(sorted.length === 0){
-            dmBox.innerHTML = `<div class="not-found">No messages yet</div>`;
-        } else {
+    // 🔥 SHOW ALL USERS IF NO MESSAGES YET
+    allUsers.forEach(user=>{
+        if(user.uid === myId) return;
+
+        dmBox.innerHTML += `
+            <div class="chat-user" onclick="openChat('${user.uid}')">
+                <img id="avatar-${user.uid}" class="avatar"
+                src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png">
+
+                <span>${user.name}</span>
+                <span id="status-${user.uid}" style="margin-left:auto;">●</span>
+            </div>
+        `;
+    });
+} else {
 sorted.forEach(([uid])=>{
     const user = allUsers.find(u => u.uid === uid);
 
