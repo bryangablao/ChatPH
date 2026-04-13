@@ -618,33 +618,6 @@ text-decoration:underline;
     animation: floatAnim 4s ease-in-out infinite;
 }
 
-.floating-wrapper{
-    position:relative;
-    display:inline-block;
-}
-
-.floating-wrapper::after{
-    content:"";
-    position:absolute;
-    top:0;
-    left:-75%;
-    width:50%;
-    height:100%;
-    background:linear-gradient(
-        120deg,
-        transparent,
-        rgba(255,255,255,0.25),
-        transparent
-    );
-    transform:skewX(-20deg);
-    animation: shineMove 5s infinite;
-}
-
-@keyframes shineMove{
-    0%{ left:-75%; }
-    100%{ left:130%; }
-}
-
 @keyframes floatAnim{
     0% { transform: translateY(0px); }
     50% { transform: translateY(-12px); }
@@ -729,16 +702,14 @@ text-decoration:underline;
     <!-- EMPTY STATE -->
 <div id="emptyState" style="margin:auto;text-align:center;">
     
-<div class="floating-wrapper">
-    <lottie-player 
-        src="https://assets10.lottiefiles.com/packages/lf20_tno6cg2w.json"
-        background="transparent"
-        speed="1"
-        class="floating-animation"
-        style="width:240px;height:240px;"
-        loop autoplay>
-    </lottie-player>
-</div>
+<lottie-player 
+    src="https://assets10.lottiefiles.com/packages/lf20_tno6cg2w.json"
+    background="transparent"
+    speed="1"
+    class="floating-animation"
+    style="width:240px;height:240px;"
+    loop autoplay>
+</lottie-player>
 
     <p style="opacity:.6;margin-top:10px;">
         Select a user to start chatting 💬
@@ -2025,6 +1996,3 @@ window.toggleCreate = toggleCreate;
     
 </body>
 </html>
-
-
-
