@@ -623,6 +623,11 @@ text-decoration:underline;
     50% { transform: translateY(-12px); }
     100% { transform: translateY(0px); }
 }
+
+#deleteChatBtn:hover{
+    background:#ff4b4b;
+    color:white;
+}
     
 </style>
 </head>
@@ -703,7 +708,7 @@ text-decoration:underline;
 <div id="emptyState" style="margin:auto;text-align:center;">
     
 <lottie-player 
-    src="https://assets2.lottiefiles.com/packages/lf20_dWUie0iIVk.json"
+    src="https://lottie.host/5c6d0d6d-6f0f-4c9c-9f4c-3d7f5d6e6b9b/loader-cat.json"
     background="transparent"
     speed="1"
     class="floating-animation"
@@ -796,13 +801,21 @@ text-decoration:underline;
 </div>
 
 <div id="chatOptionsPanel" class="side-panel">
-    <h2 id="groupNameTitle"></h2>
 
+    <!-- USER HEADER -->
+    <div id="dmHeader" style="text-align:center;margin-bottom:20px;">
+        <img id="dmAvatar"
+        style="width:60px;height:60px;border-radius:50%;margin-bottom:8px;">
+        <div id="dmName" style="font-weight:600;"></div>
+    </div>
+
+    <!-- PINNED -->
     <div class="option">
         Pinned Messages <span onclick="toggleSection('pinned')">▾</span>
         <div id="pinned" class="dropdown"></div>
     </div>
 
+    <!-- THEME -->
     <div class="option">
         Change Theme <span onclick="toggleSection('theme')">▾</span>
         <div id="theme" class="dropdown">
@@ -821,10 +834,26 @@ text-decoration:underline;
         </div>
     </div>
 
+    <!-- NICKNAMES -->
     <div class="option">
-        Group Members <span onclick="toggleSection('members')">▾</span>
-        <div id="members" class="dropdown"></div>
+        Nicknames <span onclick="toggleSection('nicknames')">▾</span>
+        <div id="nicknames" class="dropdown"></div>
     </div>
+
+    <!-- DELETE -->
+    <div class="option">
+        <div id="deleteChatBtn" style="
+            padding:10px;
+            text-align:center;
+            border-radius:10px;
+            background:#1f2937;
+            cursor:pointer;
+            transition:.2s;
+        ">
+            Delete Conversation
+        </div>
+    </div>
+
 </div>
 
 <!-- FOOTER -->
@@ -1738,21 +1767,26 @@ document.getElementById("moreBtn").onclick = async () => {
     } 
 
     // ✅ DIRECT MESSAGE
-    else if(currentChatUser){
-        membersSection.style.display = "none";
+else if(currentChatUser){
 
-        const userRef = doc(db, "users", currentChatUser);
-        const snap = await getDoc(userRef);
-        const data = snap.data();
+    const userRef = doc(db, "users", currentChatUser);
+    const snap = await getDoc(userRef);
+    const data = snap.data();
 
-        document.getElementById("groupNameTitle").innerHTML = `
-            <div style="text-align:center;">
-                <img src="${data?.pfpBase64 || 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png'}"
-                style="width:48px;height:48px;border-radius:50%;">
-                <div>${data?.name || "User"}</div>
-            </div>
-        `;
-    }
+    // SET HEADER
+    document.getElementById("dmAvatar").src =
+        data?.pfpBase64 || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+
+    document.getElementById("dmName").innerText =
+        data?.name || "User";
+
+    // LOAD NICKNAMES (simple list)
+    const nickBox = document.getElementById("nicknames");
+    nickBox.innerHTML = `
+        <div>You</div>
+        <div>${data?.name || "User"}</div>
+    `;
+}
 
     loadPinned();
 };
@@ -1958,6 +1992,43 @@ function toggleCategory(id){
         }
     });
 }
+
+const deleteBtn = document.getElementById("deleteChatBtn");
+const modal = document.getElementById("deleteModal");
+
+deleteBtn.onclick = () => {
+    modal.style.display = "flex";
+};
+
+function closeDeleteModal(){
+    modal.style.display = "none";
+}
+
+document.getElementById("confirmDelete").onclick = async () => {
+    if(!currentChatUser) return;
+
+    const myId = auth.currentUser.uid;
+
+    const q = query(collection(db, "messages"));
+    const snap = await getDocs(q);
+
+    const deletes = [];
+
+    snap.forEach(docSnap=>{
+        const m = docSnap.data();
+        if(
+            (m.from === myId && m.to === currentChatUser) ||
+            (m.from === currentChatUser && m.to === myId)
+        ){
+            deletes.push(deleteDoc(doc(db, "messages", docSnap.id)));
+        }
+    });
+
+    await Promise.all(deletes);
+
+    closeDeleteModal();
+    document.getElementById("closeChat").click();
+};
     
 // 🔥 MAKE FUNCTIONS GLOBAL (IMPORTANT)
 
@@ -1992,6 +2063,36 @@ window.toggleCreate = toggleCreate;
     <div class="menu-item" onclick="editMessage()">Edit Message</div>
     <div class="menu-item" onclick="togglePin()">Pin Message</div>
     <div class="menu-item delete" onclick="deleteMessage()">Delete Message</div>
+</div>
+
+<div id="deleteModal" style="
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.6);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:3000;
+">
+    <div style="
+        background:#11141a;
+        padding:20px;
+        border-radius:12px;
+        width:260px;
+        text-align:center;
+    ">
+        <p>Do you want to delete this conversation?</p>
+        <div style="display:flex;gap:10px;margin-top:15px;">
+            <button id="confirmDelete"
+                style="flex:1;background:#ff4b4b;color:white;border:none;padding:8px;border-radius:8px;">
+                Yes
+            </button>
+            <button onclick="closeDeleteModal()"
+                style="flex:1;background:#22c55e;color:white;border:none;padding:8px;border-radius:8px;">
+                No
+            </button>
+        </div>
+    </div>
 </div>
     
 </body>
