@@ -1157,17 +1157,30 @@ onAuthStateChanged(auth, async (user) => {
     if(user){
         setOnlineStatus(user);
 
+        // ✅ VISIBILITY TRACKING
+        document.addEventListener("visibilitychange", () => {
+            if(document.visibilityState === "hidden"){
+                setDoc(doc(db, "status", user.uid), {
+                    online: false,
+                    lastSeen: serverTimestamp()
+                });
+            } else {
+                setDoc(doc(db, "status", user.uid), {
+                    online: true
+                }, { merge: true });
+            }
+        });
+
         await setDoc(doc(db, "users", user.uid), {
             name: user.displayName || "No Name",
         }, { merge: true });
 
         await loadUsers();
 
-        // 🔥 AUTO OPEN CHAT IF REDIRECTED
         if(chatUID){
             openChat(chatUID);
         } else {
-            showEmptyState(); // ✅ default empty
+            showEmptyState();
         }
 
         setTimeout(() => {
@@ -1605,8 +1618,18 @@ if(m.system){
 const isMe = m.from === auth.currentUser.uid;
 
 // get current theme
-const themeColor = "#facc15";
+const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
+const themeRef = doc(db, "dmThemes", chatId);
 
+let currentTheme = "#4da3ff"; // default
+
+onSnapshot(themeRef, (snap)=>{
+    const data = snap.data();
+    if(data?.theme){
+        currentTheme = data.theme;
+    }
+});
+    
 box.innerHTML += `
     <div class="msg ${isMe ? "me" : "other"}"
          data-id="${m.id}"
