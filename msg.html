@@ -1877,43 +1877,59 @@ async function deleteMessage(){
     });
 }
 
-async function editMessage(){
+function editMessage(){
     if(!selectedMsgId) return;
 
-    const input = document.getElementById("msgInput");
+    const msgEl = document.querySelector(`.msg[data-id="${selectedMsgId}"]`);
+    if(!msgEl) return;
 
-    // 🔥 get current message text from UI
-    const selectedMsg = document.querySelector(".msg.selected");
-    if(!selectedMsg) return;
+    const originalText = msgEl.childNodes[0].textContent.trim();
 
-    const text = selectedMsg.childNodes[0].textContent.trim();
+    // 🔥 replace text with input
+    msgEl.innerHTML = `
+        <input class="inline-edit"
+               value="${originalText}"
+               style="
+                    width:100%;
+                    padding:6px;
+                    border-radius:6px;
+                    border:none;
+                    outline:none;
+                    background:#1f2937;
+                    color:white;
+               ">
+    `;
 
-    // put text in input
-    input.value = text;
+    const input = msgEl.querySelector("input");
     input.focus();
 
-    // 🔥 change send button to UPDATE MODE
-    const btn = document.querySelector(".chat-input button");
-isEditing = true;
+    // ✅ SAVE (ENTER)
+    input.addEventListener("keydown", async (e)=>{
+        if(e.key === "Enter"){
+            const newText = input.value.trim();
+            if(!newText) return;
 
-btn.innerText = "Update";
-btn.onclick = async () => {
-    const newText = input.value.trim();
-    if(!newText) return;
+            await updateDoc(doc(db, "messages", selectedMsgId), {
+                text: newText,
+                edited: true,
+                editedTime: Date.now()
+            });
 
-await updateDoc(doc(db, "messages", selectedMsgId), {
-    text: newText,
-    edited: true,
-    editedTime: Date.now()
-});
+            selectedMsgId = null;
+        }
 
-    input.value = "";
-    btn.innerText = "Send";
-    btn.onclick = sendMsg;
+        // ❌ CANCEL (ESC)
+        if(e.key === "Escape"){
+            loadMessages(); // reload original
+            selectedMsgId = null;
+        }
+    });
 
-    selectedMsgId = null;
-    isEditing = false; // 🔥 IMPORTANT
-};
+    // ❌ CLICK OUTSIDE = CANCEL
+    input.addEventListener("blur", ()=>{
+        loadMessages();
+        selectedMsgId = null;
+    });
 
     document.getElementById("msgMenu").style.display = "none";
 }
