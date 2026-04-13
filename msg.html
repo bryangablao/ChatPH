@@ -556,43 +556,43 @@ text-decoration:underline;
     align-items:center;
     background:#0f1115;
     transition: all 0.25s ease;
+    isolation:isolate;
     position: relative;
     overflow: hidden;
 }
 
-/* sliding effect */
+/* 🔥 sliding layer (BEHIND text) */
 .category::before{
     content:"";
     position:absolute;
-    left:0;
-    top:0;
-    height:100%;
-    width:0%;
+    inset:0;
     background:#1f2633;
-    transition:width 0.3s ease;
+    transform:scaleX(0);
+    transform-origin:left;
+    transition:transform 0.3s ease;
     z-index:0;
 }
 
-/* 🔥 ADD THIS ONLY */
-.category *{
+/* 🔥 THIS IS THE REAL FIX */
+.category > *{
     position: relative;
-    z-index: 2;
+    z-index: 1; /* above sliding layer */
 }
 
+/* hover effect */
 .category:hover::before{
-    width:100%;
+    transform:scaleX(1);
 }
 
+.category:hover{
+    background:#1a1f29;
+    transform:translateX(3px);
+}
+    
 .category span,
 .category{
     position:relative;
     z-index:1;
-}
-
-/* 🔥 slight move + glow */
-.category:hover{
-    background:#1a1f29;
-    transform:translateX(3px);
 }
 
 .category-content{
@@ -1602,7 +1602,7 @@ box.innerHTML += `
     <div class="msg"
          data-id="${m.id}"
          style="
-            background:${isMe ? themeColor : themeColor + "33"};
+            background:${isMe ? themeColor : "#2a2f3a"};
             color:${isMe ? "#000" : "#fff"};
             margin-left:${isMe ? "auto" : "0"};
          "
@@ -1676,7 +1676,7 @@ if(m.system){
                  ontouchstart="startPress(event, '${m.id}', '${m.from}')"
                  ontouchend="cancelPress()"
                  style="
-                    background:${m.from === auth.currentUser.uid ? groupTheme : groupTheme + "33"};
+                    background:${m.from === auth.currentUser.uid ? groupTheme : "#2a2f3a"};
                     color:${m.from === auth.currentUser.uid ? "#000" : "#fff"};
                  ">
                 <div style="font-size:11px;opacity:.7;">
