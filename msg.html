@@ -1929,28 +1929,34 @@ document.getElementById("moreBtn").onclick = async () => {
 
     // ✅ DIRECT MESSAGE
 else if(currentChatUser){
+    const myId = auth.currentUser.uid;
+    const chatId = [myId, currentChatUser].sort().join("_");
 
-    const userRef = doc(db, "users", currentChatUser);
-    const snap = await getDoc(userRef);
-    const data = snap.data();
+    // 🔥 GET BOTH USER DATA
+    const userSnap = await getDoc(doc(db, "users", currentChatUser));
+    const meSnap = await getDoc(doc(db, "users", myId));
 
-    // SET HEADER
-    document.getElementById("dmAvatar").src =
-        data?.pfpBase64 || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+    const userData = userSnap.data();
+    const meData = meSnap.data();
 
-    document.getElementById("dmName").innerText =
-        data?.name || "User";
+    // 🔥 GET SAVED NICKNAMES
+    const convoSnap = await getDoc(doc(db, "conversations", chatId));
+    const nicknames = convoSnap.exists() ? convoSnap.data().nicknames || {} : {};
 
-    // LOAD NICKNAMES (simple list)
     const nickBox = document.getElementById("nicknames");
-nickBox.innerHTML = `
-    <div class="nickname-item" onclick="editNick('${auth.currentUser.uid}')">
-        You
-    </div>
-    <div class="nickname-item" onclick="editNick('${currentChatUser}')">
-        ${data?.name || "User"}
-    </div>
-`;
+
+    const myName = nicknames[myId] || meData?.name || "You";
+    const otherName = nicknames[currentChatUser] || userData?.name || "User";
+
+    nickBox.innerHTML = `
+        <div class="nickname-item" onclick="editNick('${myId}')">
+            ${myName} (You)
+        </div>
+
+        <div class="nickname-item" onclick="editNick('${currentChatUser}')">
+            ${otherName}
+        </div>
+    `;
 }
 
     loadPinned();
@@ -2213,15 +2219,26 @@ document.getElementById("confirmDelete").onclick = async () => {
 
 async function saveNick(uid){
     const input = document.getElementById("nickInput");
+    const value = input.value.trim();
+    if(!value) return;
+
     const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
 
-    await setDoc(doc(db, "conversations", chatId), {
-        nicknames: {
-            [uid]: input.value
-        }
+    const ref = doc(db, "conversations", chatId);
+    const snap = await getDoc(ref);
+
+    let existing = {};
+    if(snap.exists()){
+        existing = snap.data().nicknames || {};
+    }
+
+    existing[uid] = value;
+
+    await setDoc(ref, {
+        nicknames: existing
     }, { merge:true });
 
-    // reload UI
+    // 🔥 reload nicknames UI
     document.getElementById("moreBtn").click();
 }
 
@@ -2229,11 +2246,11 @@ function editNick(uid){
     const box = document.getElementById("nicknames");
 
     box.innerHTML = `
-        <div>
+        <div style="display:flex;gap:6px;">
             <input id="nickInput" placeholder="Enter nickname"
-            style="width:70%;padding:6px;border-radius:6px;border:none;background:#1f2937;color:white;">
+            style="flex:1;padding:6px;border-radius:6px;border:none;background:#1f2937;color:white;">
             
-            <button onclick="saveNick('${uid}')">Save</button>
+            <button class="save-btn" onclick="saveNick('${uid}')">OK</button>
         </div>
     `;
 }
