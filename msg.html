@@ -1080,21 +1080,8 @@ function loadChatList(){
 
         // ✅ DIRECT MESSAGES
         if(sorted.length === 0){
-    // 🔥 SHOW ALL USERS IF NO MESSAGES YET
-    allUsers.forEach(user=>{
-        if(user.uid === myId) return;
-
-        dmBox.innerHTML += `
-            <div class="chat-user" onclick="openChat('${user.uid}')">
-                <img id="avatar-${user.uid}" class="avatar"
-                src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png">
-
-                <span>${user.name}</span>
-                <span id="status-${user.uid}" style="margin-left:auto;">●</span>
-            </div>
-        `;
-    });
-} else {
+            dmBox.innerHTML = `<div class="not-found">No messages yet</div>`;
+        } else {
 sorted.forEach(([uid])=>{
     const user = allUsers.find(u => u.uid === uid);
 
@@ -1441,49 +1428,21 @@ indicator.style.height = active.offsetHeight+"px";
 /* SEARCH USER */
 document.getElementById("userSearch").addEventListener("input", function(){
     const value = this.value.toLowerCase();
-
-    const fav = document.querySelector(".category:nth-of-type(1)");
-    const groups = document.querySelector(".category:nth-of-type(2)");
-    const dm = document.querySelector(".category:nth-of-type(3)");
-
-    const favBox = document.getElementById("fav");
-    const groupBox = document.getElementById("groups");
-    const dmBox = document.getElementById("dm");
-
     const results = document.getElementById("userResults");
-
-    if(!value){
-        // ✅ SHOW BACK CATEGORIES
-        fav.style.display = "flex";
-        groups.style.display = "flex";
-        dm.style.display = "flex";
-
-        favBox.style.display = "block";
-        groupBox.style.display = "block";
-        dmBox.style.display = "block";
-
-        loadChatList();
-        return;
-    }
-
-    // ❌ HIDE categories when searching
-    fav.style.display = "none";
-    groups.style.display = "none";
-    dm.style.display = "none";
-
-    favBox.style.display = "none";
-    groupBox.style.display = "none";
-    dmBox.style.display = "none";
-
-    const myId = auth.currentUser?.uid;
-    if (!myId) return;
-
-    const filtered = allUsers.filter(u => 
-        u.uid !== myId &&
-        u.name.toLowerCase().includes(value)
-    );
-
     results.innerHTML = "";
+
+if(!value){
+    loadChatList(); // 🔥 restore chats
+    return;
+}
+
+const myId = auth.currentUser?.uid;
+if (!myId) return;
+
+const filtered = allUsers.filter(u => 
+    u.uid !== myId && // 🔥 exclude yourself
+    u.name.toLowerCase().includes(value)
+);
 
     if(filtered.length === 0){
         results.innerHTML = `<div class="not-found">User not found</div>`;
@@ -1491,12 +1450,12 @@ document.getElementById("userSearch").addEventListener("input", function(){
     }
 
     filtered.forEach(user=>{
-        results.innerHTML += `
-            <div class="chat-user" onclick="openChat('${user.uid}')">
-                ${user.name}
-            </div>
-        `;
-    });
+    results.innerHTML += `
+        <div class="chat-user" onclick="openChat('${user.uid}')">
+            ${user.name}
+        </div>
+    `;
+});
 });
 
 document.getElementById("groupSearch").addEventListener("input", function(){
@@ -2247,13 +2206,6 @@ function editNick(uid){
 document.getElementById("deleteModal").addEventListener("click", (e)=>{
     if(e.target === document.getElementById("deleteModal")){
         closeDeleteModal();
-    }
-});
-
-document.addEventListener("click", (e)=>{
-    if(!document.getElementById("userSearch").contains(e.target)){
-        document.getElementById("userSearch").value = "";
-        loadChatList();
     }
 });
     
