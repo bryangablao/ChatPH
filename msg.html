@@ -1978,29 +1978,28 @@ async function changeTheme(color){
         await updateDoc(doc(db, "groups", currentGroup), {
             theme: color
         });
-
         document.getElementById("chatBox").style.background = color + "22";
     }
 
     // ✅ DIRECT MESSAGE
     else if(currentChatUser){
-    const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
+        const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
 
-    await setDoc(doc(db, "dmThemes", chatId), {
-        theme: color
-    });
+        await setDoc(doc(db, "dmThemes", chatId), {
+            theme: color
+        });
 
-    // 🔥 ADD SYSTEM MESSAGE
-    await addDoc(collection(db, "messages"), {
-        system: true,
-        text: `${auth.currentUser.displayName} changed the theme`,
-        theme: color,
-        from: auth.currentUser.uid,
-        to: currentChatUser,
-        time: Date.now()
-    });
+        await addDoc(collection(db, "messages"), {
+            system: true,
+            text: `${auth.currentUser.displayName} changed the theme`,
+            theme: color,
+            from: auth.currentUser.uid,
+            to: currentChatUser,
+            time: Date.now()
+        });
 
-    document.getElementById("chatBox").style.background = color + "22";
+        document.getElementById("chatBox").style.background = color + "22";
+    }
 }
 
 document.addEventListener("keydown", (e) => {
