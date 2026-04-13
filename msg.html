@@ -1009,7 +1009,8 @@ let unsubscribe = null;
 let groupTheme = "";
 let chatListUnsubscribe = null;
 let typingUnsubscribe = null;
-
+let themeColor = "#4da3ff";
+    
 const themeNames = {
     "#4da3ff": "Blue",
     "#ff4b4b": "Red",
@@ -1312,9 +1313,12 @@ const chatId = [auth.currentUser.uid, uid].sort().join("_");
 const themeRef = doc(db, "dmThemes", chatId);
 onSnapshot(themeRef, (snap)=>{
     const data = snap.data();
+
     if(data?.theme){
+        themeColor = data.theme; 
         document.getElementById("chatBox").style.background = data.theme + "22";
     } else {
+        themeColor = "#4da3ff";
         document.getElementById("chatBox").style.background = "";
     }
 });
@@ -1616,19 +1620,6 @@ if(m.system){
 
     // NORMAL MESSAGE
 const isMe = m.from === auth.currentUser.uid;
-
-// get current theme
-const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
-const themeRef = doc(db, "dmThemes", chatId);
-
-let currentTheme = "#4da3ff"; // default
-
-onSnapshot(themeRef, (snap)=>{
-    const data = snap.data();
-    if(data?.theme){
-        currentTheme = data.theme;
-    }
-});
     
 box.innerHTML += `
     <div class="msg ${isMe ? "me" : "other"}"
