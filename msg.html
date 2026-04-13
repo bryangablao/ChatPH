@@ -1427,43 +1427,43 @@ indicator.style.height = active.offsetHeight+"px";
 
 /* SEARCH USER */
 document.getElementById("userSearch").addEventListener("input", function(){
-    const value = this.value.toLowerCase();
+    const value = this.value.toLowerCase();
 
-    const results = document.getElementById("userResults");
+    const results = document.getElementById("userResults");
 
-    // 🔥 CREATE SEARCH BOX (if not exist)
-    let searchBox = document.getElementById("searchResults");
+    // 🔥 CREATE SEARCH BOX (if not exist)
+    let searchBox = document.getElementById("searchResults");
 
-    if(!searchBox){
-        searchBox = document.createElement("div");
-        searchBox.id = "searchResults";
-        results.parentNode.insertBefore(searchBox, results);
-    }
+    if(!searchBox){
+        searchBox = document.createElement("div");
+        searchBox.id = "searchResults";
+        results.parentNode.insertBefore(searchBox, results);
+    }
 
-    searchBox.innerHTML = "";
+    searchBox.innerHTML = "";
 
-    // ✅ IF EMPTY → SHOW CATEGORIES AGAIN
-    if(!value){
-        searchBox.style.display = "none";
-        results.style.display = "block";
-        return;
-    }
+    // ✅ IF EMPTY → SHOW CATEGORIES AGAIN
+    if(!value){
+        searchBox.style.display = "none";
+        results.style.display = "block";
+        return;
+    }
 
-    results.style.display = "none";
-    searchBox.style.display = "block";
+    results.style.display = "none";
+    searchBox.style.display = "block";
 
-    const myId = auth.currentUser?.uid;
-    if (!myId) return;
+    const myId = auth.currentUser?.uid;
+    if (!myId) return;
 
-    const filtered = allUsers.filter(u => 
-        u.uid !== myId &&
-        u.name.toLowerCase().includes(value)
-    );
+    const filtered = allUsers.filter(u => 
+        u.uid !== myId &&
+        u.name.toLowerCase().includes(value)
+    );
 
-    if(filtered.length === 0){
-        searchBox.innerHTML = `<div class="not-found">User not found</div>`;
-        return;
-    }
+    if(filtered.length === 0){
+        searchBox.innerHTML = `<div class="not-found">User not found</div>`;
+        return;
+    }
 
 filtered.forEach(user=>{
     searchBox.innerHTML += `
@@ -1929,34 +1929,28 @@ document.getElementById("moreBtn").onclick = async () => {
 
     // ✅ DIRECT MESSAGE
 else if(currentChatUser){
-    const myId = auth.currentUser.uid;
-    const chatId = [myId, currentChatUser].sort().join("_");
 
-    // 🔥 GET BOTH USER DATA
-    const userSnap = await getDoc(doc(db, "users", currentChatUser));
-    const meSnap = await getDoc(doc(db, "users", myId));
+    const userRef = doc(db, "users", currentChatUser);
+    const snap = await getDoc(userRef);
+    const data = snap.data();
 
-    const userData = userSnap.data();
-    const meData = meSnap.data();
+    // SET HEADER
+    document.getElementById("dmAvatar").src =
+        data?.pfpBase64 || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
 
-    // 🔥 GET SAVED NICKNAMES
-    const convoSnap = await getDoc(doc(db, "conversations", chatId));
-    const nicknames = convoSnap.exists() ? convoSnap.data().nicknames || {} : {};
+    document.getElementById("dmName").innerText =
+        data?.name || "User";
 
+    // LOAD NICKNAMES (simple list)
     const nickBox = document.getElementById("nicknames");
-
-    const myName = nicknames[myId] || meData?.name || "You";
-    const otherName = nicknames[currentChatUser] || userData?.name || "User";
-
-    nickBox.innerHTML = `
-        <div class="nickname-item" onclick="editNick('${myId}')">
-            ${myName} (You)
-        </div>
-
-        <div class="nickname-item" onclick="editNick('${currentChatUser}')">
-            ${otherName}
-        </div>
-    `;
+nickBox.innerHTML = `
+    <div class="nickname-item" onclick="editNick('${auth.currentUser.uid}')">
+        You
+    </div>
+    <div class="nickname-item" onclick="editNick('${currentChatUser}')">
+        ${data?.name || "User"}
+    </div>
+`;
 }
 
     loadPinned();
@@ -2219,26 +2213,15 @@ document.getElementById("confirmDelete").onclick = async () => {
 
 async function saveNick(uid){
     const input = document.getElementById("nickInput");
-    const value = input.value.trim();
-    if(!value) return;
-
     const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
 
-    const ref = doc(db, "conversations", chatId);
-    const snap = await getDoc(ref);
-
-    let existing = {};
-    if(snap.exists()){
-        existing = snap.data().nicknames || {};
-    }
-
-    existing[uid] = value;
-
-    await setDoc(ref, {
-        nicknames: existing
+    await setDoc(doc(db, "conversations", chatId), {
+        nicknames: {
+            [uid]: input.value
+        }
     }, { merge:true });
 
-    // 🔥 reload nicknames UI
+    // reload UI
     document.getElementById("moreBtn").click();
 }
 
@@ -2246,11 +2229,11 @@ function editNick(uid){
     const box = document.getElementById("nicknames");
 
     box.innerHTML = `
-        <div style="display:flex;gap:6px;">
+        <div>
             <input id="nickInput" placeholder="Enter nickname"
-            style="flex:1;padding:6px;border-radius:6px;border:none;background:#1f2937;color:white;">
+            style="width:70%;padding:6px;border-radius:6px;border:none;background:#1f2937;color:white;">
             
-            <button class="save-btn" onclick="saveNick('${uid}')">OK</button>
+            <button onclick="saveNick('${uid}')">Save</button>
         </div>
     `;
 }
@@ -2321,3 +2304,6 @@ z-index:3000;
     
 </body>
 </html>
+
+
+
