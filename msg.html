@@ -666,22 +666,22 @@ text-decoration:underline;
 .modal-btn.no:hover{
     background:#ff4b4b;
 }
-
-#deleteChatBtn{
-    background:#1f2937;
-    transition: background 0.3s ease, color 0.3s ease;
-    outline:none;
-    box-shadow:none;
-}
     
 #deleteChatBtn:focus{
     outline:none;
     box-shadow:none;
 }
 
+#deleteChatBtn{
+    background:#1f2937;
+    color:white;
+    transition: background 0.35s ease, color 0.35s ease, transform 0.2s ease;
+}
+
 #deleteChatBtn:hover{
     background:#ff4b4b;
     color:white;
+    transform:scale(1.03);
 }
 
 #deleteModal{
@@ -1323,13 +1323,23 @@ async function sendMsg(){
     const user = auth.currentUser;
     if(!user) return;
 
-    await addDoc(collection(db, "messages"), {
-        text: text,
-        from: user.uid,
-        to: currentChatUser || null,
-        groupId: currentGroup || null,
-        time: Date.now()
-    });
+const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
+
+const themeSnap = await getDoc(doc(db, "dmThemes", chatId));
+const oldTheme = themeSnap.exists() ? themeSnap.data().theme : null;
+
+await setDoc(doc(db, "dmThemes", chatId), {
+    theme: color
+});
+
+await addDoc(collection(db, "messages"), {
+    system: true,
+    from: auth.currentUser.uid,
+    to: currentChatUser,
+    oldTheme: oldTheme,
+    newTheme: color,
+    time: Date.now()
+});
 
     input.value="";
 }
@@ -1561,16 +1571,18 @@ function loadMessages(){
 
 messages.forEach(m=>{
 
-    // ✅ SYSTEM MESSAGE (CENTER STYLE)
+    // 🔥 NEW: THEME CHANGE SYSTEM MESSAGE
     if(m.system){
+        const oldC = m.oldTheme || "#6b7280";
+        const newC = m.newTheme || "#4da3ff";
+
         box.innerHTML += `
-            <div style="
-                text-align:center;
-                font-size:12px;
-                opacity:.7;
-                margin:10px 0;
-            ">
-                ${m.text}
+            <div style="text-align:center;font-size:12px;opacity:.8;margin:10px 0;">
+                <span style="color:${oldC}">●</span>
+                →
+                <span style="color:${newC}">●</span>
+                <br>
+                ${m.from === auth.currentUser.uid ? "You" : "User"} changed the theme
             </div>
         `;
         return;
@@ -1753,7 +1765,7 @@ document.addEventListener("click", (e) => {
     const btn = document.getElementById("moreBtn");
     const modal = document.getElementById("deleteModal");
 
-    // ✅ STOP if modal is open
+    // ✅ IF MODAL OPEN → IGNORE PANEL CLOSE
     if(modal.style.display === "flex") return;
 
     if(panel.classList.contains("open")){
@@ -1861,18 +1873,11 @@ else if(currentChatUser){
     // LOAD NICKNAMES (simple list)
     const nickBox = document.getElementById("nicknames");
 nickBox.innerHTML = `
-    <div style="margin-bottom:10px;">
-        <input id="nick-${auth.currentUser.uid}" 
-               placeholder="Your nickname"
-               style="width:70%;padding:6px;border-radius:6px;border:none;background:#1f2937;color:white;">
-        <button onclick="saveNickname('${auth.currentUser.uid}')">Save</button>
+    <div class="nickname-item" onclick="editNick('${auth.currentUser.uid}')">
+        You
     </div>
-
-    <div>
-        <input id="nick-${currentChatUser}" 
-               placeholder="${data?.name || "User"}"
-               style="width:70%;padding:6px;border-radius:6px;border:none;background:#1f2937;color:white;">
-        <button onclick="saveNickname('${currentChatUser}')">Save</button>
+    <div class="nickname-item" onclick="editNick('${currentChatUser}')">
+        ${data?.name || "User"}
     </div>
 `;
 }
@@ -2020,15 +2025,18 @@ async function changeTheme(color){
             theme: color
         });
 
-        await addDoc(collection(db, "messages"), {
-            system: true,
-            text: `${auth.currentUser.displayName} changed the theme`,
-            theme: color,
-            from: auth.currentUser.uid,
-            to: currentChatUser,
-            time: Date.now()
-        });
+const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
+const themeSnap = await getDoc(doc(db, "dmThemes", chatId));
+const oldTheme = themeSnap.exists() ? themeSnap.data().theme : null;
 
+await addDoc(collection(db, "messages"), {
+    system: true,
+    from: auth.currentUser.uid,
+    to: currentChatUser,
+    oldTheme: oldTheme,
+    newTheme: color,
+    time: Date.now()
+});
         document.getElementById("chatBox").style.background = color + "22";
     }
 }
@@ -2129,19 +2137,35 @@ document.getElementById("confirmDelete").onclick = async () => {
     document.getElementById("closeChat").click();
 };
 
-async function saveNickname(uid){
+async function saveNick(uid){
+    const input = document.getElementById("nickInput");
     const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
-    const input = document.getElementById("nick-" + uid);
 
     await setDoc(doc(db, "conversations", chatId), {
         nicknames: {
             [uid]: input.value
         }
     }, { merge:true });
+
+    // reload UI
+    document.getElementById("moreBtn").click();
+}
+
+function editNick(uid){
+    const box = document.getElementById("nicknames");
+
+    box.innerHTML = `
+        <div>
+            <input id="nickInput" placeholder="Enter nickname"
+            style="width:70%;padding:6px;border-radius:6px;border:none;background:#1f2937;color:white;">
+            
+            <button onclick="saveNick('${uid}')">Save</button>
+        </div>
+    `;
 }
 
 document.getElementById("deleteModal").addEventListener("click", (e)=>{
-    if(e.target.id === "deleteModal"){
+    if(e.target === document.getElementById("deleteModal")){
         closeDeleteModal();
     }
 });
