@@ -2026,46 +2026,27 @@ async function changeTheme(color){
     }
 
     // ✅ DIRECT MESSAGE
-else if(currentChatUser){
+    else if(currentChatUser){
+        const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
 
-    const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
+        const themeRef = doc(db, "dmThemes", chatId);
+        const themeSnap = await getDoc(themeRef);
+        const oldTheme = themeSnap.exists() ? themeSnap.data().theme : null;
 
-    // ✅ GET OLD THEME FIRST
-    const themeRef = doc(db, "dmThemes", chatId);
-    const themeSnap = await getDoc(themeRef);
-    const oldTheme = themeSnap.exists() ? themeSnap.data().theme : null;
+        await setDoc(themeRef, {
+            theme: color
+        });
 
-    // ✅ THEN UPDATE THEME
-    await setDoc(themeRef, {
-        theme: color
-    });
+        await addDoc(collection(db, "messages"), {
+            system: true,
+            from: auth.currentUser.uid,
+            to: currentChatUser,
+            userName: auth.currentUser.displayName || "User",
+            oldTheme: oldTheme,
+            newTheme: color,
+            time: Date.now()
+        });
 
-    // ✅ SAVE SYSTEM MESSAGE WITH NAME
-    await addDoc(collection(db, "messages"), {
-        system: true,
-        from: auth.currentUser.uid,
-        to: currentChatUser,
-        userName: auth.currentUser.displayName || "User",
-        oldTheme: oldTheme,
-        newTheme: color,
-        time: Date.now()
-    });
-
-    document.getElementById("chatBox").style.background = color + "22";
-}
-
-const themeSnap = await getDoc(doc(db, "dmThemes", chatId));
-const oldTheme = themeSnap.exists() ? themeSnap.data().theme : null;
-
-await addDoc(collection(db, "messages"), {
-    system: true,
-    from: auth.currentUser.uid,
-    userName: auth.currentUser.displayName || "User",
-    to: currentChatUser,
-    oldTheme: oldTheme,
-    newTheme: color,
-    time: Date.now()
-});
         document.getElementById("chatBox").style.background = color + "22";
     }
 }
