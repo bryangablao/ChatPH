@@ -624,6 +624,21 @@ text-decoration:underline;
     100% { transform: translateY(0px); }
 }
 
+.hover-text{
+    opacity:.7;
+    margin-bottom:10px;
+    transition: all 0.3s ease;
+    cursor:pointer;
+}
+
+/* ✨ Hover effect */
+.hover-text:hover{
+    opacity:1;
+    transform:translateY(-3px) scale(1.05);
+    color:var(--accent);
+    text-shadow:0 0 10px rgba(77,163,255,0.6);
+}
+
 #deleteChatBtn:hover{
     background:#ff4b4b;
     color:white;
@@ -706,19 +721,19 @@ text-decoration:underline;
 
     <!-- EMPTY STATE -->
 <div id="emptyState" style="margin:auto;text-align:center;">
-    
-<lottie-player 
-    src="animations/cat.json"
-    background="transparent"
-    speed="1"
-    class="floating-animation"
-    style="width:240px;height:240px;"
-    loop autoplay>
-</lottie-player>
 
-    <p style="opacity:.6;margin-top:10px;">
+    <p class="hover-text">
         Select a user to start chatting 💬
     </p>
+
+    <lottie-player 
+        src="animations/cat.json"
+        background="transparent"
+        speed="1"
+        class="floating-animation"
+        style="width:240px;height:240px;"
+        loop autoplay>
+    </lottie-player>
 
 </div>
 
