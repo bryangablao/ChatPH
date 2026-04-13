@@ -556,7 +556,7 @@ text-decoration:underline;
     align-items:center;
     background:#0f1115;
     transition: all 0.25s ease;
-    isolation:isolate;
+
     position: relative;
     overflow: hidden;
 }
@@ -570,7 +570,8 @@ text-decoration:underline;
     transform:scaleX(0);
     transform-origin:left;
     transition:transform 0.3s ease;
-    z-index:0;
+
+    z-index:-1; /* 🔥 PUSH IT BEHIND EVERYTHING */
 }
 
 /* 🔥 THIS IS THE REAL FIX */
@@ -585,7 +586,6 @@ text-decoration:underline;
 }
 
 .category:hover{
-    background:#1a1f29;
     transform:translateX(3px);
 }
     
