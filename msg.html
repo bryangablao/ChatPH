@@ -1605,14 +1605,14 @@ if(m.system){
 const isMe = m.from === auth.currentUser.uid;
 
 // get current theme
-const bg = document.getElementById("chatBox").style.background;
-const themeColor = bg ? bg.replace("22", "") : "#4da3ff";
+const themeColor = "#facc15";
 
 box.innerHTML += `
     <div class="msg ${isMe ? "me" : "other"}"
          data-id="${m.id}"
          style="
             background:${isMe ? themeColor : "#2a2f3a"};
+            color:${isMe ? "#000" : "#fff"};
          "
          oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;"
          ontouchstart="startPress(event, '${m.id}', '${m.from}')"
