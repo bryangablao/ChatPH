@@ -560,13 +560,12 @@ text-decoration:underline;
     justify-content:space-between;
     align-items:center;
     background:#0f1115;
-
     transition: all 0.25s ease;
     position: relative;
     overflow: hidden;
 }
 
-/* 🔥 sliding light effect */
+/* sliding effect */
 .category::before{
     content:"";
     position:absolute;
@@ -577,6 +576,12 @@ text-decoration:underline;
     background:#1f2633;
     transition:width 0.3s ease;
     z-index:0;
+}
+
+/* 🔥 ADD THIS ONLY */
+.category *{
+    position: relative;
+    z-index: 2;
 }
 
 .category:hover::before{
@@ -679,9 +684,9 @@ text-decoration:underline;
 }
 
 #deleteChatBtn:hover{
-    background:#ff4b4b;
-    color:white;
-    transform:scale(1.03);
+    background:#ff4b4b !important;
+    color:white !important;
+    transition: all 0.25s ease;
 }
 
 #deleteModal{
@@ -1564,21 +1569,32 @@ function loadMessages(){
 messages.forEach(m=>{
 
     // 🔥 NEW: THEME CHANGE SYSTEM MESSAGE
-    if(m.system){
-        const oldC = m.oldTheme || "#6b7280";
-        const newC = m.newTheme || "#4da3ff";
+if(m.system){
+    let html = "";
 
-        box.innerHTML += `
-            <div style="text-align:center;font-size:12px;opacity:.8;margin:10px 0;">
-                <span style="color:${oldC}">●</span>
-                →
-                <span style="color:${newC}">●</span>
-                <br>
-                ${m.from === auth.currentUser.uid ? "You" : "User"} changed the theme
-            </div>
+    if(!m.oldTheme){
+        // ✅ FIRST CHANGE
+        html = `
+            ${m.userName} changed the theme to 
+            <span style="color:${m.newTheme}">●</span>
         `;
-        return;
+    } else {
+        // ✅ NORMAL CHANGE
+        html = `
+            ${m.userName} changed the theme from 
+            <span style="color:${m.oldTheme}">●</span>
+            →
+            <span style="color:${m.newTheme}">●</span>
+        `;
     }
+
+    box.innerHTML += `
+        <div style="text-align:center;font-size:12px;opacity:.8;margin:10px 0;">
+            ${html}
+        </div>
+    `;
+    return;
+}
 
     // NORMAL MESSAGE
     box.innerHTML += `
@@ -2010,12 +2026,33 @@ async function changeTheme(color){
     }
 
     // ✅ DIRECT MESSAGE
-    else if(currentChatUser){
-        const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
+else if(currentChatUser){
 
-        await setDoc(doc(db, "dmThemes", chatId), {
-            theme: color
-        });
+    const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
+
+    // ✅ GET OLD THEME FIRST
+    const themeRef = doc(db, "dmThemes", chatId);
+    const themeSnap = await getDoc(themeRef);
+    const oldTheme = themeSnap.exists() ? themeSnap.data().theme : null;
+
+    // ✅ THEN UPDATE THEME
+    await setDoc(themeRef, {
+        theme: color
+    });
+
+    // ✅ SAVE SYSTEM MESSAGE WITH NAME
+    await addDoc(collection(db, "messages"), {
+        system: true,
+        from: auth.currentUser.uid,
+        to: currentChatUser,
+        userName: auth.currentUser.displayName || "User",
+        oldTheme: oldTheme,
+        newTheme: color,
+        time: Date.now()
+    });
+
+    document.getElementById("chatBox").style.background = color + "22";
+}
 
 const themeSnap = await getDoc(doc(db, "dmThemes", chatId));
 const oldTheme = themeSnap.exists() ? themeSnap.data().theme : null;
@@ -2023,6 +2060,7 @@ const oldTheme = themeSnap.exists() ? themeSnap.data().theme : null;
 await addDoc(collection(db, "messages"), {
     system: true,
     from: auth.currentUser.uid,
+    userName: auth.currentUser.displayName || "User",
     to: currentChatUser,
     oldTheme: oldTheme,
     newTheme: color,
