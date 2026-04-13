@@ -1176,17 +1176,16 @@ onAuthStateChanged(auth, async (user) => {
             name: user.displayName || "No Name",
         }, { merge: true });
 
-        await loadUsers();
+await loadUsers();
+loadChatList();
 
-        if(chatUID){
-            openChat(chatUID);
-        } else {
-            showEmptyState();
-        }
-
-        setTimeout(() => {
-            loadChatList();
-        }, 200);
+setTimeout(() => {
+    if(chatUID){
+        openChat(chatUID);
+    } else {
+        showEmptyState();
+    }
+}, 300);
 
         document.getElementById("userName").innerText =
             user.displayName || "User";
@@ -1252,12 +1251,17 @@ const avatar = document.getElementById("chatAvatar");
 const statusEl = document.getElementById("chatStatus");
 
 // 🔥 FETCH USER PROFILE IMAGE
+if(window.chatAvatarListener){
+    window.chatAvatarListener(); // 🔥 unsubscribe old
+}
+
 const userRef = doc(db, "users", uid);
-onSnapshot(userRef, (snap)=>{
+window.chatAvatarListener = onSnapshot(userRef, (snap)=>{
     const data = snap.data();
     if(avatar){
-        avatar.src = data?.pfpBase64 
-        || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+        avatar.src = (data && data.pfpBase64 && data.pfpBase64.trim() !== "")
+        ? data.pfpBase64
+        : "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
     }
 });
 
