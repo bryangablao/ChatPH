@@ -613,6 +613,16 @@ text-decoration:underline;
     object-fit:cover;
     flex-shrink:0;
 }
+
+.floating-animation{
+    animation: floatAnim 4s ease-in-out infinite;
+}
+
+@keyframes floatAnim{
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
+    100% { transform: translateY(0px); }
+}
     
 </style>
 </head>
@@ -696,6 +706,7 @@ text-decoration:underline;
     src="https://assets10.lottiefiles.com/packages/lf20_tno6cg2w.json"
     background="transparent"
     speed="1"
+    class="floating-animation"
     style="width:240px;height:240px;"
     loop autoplay>
 </lottie-player>
