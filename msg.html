@@ -711,6 +711,17 @@ text-decoration:underline;
     margin-right:auto;
     color:#fff;
 }
+
+.nickname-item{
+    padding:10px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.nickname-item:hover{
+    background:#2a3342;
+}
     
 </style>
 </head>
@@ -1949,10 +1960,11 @@ else if(currentChatUser){
     const nickBox = document.getElementById("nicknames");
 nickBox.innerHTML = `
     <div class="nickname-item" onclick="editNick('${auth.currentUser.uid}')">
-        You
+        ${auth.currentUser.displayName || "You"} <span style="opacity:.6;">(You)</span>
     </div>
+
     <div class="nickname-item" onclick="editNick('${currentChatUser}')">
-        ${data?.name || "User"}
+        ${data?.name || "Test User"}
     </div>
 `;
 }
