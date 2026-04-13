@@ -1138,7 +1138,8 @@ onAuthStateChanged(auth, async (user) => {
             loadChatList();
         }, 200);
 
-        document.getElementById("userName").innerText = user.displayName;
+        document.getElementById("userName").innerText =
+            user.displayName || "User";
     }
 });
     
