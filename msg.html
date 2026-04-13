@@ -1465,13 +1465,31 @@ document.getElementById("userSearch").addEventListener("input", function(){
         return;
     }
 
-    filtered.forEach(user=>{
-        searchBox.innerHTML += `
-            <div class="chat-user" onclick="openChat('${user.uid}')">
-                ${user.name}
-            </div>
-        `;
-    });
+filtered.forEach(user=>{
+    searchBox.innerHTML += `
+        <div class="chat-user" onclick="openChat('${user.uid}')">
+            <img id="search-avatar-${user.uid}" class="avatar"
+            src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png">
+            
+            <span>${user.name}</span>
+        </div>
+    `;
+});
+
+filtered.forEach(user=>{
+    const userRef = doc(db, "users", user.uid);
+
+    onSnapshot(userRef, (snap)=>{
+        const data = snap.data();
+        const img = document.getElementById("search-avatar-" + user.uid);
+
+        if(img){
+            img.src = data?.pfpBase64 
+            || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+        }
+    });
+});
+    
 });
 
 document.getElementById("groupSearch").addEventListener("input", function(){
