@@ -291,10 +291,10 @@ opacity:0.9;
 }
 
 .creator-img{
-    width:100px;
-    height:100px;
+    width:120px;
+    height:120px;
     object-fit:cover;
-    border-radius:18px; /* curved square */
+    border-radius:20px;
     border:2px solid var(--border);
 }
 
@@ -317,16 +317,28 @@ opacity:0.9;
     }
 
     .creator-img{
-        width:60px;
-        height:60px;
+        width:80px;
+        height:80px;
     }
 }
 
-.owner{
-    font-size:12px;
-    color:var(--subtext); /* gray */
-    font-weight:normal;
-    margin-left:6px;
+.owner-badge{
+    margin-left:8px;
+    padding:3px 10px;
+    font-size:11px;
+    border-radius:20px;
+    font-weight:600;
+    color:#fff;
+
+    background: linear-gradient(270deg, #ff3c3c, #8b5cf6, #ff3c3c);
+    background-size: 300% 300%;
+    animation: gradientMove 4s ease infinite;
+}
+
+@keyframes gradientMove{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
 }
 
 .chatbot-btn{
@@ -428,13 +440,13 @@ without worrying about performance or complexity.
         <div>
 <strong>
     Bryan Gutierrez Ablao 
-    <span class="owner">(Owner)</span>
+    <span class="owner-badge">Owner</span>
 </strong><br>
 <span class="creator-role">(Website Developer and Designer)</span>
 
 <p class="creator-desc">
     <em>
-    Passionate about building clean and modern web experiences. 
+            - Passionate about building clean and modern web experiences. 
     Focused on performance, simplicity, and user-friendly design to make ChatPH smooth and enjoyable for everyone.
     </em>
 </p>
@@ -693,9 +705,9 @@ window.addEventListener("DOMContentLoaded", () => {
 </script>
 
 <!-- 🤖 FLOATING CHAT BOT -->
-<div class="chatbot-btn" onclick="alert('Chatbot coming soon 👀')">
+<div class="chatbot-btn" onclick="console.log('Chatbot clicked')">
     <lottie-player 
-        src="animations/Robot Futuristic Ai animated.lottie"
+        src="animations/AiChat.json"
         background="transparent"
         speed="1"
         loop
