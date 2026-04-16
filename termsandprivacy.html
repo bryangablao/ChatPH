@@ -208,15 +208,31 @@ opacity:0.9;
 .card a{
     color: inherit;
     text-decoration: none;
-    background-image: linear-gradient(var(--accent), var(--accent));
-    background-size: 0% 2px;
+    position: relative;
+
+    /* 🔥 TWO LINES: bottom + top */
+    background-image: 
+        linear-gradient(var(--accent), var(--accent)),  /* bottom */
+        linear-gradient(var(--accent), var(--accent));  /* top */
+
+    background-size: 
+        0% 2px,   /* bottom starts hidden */
+        0% 2px;   /* top starts hidden */
+
+    background-position: 
+        left bottom,   /* bottom grows left → right */
+        right top;     /* top grows right → left */
+
     background-repeat: no-repeat;
-    background-position: left bottom;
-    transition: background-size 0.3s ease;
+
+    transition: background-size 0.5s ease;
 }
 
 .card a:hover{
-    background-size: 100% 2px;
+    background-size: 
+        100% 2px,  /* bottom full */
+        100% 2px;  /* top full */
+
     opacity: 0.8;
     text-decoration: none;
 }
