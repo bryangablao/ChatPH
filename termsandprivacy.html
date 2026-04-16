@@ -291,10 +291,10 @@ opacity:0.9;
 }
 
 .creator-img{
-    width:70px;
-    height:70px;
+    width:100px;
+    height:100px;
     object-fit:cover;
-    border-radius:16px; /* curved square */
+    border-radius:18px; /* curved square */
     border:2px solid var(--border);
 }
 
@@ -320,6 +320,33 @@ opacity:0.9;
         width:60px;
         height:60px;
     }
+}
+
+.owner{
+    font-size:12px;
+    color:var(--subtext); /* gray */
+    font-weight:normal;
+    margin-left:6px;
+}
+
+.chatbot-btn{
+    position:fixed;
+    bottom:80px; /* above footer */
+    right:20px;
+    width:80px;
+    height:80px;
+    cursor:pointer;
+    z-index:999;
+    transition: transform 0.3s ease;
+}
+
+.chatbot-btn:hover{
+    transform: scale(1.1);
+}
+
+.chatbot-btn lottie-player{
+    width:100%;
+    height:100%;
 }
     
 /* 📲 TABLET */
@@ -393,14 +420,17 @@ without worrying about performance or complexity.
 </div>
 
 <div class="card creator-card">
-    <h3>Website Creator</h3>
+    <h3>Website Administrators</h3>
 
     <div class="creator-content">
         <img src="image/char/bryan.png" alt="Bryan" class="creator-img">
 
         <div>
-            <strong>Bryan Gutierrez Ablao</strong><br>
-            <span class="creator-role">(Website Developer and Designer)</span>
+<strong>
+    Bryan Gutierrez Ablao 
+    <span class="owner">(Owner)</span>
+</strong><br>
+<span class="creator-role">(Website Developer and Designer)</span>
 
 <p class="creator-desc">
     <em>
@@ -662,5 +692,18 @@ window.addEventListener("DOMContentLoaded", () => {
   
 </script>
 
+<!-- 🤖 FLOATING CHAT BOT -->
+<div class="chatbot-btn" onclick="alert('Chatbot coming soon 👀')">
+    <lottie-player 
+        src="animations/Robot Futuristic Ai animated.lottie"
+        background="transparent"
+        speed="1"
+        loop
+        autoplay>
+    </lottie-player>
+</div>
+
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    
 </body>
 </html>
