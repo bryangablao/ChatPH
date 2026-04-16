@@ -282,6 +282,46 @@ opacity:0.9;
     }
 }
 
+/* CREATOR CARD */
+.creator-content{
+    display:flex;
+    align-items:flex-start;
+    gap:16px;
+    margin-top:10px;
+}
+
+.creator-img{
+    width:70px;
+    height:70px;
+    object-fit:cover;
+    border-radius:16px; /* curved square */
+    border:2px solid var(--border);
+}
+
+.creator-role{
+    font-size:13px;
+    color:var(--subtext);
+}
+
+.creator-desc{
+    margin-top:8px;
+    font-size:14px;
+    color:var(--subtext);
+}
+
+/* 📱 MOBILE FIX */
+@media (max-width: 600px){
+    .creator-content{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .creator-img{
+        width:60px;
+        height:60px;
+    }
+}
+    
 /* 📲 TABLET */
 @media (max-width: 1024px){
     .panel{
@@ -351,6 +391,27 @@ ChatPH focuses on reliability and ease of use, ensuring that users can focus on 
 without worrying about performance or complexity.
 </p>
 </div>
+
+<div class="card creator-card">
+    <h3>Website Creator</h3>
+
+    <div class="creator-content">
+        <img src="image/char/bryan.png" alt="Bryan" class="creator-img">
+
+        <div>
+            <strong>Bryan Gutierrez Ablao</strong><br>
+            <span class="creator-role">(Website Developer and Designer)</span>
+
+<p class="creator-desc">
+    <em>
+    Passionate about building clean and modern web experiences. 
+    Focused on performance, simplicity, and user-friendly design to make ChatPH smooth and enjoyable for everyone.
+    </em>
+</p>
+        </div>
+    </div>
+</div>
+    
 </div>
 
 <!-- PRIVACY -->
