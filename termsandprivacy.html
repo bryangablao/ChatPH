@@ -1386,34 +1386,48 @@ const replies = [
 
 const randomReply = replies[Math.floor(Math.random() * replies.length)];
 
-/* ⏳ RANDOM DELAY (1.5s - 3s) */
-const delay = Math.floor(Math.random() * 1500) + 1500;
-
-/* 💭 TYPING MESSAGE WITH ANIMATION */
+/* 💭 THINKING MESSAGE */
 const typing = document.createElement("div");
 typing.className = "bot-message";
 typing.innerHTML = `<strong>Sora</strong><br><span class="typing">thinking</span>`;
 chatMessages.appendChild(typing);
 chatMessages.scrollTop = chatMessages.scrollHeight;
 
-/* ✨ DOT ANIMATION */
+/* 🔄 DOT ANIMATION */
 let dots = 0;
 const typingInterval = setInterval(() => {
     dots = (dots + 1) % 4;
     typing.querySelector(".typing").innerText = "thinking" + ".".repeat(dots);
 }, 400);
 
-/* 🤖 FINAL RESPONSE */
+/* ⏱ DELAY BASED ON MESSAGE LENGTH */
+const delay = Math.min(3000, 800 + randomReply.length * 40);
+
 setTimeout(() => {
     clearInterval(typingInterval);
     typing.remove();
 
+    /* 🤖 CREATE EMPTY MESSAGE */
     const botMsg = document.createElement("div");
     botMsg.className = "bot-message";
-    botMsg.innerHTML = `<strong>Sora</strong><br>${randomReply}`;
-
+    botMsg.innerHTML = `<strong>Sora</strong><br><span class="typing-text"></span>`;
     chatMessages.appendChild(botMsg);
+
+    const textEl = botMsg.querySelector(".typing-text");
+
+    /* ⌨️ LETTER-BY-LETTER EFFECT */
+    let i = 0;
+    function typeLetter() {
+        if (i < randomReply.length) {
+            textEl.innerHTML += randomReply.charAt(i);
+            i++;
+            setTimeout(typeLetter, 20 + Math.random() * 30); // random speed
+        }
+    }
+
+    typeLetter();
     chatMessages.scrollTop = chatMessages.scrollHeight;
+
 }, delay);
 };
 });
