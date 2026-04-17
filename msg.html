@@ -722,6 +722,12 @@ text-decoration:underline;
 .nickname-item:hover{
     background:#2a3342;
 }
+
+#userName:hover{
+    color: var(--accent);
+    text-decoration: underline;
+    cursor: pointer;
+}
     
 </style>
 </head>
@@ -741,7 +747,9 @@ text-decoration:underline;
 </div>
 
 <div style="display:flex;align-items:center;gap:12px;">
-    <span id="userName">Loading...</span>
+<a href="prfl.html" id="userName" style="text-decoration:none; color:white; font-weight:600;">
+    Loading...
+</a>
     <div id="logoutBtn">Logout</div>
 </div>
 </header>
