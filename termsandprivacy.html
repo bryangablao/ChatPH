@@ -660,6 +660,83 @@ opacity:0.9;
         font-size:11px;
     }
 }
+
+.chat-support{
+    position:fixed;
+    bottom:100px;
+    right:20px;
+    width:300px;
+    max-height:400px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    display:none;
+    flex-direction:column;
+    overflow:hidden;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+    z-index:1000;
+}
+
+/* HEADER */
+.chat-header{
+    padding:10px;
+    background:var(--accent);
+    color:#000;
+    font-weight:600;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+/* MESSAGES */
+.chat-messages{
+    flex:1;
+    padding:10px;
+    overflow-y:auto;
+    font-size:13px;
+}
+
+/* BOT (LEFT) */
+.bot-message{
+    background:rgba(255,255,255,0.08);
+    padding:8px 10px;
+    border-radius:10px;
+    margin-bottom:8px;
+    max-width:80%;
+}
+
+/* USER (RIGHT) */
+.user-message{
+    background:var(--accent);
+    color:#000;
+    padding:8px 10px;
+    border-radius:10px;
+    margin-bottom:8px;
+    margin-left:auto;
+    max-width:80%;
+}
+
+/* INPUT */
+.chat-input{
+    display:flex;
+    border-top:1px solid var(--border);
+}
+
+.chat-input input{
+    flex:1;
+    border:none;
+    padding:10px;
+    outline:none;
+    background:transparent;
+    color:var(--text);
+}
+
+.chat-input button{
+    border:none;
+    background:var(--accent);
+    padding:10px;
+    cursor:pointer;
+}
     
 </style>
 </head>
@@ -1195,11 +1272,51 @@ function resetAutoSlide(){
 /* INIT */
 updateCoverflow();
 startAutoSlide();
+
+const chatBox = document.getElementById("chatSupport");
+const chatMessages = document.getElementById("chatMessages");
+
+/* OPEN / CLOSE */
+function toggleChat(){
+    chatBox.style.display = chatBox.style.display === "flex" ? "none" : "flex";
+}
+
+document.getElementById("closeChat").onclick = ()=>{
+    chatBox.style.display = "none";
+};
+
+/* SEND MESSAGE */
+function sendMessage(){
+    const input = document.getElementById("chatInput");
+    const text = input.value.trim();
+    if(!text) return;
+
+    // USER MESSAGE
+    const userMsg = document.createElement("div");
+    userMsg.className = "user-message";
+    userMsg.innerText = text;
+    chatMessages.appendChild(userMsg);
+
+    input.value = "";
+
+    // AUTO SCROLL
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // BOT REPLY (simple demo)
+    setTimeout(()=>{
+        const botMsg = document.createElement("div");
+        botMsg.className = "bot-message";
+        botMsg.innerHTML = "<strong>Sora</strong><br>I'm still learning 🤖";
+        chatMessages.appendChild(botMsg);
+
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }, 800);
+}
     
 </script>
 
 <!-- 🤖 FLOATING CHAT BOT -->
-<div class="chatbot-btn" onclick="console.log('Chatbot clicked')">
+<div class="chatbot-btn" onclick="toggleChat()">
     <lottie-player 
         src="animations/Robot.json"
         background="transparent"
@@ -1207,6 +1324,26 @@ startAutoSlide();
         loop
         autoplay>
     </lottie-player>
+</div>
+
+<!-- 💬 CHAT SUPPORT -->
+<div class="chat-support" id="chatSupport">
+    <div class="chat-header">
+        ChatPH Bot
+        <span id="closeChat">✕</span>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+        <div class="bot-message">
+            <strong>Sora</strong><br>
+            Hi there, how can I help you?
+        </div>
+    </div>
+
+    <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Type a message...">
+        <button onclick="sendMessage()">➤</button>
+    </div>
 </div>
 
 <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
