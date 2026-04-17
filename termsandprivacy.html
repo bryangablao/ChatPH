@@ -1273,45 +1273,42 @@ function resetAutoSlide(){
 updateCoverflow();
 startAutoSlide();
 
-const chatBox = document.getElementById("chatSupport");
-const chatMessages = document.getElementById("chatMessages");
+document.addEventListener("DOMContentLoaded", () => {
+    const chatBox = document.getElementById("chatSupport");
+    const chatMessages = document.getElementById("chatMessages");
+    const closeBtn = document.getElementById("closeChat");
 
-/* OPEN / CLOSE */
-function toggleChat(){
-    chatBox.style.display = chatBox.style.display === "flex" ? "none" : "flex";
-}
+    function toggleChat(){
+        chatBox.style.display = chatBox.style.display === "flex" ? "none" : "flex";
+    }
 
-document.getElementById("closeChat").onclick = ()=>{
-    chatBox.style.display = "none";
-};
+    closeBtn.onclick = () => {
+        chatBox.style.display = "none";
+    };
 
-/* SEND MESSAGE */
-function sendMessage(){
-    const input = document.getElementById("chatInput");
-    const text = input.value.trim();
-    if(!text) return;
+    window.toggleChat = toggleChat; // make it callable from HTML
+    window.sendMessage = function(){
+        const input = document.getElementById("chatInput");
+        const text = input.value.trim();
+        if(!text) return;
 
-    // USER MESSAGE
-    const userMsg = document.createElement("div");
-    userMsg.className = "user-message";
-    userMsg.innerText = text;
-    chatMessages.appendChild(userMsg);
+        const userMsg = document.createElement("div");
+        userMsg.className = "user-message";
+        userMsg.innerText = text;
+        chatMessages.appendChild(userMsg);
 
-    input.value = "";
-
-    // AUTO SCROLL
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-
-    // BOT REPLY (simple demo)
-    setTimeout(()=>{
-        const botMsg = document.createElement("div");
-        botMsg.className = "bot-message";
-        botMsg.innerHTML = "<strong>Sora</strong><br>I'm still learning 🤖";
-        chatMessages.appendChild(botMsg);
-
+        input.value = "";
         chatMessages.scrollTop = chatMessages.scrollHeight;
-    }, 800);
-}
+
+        setTimeout(()=>{
+            const botMsg = document.createElement("div");
+            botMsg.className = "bot-message";
+            botMsg.innerHTML = "<strong>Sora</strong><br>I'm still learning 🤖";
+            chatMessages.appendChild(botMsg);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 800);
+    };
+});
     
 </script>
 
