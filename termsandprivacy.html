@@ -456,14 +456,6 @@ opacity:0.9;
     color: var(--text);
 }
 
-/* MOBILE FIX (center title on small screens) */
-@media (max-width:600px){
-    .admin-header{
-        justify-content: center;
-        padding-right: 0;
-    }
-}
-    
 /* SECTION */
 .coverflow-section{
     position:relative;
@@ -473,44 +465,64 @@ opacity:0.9;
     padding-top: 10px;
 }
 
-/* SLIDER */
 .coverflow{
     display:flex;
     justify-content:center;
     align-items:center;
-    gap:20px;
-    transition:0.5s ease;
+    position:relative;
+    height:260px;
 }
 
-/* ITEM */
+/* ALL ITEMS */
 .cover-item{
-    width:260px;
+    position:absolute;
+    width:240px;
+    padding:15px;
+    border-radius:16px;
     background:var(--card);
     border:1px solid var(--border);
-    border-radius:16px;
-    padding:15px;
-    opacity:0.4;
-    transform:scale(0.85);
-    transition:0.4s;
+
+    opacity:0;
+    transform:scale(0.7);
+    filter:blur(4px);
+
+    transition: all 0.6s ease;
 }
 
-/* ACTIVE CENTER */
+/* CENTER */
 .cover-item.active{
     opacity:1;
-    transform:scale(1);
+    transform:scale(1.15);
+    filter:blur(0);
+    z-index:5;
 }
 
-/* SIDE POSITIONS */
-.cover-item.left1,
+/* RIGHT SIDE */
 .cover-item.right1{
+    transform:translateX(220px) scale(0.9);
     opacity:0.7;
-    transform:scale(0.9);
+    filter:blur(1.5px);
+    z-index:3;
+}
+.cover-item.right2{
+    transform:translateX(400px) scale(0.75);
+    opacity:0.4;
+    filter:blur(3px);
+    z-index:2;
 }
 
-.cover-item.left2,
-.cover-item.right2{
+/* LEFT SIDE */
+.cover-item.left1{
+    transform:translateX(-220px) scale(0.9);
+    opacity:0.7;
+    filter:blur(1.5px);
+    z-index:3;
+}
+.cover-item.left2{
+    transform:translateX(-400px) scale(0.75);
     opacity:0.4;
-    transform:scale(0.8);
+    filter:blur(3px);
+    z-index:2;
 }
 
 /* PROFILE ROW */
@@ -605,24 +617,45 @@ opacity:0.9;
 }
 
 @media (max-width:600px){
+
+    /* creator */
+    .creator-content{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+    .creator-img{
+        width:80px;
+        height:80px;
+    }
+
+    /* admin header */
+    .admin-header{
+        justify-content: center;
+        padding-right: 0;
+    }
+
+    /* coverflow */
     .coverflow{
-        gap:10px;
+        height:220px;
     }
 
     .cover-item{
         width:200px;
-        padding:12px;
     }
 
+    .cover-item.right1{ transform:translateX(140px) scale(0.9); }
+    .cover-item.left1{ transform:translateX(-140px) scale(0.9); }
+    .cover-item.right2{ transform:translateX(240px) scale(0.75); }
+    .cover-item.left2{ transform:translateX(-240px) scale(0.75); }
+
+    /* text + image */
     .cf-img{
         width:45px;
         height:45px;
     }
-
     .cf-name{
         font-size:13px;
     }
-
     .cf-desc{
         font-size:11px;
     }
@@ -1109,30 +1142,59 @@ window.addEventListener("DOMContentLoaded", () => {
 
 const items = document.querySelectorAll(".cover-item");
 let index = 0;
+let autoSlide;
 
+/* UPDATE POSITIONS */
 function updateCoverflow(){
     items.forEach((item, i)=>{
         item.className = "cover-item";
 
         if(i === index) item.classList.add("active");
-        else if(i === index - 1) item.classList.add("left1");
-        else if(i === index - 2) item.classList.add("left2");
-        else if(i === index + 1) item.classList.add("right1");
-        else if(i === index + 2) item.classList.add("right2");
+        else if(i === (index - 1 + items.length) % items.length) item.classList.add("left1");
+        else if(i === (index - 2 + items.length) % items.length) item.classList.add("left2");
+        else if(i === (index + 1) % items.length) item.classList.add("right1");
+        else if(i === (index + 2) % items.length) item.classList.add("right2");
     });
 }
 
+/* CLICK TO FOCUS 🔥 */
+items.forEach((item, i)=>{
+    item.addEventListener("click", ()=>{
+        index = i;
+        updateCoverflow();
+        resetAutoSlide();
+    });
+});
+
+/* ARROWS */
 document.getElementById("coverLeft").onclick = ()=>{
     index = (index - 1 + items.length) % items.length;
     updateCoverflow();
+    resetAutoSlide();
 };
 
 document.getElementById("coverRight").onclick = ()=>{
     index = (index + 1) % items.length;
     updateCoverflow();
+    resetAutoSlide();
 };
 
+/* AUTO SLIDE 🔥 */
+function startAutoSlide(){
+    autoSlide = setInterval(()=>{
+        index = (index + 1) % items.length;
+        updateCoverflow();
+    }, 3000);
+}
+
+function resetAutoSlide(){
+    clearInterval(autoSlide);
+    startAutoSlide();
+}
+
+/* INIT */
 updateCoverflow();
+startAutoSlide();
     
 </script>
 
