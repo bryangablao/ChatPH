@@ -388,7 +388,13 @@ font-size:14px;
     
 #logoutBtn { cursor: pointer; color: var(--dim); font-weight: 600; font-size: 14px; }
 #logoutBtn:hover { color: #ff4b4b; }
-  
+
+#userDisplay:hover{
+    color: var(--accent);
+    text-decoration: underline;
+    cursor: pointer;
+}
+    
 </style>
 </head>
 
@@ -406,7 +412,9 @@ font-size:14px;
 
 </div>
     <div style="display:flex;align-items:center;gap:16px;">
-        <span id="userDisplay">Guest</span>
+<a href="prfl.html" id="userDisplay" style="text-decoration:none; color:white; font-weight:600;">
+    Guest
+</a>
         <div id="logoutBtn">Logout</div>
     </div>
 </header>
