@@ -436,12 +436,41 @@ opacity:0.9;
     100%{background-position:0% 50%;}
 }
 
+/* WRAPPER */
+.admin-wrapper{
+    position: relative;
+    margin-top: 20px;
+}
+
+/* TITLE (RIGHT SIDE) */
+.admin-header{
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+    padding-right: 10px;
+}
+
+.admin-header h3{
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+/* MOBILE FIX (center title on small screens) */
+@media (max-width:600px){
+    .admin-header{
+        justify-content: center;
+        padding-right: 0;
+    }
+}
+    
 /* SECTION */
 .coverflow-section{
     position:relative;
     width:100%;
     overflow:hidden;
-    margin-top:20px;
+    margin-top: 10px;
+    padding-top: 10px;
 }
 
 /* SLIDER */
@@ -666,7 +695,12 @@ without worrying about performance or complexity.
 </p>
 </div>
 
-<section class="coverflow-section">
+<div class="admin-wrapper">
+    <div class="admin-header">
+        <h3>Website Administrators</h3>
+    </div>
+
+    <section class="coverflow-section">
     <div class="cover-arrow left" id="coverLeft">❮</div>
 
     <div class="coverflow" id="coverflow">
@@ -760,6 +794,7 @@ without worrying about performance or complexity.
 
     <div class="cover-arrow right" id="coverRight">❯</div>
 </section>
+</div>
     
 </div>
 
