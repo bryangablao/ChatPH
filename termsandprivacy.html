@@ -661,81 +661,143 @@ opacity:0.9;
     }
 }
 
+/* 💬 CHAT CONTAINER */
 .chat-support{
     position:fixed;
     bottom:100px;
     right:20px;
-    width:300px;
-    max-height:400px;
+    width:320px;
+    max-height:420px;
     background:var(--card);
     border:1px solid var(--border);
-    border-radius:16px;
+    border-radius:18px;
     display:none;
     flex-direction:column;
     overflow:hidden;
-    box-shadow:0 10px 30px rgba(0,0,0,0.3);
-    z-index:1000;
+    box-shadow:0 15px 40px rgba(0,0,0,0.4);
+    backdrop-filter: blur(12px);
+    animation:fadeIn .3s ease;
 }
 
 /* HEADER */
 .chat-header{
-    padding:10px;
-    background:var(--accent);
+    padding:12px 14px;
+    background:linear-gradient(135deg, var(--accent), #6ec1ff);
     color:#000;
     font-weight:600;
     display:flex;
     justify-content:space-between;
     align-items:center;
+    font-size:14px;
 }
 
-/* MESSAGES */
+.chat-header span{
+    cursor:pointer;
+    font-size:16px;
+    opacity:0.7;
+}
+.chat-header span:hover{
+    opacity:1;
+}
+
+/* MESSAGES AREA */
 .chat-messages{
     flex:1;
-    padding:10px;
+    padding:12px;
     overflow-y:auto;
     font-size:13px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+/* COMMON MESSAGE STYLE */
+.bot-message,
+.user-message{
+    padding:10px 12px;
+    border-radius:14px;
+    max-width:75%;
+    line-height:1.4;
+    word-wrap:break-word;
+    animation:pop .2s ease;
 }
 
 /* BOT (LEFT) */
 .bot-message{
-    background:rgba(255,255,255,0.08);
-    padding:8px 10px;
-    border-radius:10px;
-    margin-bottom:8px;
-    max-width:80%;
+    background:rgba(255,255,255,0.06);
+    border:1px solid var(--border);
+    align-self:flex-start;
+    color:var(--text);
 }
 
 /* USER (RIGHT) */
 .user-message{
-    background:var(--accent);
+    background:linear-gradient(135deg, var(--accent), #6ec1ff);
     color:#000;
-    padding:8px 10px;
-    border-radius:10px;
-    margin-bottom:8px;
-    margin-left:auto;
-    max-width:80%;
+    align-self:flex-end;
+    box-shadow:0 4px 10px rgba(0,0,0,0.2);
 }
 
-/* INPUT */
+/* BOT NAME */
+.bot-message strong{
+    display:block;
+    font-size:11px;
+    margin-bottom:2px;
+    opacity:0.7;
+}
+
+/* INPUT AREA */
 .chat-input{
     display:flex;
+    padding:8px;
     border-top:1px solid var(--border);
+    background:rgba(255,255,255,0.02);
 }
 
+/* INPUT FIELD */
 .chat-input input{
     flex:1;
     border:none;
-    padding:10px;
+    padding:10px 12px;
+    border-radius:12px;
     outline:none;
-    background:transparent;
+    background:rgba(255,255,255,0.05);
     color:var(--text);
+    font-size:13px;
 }
 
+/* SEND BUTTON */
 .chat-input button{
     border:none;
-    background:var(--accent);
-    padding:10px;
+    margin-left:6px;
+    padding:10px 14px;
+    border-radius:12px;
+    background:linear-gradient(135deg, var(--accent), #6ec1ff);
+    color:#000;
     cursor:pointer;
+    transition:.2s;
+}
+.chat-input button:hover{
+    transform:scale(1.05);
+}
+
+/* SCROLLBAR */
+.chat-messages::-webkit-scrollbar{
+    width:5px;
+}
+.chat-messages::-webkit-scrollbar-thumb{
+    background:var(--border);
+    border-radius:10px;
+}
+
+/* ANIMATIONS */
+@keyframes pop{
+    from{opacity:0; transform:translateY(5px);}
+    to{opacity:1; transform:translateY(0);}
+}
+@keyframes fadeIn{
+    from{opacity:0; transform:translateY(10px);}
+    to{opacity:1; transform:translateY(0);}
 }
     
 </style>
@@ -1278,6 +1340,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const chatMessages = document.getElementById("chatMessages");
     const closeBtn = document.getElementById("closeChat");
 
+    // 🔥 CLOSE WHEN CLICKING OUTSIDE
+document.addEventListener("click", function(e){
+    if(
+        chatBox.style.display === "flex" &&
+        !chatBox.contains(e.target) &&
+        !e.target.closest(".chatbot-btn")
+    ){
+        chatBox.style.display = "none";
+    }
+});
+    
     function toggleChat(){
         chatBox.style.display = chatBox.style.display === "flex" ? "none" : "flex";
     }
@@ -1287,28 +1360,49 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     window.toggleChat = toggleChat; // make it callable from HTML
-    window.sendMessage = function(){
-        const input = document.getElementById("chatInput");
-        const text = input.value.trim();
-        if(!text) return;
+window.sendMessage = function(){
+    const input = document.getElementById("chatInput");
+    const text = input.value.trim();
+    if(!text) return;
 
-        const userMsg = document.createElement("div");
-        userMsg.className = "user-message";
-        userMsg.innerText = text;
-        chatMessages.appendChild(userMsg);
+    const userMsg = document.createElement("div");
+    userMsg.className = "user-message";
+    userMsg.innerText = text;
+    chatMessages.appendChild(userMsg);
 
-        input.value = "";
+    input.value = "";
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // 🔥 PUT IT HERE
+    const replies = [
+        "Got you! 🤖✨",
+        "I'm on it! Give me a sec 👀",
+        "Nice question 👌 Let me think...",
+        "Alright, here's what I got 🔥",
+        "Hmm interesting 🤔 here's my answer:"
+    ];
+
+    const randomReply = replies[Math.floor(Math.random() * replies.length)];
+
+    // 👇 your typing + response
+    const typing = document.createElement("div");
+    typing.className = "bot-message";
+    typing.innerHTML = "<strong>Sora</strong><br><em>typing...</em>";
+    chatMessages.appendChild(typing);
+
+    setTimeout(()=>{
+        typing.remove();
+
+        const botMsg = document.createElement("div");
+        botMsg.className = "bot-message";
+
+
+        botMsg.innerHTML = `<strong>Sora</strong><br>${randomReply}`;
+
+        chatMessages.appendChild(botMsg);
         chatMessages.scrollTop = chatMessages.scrollHeight;
-
-        setTimeout(()=>{
-            const botMsg = document.createElement("div");
-            botMsg.className = "bot-message";
-            botMsg.innerHTML = "<strong>Sora</strong><br>I'm still learning 🤖";
-            chatMessages.appendChild(botMsg);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }, 800);
-    };
-});
+    }, 1200);
+};
     
 </script>
 
