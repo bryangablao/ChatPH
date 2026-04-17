@@ -1375,8 +1375,13 @@ window.sendMessage = function(){
     input.value = "";
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // 🔥 PUT IT HERE
-const replies = [
+const lowerText = text.toLowerCase();
+
+const ackKeywords = ["ok", "okay", "thanks", "thank you", "got it", "i understand"];
+
+const isAck = ackKeywords.some(k => lowerText.includes(k));
+
+const normalReplies = [
     "Hi! 👋 I'm still in beta, so I can't answer questions yet. Please stay tuned for updates!",
     "Thanks for your message! 😊 This feature is still under development.",
     "Hey! 🤖 I'm currently in beta mode, improvements are coming soon.",
@@ -1384,7 +1389,17 @@ const replies = [
     "Hello! 💬 I'm not fully ready yet, please check back soon!"
 ];
 
-const randomReply = replies[Math.floor(Math.random() * replies.length)];
+const ackReplies = [
+    "Thanks for understanding! 🙏 Updates are coming soon.",
+    "Appreciate it! 😊 Stay tuned for future features.",
+    "Got it! 👍 We'll be improving this soon.",
+    "Thanks! 💬 More updates will be announced soon.",
+    "See you soon! 🚀 This feature is still being worked on."
+];
+
+const randomReply = isAck
+    ? ackReplies[Math.floor(Math.random() * ackReplies.length)]
+    : normalReplies[Math.floor(Math.random() * normalReplies.length)];
 
 /* 💭 THINKING MESSAGE */
 const typing = document.createElement("div");
@@ -1416,14 +1431,26 @@ setTimeout(() => {
     const textEl = botMsg.querySelector(".typing-text");
 
     /* ⌨️ LETTER-BY-LETTER EFFECT */
-    let i = 0;
-    function typeLetter() {
-        if (i < randomReply.length) {
-            textEl.innerHTML += randomReply.charAt(i);
-            i++;
-            setTimeout(typeLetter, 20 + Math.random() * 30); // random speed
-        }
+let i = 0;
+
+function typeLetter() {
+    if (i < randomReply.length) {
+        const char = randomReply.charAt(i);
+        textEl.innerHTML += char;
+        i++;
+
+        let delay = 20 + Math.random() * 30;
+
+        // ⏸️ pause for realism
+        if (char === "," || char === ".") delay = 300;
+        if (char === "!") delay = 250;
+        if (char === "?") delay = 350;
+
+        setTimeout(typeLetter, delay);
+    } else {
+        showSeenStatus(); // 👀 trigger after typing done
     }
+}
 
     typeLetter();
     chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -1431,6 +1458,18 @@ setTimeout(() => {
 }, delay);
 };
 });
+
+function showSeenStatus() {
+    const seen = document.createElement("div");
+    seen.style.fontSize = "10px";
+    seen.style.opacity = "0.6";
+    seen.style.marginTop = "4px";
+    seen.innerText = "Seen";
+
+    chatMessages.appendChild(seen);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+    
 </script>
 
 <!-- 🤖 FLOATING CHAT BOT -->
