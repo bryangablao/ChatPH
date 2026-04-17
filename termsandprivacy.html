@@ -406,14 +406,14 @@ opacity:0.9;
 .moderator-exe{
     background: linear-gradient(270deg, #3b82f6, #06b6d4, #6366f1);
     background-size: 300% 300%;
-    animation: gradientMove 3s ease infinite;
+    animation: gradientMove 2s ease infinite;
 }
 
 /* 💜 Akira (Social) */
 .moderator-akira{
     background: linear-gradient(270deg, #ec4899, #a855f7, #8b5cf6);
     background-size: 300% 300%;
-    animation: gradientMove 5s ease infinite;
+    animation: gradientMove 2s ease infinite;
 }
 
 /* 🟢 Sword (Security) */
@@ -427,7 +427,7 @@ opacity:0.9;
 .moderator-f11{
     background: linear-gradient(270deg, #f97316, #f59e0b, #eab308);
     background-size: 300% 300%;
-    animation: gradientMove 4s ease infinite;
+    animation: gradientMove 2s ease infinite;
 }
 
 @keyframes gradientMove{
@@ -800,6 +800,13 @@ opacity:0.9;
 @keyframes fadeIn{
     from{opacity:0; transform:translateY(10px);}
     to{opacity:1; transform:translateY(0);}
+}
+
+.seen-status{
+    font-size:10px;
+    opacity:0.6;
+    margin-top:4px;
+    text-align:right;
 }
     
 </style>
@@ -1371,7 +1378,7 @@ window.sendMessage = function(){
     userMsg.className = "user-message";
     userMsg.innerText = text;
     chatMessages.appendChild(userMsg);
-
+    let lastUserMsg = userMsg;
     input.value = "";
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
@@ -1460,14 +1467,22 @@ function typeLetter() {
 });
 
 function showSeenStatus() {
-    const seen = document.createElement("div");
+    if (!lastUserMsg) return;
+
+    let seen = lastUserMsg.querySelector(".seen-status");
+
+    // remove old seen if exists (avoid duplicates)
+    if (seen) seen.remove();
+
+    seen = document.createElement("div");
+    seen.className = "seen-status";
     seen.style.fontSize = "10px";
     seen.style.opacity = "0.6";
     seen.style.marginTop = "4px";
+    seen.style.textAlign = "right";
     seen.innerText = "Seen";
 
-    chatMessages.appendChild(seen);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    lastUserMsg.appendChild(seen);
 }
     
 </script>
@@ -1486,7 +1501,7 @@ function showSeenStatus() {
 <!-- 💬 CHAT SUPPORT -->
 <div class="chat-support" id="chatSupport">
     <div class="chat-header">
-        ChatPH Bot
+        ChatPH Bot (Sora)
         <span id="closeChat">✕</span>
     </div>
 
