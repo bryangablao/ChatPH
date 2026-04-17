@@ -444,9 +444,9 @@ opacity:0.9;
 
 /* TITLE (RIGHT SIDE) */
 .admin-header{
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 10px;
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom: 6px;   /* tighter to cards */
     padding-right: 10px;
 }
 
@@ -461,8 +461,8 @@ opacity:0.9;
     position:relative;
     width:100%;
     overflow:hidden;
-    margin-top: 10px;
-    padding-top: 10px;
+    margin-top: 0;
+    padding-top: 0;
 }
 
 .coverflow{
@@ -729,11 +729,11 @@ without worrying about performance or complexity.
 </div>
 
 <div class="admin-wrapper">
-    <div class="admin-header">
-        <h3>Website Administrators</h3>
-    </div>
-
     <section class="coverflow-section">
+
+        <div class="admin-header">
+            <h3>Website Administrators</h3>
+        </div>
     <div class="cover-arrow left" id="coverLeft">❮</div>
 
     <div class="coverflow" id="coverflow">
