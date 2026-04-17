@@ -406,7 +406,7 @@ opacity:0.9;
 .moderator-exe{
     background: linear-gradient(270deg, #3b82f6, #06b6d4, #6366f1);
     background-size: 300% 300%;
-    animation: gradientMove 5s ease infinite;
+    animation: gradientMove 3s ease infinite;
 }
 
 /* 💜 Akira (Social) */
@@ -420,14 +420,14 @@ opacity:0.9;
 .moderator-sword{
     background: linear-gradient(270deg, #22c55e, #10b981, #14b8a6);
     background-size: 300% 300%;
-    animation: gradientMove 5s ease infinite;
+    animation: gradientMove 2s ease infinite;
 }
 
 /* 🟠 F11 (Logic) */
 .moderator-f11{
     background: linear-gradient(270deg, #f97316, #f59e0b, #eab308);
     background-size: 300% 300%;
-    animation: gradientMove 5s ease infinite;
+    animation: gradientMove 4s ease infinite;
 }
 
 @keyframes gradientMove{
@@ -436,6 +436,104 @@ opacity:0.9;
     100%{background-position:0% 50%;}
 }
 
+/* SECTION */
+.coverflow-section{
+    position:relative;
+    width:100%;
+    overflow:hidden;
+    margin-top:20px;
+}
+
+/* SLIDER */
+.coverflow{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:20px;
+    transition:0.5s ease;
+}
+
+/* ITEM */
+.cover-item{
+    width:260px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:15px;
+    opacity:0.4;
+    transform:scale(0.85);
+    transition:0.4s;
+}
+
+/* ACTIVE CENTER */
+.cover-item.active{
+    opacity:1;
+    transform:scale(1);
+}
+
+/* SIDE POSITIONS */
+.cover-item.left1,
+.cover-item.right1{
+    opacity:0.7;
+    transform:scale(0.9);
+}
+
+.cover-item.left2,
+.cover-item.right2{
+    opacity:0.4;
+    transform:scale(0.8);
+}
+
+/* PROFILE ROW */
+.profile-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+/* IMAGE */
+.cf-img{
+    width:55px;
+    height:55px;
+    border-radius:50%;
+    object-fit:cover;
+    border:2px solid var(--border);
+}
+
+/* NAME */
+.cf-name{
+    font-size:14px;
+    font-weight:600;
+}
+
+/* ROLE */
+.cf-role{
+    font-size:11px;
+    color:var(--subtext);
+}
+
+/* DESC */
+.cf-desc{
+    margin-top:10px;
+    font-size:12px;
+    color:var(--subtext);
+}
+
+/* ARROWS */
+.cover-arrow{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:20px;
+    cursor:pointer;
+    padding:8px;
+    border-radius:50%;
+    background:var(--card);
+}
+
+.cover-arrow.left{ left:5px; }
+.cover-arrow.right{ right:5px; }
+    
 .chatbot-btn{
     position:fixed;
     bottom:80px; /* above footer */
@@ -474,6 +572,30 @@ opacity:0.9;
 @media (max-width: 1024px){
     .panel{
         max-width:90%;
+    }
+}
+
+@media (max-width:600px){
+    .coverflow{
+        gap:10px;
+    }
+
+    .cover-item{
+        width:200px;
+        padding:12px;
+    }
+
+    .cf-img{
+        width:45px;
+        height:45px;
+    }
+
+    .cf-name{
+        font-size:13px;
+    }
+
+    .cf-desc{
+        font-size:11px;
     }
 }
     
@@ -544,80 +666,100 @@ without worrying about performance or complexity.
 </p>
 </div>
 
-<div class="card creator-card">
-    <h3 style="text-align:center;">Website Administrators</h3>
+<section class="coverflow-section">
+    <div class="cover-arrow left" id="coverLeft">❮</div>
 
-    <div class="creator-grid">
+    <div class="coverflow" id="coverflow">
 
         <!-- 👑 OWNER -->
-        <div class="profile-card">
-            <img src="image/char/bryan.png" class="profile-img">
-            <h4>
-                Bryan Gutierrez Ablao 
-                <span class="owner-badge">Owner</span>
-            </h4>
-            <span class="profile-role">(Website Developer & Designer)</span>
-            <p class="profile-desc">
-                Passionate about building clean and modern web experiences. 
-                Focused on performance, simplicity, and user-friendly design.
+        <div class="cover-item active">
+            <div class="profile-row">
+                <img src="image/char/bryan.png" class="cf-img">
+                <div>
+                    <div class="cf-name">
+                        Bryan Gutierrez Ablao
+                        <span class="owner-badge">Owner</span>
+                    </div>
+                    <div class="cf-role">(Website Developer & Designer)</div>
+                </div>
+            </div>
+            <p class="cf-desc">
+                <em>Passionate about building clean and modern web experiences focused on simplicity and performance.</em>
             </p>
         </div>
 
-        <!-- 🧪 EXE -->
-        <div class="profile-card">
-            <img src="image/char/exe.png" class="profile-img">
-            <h4>
-                Anonymous EXE
-                <span class="moderator-badge moderator-exe">Moderator</span>
-            </h4>
-            <span class="profile-role">(QA Tester)</span>
-            <p class="profile-desc">
-                Focused on testing features, finding bugs, and ensuring stability 
-                for a smooth user experience.
+        <!-- EXE -->
+        <div class="cover-item right1">
+            <div class="profile-row">
+                <img src="image/char/exe.png" class="cf-img">
+                <div>
+                    <div class="cf-name">
+                        Anonymous EXE
+                        <span class="moderator-badge moderator-exe">Moderator</span>
+                    </div>
+                    <div class="cf-role">(QA Tester)</div>
+                </div>
+            </div>
+            <p class="cf-desc">
+                <em>Focused on testing features and ensuring system stability for a smooth experience.</em>
             </p>
         </div>
 
-        <!-- 📱 AKIRA -->
-        <div class="profile-card">
-            <img src="image/char/akira.png" class="profile-img">
-            <h4>
-                Anonymous Akira
-                <span class="moderator-badge moderator-akira">Moderator</span>
-            </h4>
-            <span class="profile-role">(Social Media Manager)</span>
-            <p class="profile-desc">
-                Manages community presence, updates, and engagement across platforms.
+        <!-- AKIRA -->
+        <div class="cover-item right2">
+            <div class="profile-row">
+                <img src="image/char/akira.png" class="cf-img">
+                <div>
+                    <div class="cf-name">
+                        Anonymous Akira
+                        <span class="moderator-badge moderator-akira">Moderator</span>
+                    </div>
+                    <div class="cf-role">(Social Media Manager)</div>
+                </div>
+            </div>
+            <p class="cf-desc">
+                <em>Handles community engagement and manages platform presence across social media.</em>
             </p>
         </div>
 
-        <!-- 🔐 SWORD -->
-        <div class="profile-card">
-            <img src="image/char/sword.png" class="profile-img">
-            <h4>
-                Anonymous Sword
-                <span class="moderator-badge moderator-sword">Moderator</span>
-            </h4>
-            <span class="profile-role">(Security Specialist)</span>
-            <p class="profile-desc">
-                Protects system data and ensures platform security and integrity.
+        <!-- SWORD -->
+        <div class="cover-item left1">
+            <div class="profile-row">
+                <img src="image/char/sword.png" class="cf-img">
+                <div>
+                    <div class="cf-name">
+                        Anonymous Sword
+                        <span class="moderator-badge moderator-sword">Moderator</span>
+                    </div>
+                    <div class="cf-role">(Security Specialist)</div>
+                </div>
+            </div>
+            <p class="cf-desc">
+                <em>Ensures data protection and maintains system security across the platform.</em>
             </p>
         </div>
 
-        <!-- 🧠 F11 -->
-        <div class="profile-card">
-            <img src="image/char/f11.png" class="profile-img">
-            <h4>
-                Anonymous F11
-                <span class="moderator-badge moderator-f11">Moderator</span>
-            </h4>
-            <span class="profile-role">(Logic & Strategy Planner)</span>
-            <p class="profile-desc">
-                Improves system logic, fixes bugs, and enhances user interaction flow.
+        <!-- F11 -->
+        <div class="cover-item left2">
+            <div class="profile-row">
+                <img src="image/char/f11.png" class="cf-img">
+                <div>
+                    <div class="cf-name">
+                        Anonymous F11
+                        <span class="moderator-badge moderator-f11">Moderator</span>
+                    </div>
+                    <div class="cf-role">(Logic & Strategy Planner)</div>
+                </div>
+            </div>
+            <p class="cf-desc">
+                <em>Improves system logic, fixes bugs, and enhances overall user interaction.</em>
             </p>
         </div>
 
     </div>
-</div>
+
+    <div class="cover-arrow right" id="coverRight">❯</div>
+</section>
     
 </div>
 
@@ -929,7 +1071,34 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
 });
-  
+
+const items = document.querySelectorAll(".cover-item");
+let index = 0;
+
+function updateCoverflow(){
+    items.forEach((item, i)=>{
+        item.className = "cover-item";
+
+        if(i === index) item.classList.add("active");
+        else if(i === index - 1) item.classList.add("left1");
+        else if(i === index - 2) item.classList.add("left2");
+        else if(i === index + 1) item.classList.add("right1");
+        else if(i === index + 2) item.classList.add("right2");
+    });
+}
+
+document.getElementById("coverLeft").onclick = ()=>{
+    index = (index - 1 + items.length) % items.length;
+    updateCoverflow();
+};
+
+document.getElementById("coverRight").onclick = ()=>{
+    index = (index + 1) % items.length;
+    updateCoverflow();
+};
+
+updateCoverflow();
+    
 </script>
 
 <!-- 🤖 FLOATING CHAT BOT -->
