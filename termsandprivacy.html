@@ -1377,33 +1377,44 @@ window.sendMessage = function(){
 
     // 🔥 PUT IT HERE
 const replies = [
-    "Hi! 👋 I'm still in beta, so I can't answer questions yet. Please stay tuned for future updates!",
-    "Thanks for your message! 😊 This feature is still under development and will be available soon.",
-    "Hey there! 🤖 I'm currently in beta mode, so responses are limited for now. Updates are coming soon!",
-    "I appreciate your question! 🙌 At the moment, I'm still being improved. Full features will be released soon.",
-    "Hello! 💬 I'm not fully ready yet, but updates are on the way. Please check back soon!"
+    "Hi! 👋 I'm still in beta, so I can't answer questions yet. Please stay tuned for updates!",
+    "Thanks for your message! 😊 This feature is still under development.",
+    "Hey! 🤖 I'm currently in beta mode, improvements are coming soon.",
+    "I appreciate your question! 🙌 Full support will be available in a future update.",
+    "Hello! 💬 I'm not fully ready yet, please check back soon!"
 ];
 
-    const randomReply = replies[Math.floor(Math.random() * replies.length)];
+const randomReply = replies[Math.floor(Math.random() * replies.length)];
 
-    // 👇 your typing + response
-    const typing = document.createElement("div");
-    typing.className = "bot-message";
-    typing.innerHTML = "<strong>Sora</strong><br><em>typing...</em>";
-    chatMessages.appendChild(typing);
+/* ⏳ RANDOM DELAY (1.5s - 3s) */
+const delay = Math.floor(Math.random() * 1500) + 1500;
 
-    setTimeout(()=>{
-        typing.remove();
+/* 💭 TYPING MESSAGE WITH ANIMATION */
+const typing = document.createElement("div");
+typing.className = "bot-message";
+typing.innerHTML = `<strong>Sora</strong><br><span class="typing">thinking</span>`;
+chatMessages.appendChild(typing);
+chatMessages.scrollTop = chatMessages.scrollHeight;
 
-        const botMsg = document.createElement("div");
-        botMsg.className = "bot-message";
+/* ✨ DOT ANIMATION */
+let dots = 0;
+const typingInterval = setInterval(() => {
+    dots = (dots + 1) % 4;
+    typing.querySelector(".typing").innerText = "thinking" + ".".repeat(dots);
+}, 400);
 
+/* 🤖 FINAL RESPONSE */
+setTimeout(() => {
+    clearInterval(typingInterval);
+    typing.remove();
 
-        botMsg.innerHTML = `<strong>Sora</strong><br>${randomReply}`;
+    const botMsg = document.createElement("div");
+    botMsg.className = "bot-message";
+    botMsg.innerHTML = `<strong>Sora</strong><br>${randomReply}`;
 
-        chatMessages.appendChild(botMsg);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }, 1200);
+    chatMessages.appendChild(botMsg);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}, delay);
 };
 });
 </script>
