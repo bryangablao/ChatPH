@@ -67,7 +67,6 @@ background:rgba(255,255,255,0.08);
 .version{
 font-size:12px;
 color:var(--subtext);
-cursor:help;
 }
 
 /* TABS */
@@ -331,11 +330,49 @@ opacity:0.9;
     border-radius:20px;
     font-weight:600;
     color:#fff;
-
     position: relative;
     top: -2px;                /* move slightly upward */
 
     background: linear-gradient(270deg, #ff3c3c, #8b5cf6, #ff3c3c);
+    background-size: 300% 300%;
+    animation: gradientMove 4s ease infinite;
+}
+
+.moderator-badge{
+    margin-left:4px;
+    padding:2px 8px;
+    font-size:10px;
+    border-radius:20px;
+    font-weight:600;
+    color:#fff;
+    position: relative;
+    top:-2px;
+}
+
+/* 🔵 EXE (Tester) */
+.moderator-exe{
+    background: linear-gradient(270deg, #3b82f6, #06b6d4, #3b82f6);
+    background-size: 300% 300%;
+    animation: gradientMove 4s ease infinite;
+}
+
+/* 💜 Akira (Social) */
+.moderator-akira{
+    background: linear-gradient(270deg, #ec4899, #a78bfa, #ec4899);
+    background-size: 300% 300%;
+    animation: gradientMove 4s ease infinite;
+}
+
+/* 🟢 Sword (Security) */
+.moderator-sword{
+    background: linear-gradient(270deg, #22c55e, #4ade80, #22c55e);
+    background-size: 300% 300%;
+    animation: gradientMove 4s ease infinite;
+}
+
+/* 🟠 F11 (Logic) */
+.moderator-f11{
+    background: linear-gradient(270deg, #f59e0b, #fbbf24, #f59e0b);
     background-size: 300% 300%;
     animation: gradientMove 4s ease infinite;
 }
@@ -457,24 +494,99 @@ without worrying about performance or complexity.
 <div class="card creator-card">
     <h3>Website Administrators</h3>
 
+    <!-- 👑 OWNER -->
     <div class="creator-content">
         <img src="image/char/bryan.png" alt="Bryan" class="creator-img">
-
         <div>
-<strong>
-    Bryan Gutierrez Ablao 
-    <span class="owner-badge">Owner</span>
-</strong><br>
-<span class="creator-role">(Website Developer and Designer)</span>
-
-<p class="creator-desc">
-    <em>
-            - Passionate about building clean and modern web experiences. 
-    Focused on performance, simplicity, and user-friendly design to make ChatPH smooth and enjoyable for everyone.
-    </em>
-</p>
+            <strong>
+                Bryan Gutierrez Ablao 
+                <span class="owner-badge">Owner</span>
+            </strong><br>
+            <span class="creator-role">(Website Developer and Designer)</span>
+            <p class="creator-desc">
+                <em>
+                    - Passionate about building clean and modern web experiences. 
+                    Focused on performance, simplicity, and user-friendly design to make ChatPH smooth and enjoyable for everyone.
+                </em>
+            </p>
         </div>
     </div>
+
+    <!-- 🧪 TESTER -->
+    <div class="creator-content">
+        <img src="image/char/anonymous.png" alt="Anonymous EXE" class="creator-img">
+        <div>
+            <strong>
+                Anonymous EXE
+                <span class="moderator-badge moderator-exe">Moderator</span>
+            </strong><br>
+            <span class="creator-role">(Website Tester & Quality Assurance)</span>
+            <p class="creator-desc">
+                <em>
+                    - Dedicated to testing features, identifying bugs, and ensuring a smooth and stable experience for all users. 
+                    Focused on improving performance, usability, and reliability across the platform.
+                </em>
+            </p>
+        </div>
+    </div>
+
+    <!-- 📱 SOCIAL MEDIA -->
+<div class="creator-content">
+    <img src="image/char/akira.png" alt="Anonymous Akira" class="creator-img">
+    <div>
+        <strong>
+            Anonymous Akira
+            <span class="moderator-badge moderator-akira">Moderator</span>
+        </strong><br>
+        <span class="creator-role">(Social Media Manager)</span>
+        <p class="creator-desc">
+            <em>
+                - Responsible for managing ChatPH’s social presence, engaging with the community, 
+                and sharing updates across platforms. Focused on building a strong connection 
+                between users and the platform.
+            </em>
+        </p>
+    </div>
+</div>
+
+<!-- 🔐 DATA SECURITY -->
+<div class="creator-content">
+    <img src="image/char/sword.png" alt="Anonymous Sword" class="creator-img">
+    <div>
+        <strong>
+            Anonymous Sword
+            <span class="moderator-badge moderator-sword">Moderator</span>
+        </strong><br>
+        <span class="creator-role">(Data Security & System Protection)</span>
+        <p class="creator-desc">
+            <em>
+                - Handles data security and system protection, ensuring that user information 
+                remains safe and protected. Focused on preventing vulnerabilities and maintaining 
+                a secure and trustworthy platform.
+            </em>
+        </p>
+    </div>
+</div>
+
+<!-- 🧠 LOGIC / PLANNER -->
+<div class="creator-content">
+    <img src="image/char/f11.png" alt="Anonymous F11" class="creator-img">
+    <div>
+        <strong>
+            Anonymous F11
+            <span class="moderator-badge moderator-f11">Moderator</span>
+        </strong><br>
+        <span class="creator-role">(System Logic & Strategy Planner)</span>
+        <p class="creator-desc">
+            <em>
+                - Focused on system logic, debugging, and improving platform behavior. 
+                Also responsible for analyzing user interactions and providing smart 
+                recommendations to enhance communication and overall user experience.
+            </em>
+        </p>
+    </div>
+</div>
+
 </div>
     
 </div>
@@ -658,7 +770,7 @@ maintain and manage the system efficiently.
 If you are nearby or referencing our location, you may find us here:
 <br><br>
 <a href="https://maps.app.goo.gl/fJqPDH6FmHom23qi9" target="_blank" style="color:var(--accent);">
-Barranggay 22-C Poblacion District, Super Block #3 Piape Boulevard, Davao City, 8000 Davao Del Sur
+Baranggay 22-C Poblacion District, Super Block #3 Piapi Boulevard, Davao City, 8000 Davao Del Sur
 </a>
 <br><br>
 This location represents our development and operational base.
