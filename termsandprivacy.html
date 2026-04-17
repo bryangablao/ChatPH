@@ -461,10 +461,21 @@ opacity:0.9;
     position:relative;
     width:100%;
     overflow:hidden;
-    margin-top: 0;
-    padding-top: 0;
+
+    margin-top: 20px;
+    padding: 20px;
+
+    background: rgba(255,255,255,0.03); /* subtle for dark */
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    backdrop-filter: blur(8px);
 }
 
+.light .coverflow-section{
+    background: rgba(0,0,0,0.03); /* subtle for light */
+}
+    
 .coverflow{
     display:flex;
     justify-content:center;
