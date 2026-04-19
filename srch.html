@@ -138,32 +138,10 @@ pointer-events:auto;
 
 /* MAIN */
 .main{
-    position: relative;
-    max-width:520px;
-    margin:auto;
-    padding:16px;
-    z-index:1;
-
-    background: transparent;
-}
-
-.page-bg{
-    position: relative;
-    width: 100%;
-    flex: 1;
-
-    background: url('image/wallpaper/ChatPHwallpaper.png') center center / cover no-repeat;
-}
-
-.search-box,
-.user-card{
-    background: rgba(23,26,33,0.85);
-    backdrop-filter: blur(10px);
-}
-
-.main > *{
-    position: relative;
-    z-index: 1;
+max-width:520px;
+margin:auto;
+padding:16px;
+flex:1;
 }
 
 .main.centered .search-box{
@@ -355,11 +333,10 @@ cursor:pointer;
 /* FOOTER */
 footer{
     text-align:center;
-    padding:30px 20px;
-    color:#94a3b8;
-    border-top:1px solid rgba(255,255,255,0.08);
+    padding:10px;
+    font-size:13px;
+    opacity:.6;
     background:var(--bg);
-    margin-top:0; /* 🔥 remove gap */
 }
     
 footer a:hover{
@@ -456,7 +433,6 @@ font-size:14px;
 <div class="overlay" id="overlay" onclick="toggleSidebar(true)"></div>
 
 <!-- MAIN -->
-<div class="page-bg">
 <div class="main">
 
 <div class="search-box">
@@ -471,7 +447,7 @@ Online: <span id="onlineUsers">0</span>
 <div id="results"></div>
 
 </div>
-</div>
+
 <!-- POPUP -->
 <div class="popup" id="popup">
 <div class="popup-content">
@@ -1037,3 +1013,5 @@ z-index:99999;
 "></div>
 </body>
 </html>
+
+
