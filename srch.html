@@ -138,10 +138,27 @@ pointer-events:auto;
 
 /* MAIN */
 .main{
-max-width:520px;
-margin:auto;
-padding:16px;
-flex:1;
+    position: relative;
+    max-width:520px;
+    margin:auto;
+    padding:16px;
+    flex:1;
+    min-height: calc(100vh - 70px);
+    
+    background: url('image/wallpaper/ChatPHwallpaper.png') center/cover no-repeat;
+}
+
+.main::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.5); /* dark overlay */
+    z-index: 0;
+}
+
+.main > *{
+    position: relative;
+    z-index: 1;
 }
 
 .main.centered .search-box{
