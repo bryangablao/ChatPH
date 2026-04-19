@@ -137,10 +137,12 @@ pointer-events:auto;
 
 /* MAIN */
 .main{
-    max-width:520px;
+    max-width:420px;
     margin:auto;
     padding:16px;
-    width:100%; /* important */
+    width:100%;
+    position:relative;
+    z-index:1;
 }
 
 .main-bg{
@@ -149,6 +151,16 @@ pointer-events:auto;
     background: url('image/wallpaper/ChatPHwallpaper.png') center center / cover no-repeat;
     display:flex;
     justify-content:center;
+    position:relative; /* مهم */
+}
+
+/* 🔥 overlay layer */
+.main-bg::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background: rgba(0,0,0,0.55); /* adjust 0.3 - 0.7 */
+    z-index:0;
 }
 
 .main.centered .search-box{
