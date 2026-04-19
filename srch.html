@@ -155,26 +155,10 @@ pointer-events:auto;
     background: url('image/wallpaper/ChatPHwallpaper.png') center center / cover no-repeat;
 }
 
-.page-bg::before{
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.55);
-    z-index: 0;
-}
-
 .search-box,
 .user-card{
     background: rgba(23,26,33,0.85);
     backdrop-filter: blur(10px);
-}
-
-.main::before{
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.55);
-    z-index: 0;
 }
 
 .main > *{
@@ -371,10 +355,11 @@ cursor:pointer;
 /* FOOTER */
 footer{
     text-align:center;
-    padding:10px;
-    font-size:13px;
-    opacity:.6;
+    padding:30px 20px;
+    color:#94a3b8;
+    border-top:1px solid rgba(255,255,255,0.08);
     background:var(--bg);
+    margin-top:0; /* 🔥 remove gap */
 }
     
 footer a:hover{
