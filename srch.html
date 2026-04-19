@@ -20,9 +20,8 @@
 body{
     margin:0;
     font-family:'Inter',sans-serif;
-    background:var(--bg);
+    background:var(--bg); 
     color:var(--text);
-
     display:flex;
     flex-direction:column;
     min-height:100vh;
@@ -138,16 +137,25 @@ pointer-events:auto;
 
 /* MAIN */
 .main{
-max-width:520px;
-margin:auto;
-padding:16px;
-flex:1;
+    max-width:520px;
+    margin:auto;
+    padding:16px;
+    width:100%; /* important */
+}
+
+.main-bg{
+    flex:1;
+    width:100%;
+    background: url('image/wallpaper/ChatPHwallpaper.png') center center / cover no-repeat;
+
+    display:flex;
+    justify-content:center;
 }
 
 .main.centered .search-box{
 width:100%;
-max-width:650px; /* 👈 bigger */
-padding:25px; /* 👈 more space */
+max-width:650px;
+padding:25px
 border-radius:16px;
 }
 
@@ -433,6 +441,7 @@ font-size:14px;
 <div class="overlay" id="overlay" onclick="toggleSidebar(true)"></div>
 
 <!-- MAIN -->
+<div class="main-bg">
 <div class="main">
 
 <div class="search-box">
@@ -447,7 +456,7 @@ Online: <span id="onlineUsers">0</span>
 <div id="results"></div>
 
 </div>
-
+</div>
 <!-- POPUP -->
 <div class="popup" id="popup">
 <div class="popup-content">
