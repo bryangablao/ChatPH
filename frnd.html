@@ -145,6 +145,16 @@ padding:16px;
 flex:1;
 }
 
+.main-bg{
+    flex:1;
+    width:100%;
+    background: 
+        linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), /* 🔥 dark overlay */
+        url('image/wallpaper/ChatPHwallpaper.png') center center / cover no-repeat;
+    display:flex;
+    justify-content:center;
+}
+
 /* FOOTER */
 footer{
     text-align:center;
@@ -360,6 +370,7 @@ text-decoration:underline;
 <div class="overlay" id="overlay" onclick="toggleSidebar(true)"></div>
 
 <!-- MAIN -->
+<div class="main-bg">
 <div class="main">
 <div class="tabs">
     <div class="tab active" data-tab="friends">Friends</div>
@@ -373,6 +384,7 @@ text-decoration:underline;
     <div id="requestsPanel" class="panel"></div>
 </div>
 </div>
+</div>
 
 <!-- FOOTER -->
 <footer style="
@@ -380,7 +392,6 @@ text-align:center;
 padding:30px 20px;
 color:#94a3b8;
 border-top:1px solid rgba(255,255,255,0.08);
-margin-top:40px;
 ">
 <div>© 2026 ChatPH • All Rights Reserved</div>
 
