@@ -26,8 +26,6 @@ body{
     display:flex;
     flex-direction:column;
     min-height:100vh;
-
-    background: url('image/wallpaper/ChatPHwallpaper.png') center/cover no-repeat fixed;
 }
 
 /* HEADER */
@@ -140,18 +138,22 @@ pointer-events:auto;
 
 /* MAIN */
 .main{
+    position: relative;
     max-width:520px;
     margin:auto;
     padding:16px;
     flex:1;
-    background: transparent;
+
+    background: url('image/wallpaper/ChatPHwallpaper.png') center center / cover no-repeat;
+    border-radius:16px; /* 👈 makes it look clean */
+    overflow:hidden; /* 👈 fixes overlay edges */
 }
 
 .main::before{
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.5); /* dark overlay */
+    background: rgba(0,0,0,0.55);
     z-index: 0;
 }
 
