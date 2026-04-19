@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Stick Runner</title>
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+    background:#0f1115;
+}
+canvas{
+    display:block;
+    margin:auto;
+    background:#111;
+}
+</style>
+</head>
+<body>
+
+<canvas id="gameCanvas"></canvas>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = 800;
+canvas.height = 400;
+
+/* PLAYER */
+let player = {
+    x: 100,
+    y: 300,
+    width: 30,
+    height: 50,
+    dy: 0,
+    gravity: 0.8,
+    jumpForce: -15,
+    grounded: true
+};
+
+/* OBSTACLES */
+let obstacles = [];
+let speed = 6;
+
+/* CONTROLS */
+document.addEventListener("keydown", (e)=>{
+    if(e.code === "Space" && player.grounded){
+        player.dy = player.jumpForce;
+        player.grounded = false;
+    }
+});
+
+/* GAME LOOP */
+function update(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    /* PLAYER PHYSICS */
+    player.dy += player.gravity;
+    player.y += player.dy;
+
+    if(player.y >= 300){
+        player.y = 300;
+        player.dy = 0;
+        player.grounded = true;
+    }
+
+    /* DRAW PLAYER (stickman) */
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 3;
+
+    // head
+    ctx.beginPath();
+    ctx.arc(player.x + 15, player.y - 10, 10, 0, Math.PI*2);
+    ctx.stroke();
+
+    // body
+    ctx.beginPath();
+    ctx.moveTo(player.x + 15, player.y);
+    ctx.lineTo(player.x + 15, player.y + 30);
+    ctx.stroke();
+
+    // arms
+    ctx.beginPath();
+    ctx.moveTo(player.x, player.y + 10);
+    ctx.lineTo(player.x + 30, player.y + 10);
+    ctx.stroke();
+
+    // legs
+    ctx.beginPath();
+    ctx.moveTo(player.x + 15, player.y + 30);
+    ctx.lineTo(player.x, player.y + 50);
+    ctx.moveTo(player.x + 15, player.y + 30);
+    ctx.lineTo(player.x + 30, player.y + 50);
+    ctx.stroke();
+
+    /* SPAWN OBSTACLES */
+    if(Math.random() < 0.02){
+        obstacles.push({
+            x: canvas.width,
+            y: 320,
+            width: 20,
+            height: 30
+        });
+    }
+
+    /* DRAW + MOVE OBSTACLES */
+    for(let i=0;i<obstacles.length;i++){
+        let o = obstacles[i];
+        o.x -= speed;
+
+        ctx.fillStyle = "red";
+        ctx.fillRect(o.x, o.y, o.width, o.height);
+
+        /* COLLISION */
+        if(
+            player.x < o.x + o.width &&
+            player.x + player.width > o.x &&
+            player.y < o.y + o.height &&
+            player.y + player.height > o.y
+        ){
+            alert("Game Over!");
+            document.location.reload();
+        }
+    }
+
+    requestAnimationFrame(update);
+}
+
+update();
+</script>
+
+</body>
+</html>
