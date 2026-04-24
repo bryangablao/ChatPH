@@ -123,6 +123,7 @@ font-weight:700;
     top: 0;
     transition: 0.3s ease;
     box-shadow: 0 0 10px rgba(59,130,246,0.7);
+    z-index: 0;
 }
 
 .overlay{
@@ -444,16 +445,18 @@ font-size:14px;
 
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
-<a href="home.html">Home</a>
-<a href="msg.html">Messages</a>
-<a href="frnd.html">Friends</a>
-<a href="#" class="active" onclick="return false;">Search User</a>
-<a href="prfl.html">Profile</a>
 
-<!-- PUSH SETTINGS TO BOTTOM -->
-<a href="set.html" id="settingsBtn" style="margin-top:auto;">Settings</a>
+    <div class="top-links">
+        <a href="home.html">Home</a>
+        <a href="msg.html">Messages</a>
+        <a href="frnd.html">Friends</a>
+        <a href="#" class="active" onclick="return false;">Search User</a>
+        <a href="prfl.html">Profile</a>
+    </div>
 
-<div class="indicator" id="indicator"></div>
+    <a href="set.html" class="bottom-link">Settings</a>
+
+    <div class="indicator" id="indicator"></div>
 </div>
 
 <div class="overlay" id="overlay" onclick="toggleSidebar(true)"></div>
