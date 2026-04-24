@@ -61,6 +61,8 @@ font-weight:700;
 
 /* SIDEBAR */
 .sidebar{
+    display:flex;
+    flex-direction:column;
     position: fixed;
     top: 0;
     left: -260px;
@@ -445,6 +447,11 @@ font-size:14px;
 <a href="frnd.html">Friends</a>
 <a href="#" class="active" onclick="return false;">Search User</a>
 <a href="prfl.html">Profile</a>
+
+<!-- PUSH SETTINGS TO BOTTOM -->
+<div style="flex:1;"></div>
+
+<a href="set.html" id="settingsBtn">Settings</a>
 
 <div class="indicator" id="indicator"></div>
 </div>
