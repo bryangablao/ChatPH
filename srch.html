@@ -74,6 +74,7 @@ font-weight:700;
     padding-top: 70px;
     transition: .3s;
     z-index: 999;
+    overflow-y: auto;
 }
 .sidebar.open{
     left:0;
@@ -131,6 +132,7 @@ background:rgba(0,0,0,0.5);
 opacity:0;
 pointer-events:none;
 transition:.3s;
+z-index: 998;
 }
 .overlay.active{
 opacity:1;
@@ -449,9 +451,7 @@ font-size:14px;
 <a href="prfl.html">Profile</a>
 
 <!-- PUSH SETTINGS TO BOTTOM -->
-<div style="flex:1;"></div>
-
-<a href="set.html" id="settingsBtn">Settings</a>
+<a href="set.html" id="settingsBtn" style="margin-top:auto;">Settings</a>
 
 <div class="indicator" id="indicator"></div>
 </div>
@@ -553,15 +553,23 @@ const auth = getAuth(app);
 
 /* SIDEBAR */
 window.toggleSidebar = (close=false)=>{
-const s = document.getElementById("sidebar");
-const o = document.getElementById("overlay");
-if(close){
-s.classList.remove("open");
-o.classList.remove("active");
-}else{
-s.classList.toggle("open");
-o.classList.toggle("active");
-}
+    const s = document.getElementById("sidebar");
+    const o = document.getElementById("overlay");
+
+    if(close){
+        s.classList.remove("open");
+        o.classList.remove("active");
+    }else{
+        const isOpen = s.classList.contains("open");
+
+        if(isOpen){
+            s.classList.remove("open");
+            o.classList.remove("active");
+        }else{
+            s.classList.add("open");
+            o.classList.add("active");
+        }
+    }
 };
 
 /* AUTH */
