@@ -61,35 +61,18 @@ font-weight:700;
 
 /* SIDEBAR */
 .sidebar{
-    display:flex;
-    flex-direction:column;
-
     position: fixed;
     top: 0;
     left: -260px;
     width: 240px;
-    height: 100vh;
-
+    height: 100%;
     background: rgba(21,25,33,0.75);
     backdrop-filter: blur(12px);
     border-right: 1px solid rgba(255,255,255,0.08);
-
     padding-top: 70px;
-
     transition: .3s;
     z-index: 999;
 }
-
-.top-links{
-    display:flex;
-    flex-direction:column;
-    flex:1;
-}
-
-.bottom-link{
-    margin-top:auto;
-}
-    
 .sidebar.open{
     left:0;
 }
@@ -137,7 +120,6 @@ font-weight:700;
     top: 0;
     transition: 0.3s ease;
     box-shadow: 0 0 10px rgba(59,130,246,0.7);
-    z-index: 0;
 }
 
 .overlay{
@@ -147,7 +129,6 @@ background:rgba(0,0,0,0.5);
 opacity:0;
 pointer-events:none;
 transition:.3s;
-z-index: 998;
 }
 .overlay.active{
 opacity:1;
@@ -459,18 +440,13 @@ font-size:14px;
 
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
+<a href="home.html">Home</a>
+<a href="msg.html">Messages</a>
+<a href="frnd.html">Friends</a>
+<a href="#" class="active" onclick="return false;">Search User</a>
+<a href="prfl.html">Profile</a>
 
-    <div class="top-links">
-        <a href="home.html">Home</a>
-        <a href="msg.html">Messages</a>
-        <a href="frnd.html">Friends</a>
-        <a href="#" class="active" onclick="return false;">Search User</a>
-        <a href="prfl.html">Profile</a>
-    </div>
-
-    <a href="set.html" class="bottom-link">Settings</a>
-
-    <div class="indicator" id="indicator"></div>
+<div class="indicator" id="indicator"></div>
 </div>
 
 <div class="overlay" id="overlay" onclick="toggleSidebar(true)"></div>
@@ -570,23 +546,15 @@ const auth = getAuth(app);
 
 /* SIDEBAR */
 window.toggleSidebar = (close=false)=>{
-    const s = document.getElementById("sidebar");
-    const o = document.getElementById("overlay");
-
-    if(close){
-        s.classList.remove("open");
-        o.classList.remove("active");
-    }else{
-        const isOpen = s.classList.contains("open");
-
-        if(isOpen){
-            s.classList.remove("open");
-            o.classList.remove("active");
-        }else{
-            s.classList.add("open");
-            o.classList.add("active");
-        }
-    }
+const s = document.getElementById("sidebar");
+const o = document.getElementById("overlay");
+if(close){
+s.classList.remove("open");
+o.classList.remove("active");
+}else{
+s.classList.toggle("open");
+o.classList.toggle("active");
+}
 };
 
 /* AUTH */
@@ -1064,5 +1032,4 @@ z-index:99999;
 "></div>
 </body>
 </html>
-
 
