@@ -404,6 +404,25 @@ padding:9px;
 }
 
 }
+
+/* register */
+.username-box{
+    position:relative;
+}
+
+.username-box input{
+    padding-right:90px; /* space for suffix */
+}
+
+.suffix{
+    position:absolute;
+    right:12px;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:12px;
+    color:#9ca3af;
+    pointer-events:none;
+}
   
 </style>
 </head>
@@ -447,7 +466,7 @@ in a simple and meaningful way.
 
 <div class="input">
 <i class="fa fa-envelope"></i>
-<input type="email" placeholder="Email">
+<input type="text" placeholder="Email">
 </div>
 
 <div class="input">
@@ -481,7 +500,11 @@ Sign in with Google
 
 <div class="input">
 <i class="fa fa-envelope"></i>
-<input type="email" id="registerEmail" placeholder="Email">
+<div class="input username-box">
+    <i class="fa fa-user"></i>
+    <input type="text" id="registerEmail" placeholder="Username">
+    <span class="suffix">@chat.ph</span>
+</div>
 </div>
   
 <div class="input">
@@ -632,7 +655,8 @@ document.getElementById(form).classList.add("active")
 document.getElementById("register").addEventListener("submit", async function(e){
 e.preventDefault()
 
-const email = document.getElementById("registerEmail").value
+const username = document.getElementById("registerEmail").value.trim()
+const email = username + "@chat.ph"
 const password = this.querySelector('input[type="password"]').value
 const firstName = document.getElementById("firstName").value
 const lastName = document.getElementById("lastName").value
@@ -660,8 +684,6 @@ try{
 const userCredential = await createUserWithEmailAndPassword(auth,email,password)
 const user = userCredential.user
 
-await sendEmailVerification(user)
-
 await updateProfile(user,{
 displayName:firstName + " " + lastName,
 photoURL:"https://i.imgur.com/6VBx3io.png"
@@ -679,7 +701,7 @@ createdAt:new Date()
 
 regStatus.style.display="block"
 regStatus.style.color="#22c55e"
-regStatus.textContent="Account created. Please verify your email before login."
+regStatus.textContent="Account created successfully. You can now login."
 
 }catch(error){
 
@@ -695,7 +717,8 @@ document.getElementById("login").addEventListener("submit", async function(e){
 
 e.preventDefault()
 
-const email = this.querySelector('input[type="email"]').value
+const username = this.querySelector('input[type="text"]').value.trim()
+const email = username + "@chat.ph"
 const password = this.querySelector('input[type="password"]').value
 
 let status = this.querySelector(".loginStatus")
@@ -722,12 +745,6 @@ return
 
 const userCredential = await signInWithEmailAndPassword(auth,email,password)
 const user = userCredential.user
-
-if(!user.emailVerified){
-status.style.color="#ef4444"
-status.textContent="Please verify your email before logging in."
-return
-}
 
 status.textContent="Login successful. Redirecting..."
 
