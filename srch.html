@@ -63,6 +63,8 @@ font-weight:700;
 .sidebar{
     display:flex;
     flex-direction:column;
+    justify-content:space-between; /* ⭐ THIS IS THE FIX */
+    
     position: fixed;
     top: 0;
     left: -260px;
@@ -74,8 +76,13 @@ font-weight:700;
     padding-top: 70px;
     transition: .3s;
     z-index: 999;
-    overflow-y: auto;
 }
+
+.top-links{
+    display:flex;
+    flex-direction:column;
+}
+    
 .sidebar.open{
     left:0;
 }
@@ -418,15 +425,6 @@ font-size:14px;
     text-decoration: underline;
     cursor: pointer;
 }
-
-.top-links{
-    display:flex;
-    flex-direction:column;
-}
-
-.bottom-link{
-    margin-top:auto;
-}
     
 </style>
 </head>
@@ -463,7 +461,7 @@ font-size:14px;
         <a href="prfl.html">Profile</a>
     </div>
 
-    <a href="set.html" class="bottom-link">Settings</a>
+    <a href="set.html">Settings</a>
 
     <div class="indicator" id="indicator"></div>
 </div>
