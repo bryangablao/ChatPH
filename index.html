@@ -424,38 +424,18 @@ padding:9px;
     pointer-events:none;
 }
 
-.info-icon{
-    position:absolute;
-    right:70px;
-    top:50%;
-    transform:translateY(-50%);
-    width:18px;
-    height:18px;
-    border-radius:50%;
-    background:#555;
-    color:#fff;
-    font-size:12px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
+.spinner{
+width:18px;
+height:18px;
+border:2px solid #fff;
+border-top:2px solid transparent;
+border-radius:50%;
+animation:spin .6s linear infinite;
+margin:auto;
 }
 
-.info-box{
-    position:absolute;
-    right:-10px;
-    top:-70px;
-    background:#111;
-    border:1px solid rgba(255,255,255,0.1);
-    padding:8px;
-    border-radius:8px;
-    font-size:11px;
-    width:180px;
-    display:none;
-}
-
-.username-box:hover .info-box{
-    display:block;
+@keyframes spin{
+to{ transform:rotate(360deg); }
 }
   
 </style>
@@ -541,12 +521,6 @@ Sign in with Google
     oninput="this.value=this.value.replace(/[^a-zA-Z0-9*\-_/!]/g,'')">
 
     <span class="suffix">@chat.ph</span>
-    <div class="info-icon">i</div>
-    <div class="info-box">
-        Allowed:<br>
-        a-z, A-Z, 0-9, *, -, _, !, /<br>
-        Min: 7 | Max: 13
-    </div>
 </div>
 </div>
   
@@ -701,71 +675,75 @@ document.getElementById("register").addEventListener("submit", async function(e)
 e.preventDefault()
 
 const username = document.getElementById("registerEmail").value.trim()
-if(!/^[a-zA-Z0-9*\-_/!]{7,13}$/.test(username)){
-    regStatus.style.display="block"
-    regStatus.style.color="#ef4444"
-    regStatus.textContent="Username must be 7–13 chars (a-z, A-Z, 0-9, *, -, _, !, /)"
-    return
-}
-if(!/^[A-Za-z]+$/.test(firstName) || !/^[A-Za-z]+$/.test(lastName)){
-    regStatus.style.display="block"
-    regStatus.style.color="#ef4444"
-    regStatus.textContent="Names must contain letters only"
-    return
-}
-const email = username + "@chat.ph"
-const password = this.querySelector('input[type="password"]').value
 const firstName = document.getElementById("firstName").value
 const lastName = document.getElementById("lastName").value
 const phone = document.getElementById("mobileNumber").value
 const pin = document.getElementById("pinInput").value
+const password = this.querySelector('input[type="password"]').value
 const regStatus = document.getElementById("regStatus")
 
-/* VALIDATION */
-if(!/^09\d{9}$/.test(phone)){
+/* SHOW SPINNER */
 regStatus.style.display="block"
-regStatus.style.color="#ef4444"
-regStatus.textContent="Invalid Philippine mobile number"
-return
+regStatus.style.color="#fff"
+regStatus.innerHTML = '<div class="spinner"></div>'
+
+/* VALIDATIONS */
+if(!/^[a-zA-Z0-9*\-_/!]{7,13}$/.test(username)){
+    regStatus.style.color="#ef4444"
+    regStatus.textContent="Username must be 7–13 chars"
+    return
+}
+
+if(!/^[A-Za-z]+$/.test(firstName) || !/^[A-Za-z]+$/.test(lastName)){
+    regStatus.style.color="#ef4444"
+    regStatus.textContent="Names must contain letters only"
+    return
+}
+
+if(!/^09\d{9}$/.test(phone)){
+    regStatus.style.color="#ef4444"
+    regStatus.textContent="Invalid mobile number"
+    return
 }
 
 if(!/^\d{6}$/.test(pin)){
-regStatus.style.display="block"
-regStatus.style.color="#ef4444"
-regStatus.textContent="PIN must be 6 digits"
-return
+    regStatus.style.color="#ef4444"
+    regStatus.textContent="PIN must be 6 digits"
+    return
 }
 
+const email = username + "@chat.ph"
+
 try{
+    const userCredential = await createUserWithEmailAndPassword(auth,email,password)
+    const user = userCredential.user
 
-const userCredential = await createUserWithEmailAndPassword(auth,email,password)
-const user = userCredential.user
+    await updateProfile(user,{
+        displayName:firstName + " " + lastName,
+        photoURL:"https://i.imgur.com/6VBx3io.png"
+    })
 
-await updateProfile(user,{
-displayName:firstName + " " + lastName,
-photoURL:"https://i.imgur.com/6VBx3io.png"
-})
+    await setDoc(doc(db,"users",user.uid),{
+        firstName,
+        lastName,
+        phone,
+        pin,
+        email,
+        photo:"https://i.imgur.com/6VBx3io.png",
+        createdAt:new Date()
+    })
 
-await setDoc(doc(db,"users",user.uid),{
-firstName:firstName,
-lastName:lastName,
-phone:phone,
-pin:pin,
-email:email,
-photo:"https://i.imgur.com/6VBx3io.png",
-createdAt:new Date()
-})
+    regStatus.style.color="#22c55e"
+    regStatus.textContent="Account created successfully!"
+}
+catch(error){
+    regStatus.style.color="#ef4444"
 
-regStatus.style.display="block"
-regStatus.style.color="#22c55e"
-regStatus.textContent="Account created successfully. You can now login."
-
-}catch(error){
-
-regStatus.style.display="block"
-regStatus.style.color="#ef4444"
-regStatus.textContent=error.message
-
+    if(error.code === "auth/email-already-in-use"){
+        regStatus.textContent="Username already taken"
+    }else{
+        regStatus.textContent="Registration failed"
+    }
 }
 })
 
@@ -787,17 +765,34 @@ this.appendChild(status)
 }
 
 status.style.display="block"
-status.style.color="#22c55e"
+status.style.color="#fff"
+status.innerHTML = '<div class="spinner"></div>'
 
 try{
     const userCredential = await signInWithEmailAndPassword(auth,email,password)
+
+    status.style.color="#22c55e"
     status.textContent="Login successful. Redirecting..."
+
     setTimeout(()=>{
         window.location.href="home.html"
     },1500)
+
 }catch(error){
     status.style.color="#ef4444"
-    status.textContent="Invalid username or password"
+
+    if(error.code === "auth/user-not-found"){
+        status.textContent="No account found"
+    }
+    else if(error.code === "auth/wrong-password"){
+        status.textContent="Wrong password"
+    }
+    else if(error.code === "auth/invalid-email"){
+        status.textContent="Invalid username"
+    }
+    else{
+        status.textContent="Login failed"
+    }
 }
 
 })
