@@ -63,24 +63,33 @@ font-weight:700;
 .sidebar{
     display:flex;
     flex-direction:column;
-    justify-content:space-between; /* ⭐ THIS IS THE FIX */
-    
+
     position: fixed;
     top: 0;
     left: -260px;
     width: 240px;
     height: 100%;
+
     background: rgba(21,25,33,0.75);
     backdrop-filter: blur(12px);
     border-right: 1px solid rgba(255,255,255,0.08);
+
     padding-top: 70px;
+
     transition: .3s;
     z-index: 999;
+
+    overflow-y: auto;
 }
 
 .top-links{
     display:flex;
     flex-direction:column;
+    flex:1;
+}
+
+.bottom-link{
+    margin-top:auto;
 }
     
 .sidebar.open{
@@ -461,7 +470,7 @@ font-size:14px;
         <a href="prfl.html">Profile</a>
     </div>
 
-    <a href="set.html">Settings</a>
+    <a href="set.html" class="bottom-link">Settings</a>
 
     <div class="indicator" id="indicator"></div>
 </div>
