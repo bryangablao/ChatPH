@@ -423,6 +423,40 @@ padding:9px;
     color:#9ca3af;
     pointer-events:none;
 }
+
+.info-icon{
+    position:absolute;
+    right:70px;
+    top:50%;
+    transform:translateY(-50%);
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    background:#555;
+    color:#fff;
+    font-size:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+}
+
+.info-box{
+    position:absolute;
+    right:-10px;
+    top:-70px;
+    background:#111;
+    border:1px solid rgba(255,255,255,0.1);
+    padding:8px;
+    border-radius:8px;
+    font-size:11px;
+    width:180px;
+    display:none;
+}
+
+.username-box:hover .info-box{
+    display:block;
+}
   
 </style>
 </head>
@@ -502,19 +536,30 @@ Sign in with Google
 <i class="fa fa-envelope"></i>
 <div class="input username-box">
     <i class="fa fa-user"></i>
-    <input type="text" id="registerEmail" placeholder="Username">
+
+    <input type="text" id="registerEmail" placeholder="Email"
+    oninput="this.value=this.value.replace(/[^a-zA-Z0-9*\-_/!]/g,'')">
+
     <span class="suffix">@chat.ph</span>
+    <div class="info-icon">i</div>
+    <div class="info-box">
+        Allowed:<br>
+        a-z, A-Z, 0-9, *, -, _, !, /<br>
+        Min: 7 | Max: 13
+    </div>
 </div>
 </div>
   
 <div class="input">
 <i class="fa fa-user"></i>
-<input type="text" id="firstName" placeholder="First Name">
+<input type="text" id="firstName" placeholder="First Name"
+oninput="this.value=this.value.replace(/[^A-Za-z]/g,'')">
 </div>
 
 <div class="input">
 <i class="fa fa-user"></i>
-<input type="text" id="lastName" placeholder="Last Name">
+<input type="text" id="lastName" placeholder="Last Name"
+oninput="this.value=this.value.replace(/[^A-Za-z]/g,'')">
 </div>
 
 <div class="input">
@@ -656,6 +701,18 @@ document.getElementById("register").addEventListener("submit", async function(e)
 e.preventDefault()
 
 const username = document.getElementById("registerEmail").value.trim()
+if(!/^[a-zA-Z0-9*\-_/!]{7,13}$/.test(username)){
+    regStatus.style.display="block"
+    regStatus.style.color="#ef4444"
+    regStatus.textContent="Username must be 7–13 chars (a-z, A-Z, 0-9, *, -, _, !, /)"
+    return
+}
+if(!/^[A-Za-z]+$/.test(firstName) || !/^[A-Za-z]+$/.test(lastName)){
+    regStatus.style.display="block"
+    regStatus.style.color="#ef4444"
+    regStatus.textContent="Names must contain letters only"
+    return
+}
 const email = username + "@chat.ph"
 const password = this.querySelector('input[type="password"]').value
 const firstName = document.getElementById("firstName").value
@@ -733,30 +790,14 @@ status.style.display="block"
 status.style.color="#22c55e"
 
 try{
-
-const q = query(collection(db,"users"), where("email","==",email))
-const snap = await getDocs(q)
-
-if(snap.empty){
-status.style.color="#ef4444"
-status.textContent="Account does not exist"
-return
-}
-
-const userCredential = await signInWithEmailAndPassword(auth,email,password)
-const user = userCredential.user
-
-status.textContent="Login successful. Redirecting..."
-
-setTimeout(()=>{
-window.location.href="home.html"
-},5000)
-
+    const userCredential = await signInWithEmailAndPassword(auth,email,password)
+    status.textContent="Login successful. Redirecting..."
+    setTimeout(()=>{
+        window.location.href="home.html"
+    },1500)
 }catch(error){
-
-status.style.color="#ef4444"
-status.textContent="Invalid email or password"
-
+    status.style.color="#ef4444"
+    status.textContent="Invalid username or password"
 }
 
 })
