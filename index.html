@@ -480,7 +480,7 @@ in a simple and meaningful way.
 
 <div class="input">
 <i class="fa fa-envelope"></i>
-<input type="text" placeholder="Email">
+<input type="text" placeholder="Email or Username">
 </div>
 
 <div class="input">
@@ -517,7 +517,7 @@ Sign in with Google
 <div class="input username-box">
     <i class="fa fa-user"></i>
 
-    <input type="text" id="registerEmail" placeholder="Email"
+    <input type="text" id="registerEmail" placeholder="Username"
     oninput="this.value=this.value.replace(/[^a-zA-Z0-9*\-_/!]/g,'')">
 
     <span class="suffix">@chat.ph</span>
@@ -752,8 +752,14 @@ document.getElementById("login").addEventListener("submit", async function(e){
 
 e.preventDefault()
 
-const username = this.querySelector('input[type="text"]').value.trim()
-const email = username + "@chat.ph"
+const input = this.querySelector('input[type="text"]').value.trim()
+
+let email
+if(input.includes("@")){
+    email = input   // user typed full email
+}else{
+    email = input + "@chat.ph"  // user typed username
+}
 const password = this.querySelector('input[type="password"]').value
 
 let status = this.querySelector(".loginStatus")
