@@ -245,9 +245,12 @@ import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from "https://www.gst
 import { getAuth, onAuthStateChanged, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const app = initializeApp({
-apiKey:"AIza...",
-authDomain:"chatph-cc187.firebaseapp.com",
-projectId:"chatph-cc187"
+  apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
+  authDomain: "chatph-cc187.firebaseapp.com",
+  projectId: "chatph-cc187",
+  storageBucket: "chatph-cc187.firebasestorage.app",
+  messagingSenderId: "324012163441",
+  appId: "1:324012163441:web:7a54be2231ad2cae71f6d0"
 });
 
 const db = getFirestore(app);
