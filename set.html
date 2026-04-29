@@ -231,6 +231,35 @@ button:hover{
 .back-btn:hover{
     opacity:1;
 }
+
+select{
+    width:100%;
+    padding:10px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#0f1115;
+    color:white;
+    font-size:14px;
+    appearance:none;
+    outline:none;
+    cursor:pointer;
+}
+
+/* custom arrow */
+.select-wrap{
+    position:relative;
+}
+
+.select-wrap::after{
+    content:"▼";
+    position:absolute;
+    right:12px;
+    top:50%;
+    transform:translateY(-50%);
+    pointer-events:none;
+    font-size:12px;
+    opacity:.6;
+}
     
 /* FOOTER */
 footer{
@@ -283,9 +312,12 @@ opacity:.6;
 </div>
 
 <div class="row">
-<div class="label">Phone</div>
-<div class="value view" id="viewPhone"></div>
-<input id="phone" maxlength="11" inputmode="numeric">
+  <div class="label">Phone</div>
+  <div class="value view" id="viewPhone"></div>
+  
+  <div class="input-wrap edit-field" hidden>
+    <input id="phone" maxlength="11" inputmode="numeric">
+  </div>
 </div>
 
 <div class="row">
@@ -307,12 +339,14 @@ opacity:.6;
   <div class="label">Gender</div>
   <div class="value view" id="viewGender"></div>
 
-  <select id="gender" class="edit-field" hidden>
+<div class="select-wrap edit-field" hidden>
+  <select id="gender">
     <option value="">Select</option>
     <option value="Male">Male</option>
     <option value="Female">Female</option>
     <option value="Rather not say">Rather not say</option>
   </select>
+</div>
 </div>
 
 <div class="actions">
