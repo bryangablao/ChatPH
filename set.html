@@ -158,13 +158,30 @@ input{
 button{
     padding:10px 16px;
     border:none;
-    border-radius:10px;
+    border-radius:12px;
     cursor:pointer;
     font-weight:600;
+    color:white;
+
+    background: linear-gradient(135deg, rgba(77,163,255,0.7), rgba(0,200,255,0.4));
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+
+    transition: all 0.25s ease;
+}
+
+/* hover effect */
+button:hover{
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+}
+
+/* delete button */
+.delete{
+    background: linear-gradient(135deg, rgba(255,75,75,0.8), rgba(255,0,100,0.5));
 }
 
 .edit{background:#4da3ff;color:black;}
-.delete{background:#ff4b4b;color:white;}
 .cancel{background:#6b7280;color:white;}
 
 .header{
@@ -268,7 +285,7 @@ opacity:.6;
 <div class="row">
 <div class="label">Phone</div>
 <div class="value view" id="viewPhone"></div>
-<input id="phone" class="edit-field" hidden>
+<input id="phone" maxlength="11" inputmode="numeric">
 </div>
 
 <div class="row">
@@ -276,8 +293,7 @@ opacity:.6;
 <div class="value view" id="viewPin">••••••</div>
 
 <div class="input-wrap edit-field" hidden>
-<input id="pin" type="password">
-<span class="eye-btn" onclick="togglePin()">👁</span>
+<input id="pin" type="password" maxlength="6" pattern="\d{6}" inputmode="numeric">
 </div>
 </div>
 
@@ -287,9 +303,21 @@ opacity:.6;
 <input id="birthdate" type="date" class="edit-field" hidden>
 </div>
 
+<div class="row">
+  <div class="label">Gender</div>
+  <div class="value view" id="viewGender"></div>
+
+  <select id="gender" class="edit-field" hidden>
+    <option value="">Select</option>
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+    <option value="Rather not say">Rather not say</option>
+  </select>
+</div>
+
 <div class="actions">
 <button class="edit" id="editBtn">Edit</button>
-<button class="delete" id="deleteBtn">Delete</button>
+<button class="delete" id="deleteBtn">Delete Account</button>
 </div>
 
 </div>
@@ -368,6 +396,8 @@ onAuthStateChanged(auth, async(user)=>{
     viewLastName.innerText = data.lastName || "-";
     viewPhone.innerText = data.phone || "-";
     viewBirthdate.innerText = data.birthdate || "-";
+    viewGender.innerText = data.gender || "-";
+    gender.value = data.gender || "";
     viewPin.innerText = data.pin ? "••••••" : "-";
 
     // EDIT MODE
@@ -376,6 +406,18 @@ onAuthStateChanged(auth, async(user)=>{
     phone.value = data.phone || "";
     pin.value = data.pin || "";
     birthdate.value = data.birthdate || "";
+});
+
+const phone = document.getElementById("phone");
+
+phone.addEventListener("input", () => {
+    phone.value = phone.value.replace(/\D/g, "");
+
+    if (!phone.value.startsWith("09")) {
+        phone.value = "09";
+    }
+
+    phone.value = phone.value.slice(0, 11);
 });
 
 /* EDIT / UPDATE / CANCEL */
@@ -400,7 +442,8 @@ editBtn.onclick = async ()=>{
             lastName:lastName.value,
             phone:phone.value,
             pin:pin.value,
-            birthdate:birthdate.value
+            birthdate:birthdate.value,
+            gender: gender.value
         });
 
         location.reload();
