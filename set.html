@@ -346,18 +346,21 @@ overlay.classList.toggle("active");
 const editBtn = document.getElementById("editBtn");
 const deleteBtn = document.getElementById("deleteBtn");
 
-let editMode = false;
-
 /* LOAD USER */
 onAuthStateChanged(auth, async(user)=>{
     if (!user) return location.href="index.html";
 
     currentUID = user.uid;
+    document.getElementById("email").innerText = user.email;
+
     const snap = await getDoc(doc(db,"users",user.uid));
+    if (!snap.exists()) return;
+
     const data = snap.data();
 
-    userDisplay.innerText = (data.firstName || "") + " " + (data.lastName || "");
-    createdAt.innerText = data.createdAt?.toDate().toLocaleString();
+    document.getElementById("userDisplay").innerText =
+    (data.firstName || "") + " " + (data.lastName || "");
+
     createdAt.innerText = data.createdAt?.toDate().toLocaleString();
 
     // VIEW MODE
@@ -365,8 +368,9 @@ onAuthStateChanged(auth, async(user)=>{
     viewLastName.innerText = data.lastName || "-";
     viewPhone.innerText = data.phone || "-";
     viewBirthdate.innerText = data.birthdate || "-";
+    viewPin.innerText = data.pin ? "••••••" : "-";
 
-    // EDIT MODE VALUES
+    // EDIT MODE
     firstName.value = data.firstName || "";
     lastName.value = data.lastName || "";
     phone.value = data.phone || "";
