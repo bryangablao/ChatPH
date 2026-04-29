@@ -266,20 +266,28 @@ overlay.classList.toggle("active");
 };
 
 /* LOAD USER */
+let isAuthReady = false;
+
 onAuthStateChanged(auth, async(user)=>{
-if(!user) return location.href="index.html";
+    if (!user) {
+        // ⏳ wait until Firebase fully initializes
+        if (!isAuthReady) return;
+        return location.href = "index.html";
+    }
 
-currentUID = user.uid;
-document.getElementById("userDisplay").innerText = user.email;
+    isAuthReady = true;
 
-const snap = await getDoc(doc(db,"users",user.uid));
-const data = snap.data();
+    currentUID = user.uid;
+    document.getElementById("userDisplay").innerText = user.email;
 
-createdAt.innerText = data.createdAt?.toDate().toLocaleString();
-firstName.value = data.firstName;
-lastName.value = data.lastName;
-phone.value = data.phone;
-pin.value = data.pin;
+    const snap = await getDoc(doc(db,"users",user.uid));
+    const data = snap.data();
+
+    createdAt.innerText = data.createdAt?.toDate().toLocaleString();
+    firstName.value = data.firstName;
+    lastName.value = data.lastName;
+    phone.value = data.phone;
+    pin.value = data.pin;
 });
 
 /* EDIT */
