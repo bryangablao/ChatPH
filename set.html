@@ -27,18 +27,7 @@ flex-direction:column;
 min-height:100vh;
 }
 
-/* HEADER */
-header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:15px 24px;
-border-bottom:1px solid var(--border);
-}
-
 .menu-icon{font-size:24px;cursor:pointer;}
-.logo{width:30px;}
-.brand{font-weight:700}
 
 /* SIDEBAR */
 .sidebar{
@@ -82,51 +71,6 @@ padding:20px;
 width:100%;
 }
 
-/* CARD */
-.card{
-background:var(--card);
-border:1px solid var(--border);
-padding:18px;
-border-radius:12px;
-}
-
-.row{
-margin-bottom:12px;
-}
-
-.label{
-font-size:13px;
-opacity:.7;
-}
-
-.value{
-font-weight:600;
-}
-
-input{
-width:100%;
-padding:10px;
-border:none;
-border-radius:8px;
-background:#0f1115;
-color:white;
-margin-top:4px;
-}
-
-/* BUTTONS */
-.actions{
-display:flex;
-justify-content:flex-end;
-gap:10px;
-margin-top:10px;
-}
-
-button{
-padding:10px 14px;
-border:none;
-border-radius:8px;
-cursor:pointer;
-}
 
 .edit{background:#4da3ff;color:black;}
 .delete{background:#ff4b4b;color:white;}
@@ -153,6 +97,124 @@ text-align:center;
 margin:8px;
 }
 
+.card{
+    background:var(--card);
+    border:1px solid var(--border);
+    padding:20px;
+    border-radius:16px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.3);
+}
+
+.row{
+    margin-bottom:16px;
+}
+
+.label{
+    font-size:12px;
+    opacity:.6;
+    margin-bottom:4px;
+}
+
+.value{
+    font-weight:600;
+    font-size:14px;
+}
+
+/* INPUT WRAPPER */
+.input-wrap{
+    position:relative;
+}
+
+input{
+    width:100%;
+    padding:10px 40px 10px 10px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#0f1115;
+    color:white;
+    font-size:14px;
+    box-sizing:border-box;
+}
+
+/* EYE BUTTON INSIDE */
+.eye-btn{
+    position:absolute;
+    right:10px;
+    top:50%;
+    transform:translateY(-50%);
+    cursor:pointer;
+    font-size:14px;
+    opacity:.7;
+}
+
+/* BUTTONS */
+.actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:20px;
+}
+
+button{
+    padding:10px 16px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.edit{background:#4da3ff;color:black;}
+.delete{background:#ff4b4b;color:white;}
+.cancel{background:#6b7280;color:white;}
+
+.header{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:15px 20px;
+    border-bottom:1px solid var(--border);
+}
+
+.header-center{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.logo{
+    width:28px;
+}
+
+.brand{
+    font-weight:700;
+    font-size:16px;
+}
+
+/* Name on right */
+.user-name{
+    position:absolute;
+    right:20px;
+    font-size:14px;
+    font-weight:600;
+    opacity:.8;
+}
+
+.back-btn{
+    position:absolute;
+    left:15px;
+    background:none;
+    border:none;
+    color:white;
+    font-size:20px;
+    cursor:pointer;
+    opacity:.8;
+}
+
+.back-btn:hover{
+    opacity:1;
+}
+    
 /* FOOTER */
 footer{
 text-align:center;
@@ -166,26 +228,16 @@ opacity:.6;
 <body>
 
 <!-- HEADER -->
-<header>
-<div style="display:flex;gap:10px;align-items:center;">
-<span class="menu-icon" onclick="toggleSidebar()">☰</span>
-<img src="image/chatph-logo.png" class="logo">
-<span class="brand">ChatPH</span>
-</div>
-<div id="userDisplay">User</div>
+<header class="header">
+    <button class="back-btn" onclick="goBack()">←</button>
+
+    <div class="header-center">
+        <img src="image/chatph-logo.png" class="logo">
+        <span class="brand">ChatPH</span>
+    </div>
+
+    <div id="userDisplay" class="user-name">User</div>
 </header>
-
-<!-- SIDEBAR -->
-<div class="sidebar" id="sidebar">
-<a href="home.html">Home</a>
-<a href="msg.html">Messages</a>
-<a href="frnd.html">Friends</a>
-<a href="srch.html">Search</a>
-<a href="prfl.html">Profile</a>
-<a href="#" style="color:#4da3ff;">Settings</a>
-</div>
-
-<div class="overlay" id="overlay" onclick="toggleSidebar(true)"></div>
 
 <!-- MAIN -->
 <div class="main">
@@ -197,29 +249,47 @@ opacity:.6;
 </div>
 
 <div class="row">
+<div class="label">Email</div>
+<div class="value" id="email"></div>
+</div>
+
+<div class="row">
 <div class="label">First Name</div>
-<input id="firstName" disabled>
+<div class="value view" id="viewFirstName"></div>
+<input id="firstName" class="edit-field" hidden>
 </div>
 
 <div class="row">
 <div class="label">Last Name</div>
-<input id="lastName" disabled>
+<div class="value view" id="viewLastName"></div>
+<input id="lastName" class="edit-field" hidden>
 </div>
 
 <div class="row">
 <div class="label">Phone</div>
-<input id="phone" disabled>
+<div class="value view" id="viewPhone"></div>
+<input id="phone" class="edit-field" hidden>
 </div>
 
 <div class="row">
 <div class="label">PIN</div>
-<input id="pin" type="password" disabled>
-<button onclick="togglePin()">👁</button>
+<div class="value view" id="viewPin">••••••</div>
+
+<div class="input-wrap edit-field" hidden>
+<input id="pin" type="password">
+<span class="eye-btn" onclick="togglePin()">👁</span>
+</div>
+</div>
+
+<div class="row">
+<div class="label">Birthdate</div>
+<div class="value view" id="viewBirthdate"></div>
+<input id="birthdate" type="date" class="edit-field" hidden>
 </div>
 
 <div class="actions">
 <button class="edit" id="editBtn">Edit</button>
-<button class="delete" onclick="openModal()">Delete</button>
+<button class="delete" id="deleteBtn">Delete</button>
 </div>
 
 </div>
@@ -273,54 +343,78 @@ overlay.classList.toggle("active");
 };
 
 /* LOAD USER */
-let isAuthReady = false;
+const editBtn = document.getElementById("editBtn");
+const deleteBtn = document.getElementById("deleteBtn");
 
+let editMode = false;
+
+/* LOAD USER */
 onAuthStateChanged(auth, async(user)=>{
-    if (!user) {
-        // ⏳ wait until Firebase fully initializes
-        if (!isAuthReady) return;
-        return location.href = "index.html";
-    }
-
-    isAuthReady = true;
+    if (!user) return location.href="index.html";
 
     currentUID = user.uid;
-    document.getElementById("userDisplay").innerText = user.email;
-
     const snap = await getDoc(doc(db,"users",user.uid));
     const data = snap.data();
 
+    userDisplay.innerText = (data.firstName || "") + " " + (data.lastName || "");
     createdAt.innerText = data.createdAt?.toDate().toLocaleString();
-    firstName.value = data.firstName;
-    lastName.value = data.lastName;
-    phone.value = data.phone;
-    pin.value = data.pin;
+    createdAt.innerText = data.createdAt?.toDate().toLocaleString();
+
+    // VIEW MODE
+    viewFirstName.innerText = data.firstName || "-";
+    viewLastName.innerText = data.lastName || "-";
+    viewPhone.innerText = data.phone || "-";
+    viewBirthdate.innerText = data.birthdate || "-";
+
+    // EDIT MODE VALUES
+    firstName.value = data.firstName || "";
+    lastName.value = data.lastName || "";
+    phone.value = data.phone || "";
+    pin.value = data.pin || "";
+    birthdate.value = data.birthdate || "";
 });
 
-/* EDIT */
+/* EDIT / UPDATE / CANCEL */
 editBtn.onclick = async ()=>{
-editMode = !editMode;
+    editMode = !editMode;
 
-[firstName,lastName,phone,pin].forEach(i=>{
-i.disabled = !editMode;
-});
+    const views = document.querySelectorAll(".view");
+    const edits = document.querySelectorAll(".edit-field");
 
-editBtn.innerText = editMode ? "Update" : "Edit";
+    views.forEach(v => v.hidden = editMode);
+    edits.forEach(e => e.hidden = !editMode);
 
-if(!editMode){
-await updateDoc(doc(db,"users",currentUID),{
-firstName:firstName.value,
-lastName:lastName.value,
-phone:phone.value,
-pin:pin.value
-});
-alert("Updated ✅");
-}
+    if(editMode){
+        editBtn.innerText = "Save";
+        deleteBtn.innerText = "Cancel";
+        deleteBtn.classList.remove("delete");
+        deleteBtn.classList.add("cancel");
+    }else{
+        // SAVE
+        await updateDoc(doc(db,"users",currentUID),{
+            firstName:firstName.value,
+            lastName:lastName.value,
+            phone:phone.value,
+            pin:pin.value,
+            birthdate:birthdate.value
+        });
+
+        location.reload();
+    }
+};
+
+/* DELETE OR CANCEL */
+deleteBtn.onclick = ()=>{
+    if(editMode){
+        location.reload(); // cancel edit
+    }else{
+        openModal();
+    }
 };
 
 /* PIN TOGGLE */
-window.togglePin=()=>{
-pin.type = pin.type==="password"?"text":"password";
+window.togglePin = ()=>{
+    pin.type = pin.type === "password" ? "text" : "password";
 };
 
 /* MODAL */
@@ -333,6 +427,11 @@ await deleteDoc(doc(db,"users",currentUID));
 await deleteUser(auth.currentUser);
 location.href="index.html";
 };
+
+window.goBack = () => {
+    window.history.back();
+};
+    
 </script>
 
 </body>
