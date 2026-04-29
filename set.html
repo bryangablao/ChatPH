@@ -242,7 +242,13 @@ opacity:.6;
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, deleteUser } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { 
+    getAuth, 
+    onAuthStateChanged, 
+    deleteUser,
+    setPersistence,
+    browserLocalPersistence 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const app = initializeApp({
   apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
@@ -255,6 +261,7 @@ const app = initializeApp({
 
 const db = getFirestore(app);
 const auth = getAuth(app);
+setPersistence(auth, browserLocalPersistence);
 
 let editMode = false;
 let currentUID = null;
