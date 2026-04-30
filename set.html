@@ -363,15 +363,16 @@ opacity:.6;
 </div>
 </div>
 
-<!-- MODAL -->
+<!-- DELETE MODAL -->
 <div class="modal" id="modal">
-    
-<div class="modal-box">
-<p>Delete account permanently?</p>
-<button onclick="deleteAccount()">Yes</button>
-<button onclick="closeModal()">No</button>
+  <div class="modal-box">
+    <p>Delete account permanently?</p>
+    <button onclick="deleteAccount()">Yes</button>
+    <button onclick="closeModal()">No</button>
+  </div>
 </div>
 
+<!-- PIN MODAL (SEPARATE) -->
 <div class="modal" id="pinModal">
   <div class="modal-box">
     <p>Enter 6-digit PIN</p>
@@ -380,8 +381,6 @@ opacity:.6;
     <button onclick="verifyPin()">OK</button>
     <button onclick="closePinModal()">Cancel</button>
   </div>
-</div>
-    
 </div>
 
 <!-- FOOTER -->
@@ -471,6 +470,12 @@ phone.addEventListener("input", () => {
     }
 
     phone.value = phone.value.slice(0, 11);
+});
+
+const pinCheck = document.getElementById("pinCheck");
+
+pinCheck.addEventListener("input", () => {
+    pinCheck.value = pinCheck.value.replace(/\D/g, "").slice(0,6);
 });
 
 async function toggleEdit(){
