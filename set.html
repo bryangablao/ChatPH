@@ -321,12 +321,18 @@ opacity:.6;
 </div>
 
 <div class="row">
-<div class="label">PIN</div>
-<div class="value view" id="viewPin">••••••</div>
+  <div class="label">PIN</div>
 
-<div class="input-wrap edit-field" hidden>
-<input id="pin" type="password" maxlength="6" pattern="\d{6}" inputmode="numeric">
-</div>
+  <!-- VIEW MODE -->
+  <div class="value view" id="viewPin">
+    ••••••
+    <span class="eye-btn" onclick="toggleViewPin()">👁</span>
+  </div>
+
+  <!-- EDIT MODE -->
+  <div class="input-wrap edit-field" hidden>
+    <input id="pin" type="password" maxlength="6" inputmode="numeric">
+  </div>
 </div>
 
 <div class="row">
@@ -359,11 +365,23 @@ opacity:.6;
 
 <!-- MODAL -->
 <div class="modal" id="modal">
+    
 <div class="modal-box">
 <p>Delete account permanently?</p>
 <button onclick="deleteAccount()">Yes</button>
 <button onclick="closeModal()">No</button>
 </div>
+
+<div class="modal" id="pinModal">
+  <div class="modal-box">
+    <p>Enter 6-digit PIN</p>
+    <input id="pinCheck" maxlength="6" inputmode="numeric" placeholder="Enter PIN">
+    <p id="pinError" style="color:red; font-size:12px;"></p>
+    <button onclick="verifyPin()">OK</button>
+    <button onclick="closePinModal()">Cancel</button>
+  </div>
+</div>
+    
 </div>
 
 <!-- FOOTER -->
@@ -440,6 +458,7 @@ onAuthStateChanged(auth, async(user)=>{
     phone.value = data.phone || "";
     pin.value = data.pin || "";
     birthdate.value = data.birthdate || "";
+    realPin = data.pin || "";
 });
 
 const phone = document.getElementById("phone");
@@ -454,8 +473,7 @@ phone.addEventListener("input", () => {
     phone.value = phone.value.slice(0, 11);
 });
 
-/* EDIT / UPDATE / CANCEL */
-editBtn.onclick = async ()=>{
+async function toggleEdit(){
     editMode = !editMode;
 
     const views = document.querySelectorAll(".view");
@@ -467,10 +485,7 @@ editBtn.onclick = async ()=>{
     if(editMode){
         editBtn.innerText = "Save";
         deleteBtn.innerText = "Cancel";
-        deleteBtn.classList.remove("delete");
-        deleteBtn.classList.add("cancel");
     }else{
-        // SAVE
         await updateDoc(doc(db,"users",currentUID),{
             firstName:firstName.value,
             lastName:lastName.value,
@@ -479,18 +494,18 @@ editBtn.onclick = async ()=>{
             birthdate:birthdate.value,
             gender: gender.value
         });
-
         location.reload();
     }
+}
+
+/* EDIT / UPDATE / CANCEL */
+editBtn.onclick = () => {
+    openPinModal("edit");
 };
 
 /* DELETE OR CANCEL */
 deleteBtn.onclick = ()=>{
-    if(editMode){
-        location.reload(); // cancel edit
-    }else{
-        openModal();
-    }
+    openPinModal("delete");
 };
 
 /* PIN TOGGLE */
@@ -512,6 +527,53 @@ location.href="index.html";
 window.goBack = () => {
     window.history.back();
 };
+
+let realPin = "";
+
+window.toggleViewPin = () => {
+    const view = document.getElementById("viewPin");
+
+    if (view.innerText.includes("•")) {
+        view.innerHTML = realPin + ' <span class="eye-btn" onclick="toggleViewPin()">👁</span>';
+    } else {
+        view.innerHTML = '•••••• <span class="eye-btn" onclick="toggleViewPin()">👁</span>';
+    }
+};
+
+let pendingAction = null;
+
+window.openPinModal = (action) => {
+    pendingAction = action;
+    pinModal.style.display = "flex";
+    pinCheck.value = "";
+    pinError.innerText = "";
+};
+
+window.closePinModal = () => {
+    pinModal.style.display = "none";
+};
+
+window.verifyPin = () => {
+    if (pinCheck.value === realPin) {
+        closePinModal();
+
+        if (pendingAction === "edit") {
+            toggleEdit();
+        }
+
+        if (pendingAction === "delete") {
+            openModal(); // your delete modal
+        }
+
+    } else {
+        pinError.innerText = "Wrong PIN code. Try again.";
+    }
+};
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closePinModal();
+    if (e.key === "Enter") verifyPin();
+});
     
 </script>
 
