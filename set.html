@@ -260,6 +260,17 @@ select{
     font-size:12px;
     opacity:.6;
 }
+
+.pin-box{
+    width:40px;
+    height:45px;
+    text-align:center;
+    font-size:18px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#0f1115;
+    color:white;
+}
     
 /* FOOTER */
 footer{
@@ -376,8 +387,20 @@ opacity:.6;
 <div class="modal" id="pinModal">
   <div class="modal-box">
     <p>Enter 6-digit PIN</p>
-    <input id="pinCheck" maxlength="6" inputmode="numeric" placeholder="Enter PIN">
+
+    <div id="pinBoxes" style="display:flex; gap:8px; justify-content:center;">
+      <input class="pin-box" maxlength="1">
+      <input class="pin-box" maxlength="1">
+      <input class="pin-box" maxlength="1">
+      <input class="pin-box" maxlength="1">
+      <input class="pin-box" maxlength="1">
+      <input class="pin-box" maxlength="1">
+    </div>
+
+    <input type="hidden" id="pinCheck">
+
     <p id="pinError" style="color:red; font-size:12px;"></p>
+
     <button onclick="verifyPin()">OK</button>
     <button onclick="closePinModal()">Cancel</button>
   </div>
@@ -476,6 +499,7 @@ const pinCheck = document.getElementById("pinCheck");
 
 pinCheck.addEventListener("input", () => {
     pinCheck.value = pinCheck.value.replace(/\D/g, "").slice(0,6);
+    pinError.innerText = "";
 });
 
 async function toggleEdit(){
@@ -559,19 +583,16 @@ window.closePinModal = () => {
 };
 
 window.verifyPin = () => {
-    if (pinCheck.value === realPin) {
-        closePinModal();
 
-        if (pendingAction === "edit") {
-            toggleEdit();
-        }
+    if (!pinCheck.value) {
+        pinError.innerText = "Please enter your PIN.";
+        return;
+    }
 
-        if (pendingAction === "delete") {
-            openModal(); // your delete modal
-        }
-
+    if (pinCheck.value === String(realPin)) {
+        startCheckingAnimation(true);
     } else {
-        pinError.innerText = "Wrong PIN code. Try again.";
+        startCheckingAnimation(false);
     }
 };
 
@@ -579,6 +600,62 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closePinModal();
     if (e.key === "Enter") verifyPin();
 });
+
+function startCheckingAnimation(isCorrect){
+    let dots = 0;
+
+    const interval = setInterval(() => {
+        dots = (dots % 4) + 1;
+        pinError.innerText = "Checking " + ". ".repeat(dots);
+    }, 400);
+
+    setTimeout(() => {
+        clearInterval(interval);
+
+        if (isCorrect) {
+            let count = 3;
+            const countdown = setInterval(() => {
+                pinError.innerText = `Correct PIN. Redirecting in ${count}...`;
+                count--;
+
+                if (count < 0) {
+                    clearInterval(countdown);
+                    closePinModal();
+
+                    if (pendingAction === "edit") toggleEdit();
+                    if (pendingAction === "delete") openModal();
+                }
+            }, 800);
+        } else {
+            pinError.innerText = "Wrong PIN. Try again.";
+        }
+
+    }, 2000);
+}
+
+const boxes = document.querySelectorAll(".pin-box");
+
+boxes.forEach((box, index) => {
+    box.addEventListener("input", () => {
+        box.value = box.value.replace(/\D/g, "");
+
+        if (box.value && index < boxes.length - 1) {
+            boxes[index + 1].focus();
+        }
+
+        updatePinValue();
+    });
+
+    box.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" && !box.value && index > 0) {
+            boxes[index - 1].focus();
+        }
+    });
+});
+
+function updatePinValue(){
+    pinCheck.value = Array.from(boxes).map(b => b.value).join("");
+}
     
 </script>
 
