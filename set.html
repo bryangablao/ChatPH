@@ -262,11 +262,11 @@ select{
 }
 
 .pin-box{
-    width:40px;
-    height:45px;
+    width:50px;
+    height:60px; /* taller */
     text-align:center;
-    font-size:18px;
-    border-radius:10px;
+    font-size:22px;
+    border-radius:12px;
     border:1px solid var(--border);
     background:#0f1115;
     color:white;
@@ -389,20 +389,17 @@ opacity:.6;
     <p>Enter 6-digit PIN</p>
 
     <div id="pinBoxes" style="display:flex; gap:8px; justify-content:center;">
-      <input class="pin-box" maxlength="1">
-      <input class="pin-box" maxlength="1">
-      <input class="pin-box" maxlength="1">
-      <input class="pin-box" maxlength="1">
-      <input class="pin-box" maxlength="1">
-      <input class="pin-box" maxlength="1">
+      <input class="pin-box" type="password" maxlength="1">
+      <input class="pin-box" type="password" maxlength="1">
+      <input class="pin-box" type="password" maxlength="1">
+      <input class="pin-box" type="password" maxlength="1">
+      <input class="pin-box" type="password" maxlength="1">
+      <input class="pin-box" type="password" maxlength="1">
     </div>
 
     <input type="hidden" id="pinCheck">
 
     <p id="pinError" style="color:red; font-size:12px;"></p>
-
-    <button onclick="verifyPin()">OK</button>
-    <button onclick="closePinModal()">Cancel</button>
   </div>
 </div>
 
@@ -576,6 +573,9 @@ window.openPinModal = (action) => {
     pinModal.style.display = "flex";
     pinCheck.value = "";
     pinError.innerText = "";
+
+    clearBoxes();
+    boxes[0].focus(); // ✅ focus first box
 };
 
 window.closePinModal = () => {
@@ -598,11 +598,12 @@ window.verifyPin = () => {
 
 document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closePinModal();
-    if (e.key === "Enter") verifyPin();
 });
 
 function startCheckingAnimation(isCorrect){
     let dots = 0;
+
+    pinError.style.color = "#4ade80"; // ✅ green while checking
 
     const interval = setInterval(() => {
         dots = (dots % 4) + 1;
@@ -617,19 +618,19 @@ function startCheckingAnimation(isCorrect){
             const countdown = setInterval(() => {
                 pinError.innerText = `Correct PIN. Redirecting in ${count}...`;
                 count--;
-
                 if (count < 0) {
                     clearInterval(countdown);
                     closePinModal();
-
                     if (pendingAction === "edit") toggleEdit();
                     if (pendingAction === "delete") openModal();
                 }
             }, 800);
         } else {
+            pinError.style.color = "red"; // ❌ wrong = red
             pinError.innerText = "Wrong PIN. Try again.";
-        }
 
+            clearBoxes(); // ✅ reset inputs
+        }
     }, 2000);
 }
 
@@ -655,6 +656,15 @@ boxes.forEach((box, index) => {
 
 function updatePinValue(){
     pinCheck.value = Array.from(boxes).map(b => b.value).join("");
+
+    if (pinCheck.value.length === 6) {
+        verifyPin(); // ✅ auto trigger
+    }
+}
+
+function clearBoxes(){
+    boxes.forEach(b => b.value = "");
+    boxes[0].focus();
 }
     
 </script>
