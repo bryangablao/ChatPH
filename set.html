@@ -626,16 +626,6 @@ if (isGoogleUser) {
     document.getElementById("emailInput").hidden = true;
 }
 
-// ✅ FIX EMAIL FIELD BASED ON USER TYPE
-const user = auth.currentUser;
-const providers = user.providerData.map(p => p.providerId);
-const isGoogleUser = providers.includes("google.com");
-
-if (!isGoogleUser) {
-    document.getElementById("email").hidden = false;
-    document.getElementById("emailInput").hidden = true;
-}
-
     editBtn.innerText = "Save";
     deleteBtn.innerText = "Cancel";
     pin.type = "text";
