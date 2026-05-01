@@ -266,14 +266,20 @@ select{
     height:60px;
     border-radius:12px;
     border:1px solid var(--border);
-    background:#000 !important;
-    color:#fff !important;
-    caret-color:#4da3ff;
-    font-size:22px;
+    background:#000;
+    color:#fff;
+    font-size:24px;
     text-align:center;
     font-weight:bold;
+
+    caret-color:#4da3ff;
+    line-height:60px; /* 🔥 important */
 }
 
+.pin-box:focus{
+    outline:2px solid #4da3ff;
+}
+    
 .pin-box::placeholder{
     color:#666;
 }
@@ -684,14 +690,14 @@ const boxes = document.querySelectorAll(".pin-box");
 
 boxes.forEach((box, index) => {
     box.addEventListener("input", () => {
-        box.value = box.value.replace(/[^0-9]/g, "").slice(0,1);
+    box.value = box.value.replace(/[^0-9]/g, "").slice(0,1);
+    box.style.color = "#fff"; // 🔥 force visible
 
-        if (box.value.length === 1 && index < boxes.length - 1) {
-        setTimeout(() => boxes[index + 1].focus(), 50); // smoother
-        }
-
-        updatePinValue();
-    });
+    if (box.value.length === 1 && index < boxes.length - 1) {
+        setTimeout(() => boxes[index + 1].focus(), 50);
+    }
+    updatePinValue();
+});
 
     box.addEventListener("keydown", (e) => {
         if (e.key === "Backspace" && !box.value && index > 0) {
