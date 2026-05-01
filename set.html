@@ -400,7 +400,6 @@ opacity:.6;
     <p>Enter 6-digit PIN</p>
 
     <div id="pinBoxes" style="display:flex; gap:8px; justify-content:center;">
-      
       <input class="pin-box" type="text">
       <input class="pin-box" type="text">
       <input class="pin-box" type="text">
@@ -409,8 +408,8 @@ opacity:.6;
       <input class="pin-box" type="text">
     </div>
 
+    <button onclick="verifyPin()">Verify</button>
     <input type="hidden" id="pinCheck">
-
     <p id="pinError" style="color:red; font-size:12px;"></p>
   </div>
 </div>
@@ -692,7 +691,7 @@ function updatePinValue(){
     pinCheck.value = Array.from(boxes).map(b => b.value).join("");
 
     if (pinCheck.value.length === 6) {
-        verifyPin(); // ✅ auto trigger
+        setTimeout(() => verifyPin(), 300);
     }
 }
 
