@@ -263,13 +263,15 @@ select{
 
 .pin-box{
     width:50px;
-    height:60px; /* taller */
+    height:60px;
     text-align:center;
     font-size:22px;
     border-radius:12px;
     border:1px solid var(--border);
     background:#0f1115;
     color:white;
+
+    -webkit-text-security: none;
 }
     
 /* FOOTER */
@@ -389,12 +391,13 @@ opacity:.6;
     <p>Enter 6-digit PIN</p>
 
     <div id="pinBoxes" style="display:flex; gap:8px; justify-content:center;">
-      <input class="pin-box" type="text" inputmode="numeric" maxlength="1">
-      <input class="pin-box" type="text" inputmode="numeric" maxlength="1">
-      <input class="pin-box" type="text" inputmode="numeric" maxlength="1">
-      <input class="pin-box" type="text" inputmode="numeric" maxlength="1">
-      <input class="pin-box" type="text" inputmode="numeric" maxlength="1">
-      <input class="pin-box" type="text" inputmode="numeric" maxlength="1">
+      
+<input class="pin-box" type="text" maxlength="1">
+      <input class="pin-box" type="text" maxlength="1">
+      <input class="pin-box" type="text" maxlength="1">
+      <input class="pin-box" type="text" maxlength="1">
+      <input class="pin-box" type="text" maxlength="1">
+      <input class="pin-box" type="text" maxlength="1">
     </div>
 
     <input type="hidden" id="pinCheck">
