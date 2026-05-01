@@ -535,6 +535,26 @@ editBtn.onclick = () => {
     }
 };
 
+deleteBtn.onclick = () => {
+    if (editMode) {
+        // CANCEL edit mode instantly (no PIN)
+        editMode = false;
+
+        const views = document.querySelectorAll(".view");
+        const edits = document.querySelectorAll(".edit-field");
+
+        views.forEach(v => v.hidden = false);
+        edits.forEach(e => e.hidden = true);
+
+        editBtn.innerText = "Edit";
+        deleteBtn.innerText = "Delete Account";
+
+    } else {
+        // normal delete → requires PIN
+        openPinModal("delete");
+    }
+};
+
 /* PIN TOGGLE */
 window.togglePin = ()=>{
     pin.type = pin.type === "password" ? "text" : "password";
@@ -574,6 +594,7 @@ window.openPinModal = (action) => {
     pinModal.style.display = "flex";
     pinCheck.value = "";
     pinError.innerText = "";
+    pinError.style.color = "#4ade80";
 
     clearBoxes();
     boxes[0].focus(); // ✅ focus first box
@@ -608,7 +629,7 @@ function startCheckingAnimation(isCorrect){
 
     const interval = setInterval(() => {
         dots = (dots % 4) + 1;
-        pinError.innerText = "Checking " + ". ".repeat(dots);
+        pinError.innerText = "Checking" + ".".repeat(dots);
     }, 400);
 
     setTimeout(() => {
@@ -639,10 +660,10 @@ const boxes = document.querySelectorAll(".pin-box");
 
 boxes.forEach((box, index) => {
     box.addEventListener("input", () => {
-        box.value = box.value.replace(/\D/g, "");
+        box.value = box.value.replace(/[^0-9]/g, "").slice(0,1);
 
-        if (box.value && index < boxes.length - 1) {
-            boxes[index + 1].focus();
+        if (box.value.length === 1 && index < boxes.length - 1) {
+        setTimeout(() => boxes[index + 1].focus(), 50); // smoother
         }
 
         updatePinValue();
