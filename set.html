@@ -692,31 +692,33 @@ window.closePasswordModal = () => {
 window.confirmReauth = async () => {
     const password = confirmPassword.value;
 
+    const user = auth.currentUser;
+
+    console.log("Email:", user.email);
+    console.log("Password entered:", password);
+    console.log("Provider:", user.providerData);
+
     if (!password) {
         passError.innerText = "Password required.";
         return;
     }
 
     try {
-        const user = auth.currentUser;
-
-        console.log("Email:", user.email);
-        console.log("Password entered:", password);
-
         const credential = EmailAuthProvider.credential(
             user.email.trim(),
             password.trim()
         );
 
         await reauthenticateWithCredential(user, credential);
-
         await updateEmail(user, pendingEmail);
+
         closePasswordModal();
         location.reload();
 
     } catch (err) {
-        console.error(err);
-        passError.innerText = "Wrong password.";
+        console.error("FULL ERROR:", err);
+        console.log("Error code:", err.code);
+        passError.innerText = err.code;
     }
 };
 
