@@ -516,18 +516,12 @@ onAuthStateChanged(auth, async(user)=>{
     const data = snap.data();
 
     const changePassBtn = document.getElementById("changePassBtn");
-    const emailView = document.getElementById("email");
-    const emailInputField = document.getElementById("emailInput");
+const emailView = document.getElementById("email");
+const emailInputField = document.getElementById("emailInput");
 
-if (isGoogleUser) {
-    // Google → editable
-    emailView.hidden = true;
-    emailInputField.hidden = false;
-} else {
-    // Email/password → view only
-    emailView.hidden = false;
-    emailInputField.hidden = true;
-}
+// ✅ ALWAYS default to VIEW MODE
+emailView.hidden = false;
+emailInputField.hidden = true;
 
 if (isGoogleUser) {
     changePassBtn.hidden = false;
@@ -618,6 +612,19 @@ const edits = document.querySelectorAll(".edit-field");
 
 views.forEach(v => v.hidden = true);
 edits.forEach(e => e.hidden = false);
+
+// ✅ CONTROL EMAIL FIELD PROPERLY
+const user = auth.currentUser;
+const providers = user.providerData.map(p => p.providerId);
+const isGoogleUser = providers.includes("google.com");
+
+if (isGoogleUser) {
+    document.getElementById("email").hidden = true;
+    document.getElementById("emailInput").hidden = false;
+} else {
+    document.getElementById("email").hidden = false;
+    document.getElementById("emailInput").hidden = true;
+}
 
 // ✅ FIX EMAIL FIELD BASED ON USER TYPE
 const user = auth.currentUser;
