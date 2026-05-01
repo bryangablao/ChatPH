@@ -389,12 +389,12 @@ opacity:.6;
     <p>Enter 6-digit PIN</p>
 
     <div id="pinBoxes" style="display:flex; gap:8px; justify-content:center;">
-      <input class="pin-box" type="password" maxlength="1">
-      <input class="pin-box" type="password" maxlength="1">
-      <input class="pin-box" type="password" maxlength="1">
-      <input class="pin-box" type="password" maxlength="1">
-      <input class="pin-box" type="password" maxlength="1">
-      <input class="pin-box" type="password" maxlength="1">
+      <input class="pin-box" type="text" inputmode="numeric" maxlength="1">
+      <input class="pin-box" type="text" inputmode="numeric" maxlength="1">
+      <input class="pin-box" type="text" inputmode="numeric" maxlength="1">
+      <input class="pin-box" type="text" inputmode="numeric" maxlength="1">
+      <input class="pin-box" type="text" inputmode="numeric" maxlength="1">
+      <input class="pin-box" type="text" inputmode="numeric" maxlength="1">
     </div>
 
     <input type="hidden" id="pinCheck">
@@ -526,12 +526,13 @@ async function toggleEdit(){
 
 /* EDIT / UPDATE / CANCEL */
 editBtn.onclick = () => {
-    openPinModal("edit");
-};
-
-/* DELETE OR CANCEL */
-deleteBtn.onclick = ()=>{
-    openPinModal("delete");
+    if (!editMode) {
+        // entering edit mode → require PIN
+        openPinModal("edit");
+    } else {
+        // already editing → just SAVE
+        toggleEdit();
+    }
 };
 
 /* PIN TOGGLE */
