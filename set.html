@@ -419,6 +419,17 @@ opacity:.6;
   </div>
 </div>
 
+<!-- PASSWORD MODAL -->
+<div class="modal" id="passwordModal">
+  <div class="modal-box">
+    <p>Enter your password to confirm email change</p>
+    <input type="password" id="confirmPassword" placeholder="Password">
+    <p id="passError" style="color:red; font-size:12px;"></p>
+    <button onclick="confirmReauth()">Confirm</button>
+    <button onclick="closePasswordModal()">Cancel</button>
+  </div>
+</div>
+    
 <!-- FOOTER -->
 <footer>
 © 2026 ChatPH
@@ -433,9 +444,10 @@ import {
     deleteUser,
     setPersistence,
     browserLocalPersistence,
-    updateEmail
+    updateEmail,
+    EmailAuthProvider,
+    reauthenticateWithCredential
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
 const app = initializeApp({
   apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
   authDomain: "chatph-cc187.firebaseapp.com",
@@ -538,7 +550,8 @@ async function toggleEdit(){
 
         try {
             if (auth.currentUser.email !== emailInput.value) {
-                await updateEmail(auth.currentUser, emailInput.value);
+                openPasswordModal(emailInput.value);
+                return;
             }
 
             await updateDoc(doc(db,"users",currentUID),{
@@ -556,17 +569,6 @@ async function toggleEdit(){
             console.error(err);
             alert("⚠️ Email change requires re-login. Please log in again.");
         }
-        
-        await updateDoc(doc(db,"users",currentUID),{
-            firstName:firstName.value,
-            lastName:lastName.value,
-            phone:phone.value,
-            pin:pin.value,
-            birthdate:birthdate.value,
-            gender: gender.value
-        });
-
-        location.reload();
     }
 }
 
@@ -662,6 +664,50 @@ window.verifyPin = () => {
         startCheckingAnimation(true);
     } else {
         startCheckingAnimation(false);
+    }
+};
+
+let pendingEmail = null;
+
+window.openPasswordModal = (newEmail) => {
+    pendingEmail = newEmail;
+    passwordModal.style.display = "flex";
+    confirmPassword.value = "";
+    passError.innerText = "";
+};
+
+window.closePasswordModal = () => {
+    passwordModal.style.display = "none";
+};
+
+window.confirmReauth = async () => {
+    const password = confirmPassword.value;
+
+    if (!password) {
+        passError.innerText = "Password required.";
+        return;
+    }
+
+    try {
+        const user = auth.currentUser;
+
+        const credential = EmailAuthProvider.credential(
+            user.email,
+            password
+        );
+
+        // 🔥 REAUTH
+        await reauthenticateWithCredential(user, credential);
+
+        // 🔥 NOW UPDATE EMAIL
+        await updateEmail(user, pendingEmail);
+
+        closePasswordModal();
+        location.reload();
+
+    } catch (err) {
+        passError.innerText = "Wrong password.";
+        console.error(err);
     }
 };
 
