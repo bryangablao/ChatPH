@@ -267,10 +267,15 @@ select{
     text-align:center;
     font-size:22px;
     border-radius:12px;
-    border:1px solid var(--border);
-    background:#0f1115;
-    color:#ffffff !important;
-    caret-color:#ffffff;
+    border:1px solid #4da3ff; /* brighter border */
+    background:#000000;       /* PURE BLACK for contrast */
+    color:#ffffff !important; /* force white text */
+    caret-color:#4da3ff;      /* visible cursor */
+    font-weight:bold;
+}
+
+.pin-box::placeholder{
+    color:#666;
 }
     
 /* FOOTER */
@@ -391,7 +396,6 @@ opacity:.6;
 
     <div id="pinBoxes" style="display:flex; gap:8px; justify-content:center;">
       
-<input class="pin-box" type="text" maxlength="1">
       <input class="pin-box" type="text">
       <input class="pin-box" type="text">
       <input class="pin-box" type="text">
