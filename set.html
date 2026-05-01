@@ -265,7 +265,7 @@ select{
     width:50px;
     height:60px;
     border-radius:12px;
-    border:1px solid #4da3ff;
+    border:1px solid var(--border);
     background:#000 !important;
     color:#fff !important;
     caret-color:#4da3ff;
@@ -338,7 +338,10 @@ opacity:.6;
 </div>
 
 <div class="row">
-  <div class="label">PIN</div>
+  <div class="label">
+      PIN 
+      <span onclick="togglePin()" style="cursor:pointer; margin-left:6px;">👁</span>
+  </div>
 
   <!-- VIEW MODE -->
   <div class="value view" id="viewPin">
@@ -392,7 +395,7 @@ opacity:.6;
 <!-- PIN MODAL (SEPARATE) -->
 <div class="modal" id="pinModal">
   <div class="modal-box">
-    <p>Enter 6-digit PIN</p>
+    <p>Please Enter your 6-digit PIN</p>
 
     <div id="pinBoxes" style="display:flex; gap:8px; justify-content:center;">
       <input class="pin-box" type="password">
@@ -629,36 +632,43 @@ document.addEventListener("keydown", (e) => {
 
 function startCheckingAnimation(isCorrect){
     let dots = 0;
-
-    pinError.style.color = "#4ade80"; // ✅ green while checking
+    let count = 3;
 
     const interval = setInterval(() => {
-        dots = (dots % 4) + 1;
-        pinError.innerText = "Checking" + ".".repeat(dots);
+        dots = (dots % 3) + 1; // 1 to 3 dots
+
+        if (isCorrect) {
+            pinError.innerText = `Correct PIN. Redirecting in ${count}` + ".".repeat(dots);
+        } else {
+            pinError.innerText = "Checking" + ".".repeat(dots);
+        }
+
     }, 400);
 
     setTimeout(() => {
-        clearInterval(interval);
-
         if (isCorrect) {
-            let count = 3;
             const countdown = setInterval(() => {
-                pinError.innerText = `Correct PIN. Redirecting in ${count}...`;
                 count--;
+
                 if (count < 0) {
+                    clearInterval(interval);
                     clearInterval(countdown);
                     closePinModal();
+
                     if (pendingAction === "edit") toggleEdit();
                     if (pendingAction === "delete") openModal();
                 }
+
             }, 800);
         } else {
-            pinError.style.color = "red"; // ❌ wrong = red
-            pinError.innerText = "Wrong PIN. Try again.";
-
-            clearBoxes(); // ✅ reset inputs
+            setTimeout(() => {
+                clearInterval(interval);
+                pinError.style.color = "red";
+                pinError.innerText = "Wrong PIN. Try again.";
+                clearBoxes();
+            }, 2000);
         }
-    }, 2000);
+    }, 1000);
 }
 
 const boxes = document.querySelectorAll(".pin-box");
