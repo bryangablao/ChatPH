@@ -515,18 +515,16 @@ onAuthStateChanged(auth, async(user)=>{
 
     const data = snap.data();
 
-    const emailInputField = document.getElementById("emailInput");
     const changePassBtn = document.getElementById("changePassBtn");
-
-const emailView = document.getElementById("email");
-const emailInputField = document.getElementById("emailInput");
+    const emailView = document.getElementById("email");
+    const emailInputField = document.getElementById("emailInput");
 
 if (isGoogleUser) {
-    // Google users → can edit
+    // Google → editable
     emailView.hidden = true;
     emailInputField.hidden = false;
 } else {
-    // Non-Google users → view only
+    // Email/password → view only
     emailView.hidden = false;
     emailInputField.hidden = true;
 }
