@@ -338,10 +338,7 @@ opacity:.6;
 </div>
 
 <div class="row">
-  <div class="label">
-      PIN 
-      <span onclick="togglePin()" style="cursor:pointer; margin-left:6px;">👁</span>
-  </div>
+  <div class="label">PIN</div>
 
   <!-- VIEW MODE -->
   <div class="value view" id="viewPin">
@@ -519,7 +516,14 @@ async function toggleEdit(){
     if(editMode){
         editBtn.innerText = "Save";
         deleteBtn.innerText = "Cancel";
+
+        // ✅ SHOW PIN when editing
+        pin.type = "text";
+
     }else{
+        // ✅ HIDE PIN again when saving
+        pin.type = "password";
+
         await updateDoc(doc(db,"users",currentUID),{
             firstName:firstName.value,
             lastName:lastName.value,
@@ -528,6 +532,7 @@ async function toggleEdit(){
             birthdate:birthdate.value,
             gender: gender.value
         });
+
         location.reload();
     }
 }
@@ -613,6 +618,7 @@ window.closePinModal = () => {
 };
 
 window.verifyPin = () => {
+    pinError.style.color = "#4ade80"; // ✅ ALWAYS reset to green
 
     if (!pinCheck.value) {
         pinError.innerText = "Please enter your PIN.";
@@ -634,41 +640,44 @@ function startCheckingAnimation(isCorrect){
     let dots = 0;
     let count = 3;
 
+    // 🔵 DOT animation
     const interval = setInterval(() => {
-        dots = (dots % 3) + 1; // 1 to 3 dots
+        dots = (dots % 3) + 1;
 
         if (isCorrect) {
             pinError.innerText = `Correct PIN. Redirecting in ${count}` + ".".repeat(dots);
         } else {
             pinError.innerText = "Checking" + ".".repeat(dots);
         }
-
     }, 400);
 
-    setTimeout(() => {
-        if (isCorrect) {
-            const countdown = setInterval(() => {
-                count--;
+    if (isCorrect) {
+        // 🟢 countdown
+        const countdown = setInterval(() => {
+            count--;
 
-                if (count < 0) {
-                    clearInterval(interval);
-                    clearInterval(countdown);
-                    closePinModal();
-
-                    if (pendingAction === "edit") toggleEdit();
-                    if (pendingAction === "delete") openModal();
-                }
-
-            }, 800);
-        } else {
-            setTimeout(() => {
+            if (count < 0) {
                 clearInterval(interval);
-                pinError.style.color = "red";
-                pinError.innerText = "Wrong PIN. Try again.";
-                clearBoxes();
-            }, 2000);
-        }
-    }, 1000);
+                clearInterval(countdown);
+
+                closePinModal();
+
+                if (pendingAction === "edit") toggleEdit();
+                if (pendingAction === "delete") openModal();
+            }
+        }, 1000);
+
+    } else {
+        // 🔴 wrong pin
+        setTimeout(() => {
+            clearInterval(interval);
+
+            pinError.style.color = "red";
+            pinError.innerText = "Wrong PIN. Try again.";
+
+            clearBoxes();
+        }, 2000);
+    }
 }
 
 const boxes = document.querySelectorAll(".pin-box");
