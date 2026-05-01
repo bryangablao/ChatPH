@@ -530,7 +530,16 @@ pinCheck.addEventListener("input", () => {
 });
 
 async function toggleEdit(){
-    editMode = !editMode;
+    
+    if (editMode) {
+    // SAVE MODE
+         if (auth.currentUser.email !== emailInput.value) {
+                openPasswordModal(emailInput.value);
+                return;
+        }
+    }
+
+editMode = !editMode;
 
     const views = document.querySelectorAll(".view");
     const edits = document.querySelectorAll(".edit-field");
@@ -678,6 +687,18 @@ window.openPasswordModal = (newEmail) => {
 
 window.closePasswordModal = () => {
     passwordModal.style.display = "none";
+
+    // 🔥 FORCE UI BACK TO EDIT MODE CLEANLY
+    editMode = true;
+
+    const views = document.querySelectorAll(".view");
+    const edits = document.querySelectorAll(".edit-field");
+
+    views.forEach(v => v.hidden = true);
+    edits.forEach(e => e.hidden = false);
+
+    editBtn.innerText = "Save";
+    deleteBtn.innerText = "Cancel";
 };
 
 window.confirmReauth = async () => {
@@ -692,8 +713,8 @@ window.confirmReauth = async () => {
         const user = auth.currentUser;
 
         const credential = EmailAuthProvider.credential(
-            user.email,
-            password
+            user.email.trim(),
+            password.trim()
         );
 
         // 🔥 REAUTH
