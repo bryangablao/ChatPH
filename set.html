@@ -267,11 +267,16 @@ select{
     text-align:center;
     font-size:22px;
     border-radius:12px;
-    border:1px solid #4da3ff; /* brighter border */
-    background:#000000;       /* PURE BLACK for contrast */
-    color:#ffffff !important; /* force white text */
-    caret-color:#4da3ff;      /* visible cursor */
+    border:1px solid #4da3ff;
+    background:#000;
+    
+    color:#ffffff !important;
+    -webkit-text-fill-color:#ffffff !important;
+    
+    caret-color:#4da3ff;
     font-weight:bold;
+
+    -webkit-text-security: none !important;
 }
 
 .pin-box::placeholder{
