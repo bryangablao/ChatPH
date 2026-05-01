@@ -882,7 +882,7 @@ window.sendReset = async () => {
     try {
         await sendPasswordResetEmail(auth, user.email);
         resetStatus.style.color = "#4ade80";
-        resetStatus.innerText = "Reset email sent!";
+        resetStatus.innerText = "Reset email sent! check your emails Inbox or Spam";
     } catch (err) {
         resetStatus.style.color = "red";
         resetStatus.innerText = err.message;
