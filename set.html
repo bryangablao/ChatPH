@@ -518,9 +518,18 @@ onAuthStateChanged(auth, async(user)=>{
     const emailInputField = document.getElementById("emailInput");
     const changePassBtn = document.getElementById("changePassBtn");
 
-    if (!isGoogleUser) {
-        emailInputField.style.display = "none";
-    }
+const emailView = document.getElementById("email");
+const emailInputField = document.getElementById("emailInput");
+
+if (isGoogleUser) {
+    // Google users → can edit
+    emailView.hidden = true;
+    emailInputField.hidden = false;
+} else {
+    // Non-Google users → view only
+    emailView.hidden = false;
+    emailInputField.hidden = true;
+}
 
 if (isGoogleUser) {
     changePassBtn.hidden = false;
@@ -606,11 +615,21 @@ async function toggleEdit(){
     // 👉 ENTER EDIT MODE
     editMode = true;
 
-    const views = document.querySelectorAll(".view");
-    const edits = document.querySelectorAll(".edit-field");
+const views = document.querySelectorAll(".view");
+const edits = document.querySelectorAll(".edit-field");
 
-    views.forEach(v => v.hidden = true);
-    edits.forEach(e => e.hidden = false);
+views.forEach(v => v.hidden = true);
+edits.forEach(e => e.hidden = false);
+
+// ✅ FIX EMAIL FIELD BASED ON USER TYPE
+const user = auth.currentUser;
+const providers = user.providerData.map(p => p.providerId);
+const isGoogleUser = providers.includes("google.com");
+
+if (!isGoogleUser) {
+    document.getElementById("email").hidden = false;
+    document.getElementById("emailInput").hidden = true;
+}
 
     editBtn.innerText = "Save";
     deleteBtn.innerText = "Cancel";
