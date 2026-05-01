@@ -385,6 +385,7 @@ opacity:.6;
 
 <div class="actions">
 <button class="edit" id="editBtn">Edit</button>
+<button id="changePassBtn" hidden>Change Password</button>
 <button class="delete" id="deleteBtn">Delete Account</button>
 </div>
 
@@ -429,6 +430,25 @@ opacity:.6;
     <button onclick="closePasswordModal()">Cancel</button>
   </div>
 </div>
+
+<div class="modal" id="resetModal">
+  <div class="modal-box">
+    <p>Send password reset email?</p>
+    <p id="resetStatus" style="font-size:12px;"></p>
+    <button onclick="sendReset()">Send</button>
+    <button onclick="closeReset()">Cancel</button>
+  </div>
+</div>
+
+<div class="modal" id="addPassModal">
+  <div class="modal-box">
+    <p>Add a password to your account</p>
+    <input type="password" id="newPassword" placeholder="New password">
+    <p id="addPassStatus" style="font-size:12px;"></p>
+    <button onclick="addPassword()">Save</button>
+    <button onclick="closeAddPassword()">Cancel</button>
+  </div>
+</div>
     
 <!-- FOOTER -->
 <footer>
@@ -446,8 +466,11 @@ import {
     browserLocalPersistence,
     updateEmail,
     EmailAuthProvider,
-    reauthenticateWithCredential
+    reauthenticateWithCredential, 
+    sendPasswordResetEmail,
+    linkWithCredential
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    
 const app = initializeApp({
   apiKey: "AIzaSyB0A7O_FkTbekDZgjjn6wGVIPKdJ1nkq9E",
   authDomain: "chatph-cc187.firebaseapp.com",
@@ -478,6 +501,11 @@ const deleteBtn = document.getElementById("deleteBtn");
 onAuthStateChanged(auth, async(user)=>{
     if (!user) return location.href="index.html";
 
+    const providers = user.providerData.map(p => p.providerId);
+
+    const isGoogleUser = providers.includes("google.com");
+    const hasPassword = providers.includes("password");
+    
     currentUID = user.uid;
     document.getElementById("email").innerText = user.email;
     emailInput.value = user.email;
@@ -486,6 +514,26 @@ onAuthStateChanged(auth, async(user)=>{
     if (!snap.exists()) return;
 
     const data = snap.data();
+
+    const emailInputField = document.getElementById("emailInput");
+    const changePassBtn = document.getElementById("changePassBtn");
+
+    if (!isGoogleUser) {
+        emailInputField.style.display = "none";
+    }
+
+if (isGoogleUser) {
+    changePassBtn.hidden = false;
+
+    if (hasPassword) {
+        changePassBtn.innerText = "Change Password";
+    } else {
+        changePassBtn.innerText = "Add Password";
+    }
+
+} else {
+    changePassBtn.hidden = true;
+}
 
     document.getElementById("userDisplay").innerText =
     (data.firstName || "") + " " + (data.lastName || "");
@@ -710,9 +758,12 @@ window.confirmReauth = async () => {
         );
 
         await reauthenticateWithCredential(user, credential);
-        await updateEmail(user, pendingEmail);
+        await verifyBeforeUpdateEmail(user, pendingEmail);
 
+        passError.style.color = "#4ade80";
+        passError.innerText = "Verification email sent. Check your inbox.";
         closePasswordModal();
+        
         location.reload();
 
     } catch (err) {
@@ -802,6 +853,77 @@ function clearBoxes(){
     boxes.forEach(b => b.value = "");
     boxes[0].focus();
 }
+
+window.openReset = () => {
+    resetModal.style.display = "flex";
+    resetStatus.innerText = "";
+};
+
+window.closeReset = () => {
+    resetModal.style.display = "none";
+};
+
+window.sendReset = async () => {
+    const user = auth.currentUser;
+    try {
+        await sendPasswordResetEmail(auth, user.email);
+        resetStatus.style.color = "#4ade80";
+        resetStatus.innerText = "Reset email sent!";
+    } catch (err) {
+        resetStatus.style.color = "red";
+        resetStatus.innerText = err.message;
+    }
+};
+
+changePassBtn.onclick = () => {
+    const user = auth.currentUser;
+    const providers = user.providerData.map(p => p.providerId);
+    const hasPassword = providers.includes("password");
+
+    if (hasPassword) {
+        openReset(); // existing flow
+    } else {
+        openAddPassword(); // new flow
+    }
+};
+
+window.openAddPassword = () => {
+    addPassModal.style.display = "flex";
+    addPassStatus.innerText = "";
+};
+
+window.closeAddPassword = () => {
+    addPassModal.style.display = "none";
+};
+
+window.addPassword = async () => {
+    const user = auth.currentUser;
+    const newPassword = document.getElementById("newPassword").value;
+
+    if (!newPassword) {
+        addPassStatus.innerText = "Password required.";
+        return;
+    }
+
+    try {
+        const credential = EmailAuthProvider.credential(
+            user.email,
+            newPassword
+        );
+
+        await linkWithCredential(user, credential);
+
+        addPassStatus.style.color = "#4ade80";
+        addPassStatus.innerText = "Password added successfully!";
+
+        setTimeout(() => location.reload(), 1500);
+
+    } catch (err) {
+        addPassStatus.style.color = "red";
+        addPassStatus.innerText = err.message;
+        console.error(err);
+    }
+};
     
 </script>
 
