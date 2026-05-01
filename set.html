@@ -536,8 +536,25 @@ async function toggleEdit(){
     }else{
         pin.type = "password";
 
-        if (auth.currentUser.email !== emailInput.value) {
-            await updateEmail(auth.currentUser, emailInput.value);
+        try {
+            if (auth.currentUser.email !== emailInput.value) {
+                await updateEmail(auth.currentUser, emailInput.value);
+            }
+
+            await updateDoc(doc(db,"users",currentUID),{
+                firstName:firstName.value,
+                lastName:lastName.value,
+                phone:phone.value,
+                pin:pin.value,
+                birthdate:birthdate.value,
+                gender: gender.value
+            });
+
+            location.reload();
+
+        } catch (err) {
+            console.error(err);
+            alert("⚠️ Email change requires re-login. Please log in again.");
         }
         
         await updateDoc(doc(db,"users",currentUID),{
