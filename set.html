@@ -322,8 +322,9 @@ opacity:.6;
 </div>
 
 <div class="row">
-<div class="label">Email</div>
-<div class="value" id="email"></div>
+  <div class="label">Email</div>
+  <div class="value view" id="email"></div>
+  <input id="emailInput" class="edit-field" hidden>
 </div>
 
 <div class="row">
@@ -431,7 +432,8 @@ import {
     onAuthStateChanged, 
     deleteUser,
     setPersistence,
-    browserLocalPersistence 
+    browserLocalPersistence,
+    updateEmail
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const app = initializeApp({
@@ -466,6 +468,7 @@ onAuthStateChanged(auth, async(user)=>{
 
     currentUID = user.uid;
     document.getElementById("email").innerText = user.email;
+    emailInput.value = user.email;
 
     const snap = await getDoc(doc(db,"users",user.uid));
     if (!snap.exists()) return;
@@ -531,9 +534,12 @@ async function toggleEdit(){
         pin.type = "text";
 
     }else{
-        // ✅ HIDE PIN again when saving
         pin.type = "password";
 
+        if (auth.currentUser.email !== emailInput.value) {
+            await updateEmail(auth.currentUser, emailInput.value);
+        }
+        
         await updateDoc(doc(db,"users",currentUID),{
             firstName:firstName.value,
             lastName:lastName.value,
