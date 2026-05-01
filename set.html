@@ -530,39 +530,15 @@ pinCheck.addEventListener("input", () => {
 });
 
 async function toggleEdit(){
-    
+
+    // 👉 IF SAVING
     if (editMode) {
-    // SAVE MODE
-         if (auth.currentUser.email !== emailInput.value) {
-                openPasswordModal(emailInput.value);
-                return;
+        if (auth.currentUser.email !== emailInput.value) {
+            openPasswordModal(emailInput.value);
+            return;
         }
-    }
-
-editMode = !editMode;
-
-    const views = document.querySelectorAll(".view");
-    const edits = document.querySelectorAll(".edit-field");
-
-    views.forEach(v => v.hidden = editMode);
-    edits.forEach(e => e.hidden = !editMode);
-
-    if(editMode){
-        editBtn.innerText = "Save";
-        deleteBtn.innerText = "Cancel";
-
-        // ✅ SHOW PIN when editing
-        pin.type = "text";
-
-    }else{
-        pin.type = "password";
 
         try {
-            if (auth.currentUser.email !== emailInput.value) {
-                openPasswordModal(emailInput.value);
-                return;
-            }
-
             await updateDoc(doc(db,"users",currentUID),{
                 firstName:firstName.value,
                 lastName:lastName.value,
@@ -571,14 +547,26 @@ editMode = !editMode;
                 birthdate:birthdate.value,
                 gender: gender.value
             });
-
             location.reload();
-
         } catch (err) {
             console.error(err);
-            alert("⚠️ Email change requires re-login. Please log in again.");
         }
+
+        return;
     }
+
+    // 👉 ENTER EDIT MODE
+    editMode = true;
+
+    const views = document.querySelectorAll(".view");
+    const edits = document.querySelectorAll(".edit-field");
+
+    views.forEach(v => v.hidden = true);
+    edits.forEach(e => e.hidden = false);
+
+    editBtn.innerText = "Save";
+    deleteBtn.innerText = "Cancel";
+    pin.type = "text";
 }
 
 /* EDIT / UPDATE / CANCEL */
@@ -712,23 +700,23 @@ window.confirmReauth = async () => {
     try {
         const user = auth.currentUser;
 
+        console.log("Email:", user.email);
+        console.log("Password entered:", password);
+
         const credential = EmailAuthProvider.credential(
             user.email.trim(),
             password.trim()
         );
 
-        // 🔥 REAUTH
         await reauthenticateWithCredential(user, credential);
 
-        // 🔥 NOW UPDATE EMAIL
         await updateEmail(user, pendingEmail);
-
         closePasswordModal();
         location.reload();
 
     } catch (err) {
-        passError.innerText = "Wrong password.";
         console.error(err);
+        passError.innerText = "Wrong password.";
     }
 };
 
