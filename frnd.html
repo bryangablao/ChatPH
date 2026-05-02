@@ -333,6 +333,16 @@ text-decoration:underline;
     text-decoration: underline;
     cursor: pointer;
 }
+
+.top-links{
+    display:flex;
+    flex-direction:column;
+}
+
+.bottom-link{
+    margin-top:auto;
+    margin-bottom:100px;
+}
     
 </style>
 </head>
@@ -361,13 +371,18 @@ text-decoration:underline;
 
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
-<a href="home.html">Home</a>
-<a href="msg.html">Messages</a>
-<a href="#" class="active">Friends</a>
-<a href="srch.html">Search User</a>
-<a href="prfl.html">Profile</a>
+    <div class="top-links">
+        <a href="home.html">Home</a>
+        <a href="msg.html">Messages</a>
+        <a href="frnd.html">Friends</a>
+        <a href="srch.html">Search User</a>
+        <a href="prfl.html">Profile</a>
+    </div>
 
-<div class="indicator" id="indicator"></div>
+    <!-- 🔥 SETTINGS AT BOTTOM -->
+    <a href="set.html" class="bottom-link">Settings</a>
+
+    <div class="indicator" id="indicator"></div>
 </div>
 
 <div class="overlay" id="overlay" onclick="toggleSidebar(true)"></div>
