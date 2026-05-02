@@ -785,21 +785,23 @@ window.openUser = async (id,name)=>{
     window.selectedUser = id;
 
     document.getElementById("popup").style.display="flex";
-    document.getElementById("popupName").innerText=name;
+    document.getElementById("popupName").innerText = name;
 
     const img = document.getElementById("popupImg");
 
-    // ❌ REMOVE old listener
+    // ❌ remove old listener
     if (popupUnsub) popupUnsub();
 
     const userRef = doc(db, "users", id);
 
-    // ✅ SAVE new listener
+    // ✅ listen for avatar
     popupUnsub = onSnapshot(userRef, (snap) => {
         const data = snap.data();
         img.src = data?.pfpBase64 ||
         "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
     });
+
+    await updateFriendButton(id);
 };
 
 async function updateFriendButton(id){
