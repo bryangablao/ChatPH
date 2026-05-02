@@ -75,9 +75,6 @@ font-size:18px;
     z-index: 999;
 }
     
-.sidebar.open{
-    left:0;
-}
 .sidebar a {
     display:block;
     padding:14px 20px;
@@ -815,6 +812,10 @@ footer a:hover{
     margin-top:auto;
     margin-bottom:100px;
 }
+
+.sidebar.open{
+    left:0;
+}
     
 </style>
 </head>
@@ -837,11 +838,11 @@ footer a:hover{
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
     <div class="top-links">
-        <a href="home.html">Home</a>
+        <a href="#" class="active" onclick="return false;">Home</a>
         <a href="msg.html">Messages</a>
         <a href="frnd.html">Friends</a>
-        <a href="#" class="active" onclick="return false;">Search User</a>
         <a href="prfl.html">Profile</a>
+        <a href="srch.html">Search User</a>
     </div>
 
     <a href="set.html" class="bottom-link">Settings</a>
