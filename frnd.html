@@ -245,6 +245,7 @@ text-decoration:underline;
 .dropdown div{
     padding:10px;
     cursor:pointer;
+    color: white;
 }
 
 .dropdown div:hover{
@@ -581,17 +582,17 @@ ${f.createdAt?.toDate().toLocaleTimeString('en-US', {
             </div>
 
             <!-- ⋮ BUTTON -->
-            <div class="menu-btn" onclick="toggleMenu(this)">⋮</div>
+            <div class="menu-btn" onclick="toggleMenu(this, event)">⋮</div>
 
             <!-- ✅ DROPDOWN -->
-            <div class="dropdown">
-                <div onclick="viewProfile('${f.id}')">View Profile</div>
-                <div onclick="sendMessage('${f.id}')">Message</div>
-                <div onclick="pinFriend('${f.id}', ${f.pinned})">
-                    ${f.pinned ? 'Unpin Friend' : 'Pin Friend'}
-                </div>
-                <div onclick="removeFriend('${f.id}')">Remove Friend</div>
-            </div>
+<div class="dropdown">
+    <div onclick="viewProfile('${f.id}')">👤 View Profile</div>
+    <div onclick="sendMessage('${f.id}')">💬 Message</div>
+    <div onclick="pinFriend('${f.id}', ${f.pinned})">
+        ${f.pinned ? '📍 Unpin Friend' : '📌 Pin Friend'}
+    </div>
+    <div onclick="removeFriend('${f.id}')">🗑 Remove Friend</div>
+</div>
         </div>
         `;
     });
@@ -790,10 +791,11 @@ async function reject(uid, event){
     }, 200);
 }
 
-window.toggleMenu = (btn)=>{
+window.toggleMenu = (btn, event)=>{
+    event.stopPropagation(); // ✅ prevent instant close
+
     const dropdown = btn.nextElementSibling;
 
-    // close others
     document.querySelectorAll('.dropdown').forEach(d=>{
         if(d !== dropdown) d.style.display = 'none';
     });
