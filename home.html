@@ -66,11 +66,15 @@ font-size:18px;
     top: 0;
     left: -260px;
     width: 240px;
-    height: 100%;
+    height: 100vh;
+    display:flex;
+    flex-direction:column;
+
     background: rgba(21,25,33,0.75);
     backdrop-filter: blur(12px);
     border-right: 1px solid rgba(255,255,255,0.08);
-    padding-top: 70px; /* pushes content below header */
+    
+    padding: 70px 0 20px;
     transition: .3s;
     z-index: 999;
 }
@@ -84,6 +88,7 @@ font-size:18px;
     overflow: hidden;
     z-index: 1;
 }
+/* ✨ sliding hover effect */
 .sidebar a::before {
     content: "";
     position: absolute;
