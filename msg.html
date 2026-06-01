@@ -751,33 +751,91 @@ text-decoration:underline;
     width:100%;
     padding:16px;
     border:none;
-    border-radius:16px;
-    font-weight:700;
+    border-radius:18px;
+    font-weight:800;
     font-size:15px;
     cursor:pointer;
     color:white;
+    position:relative;
+    overflow:hidden;
 
-    background:linear-gradient(
-        90deg,
-        #2563eb 0%,
-        #2563eb 35%,
+    /* 🇵🇭 Philippine flag inspired gradient */
+    background: linear-gradient(
+        135deg,
+        #1e3a8a 0%,
+        #1e3a8a 30%,
         #ffffff 50%,
-        #dc2626 65%,
-        #dc2626 100%
+        #b91c1c 70%,
+        #b91c1c 100%
     );
 
-    background-size:300% 300%;
+    background-size:200% 200%;
 
-    animation:globalGradient 6s ease infinite;
+    box-shadow:
+        0 10px 25px rgba(0,0,0,0.35),
+        0 0 18px rgba(59,130,246,0.25);
 
-    transition:.25s;
+    transition: transform .25s ease, box-shadow .25s ease;
+    background-color: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
 }
 
+/* hover lift */
 #globalChatBtn:hover{
-    transform:translateY(-3px) scale(1.02);
-    box-shadow:0 8px 20px rgba(59,130,246,.4);
+    transform: translateY(-4px) scale(1.03);
+    box-shadow:
+        0 14px 35px rgba(0,0,0,0.45),
+        0 0 25px rgba(59,130,246,0.35);
 }
 
+#globalChatBtn::before{
+    content:"";
+    position:absolute;
+    top:-50%;
+    left:-60%;
+    width:60%;
+    height:200%;
+    background: rgba(255,255,255,0.25);
+    transform: rotate(25deg);
+    animation: shine 3.5s infinite ease-in-out;
+}
+
+@keyframes shine{
+    0%{ left:-80%; opacity:0; }
+    20%{ opacity:0.6; }
+    50%{ left:120%; opacity:0.2; }
+    100%{ left:120%; opacity:0; }
+}
+
+#globalParticles{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+}
+
+.particle{
+    position:absolute;
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:rgba(255, 215, 0, 0.9);
+    box-shadow:0 0 10px rgba(255,215,0,0.8);
+    animation: floatParticle 4s linear forwards;
+}
+
+@keyframes floatParticle{
+    0%{
+        transform: translateY(20px) scale(0.5);
+        opacity:0;
+    }
+    30%{ opacity:1; }
+    100%{
+        transform: translateY(-120px) scale(1);
+        opacity:0;
+    }
+}
+    
 @keyframes globalGradient{
     0%{
         background-position:0% 50%;
@@ -871,6 +929,7 @@ text-decoration:underline;
     <div style="padding:15px;">
         <button id="globalChatBtn">
             🌎 GLOBAL CHAT
+            <div id="globalParticles"></div>
         </button>
     </div>
 
@@ -1719,7 +1778,29 @@ document.getElementById("groupSearch").addEventListener("input", function(){
         `;
     });
 });
-    
+
+function spawnParticle(){
+    const container = document.getElementById("globalParticles");
+    if(!container) return;
+
+    const p = document.createElement("div");
+    p.classList.add("particle");
+
+    const btn = document.getElementById("globalChatBtn");
+    const rect = btn.getBoundingClientRect();
+
+    p.style.left = Math.random() * rect.width + "px";
+    p.style.top = "0px";
+
+    container.appendChild(p);
+
+    setTimeout(() => {
+        p.remove();
+    }, 4000);
+}
+
+// spawn continuously
+setInterval(spawnParticle, 600);
 
 /* GROUP PANEL */
 function toggleCreate(){
@@ -2517,9 +2598,12 @@ z-index:3000;
         text-align:center;
     ">
         <p>Do you want to delete this conversation?</p>
+
         <div style="display:flex;gap:10px;margin-top:15px;">
             <button id="confirmDelete" class="modal-btn yes">Yes</button>
             <button onclick="closeDeleteModal()" class="modal-btn no">No</button>
+        </div>
+
     </div>
 </div>
     
