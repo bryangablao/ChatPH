@@ -183,8 +183,16 @@ pointer-events:auto;
     width:260px;
     border-right:1px solid var(--border);
     background:#11141a;
+
+    display:flex;
+    flex-direction:column;
+
+    overflow:hidden;
+}
+
+#userResults{
+    flex:1;
     overflow-y:auto;
-    overflow-x:hidden;
 }
 
 /* USER ITEM */
@@ -751,9 +759,11 @@ text-decoration:underline;
 
     background:linear-gradient(
         90deg,
-        #3b82f6,
-        #facc15,
-        #22c55e
+        #2563eb 0%,
+        #2563eb 35%,
+        #ffffff 50%,
+        #dc2626 65%,
+        #dc2626 100%
     );
 
     background-size:300% 300%;
@@ -855,14 +865,14 @@ text-decoration:underline;
     </div>
     <div id="dm" class="category-content"></div>
 
+</div>
+
     <!-- GLOBAL CHAT -->
     <div style="padding:15px;">
         <button id="globalChatBtn">
             🌎 GLOBAL CHAT
         </button>
     </div>
-
-</div>
 
 </div>
 
