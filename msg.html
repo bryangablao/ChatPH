@@ -738,6 +738,47 @@ text-decoration:underline;
     text-decoration: underline;
     cursor: pointer;
 }
+
+#globalChatBtn{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:16px;
+    font-weight:700;
+    font-size:15px;
+    cursor:pointer;
+    color:white;
+
+    background:linear-gradient(
+        90deg,
+        #3b82f6,
+        #facc15,
+        #22c55e
+    );
+
+    background-size:300% 300%;
+
+    animation:globalGradient 6s ease infinite;
+
+    transition:.25s;
+}
+
+#globalChatBtn:hover{
+    transform:translateY(-3px) scale(1.02);
+    box-shadow:0 8px 20px rgba(59,130,246,.4);
+}
+
+@keyframes globalGradient{
+    0%{
+        background-position:0% 50%;
+    }
+    50%{
+        background-position:100% 50%;
+    }
+    100%{
+        background-position:0% 50%;
+    }
+}
     
 </style>
 </head>
@@ -814,6 +855,13 @@ text-decoration:underline;
     </div>
     <div id="dm" class="category-content"></div>
 
+    <!-- GLOBAL CHAT -->
+    <div style="padding:15px;">
+        <button id="globalChatBtn">
+            🌎 GLOBAL CHAT
+        </button>
+    </div>
+
 </div>
 
 </div>
@@ -881,7 +929,6 @@ text-decoration:underline;
 
     </div>
 
-</div>
 </div>
 </div>
 
@@ -1039,6 +1086,7 @@ const chatUID = params.get("uid");
 let allUsers = [];
 let selectedMembers = [];
 let currentGroup = null;
+let isGlobalChat = false;
 let unsubscribe = null;
 let groupTheme = "";
 let chatListUnsubscribe = null;
@@ -1243,6 +1291,7 @@ overlay.classList.toggle("active");
 let currentChatUser = "";
 
 function openChat(uid){
+    isGlobalChat = false;
     document.querySelectorAll(".chat-user").forEach(el=>{
         el.classList.remove("active-chat");
     });
@@ -1364,6 +1413,8 @@ onSnapshot(themeRef, (snap)=>{
 }
 
 function openGroup(id, name, theme){
+
+    isGlobalChat = false;
     document.querySelectorAll(".chat-user").forEach(el=>{
         el.classList.remove("active-chat");
     });
@@ -1380,12 +1431,123 @@ function openGroup(id, name, theme){
 
     loadGroupMessages();
 }
+
+function openGlobalChat(){
+
+    isGlobalChat = true;
+
+    currentGroup = null;
+    currentChatUser = null;
+
+    document.getElementById("emptyState").style.display = "none";
+    document.getElementById("chatUI").style.display = "flex";
+
+    document.getElementById("chatTitle").innerText =
+        "🌎 Global Chat";
+
+    document.getElementById("chatStatus").innerText =
+        "Everyone can chat here";
+
+    document.getElementById("typingIndicator").innerText = "";
+
+    document.getElementById("chatAvatar").src =
+        "https://cdn-icons-png.flaticon.com/512/684/684908.png";
+
+    document.getElementById("chatBox").style.background =
+        "linear-gradient(135deg,#2563eb22,#22c55e22)";
+
+    loadGlobalMessages();
+}
+
+function loadGlobalMessages(){
+
+    const box = document.getElementById("messages");
+
+    if(unsubscribe) unsubscribe();
+
+    unsubscribe = onSnapshot(
+        collection(db,"globalChat"),
+        (snap)=>{
+
+        box.innerHTML = "";
+
+        let messages = [];
+
+        snap.forEach(docSnap=>{
+            messages.push({
+                id:docSnap.id,
+                ...docSnap.data()
+            });
+        });
+
+        messages.sort((a,b)=>a.time-b.time);
+
+        messages.forEach(m=>{
+
+            const isMe =
+                m.uid === auth.currentUser.uid;
+
+            box.innerHTML += `
+            <div class="msg ${isMe ? "me":"other"}"
+                 style="
+                 background:${isMe ? "#4da3ff":"#2a2f3a"};
+                 color:${isMe ? "#000":"#fff"};
+                 ">
+                 
+                <div style="
+                    font-size:11px;
+                    opacity:.7;
+                    margin-bottom:4px;
+                ">
+                    ${m.name}
+                </div>
+
+                ${m.text}
+
+                <div style="
+                    font-size:10px;
+                    opacity:.6;
+                    margin-top:4px;
+                ">
+                    ${new Date(m.time)
+                    .toLocaleTimeString()}
+                </div>
+            </div>
+            `;
+        });
+
+        box.scrollTop = box.scrollHeight;
+    });
+}
     
 async function sendMsg(){
     const input = document.getElementById("msgInput");
     const text = input.value.trim();
 
-    if(!text || (!currentChatUser && !currentGroup)) return;
+    if(
+        !text ||
+        (!isGlobalChat && !currentChatUser && !currentGroup)
+    ){
+        return;
+    }
+
+if(isGlobalChat){
+
+    const user = auth.currentUser;
+
+    await addDoc(
+        collection(db,"globalChat"),
+        {
+            text:text,
+            uid:user.uid,
+            name:user.displayName || "User",
+            time:Date.now()
+        }
+    );
+
+    input.value = "";
+    return;
+}
 
     const user = auth.currentUser;
     if(!user) return;
@@ -1802,6 +1964,9 @@ document.getElementById("logoutBtn").onclick = async () => {
 };
 
 document.getElementById("closeChat").onclick = () => {
+
+    isGlobalChat = false;
+    
     currentChatUser = null;
     currentGroup = null;
 
@@ -2282,10 +2447,17 @@ document.getElementById("deleteModal").addEventListener("click", (e)=>{
         closeDeleteModal();
     }
 });
+
+// GLOBAL CHAT BUTTON
+document
+    .getElementById("globalChatBtn")
+    .addEventListener("click", openGlobalChat);
     
 // 🔥 MAKE FUNCTIONS GLOBAL (IMPORTANT)
 
+window.openGlobalChat = openGlobalChat;
 window.deleteMessage = deleteMessage;
+window.closeDeleteModal = closeDeleteModal;
 window.editMessage = editMessage;
 window.pinMessage = pinMessage;
 window.unpinMessage = unpinMessage;
