@@ -723,12 +723,42 @@ text-decoration:underline;
 }
 
 .nickname-item{
-    padding:8px;
+    width:100%;
+    padding:10px;
     border-bottom:1px solid var(--border);
     display:flex;
     align-items:center;
-    gap:10px;
+    justify-content:space-between;
+    box-sizing:border-box;
     white-space:nowrap;
+    overflow:hidden;
+}
+
+
+.nickname-item > span:first-child,
+.nickname-name{
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+
+.nickname-actions{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    margin-left:auto;
+    flex-shrink:0;
+}
+
+
+.nickname-actions span{
+    cursor:pointer;
+    width:24px;
+    height:24px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
 .nickname-item:hover{
@@ -741,33 +771,16 @@ text-decoration:underline;
     cursor: pointer;
 }
 
-/* NICKNAME BUTTON SPACING */
-.nickname-actions{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    margin-left:5px;
-    flex-shrink:0;
-}
-
-.nickname-actions span{
-    cursor:pointer;
-    display:inline-flex;
-    width:24px;
-    height:24px;
-    align-items:center;
-    justify-content:center;
-}
-
 /* EDIT NICKNAME SINGLE ROW */
 .nickname-edit-row{
     display:flex;
     align-items:center;
     gap:8px;
     width:100%;
+    max-width:100%;
     box-sizing:border-box;
+    overflow:hidden;
 }
-
 
 .nickname-edit-row input{
     flex:1;
@@ -2128,118 +2141,52 @@ else if(currentChatUser){
         || "User";
 
 
-    nickBox.innerHTML = `
-    
-    <div class="nickname-item">
-        ${myName}
-
-        <div class="nickname-actions">
-
-        <span onclick="editNick('${currentChatUser}')">
-        🖉
-        </span>
-
-        <span onclick="resetNick('${currentChatUser}')">
-        ↻
-        </span>
-
-        </div>
-
-    </div>
-
-
-    <div class="nickname-item">
-
-    ${otherName}
-
-    <div class="nickname-actions">
-
-    <span onclick="editNick('${currentChatUser}')">
-    🖉
-    </span>
-
-    <span onclick="resetNick('${currentChatUser}')">
-    ↻
-    </span>
-
-    </div>
-
-    </div>
-
-    `;
-
-}
-
-// ✅ DIRECT MESSAGE
-// LOAD NICKNAMES WITH EDIT + RESET BUTTON
-
-const nickBox = document.getElementById("nicknames");
-
-const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
-
-const convoSnap = await getDoc(doc(db,"conversations",chatId));
-
-const nickData = convoSnap.exists()
-    ? convoSnap.data().nicknames || {}
-    : {};
-
-const myName = nickData[auth.currentUser.uid] 
-    || auth.currentUser.displayName 
-    || "You";
-
-const user = allUsers.find(
-    u => u.uid === currentChatUser
-);
-
-const otherName = nickData[currentChatUser]
-    || user?.name
-    || "User";
-
-
 nickBox.innerHTML = `
 
 <div class="nickname-item">
 
-${myName}
+    <span class="nickname-name">
+        ${myName}
+    </span>
 
-<span 
-onclick="editNick('${auth.currentUser.uid}')"
-style="float:right;cursor:pointer;margin-left:10px;">
-🖉
-</span>
+    <div class="nickname-actions">
 
+        <span onclick="editNick('${auth.currentUser.uid}')">
+            🖉
+        </span>
 
-<span 
-onclick="resetNick('${auth.currentUser.uid}')"
-style="float:right;cursor:pointer;">
-↻
-</span>
+        <span onclick="resetNick('${auth.currentUser.uid}')">
+            ↻
+        </span>
+
+    </div>
 
 </div>
-
 
 
 <div class="nickname-item">
 
-${otherName}
+    <span class="nickname-name">
+        ${otherName}
+    </span>
 
-<span 
-onclick="editNick('${currentChatUser}')"
-style="float:right;cursor:pointer;margin-left:10px;">
-🖉
-</span>
+    <div class="nickname-actions">
 
+        <span onclick="editNick('${currentChatUser}')">
+            🖉
+        </span>
 
-<span 
-onclick="resetNick('${currentChatUser}')"
-style="float:right;cursor:pointer;">
-↻
-</span>
+        <span onclick="resetNick('${currentChatUser}')">
+            ↻
+        </span>
 
+    </div>
 
 </div>
 
 `;
+
+}
     loadPinned();
 };
 
@@ -2614,7 +2561,7 @@ async function saveNick(uid){
     }
 
 
-    if(value.length > 20){
+    if([...value].length > 20){
 
         showNickStatus(
             "Maximum of 20 characters only"
@@ -2689,10 +2636,12 @@ async function resetNick(uid){
     }
 
 
-    await loadNicknames();
+await loadNicknames();
 
-    // refresh chat header
-    loadChatHeaderNickname(currentChatUser);
+await loadChatHeaderNickname(currentChatUser);
+
+document.getElementById("chatOptionsPanel")
+.classList.add("open");
 
 }
 
@@ -2786,8 +2735,10 @@ async function loadChatHeaderNickname(uid){
     }
 
 
-    const realName = user?.name || "User";
-
+    const realName =
+        user?.name ||
+        auth.currentUser.displayName ||
+        "User";
 
     document.getElementById("chatTitle").innerHTML = `
 
