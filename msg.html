@@ -1797,51 +1797,50 @@ messages.forEach(m=>{
 
 if(m.system){
 
-    // ✅ NICKNAME CHANGED
-    if(m.nicknameChange){
+// ✅ RESET NICKNAME FIRST
+if(m.resetNickname){
 
-        box.innerHTML += `
-        <div style="
-            text-align:center;
-            font-size:12px;
-            opacity:.8;
-            margin:10px 0;
-        ">
-            ${m.userName} changed the nickname of 
-            <b>${m.targetUser}</b>
-            →
-            <span style="color:#4da3ff;">
-            ${m.newNickname}
-            </span>
-        </div>
-        `;
+    box.innerHTML += `
 
-        return;
-    }
+    <div style="
+        text-align:center;
+        font-size:12px;
+        opacity:.8;
+        margin:10px 0;
+    ">
+
+    ${m.userName} reset the nickname of 
+    <b>${m.targetUser}</b>
+
+    </div>
+
+    `;
+
+    return;
+}
 
 
-    // ✅ NICKNAME REMOVED
-    if(m.resetNickname){
+// ✅ CHANGED NICKNAME
+if(m.nicknameChange){
 
-        box.innerHTML += `
-
-        <div style="
-            text-align:center;
-            font-size:12px;
-            opacity:.8;
-            margin:10px 0;
-        ">
-
-        ${m.userName} removed the nickname of 
+    box.innerHTML += `
+    <div style="
+        text-align:center;
+        font-size:12px;
+        opacity:.8;
+        margin:10px 0;
+    ">
+        ${m.userName} changed the nickname of 
         <b>${m.targetUser}</b>
+        →
+        <span style="color:#4da3ff;">
+        ${m.newNickname}
+        </span>
+    </div>
+    `;
 
-        </div>
-
-        `;
-
-        return;
-    }
-
+    return;
+}
 
     // ✅ THEME CHANGE
     let html = "";
@@ -2715,8 +2714,8 @@ async function resetNick(uid){
     let data = snap.data();
 
 
-    if(data.nicknames){
-
+    if(data.nicknames && data.nicknames[uid]){
+        
         delete data.nicknames[uid];
 
 
@@ -2727,8 +2726,6 @@ async function resetNick(uid){
 await addDoc(collection(db,"messages"),{
 
     system:true,
-
-    nicknameChange:true,
 
     resetNickname:true,
 
@@ -2741,8 +2738,6 @@ await addDoc(collection(db,"messages"),{
 
     targetUser:
         allUsers.find(u=>u.uid===uid)?.name || "User",
-
-    newNickname:null,
 
     time:Date.now()
 
