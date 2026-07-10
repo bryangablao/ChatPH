@@ -1986,32 +1986,71 @@ document.getElementById("moreBtn").onclick = async () => {
     } 
 
     // ✅ DIRECT MESSAGE
-else if(currentChatUser){
+// LOAD NICKNAMES WITH EDIT + RESET BUTTON
 
-    const userRef = doc(db, "users", currentChatUser);
-    const snap = await getDoc(userRef);
-    const data = snap.data();
+const nickBox = document.getElementById("nicknames");
 
-    // SET HEADER
-    document.getElementById("dmAvatar").src =
-        data?.pfpBase64 || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
 
-    document.getElementById("dmName").innerText =
-        data?.name || "User";
+const convoSnap = await getDoc(doc(db,"conversations",chatId));
 
-    // LOAD NICKNAMES (simple list)
-    const nickBox = document.getElementById("nicknames");
+const nickData = convoSnap.exists()
+    ? convoSnap.data().nicknames || {}
+    : {};
+
+const myName = nickData[auth.currentUser.uid] 
+    || auth.currentUser.displayName 
+    || "You";
+
+const otherName = nickData[currentChatUser]
+    || data?.name
+    || "User";
+
+
 nickBox.innerHTML = `
-    <div class="nickname-item" onclick="editNick('${auth.currentUser.uid}')">
-        ${auth.currentUser.displayName || "You"} <span style="opacity:.6;">(You)</span>
-    </div>
 
-    <div class="nickname-item" onclick="editNick('${currentChatUser}')">
-        ${data?.name || "Test User"}
-    </div>
+<div class="nickname-item">
+
+${myName}
+
+<span 
+onclick="editNick('${auth.currentUser.uid}')"
+style="float:right;cursor:pointer;margin-left:10px;">
+🖉
+</span>
+
+
+<span 
+onclick="resetNick('${auth.currentUser.uid}')"
+style="float:right;cursor:pointer;">
+↻
+</span>
+
+</div>
+
+
+
+<div class="nickname-item">
+
+${otherName}
+
+<span 
+onclick="editNick('${currentChatUser}')"
+style="float:right;cursor:pointer;margin-left:10px;">
+🖉
+</span>
+
+
+<span 
+onclick="resetNick('${currentChatUser}')"
+style="float:right;cursor:pointer;">
+↻
+</span>
+
+
+</div>
+
 `;
-}
-
     loadPinned();
 };
 
@@ -2275,17 +2314,69 @@ document.getElementById("confirmDelete").onclick = async () => {
 };
 
 async function saveNick(uid){
+
     const input = document.getElementById("nickInput");
-    const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
+    const value = input.value.trim();
 
-    await setDoc(doc(db, "conversations", chatId), {
-        nicknames: {
-            [uid]: input.value
+    if(!value) return;
+
+
+    const chatId = [
+        auth.currentUser.uid,
+        currentChatUser
+    ].sort().join("_");
+
+
+    await setDoc(
+        doc(db,"conversations",chatId),
+        {
+            nicknames:{
+                [uid]:value
+            }
+        },
+        {
+            merge:true
         }
-    }, { merge:true });
+    );
 
-    // reload UI
+
     document.getElementById("moreBtn").click();
+
+}
+
+async function resetNick(uid){
+
+    const chatId = [
+        auth.currentUser.uid,
+        currentChatUser
+    ].sort().join("_");
+
+
+    const ref = doc(db,"conversations",chatId);
+
+    const snap = await getDoc(ref);
+
+
+    if(!snap.exists()) return;
+
+
+    let data = snap.data();
+
+
+    if(data.nicknames){
+
+        delete data.nicknames[uid];
+
+
+        await updateDoc(ref,{
+            nicknames:data.nicknames
+        });
+
+    }
+
+
+    document.getElementById("moreBtn").click();
+
 }
 
 function editNick(uid){
@@ -2326,6 +2417,9 @@ window.changeTheme = changeTheme;
 window.toggleSection = toggleSection;
 window.toggleCategory = toggleCategory;
 window.toggleCreate = toggleCreate;
+window.editNick = editNick;
+window.saveNick = saveNick;
+window.resetNick = resetNick;
 </script>
 
 <div id="msgMenu" style="
