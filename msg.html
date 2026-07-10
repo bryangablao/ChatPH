@@ -803,7 +803,7 @@ text-decoration:underline;
     <div id="fav" class="category-content"></div>
 
     <!-- GROUP CHATS -->
-    <div class="category" onclick="toggleCategory('groups')">
+    <div class="category" onc    lick="toggleCategory('groups')">
         👥 GroupChats <span id="icon-groups">▾</span>
     </div>
     <div id="groups" class="category-content"></div>
@@ -1263,8 +1263,6 @@ function openChat(uid){
     ? "Saved Messages (You)"
     : (user ? user.name : "User");
 
-    loadMessages();
-
 // 🔥 TYPING LISTENER (PUT HERE)
 const typingRef = doc(db, "typing", uid);
 
@@ -1349,16 +1347,37 @@ onSnapshot(statusRef, (snap)=>{
 const chatId = [auth.currentUser.uid, uid].sort().join("_");
 
 const themeRef = doc(db, "dmThemes", chatId);
-onSnapshot(themeRef, (snap)=>{
+
+if(window.themeListener){
+    window.themeListener();
+}
+
+window.themeListener = onSnapshot(themeRef, (snap)=>{
+
     const data = snap.data();
 
-    if(data?.theme){
-        themeColor = data.theme; 
-        document.getElementById("chatBox").style.background = data.theme + "22";
-    } else {
+    if(data && data.theme){
+
+        themeColor = data.theme;
+
+        const chatBox = document.getElementById("chatBox");
+        chatBox.style.background = data.theme + "22";
+
+        // Force repaint
+        chatBox.offsetHeight;
+
+    }else{
+
         themeColor = "#4da3ff";
-        document.getElementById("chatBox").style.background = "";
+
+        const chatBox = document.getElementById("chatBox");
+        chatBox.style.background = "";
+
     }
+
+    // Refresh all message colors immediately
+    loadMessages();
+
 });
     
 }
@@ -1811,6 +1830,7 @@ document.getElementById("closeChat").onclick = () => {
     document.getElementById("emptyState").style.display = "block";
     document.getElementById("messages").innerHTML = "";
     document.getElementById("chatBox").style.background = "";
+    themeColor = "#4da3ff";
 };
 
 let pressTimer;
@@ -2124,7 +2144,11 @@ async function changeTheme(color){
         await updateDoc(doc(db, "groups", currentGroup), {
             theme: color
         });
+        themeColor = color;
+
         document.getElementById("chatBox").style.background = color + "22";
+
+        loadMessages();
     }
 
     // ✅ DIRECT MESSAGE
