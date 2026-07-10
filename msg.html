@@ -743,26 +743,33 @@ text-decoration:underline;
 .nickname-actions{
     display:flex;
     align-items:center;
-    gap:12px;
+    gap:10px;
     margin-left:auto;
 }
 
 .nickname-actions span{
     cursor:pointer;
+    display:inline-flex;
+    width:24px;
+    height:24px;
+    align-items:center;
+    justify-content:center;
 }
-
 
 /* EDIT NICKNAME SINGLE ROW */
 .nickname-edit-row{
     display:flex;
     align-items:center;
-    gap:6px;
+    gap:8px;
     width:100%;
+    box-sizing:border-box;
 }
+
 
 .nickname-edit-row input{
     flex:1;
     min-width:0;
+    width:100%;
     padding:8px 10px;
     border-radius:8px;
     border:none;
@@ -772,20 +779,18 @@ text-decoration:underline;
 }
 
 
-/* SMALL CHECK / CANCEL BUTTON */
 .nick-save-btn,
 .nick-cancel-btn{
-    width:28px;
-    height:28px;
+    width:32px;
+    height:32px;
+    flex-shrink:0;
     border:none;
     border-radius:8px;
-    font-size:15px;
     cursor:pointer;
     display:flex;
     align-items:center;
     justify-content:center;
 }
-
 
 .nick-save-btn{
     background:#22c55e;
@@ -1354,10 +1359,7 @@ function openChat(uid){
     document.getElementById("emptyState").style.display = "none";
     document.getElementById("chatUI").style.display = "flex";
 
-    document.getElementById("chatTitle").innerText =
-    uid === auth.currentUser.uid
-    ? "Saved Messages (You)"
-    : (user ? user.name : "User");
+    loadChatHeaderNickname(uid);
 
 // 🔥 TYPING LISTENER (PUT HERE)
 const typingRef = doc(db, "typing", uid);
@@ -2128,13 +2130,17 @@ else if(currentChatUser){
     <div class="nickname-item">
         ${myName}
 
-        <span onclick="editNick('${auth.currentUser.uid}')">
+        <div class="nickname-actions">
+
+        <span onclick="editNick('${currentChatUser}')">
         🖉
         </span>
 
-        <span onclick="resetNick('${auth.currentUser.uid}')">
+        <span onclick="resetNick('${currentChatUser}')">
         ↻
         </span>
+
+        </div>
 
     </div>
 
@@ -2634,7 +2640,7 @@ async function saveNick(uid){
 
 
     await loadNicknames();
-
+    loadChatHeaderNickname(currentChatUser);
 
     document.getElementById("chatOptionsPanel")
     .classList.add("open");
@@ -2736,6 +2742,59 @@ function showNickStatus(message){
         box.classList.remove("show");
 
     },2500);
+
+}
+
+async function loadChatHeaderNickname(uid){
+
+    const user = allUsers.find(u=>u.uid===uid);
+
+    const chatId = [
+        auth.currentUser.uid,
+        uid
+    ].sort().join("_");
+
+
+    const convoSnap = await getDoc(
+        doc(db,"conversations",chatId)
+    );
+
+
+    let nickname = null;
+
+
+    if(convoSnap.exists()){
+
+        const data = convoSnap.data();
+
+        nickname = data.nicknames?.[uid];
+
+    }
+
+
+    const finalName =
+        nickname ||
+        user?.name ||
+        "User";
+
+
+    document.getElementById("chatTitle").innerHTML = `
+
+        ${finalName}
+
+        ${
+        nickname 
+        ? `<span style="
+            margin-left:8px;
+            opacity:.6;
+            font-size:12px;
+          ">
+          [${user?.name}]
+          </span>`
+        : ""
+        }
+
+    `;
 
 }
 
