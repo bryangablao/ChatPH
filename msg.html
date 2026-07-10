@@ -738,6 +738,96 @@ text-decoration:underline;
     text-decoration: underline;
     cursor: pointer;
 }
+
+/* NICKNAME BUTTON SPACING */
+.nickname-actions{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-left:auto;
+}
+
+.nickname-actions span{
+    cursor:pointer;
+}
+
+
+/* EDIT NICKNAME SINGLE ROW */
+.nickname-edit-row{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    width:100%;
+}
+
+.nickname-edit-row input{
+    flex:1;
+    min-width:0;
+    padding:8px 10px;
+    border-radius:8px;
+    border:none;
+    outline:none;
+    background:#111827;
+    color:white;
+}
+
+
+/* SMALL CHECK / CANCEL BUTTON */
+.nick-save-btn,
+.nick-cancel-btn{
+    width:28px;
+    height:28px;
+    border:none;
+    border-radius:8px;
+    font-size:15px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+
+.nick-save-btn{
+    background:#22c55e;
+    color:white;
+}
+
+
+.nick-cancel-btn{
+    background:#ef4444;
+    color:white;
+}
+
+
+/* FLOATING STATUS MESSAGE */
+#nickStatus{
+    position:fixed;
+    top:90px;
+    right:25px;
+
+    background:#1f2937;
+    color:white;
+
+    padding:12px 18px;
+    border-radius:12px;
+
+    font-size:13px;
+
+    opacity:0;
+    transform:translateY(-20px);
+
+    pointer-events:none;
+
+    transition:.4s ease;
+
+    z-index:5000;
+}
+
+
+#nickStatus.show{
+    opacity:1;
+    transform:translateY(0);
+}
     
 </style>
 </head>
@@ -2478,15 +2568,51 @@ document.getElementById("confirmDelete").onclick = async () => {
 async function saveNick(uid){
 
     const input = document.getElementById("nickInput");
+
     const value = input.value.trim();
 
-    if(!value) return;
+
+    // EMPTY CHECK
+    if(value === ""){
+
+        showNickStatus(
+            "Cannot save if empty please fill in"
+        );
+
+        return;
+    }
+
+
+    // ONLY A-Z a-z 0-9 MAX 20
+    const valid = /^[a-zA-Z0-9]+$/.test(value);
+
+
+    if(!valid){
+
+        showNickStatus(
+            "Only letters and numbers allowed"
+        );
+
+        return;
+    }
+
+
+    if(value.length > 20){
+
+        showNickStatus(
+            "Maximum of 20 characters only"
+        );
+
+        return;
+    }
+
 
 
     const chatId = [
         auth.currentUser.uid,
         currentChatUser
     ].sort().join("_");
+
 
 
     await setDoc(
@@ -2502,8 +2628,11 @@ async function saveNick(uid){
     );
 
 
-    // ONLY refresh nickname list
-    // DO NOT CLOSE PANEL
+    showNickStatus(
+        "Nickname changed successfully"
+    );
+
+
     await loadNicknames();
 
 
@@ -2551,80 +2680,37 @@ function editNick(uid){
 
     const box = document.getElementById("nicknames");
 
+
     box.innerHTML = `
 
-    <div style="
-        background:#1f2937;
-        padding:12px;
-        border-radius:12px;
-    ">
+    <div class="nickname-edit-row">
 
-        <input id="nickInput"
-        placeholder="Enter nickname"
-        style="
-        width:100%;
-        box-sizing:border-box;
-        padding:10px;
-        border-radius:8px;
-        border:none;
-        outline:none;
-        background:#111827;
-        color:white;
-        margin-bottom:10px;
-        ">
+        <input 
+        id="nickInput"
+        maxlength="20"
+        placeholder="Enter nickname">
 
 
-        <div style="
-        display:flex;
-        gap:10px;
-        justify-content:center;
-        ">
-
-
-        <button onclick="saveNick('${uid}')"
-        style="
-        width:45px;
-        height:35px;
-        border:none;
-        border-radius:10px;
-        background:#22c55e;
-        color:white;
-        font-size:18px;
-        cursor:pointer;
-        transition:.25s;
-        "
-        onmouseover="this.style.transform='scale(1.1)'"
-        onmouseout="this.style.transform='scale(1)'"
-        >
+        <button 
+        class="nick-save-btn"
+        onclick="saveNick('${uid}')">
         ✔
         </button>
 
 
-
-        <button onclick="cancelNickEdit()"
-        style="
-        width:45px;
-        height:35px;
-        border:none;
-        border-radius:10px;
-        background:#ef4444;
-        color:white;
-        font-size:18px;
-        cursor:pointer;
-        transition:.25s;
-        "
-        onmouseover="this.style.transform='scale(1.1)'"
-        onmouseout="this.style.transform='scale(1)'"
-        >
+        <button 
+        class="nick-cancel-btn"
+        onclick="cancelNickEdit()">
         ✕
         </button>
 
 
-        </div>
-
     </div>
 
     `;
+
+
+    document.getElementById("nickInput").focus();
 }
 
 function cancelNickEdit(){
@@ -2633,6 +2719,23 @@ function cancelNickEdit(){
 
     document.getElementById("chatOptionsPanel")
     .classList.add("open");
+
+}
+
+function showNickStatus(message){
+
+    const box = document.getElementById("nickStatus");
+
+    box.innerText = message;
+
+    box.classList.add("show");
+
+
+    setTimeout(()=>{
+
+        box.classList.remove("show");
+
+    },2500);
 
 }
 
@@ -2705,6 +2808,8 @@ z-index:3000;
             <button onclick="closeDeleteModal()" class="modal-btn no">No</button>
     </div>
 </div>
+
+<div id="nickStatus"></div>
     
 </body>
 </html>
