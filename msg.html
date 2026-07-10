@@ -977,17 +977,6 @@ text-decoration:underline;
             Delete Conversation
         </div>
     </div>
-
-    <!-- GROUP MEMBERS -->
-    <div class="option" id="membersOption" style="display:none">
-
-        Members
-        <span onclick="toggleSection('members')">▾</span>
-
-        <div id="members" class="dropdown"></div>
-
-    </div>
-
 </div>
 
 <!-- FOOTER -->
@@ -2012,6 +2001,7 @@ if(currentGroup){
 else if(currentChatUser){
 
     // DIRECT MESSAGE ONLY
+    membersSection.style.display = "none";
 
     const nickBox = document.getElementById("nicknames");
 
@@ -2325,6 +2315,83 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
+async function loadNicknames(){
+
+const nickBox = document.getElementById("nicknames");
+
+
+const chatId = [
+auth.currentUser.uid,
+currentChatUser
+].sort().join("_");
+
+
+const convoSnap = await getDoc(
+doc(db,"conversations",chatId)
+);
+
+
+const nickData = convoSnap.exists()
+? convoSnap.data().nicknames || {}
+: {};
+
+
+const myName =
+nickData[auth.currentUser.uid]
+|| auth.currentUser.displayName
+|| "You";
+
+
+const user = allUsers.find(
+u=>u.uid===currentChatUser
+);
+
+
+const otherName =
+nickData[currentChatUser]
+|| user?.name
+|| "User";
+
+
+
+nickBox.innerHTML = `
+
+
+<div class="nickname-item">
+
+${myName}
+
+<span onclick="editNick('${auth.currentUser.uid}')">
+🖉
+</span>
+
+<span onclick="resetNick('${auth.currentUser.uid}')">
+↻
+</span>
+
+</div>
+
+
+
+<div class="nickname-item">
+
+${otherName}
+
+<span onclick="editNick('${currentChatUser}')">
+🖉
+</span>
+
+<span onclick="resetNick('${currentChatUser}')">
+↻
+</span>
+
+</div>
+
+
+`;
+
+}
+
 function setOnlineStatus(user){
     const userRef = doc(db, "status", user.uid);
 
@@ -2435,7 +2502,13 @@ async function saveNick(uid){
     );
 
 
-    document.getElementById("moreBtn").click();
+    // ONLY refresh nickname list
+    // DO NOT CLOSE PANEL
+    await loadNicknames();
+
+
+    document.getElementById("chatOptionsPanel")
+    .classList.add("open");
 
 }
 
@@ -2470,21 +2543,97 @@ async function resetNick(uid){
     }
 
 
-    document.getElementById("moreBtn").click();
+    loadNicknames();
 
 }
 
 function editNick(uid){
+
     const box = document.getElementById("nicknames");
 
     box.innerHTML = `
-        <div>
-            <input id="nickInput" placeholder="Enter nickname"
-            style="width:70%;padding:6px;border-radius:6px;border:none;background:#1f2937;color:white;">
-            
-            <button onclick="saveNick('${uid}')">Save</button>
+
+    <div style="
+        background:#1f2937;
+        padding:12px;
+        border-radius:12px;
+    ">
+
+        <input id="nickInput"
+        placeholder="Enter nickname"
+        style="
+        width:100%;
+        box-sizing:border-box;
+        padding:10px;
+        border-radius:8px;
+        border:none;
+        outline:none;
+        background:#111827;
+        color:white;
+        margin-bottom:10px;
+        ">
+
+
+        <div style="
+        display:flex;
+        gap:10px;
+        justify-content:center;
+        ">
+
+
+        <button onclick="saveNick('${uid}')"
+        style="
+        width:45px;
+        height:35px;
+        border:none;
+        border-radius:10px;
+        background:#22c55e;
+        color:white;
+        font-size:18px;
+        cursor:pointer;
+        transition:.25s;
+        "
+        onmouseover="this.style.transform='scale(1.1)'"
+        onmouseout="this.style.transform='scale(1)'"
+        >
+        ✔
+        </button>
+
+
+
+        <button onclick="cancelNickEdit()"
+        style="
+        width:45px;
+        height:35px;
+        border:none;
+        border-radius:10px;
+        background:#ef4444;
+        color:white;
+        font-size:18px;
+        cursor:pointer;
+        transition:.25s;
+        "
+        onmouseover="this.style.transform='scale(1.1)'"
+        onmouseout="this.style.transform='scale(1)'"
+        >
+        ✕
+        </button>
+
+
         </div>
+
+    </div>
+
     `;
+}
+
+function cancelNickEdit(){
+
+    loadNicknames();
+
+    document.getElementById("chatOptionsPanel")
+    .classList.add("open");
+
 }
 
 document.getElementById("deleteModal").addEventListener("click", (e)=>{
@@ -2516,6 +2665,8 @@ window.toggleCreate = toggleCreate;
 window.editNick = editNick;
 window.saveNick = saveNick;
 window.resetNick = resetNick;
+window.cancelNickEdit = cancelNickEdit;
+window.loadNicknames = loadNicknames;
 </script>
 
 <div id="msgMenu" style="
