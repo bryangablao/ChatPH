@@ -1795,18 +1795,66 @@ function loadMessages(){
 
 messages.forEach(m=>{
 
-    // 🔥 NEW: THEME CHANGE SYSTEM MESSAGE
 if(m.system){
+
+    // ✅ NICKNAME CHANGED
+    if(m.nicknameChange){
+
+        box.innerHTML += `
+        <div style="
+            text-align:center;
+            font-size:12px;
+            opacity:.8;
+            margin:10px 0;
+        ">
+            ${m.userName} changed the nickname of 
+            <b>${m.targetUser}</b>
+            →
+            <span style="color:#4da3ff;">
+            ${m.newNickname}
+            </span>
+        </div>
+        `;
+
+        return;
+    }
+
+
+    // ✅ NICKNAME REMOVED
+    if(m.resetNickname){
+
+        box.innerHTML += `
+
+        <div style="
+            text-align:center;
+            font-size:12px;
+            opacity:.8;
+            margin:10px 0;
+        ">
+
+        ${m.userName} removed the nickname of 
+        <b>${m.targetUser}</b>
+
+        </div>
+
+        `;
+
+        return;
+    }
+
+
+    // ✅ THEME CHANGE
     let html = "";
 
     if(!m.oldTheme){
-        // ✅ FIRST CHANGE
+
         html = `
             ${m.userName} changed the theme to 
             <span style="color:${m.newTheme}">●</span>
         `;
+
     } else {
-        // ✅ NORMAL CHANGE
+
         html = `
             ${m.userName} changed the theme from 
             <span style="color:${m.oldTheme}">●</span>
@@ -1815,14 +1863,15 @@ if(m.system){
         `;
     }
 
+
     box.innerHTML += `
         <div style="text-align:center;font-size:12px;opacity:.8;margin:10px 0;">
             ${html}
         </div>
     `;
+
     return;
 }
-
     // NORMAL MESSAGE
 const isMe = m.from === auth.currentUser.uid;
     
@@ -2570,26 +2619,68 @@ async function saveNick(uid){
         return;
     }
 
-
-
     const chatId = [
         auth.currentUser.uid,
         currentChatUser
     ].sort().join("_");
 
+// GET OLD NICKNAME
+const oldSnap = await getDoc(
+    doc(db,"conversations",chatId)
+);
+
+const oldData = oldSnap.exists()
+    ? oldSnap.data().nicknames || {}
+    : {};
+
+const oldNickname = oldData[uid] || null;
 
 
-    await setDoc(
-        doc(db,"conversations",chatId),
-        {
-            nicknames:{
-                [uid]:value
-            }
-        },
-        {
-            merge:true
+// SAVE NEW NICKNAME
+await setDoc(
+    doc(db,"conversations",chatId),
+    {
+        nicknames:{
+            [uid]:value
         }
-    );
+    },
+    {
+        merge:true
+    }
+);
+
+
+// CREATE SYSTEM MESSAGE
+const changedUser = allUsers.find(
+    u => u.uid === uid
+);
+
+
+await addDoc(collection(db,"messages"),{
+
+    system:true,
+
+    nicknameChange:true,
+
+    from:auth.currentUser.uid,
+
+    to:currentChatUser,
+
+    userName:
+        auth.currentUser.displayName 
+        || "User",
+
+    targetUser:
+        changedUser?.name 
+        || "User",
+
+    oldNickname:oldNickname,
+
+    newNickname:value,
+
+    time:Date.now()
+
+});
 
 
     showNickStatus(
@@ -2633,6 +2724,29 @@ async function resetNick(uid){
             nicknames:data.nicknames
         });
 
+await addDoc(collection(db,"messages"),{
+
+    system:true,
+
+    nicknameChange:true,
+
+    resetNickname:true,
+
+    from:auth.currentUser.uid,
+
+    to:currentChatUser,
+
+    userName:
+        auth.currentUser.displayName || "User",
+
+    targetUser:
+        allUsers.find(u=>u.uid===uid)?.name || "User",
+
+    newNickname:null,
+
+    time:Date.now()
+
+});
     }
 
 
