@@ -723,10 +723,12 @@ text-decoration:underline;
 }
 
 .nickname-item{
-    padding:10px;
-    border-radius:8px;
-    cursor:pointer;
-    transition:.25s;
+    padding:8px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    white-space:nowrap;
 }
 
 .nickname-item:hover{
@@ -743,8 +745,9 @@ text-decoration:underline;
 .nickname-actions{
     display:flex;
     align-items:center;
-    gap:10px;
-    margin-left:auto;
+    gap:8px;
+    margin-left:5px;
+    flex-shrink:0;
 }
 
 .nickname-actions span{
