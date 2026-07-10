@@ -2146,15 +2146,20 @@ else if(currentChatUser){
 
 
     <div class="nickname-item">
-        ${otherName}
 
-        <span onclick="editNick('${currentChatUser}')">
-        🖉
-        </span>
+    ${otherName}
 
-        <span onclick="resetNick('${currentChatUser}')">
-        ↻
-        </span>
+    <div class="nickname-actions">
+
+    <span onclick="editNick('${currentChatUser}')">
+    🖉
+    </span>
+
+    <span onclick="resetNick('${currentChatUser}')">
+    ↻
+    </span>
+
+    </div>
 
     </div>
 
@@ -2772,26 +2777,27 @@ async function loadChatHeaderNickname(uid){
     }
 
 
-    const finalName =
-        nickname ||
-        user?.name ||
-        "User";
+    const realName = user?.name || "User";
 
 
     document.getElementById("chatTitle").innerHTML = `
 
-        ${finalName}
+        ${realName}
 
         ${
         nickname 
-        ? `<span style="
-            margin-left:8px;
-            opacity:.6;
-            font-size:12px;
-          ">
-          [${user?.name}]
-          </span>`
-        : ""
+        ?
+        `
+        <span style="
+        margin-left:8px;
+        opacity:.7;
+        font-size:13px;
+        ">
+        [${nickname}]
+        </span>
+        `
+        :
+        ""
         }
 
     `;
