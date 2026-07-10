@@ -957,6 +957,13 @@ text-decoration:underline;
         <div id="nicknames" class="dropdown"></div>
     </div>
 
+    <!-- GROUP MEMBERS -->
+    <div class="option" id="membersOption">
+        Members
+        <span onclick="toggleSection('members')">▾</span>
+        <div id="members" class="dropdown"></div>
+    </div>
+
     <!-- DELETE -->
     <div class="option">
         <div id="deleteChatBtn" style="
@@ -969,6 +976,16 @@ text-decoration:underline;
         ">
             Delete Conversation
         </div>
+    </div>
+
+    <!-- GROUP MEMBERS -->
+    <div class="option" id="membersOption" style="display:none">
+
+        Members
+        <span onclick="toggleSection('members')">▾</span>
+
+        <div id="members" class="dropdown"></div>
+
     </div>
 
 </div>
@@ -1972,20 +1989,94 @@ async function pinMessage(){
 }
 
 document.getElementById("moreBtn").onclick = async () => {
+
+    if(!currentChatUser && !currentGroup){
+        alert("Select a chat first");
+        return;
+    }
+
     const panel = document.getElementById("chatOptionsPanel");
     panel.classList.toggle("open");
 
-    const membersSection = document.querySelector(".option:nth-child(3)");
+    const membersSection = document.getElementById("membersOption");
     const title = document.getElementById("chatTitle").innerText;
 
-    // ✅ GROUP CHAT
-    if(currentGroup){
-        document.getElementById("groupNameTitle").innerText = title;
-        membersSection.style.display = "block";
-        loadMembers();
-    } 
+// ✅ GROUP CHAT
+if(currentGroup){
 
-    // ✅ DIRECT MESSAGE
+    // GROUP CHAT ONLY
+    membersSection.style.display = "block";
+    loadMembers();
+
+}
+else if(currentChatUser){
+
+    // DIRECT MESSAGE ONLY
+
+    const nickBox = document.getElementById("nicknames");
+
+    const chatId = [
+        auth.currentUser.uid,
+        currentChatUser
+    ].sort().join("_");
+
+    const convoSnap = await getDoc(
+        doc(db,"conversations",chatId)
+    );
+
+    const nickData = convoSnap.exists()
+        ? convoSnap.data().nicknames || {}
+        : {};
+
+    const myName = nickData[auth.currentUser.uid]
+        || auth.currentUser.displayName
+        || "You";
+
+
+    const user = allUsers.find(
+        u=>u.uid === currentChatUser
+    );
+
+
+    const otherName = nickData[currentChatUser]
+        || user?.name
+        || "User";
+
+
+    nickBox.innerHTML = `
+    
+    <div class="nickname-item">
+        ${myName}
+
+        <span onclick="editNick('${auth.currentUser.uid}')">
+        🖉
+        </span>
+
+        <span onclick="resetNick('${auth.currentUser.uid}')">
+        ↻
+        </span>
+
+    </div>
+
+
+    <div class="nickname-item">
+        ${otherName}
+
+        <span onclick="editNick('${currentChatUser}')">
+        🖉
+        </span>
+
+        <span onclick="resetNick('${currentChatUser}')">
+        ↻
+        </span>
+
+    </div>
+
+    `;
+
+}
+
+// ✅ DIRECT MESSAGE
 // LOAD NICKNAMES WITH EDIT + RESET BUTTON
 
 const nickBox = document.getElementById("nicknames");
@@ -2002,8 +2093,12 @@ const myName = nickData[auth.currentUser.uid]
     || auth.currentUser.displayName 
     || "You";
 
+const user = allUsers.find(
+    u => u.uid === currentChatUser
+);
+
 const otherName = nickData[currentChatUser]
-    || data?.name
+    || user?.name
     || "User";
 
 
@@ -2416,6 +2511,7 @@ window.sendMsg = sendMsg;
 window.changeTheme = changeTheme;
 window.toggleSection = toggleSection;
 window.toggleCategory = toggleCategory;
+window.loadMembers = loadMembers;
 window.toggleCreate = toggleCreate;
 window.editNick = editNick;
 window.saveNick = saveNick;
