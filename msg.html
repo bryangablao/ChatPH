@@ -2453,14 +2453,13 @@ nickData[currentChatUser]
 || user?.name
 || "User";
 
-
-
 nickBox.innerHTML = `
-
 
 <div class="nickname-item">
 
 ${myName}
+
+<div class="nickname-actions">
 
 <span onclick="editNick('${auth.currentUser.uid}')">
 🖉
@@ -2472,11 +2471,15 @@ ${myName}
 
 </div>
 
+</div>
+
 
 
 <div class="nickname-item">
 
 ${otherName}
+
+<div class="nickname-actions">
 
 <span onclick="editNick('${currentChatUser}')">
 🖉
@@ -2488,9 +2491,9 @@ ${otherName}
 
 </div>
 
+</div>
 
 `;
-
 }
 
 function setOnlineStatus(user){
@@ -2594,8 +2597,8 @@ async function saveNick(uid){
     }
 
 
-    // ONLY A-Z a-z 0-9 MAX 20
-    const valid = /^[a-zA-Z0-9]+$/.test(value);
+    // ONLY A-Z a-z 0-9 MAX 20 EMOJIS
+    const valid = /^[\p{L}\p{N}\p{Emoji}\p{Extended_Pictographic}\s]+$/u.test(value);
 
 
     if(!valid){
@@ -2683,7 +2686,10 @@ async function resetNick(uid){
     }
 
 
-    loadNicknames();
+    await loadNicknames();
+
+    // refresh chat header
+    loadChatHeaderNickname(currentChatUser);
 
 }
 
