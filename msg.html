@@ -201,15 +201,19 @@ pointer-events:auto;
 
 /* RIGHT: CHAT BOX */
 .chat-box{
-flex:1;
-display:flex;
-flex-direction:column;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+    overflow:hidden;
 }
 
 .messages{
-flex:1;
-padding:16px;
-overflow-y:auto;
+    flex:1;
+    padding:16px;
+    overflow-y:auto;
+    overflow-x:hidden;
+    min-height:0;
 }
 
 .msg{
@@ -217,11 +221,6 @@ overflow-y:auto;
     padding:10px 14px;
     border-radius:14px;
     max-width:60%;
-}
-
-.msg.me{
-color:#000;
-margin-left:auto;
 }
 
 .msg.selected {
@@ -237,6 +236,7 @@ margin-left:auto;
     padding:12px;
     border-top:1px solid var(--border);
     background:#11141a;
+    flex-shrink:0;
 }
 
 .chat-input input{
@@ -882,6 +882,14 @@ text-decoration:underline;
     color:#9ca3af;
     margin-top:4px;
 }
+
+#chatUI{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+    overflow:hidden;
+}
     
 </style>
 </head>
@@ -1194,6 +1202,7 @@ let unsubscribe = null;
 let groupTheme = "";
 let chatListUnsubscribe = null;
 let typingUnsubscribe = null;
+let pinnedListener = null;
 let themeColor = "#4da3ff";
     
 const themeNames = {
@@ -2337,48 +2346,87 @@ function toggleSection(id){
 }
 
 function loadPinned(){
+
     const box = document.getElementById("pinned");
 
-    onSnapshot(collection(db, "messages"), (snap)=>{
+
+    if(pinnedListener){
+        pinnedListener();
+    }
+
+
+    pinnedListener = onSnapshot(
+        collection(db,"messages"),
+        (snap)=>{
+
+
         box.innerHTML = "";
+
         let hasPinned = false;
 
+
         snap.forEach(docSnap=>{
+
             const m = docSnap.data();
+
             const id = docSnap.id;
-            const isGroup = m.groupId === currentGroup;
+
+
             const isDM =
                 !m.groupId &&
-                ((m.from === auth.currentUser.uid && m.to === currentChatUser) ||
-                 (m.from === currentChatUser && m.to === auth.currentUser.uid));
+                (
+                (m.from === auth.currentUser.uid &&
+                 m.to === currentChatUser)
 
-                if((isGroup || isDM) && m.pinned){
+                ||
+
+                (m.from === currentChatUser &&
+                 m.to === auth.currentUser.uid)
+                );
+
+
+            if(isDM && m.pinned){
+
+
                 hasPinned = true;
 
+
                 box.innerHTML += `
-                    <div style="
-                        display:flex;
-                        justify-content:space-between;
-                        align-items:center;
-                        padding:8px;
-                        margin-bottom:6px;
-                        background:#1f2937;
-                        border-radius:8px;
-                        font-size:12px;
-                        cursor:pointer;
-                    ">
-                        <span onclick="scrollToMsg('${id}')">📌 ${m.text}</span>
-                        <span onclick="event.stopPropagation(); unpinMessage('${id}')" 
-                              style="color:#ff4b4b;cursor:pointer;">✕</span>
-                    </div>
+
+                <div class="pinned-item">
+
+                    <span onclick="scrollToMsg('${id}')">
+                    📌 ${m.text}
+                    </span>
+
+
+                    <span onclick="event.stopPropagation();unpinMessage('${id}')">
+                    ✕
+                    </span>
+
+                </div>
+
+
                 `;
+
             }
+
         });
 
+
+
         if(!hasPinned){
-            box.innerHTML = `<div style="padding:8px;opacity:.6;">No Pinned Messages</div>`;
+
+            box.innerHTML =
+            `<div style="opacity:.6;padding:8px;">
+            No Pinned Messages
+            </div>`;
+
         }
+
+
     });
+
 }
 
 async function unpinMessage(id){
@@ -2404,23 +2452,49 @@ async function togglePin(){
     document.getElementById("msgMenu").style.display = "none";
 }
 
-function scrollToMsg(id){
-    const msgs = document.querySelectorAll(".msg");
+async function scrollToMsg(id){
 
-    msgs.forEach(el=>{
-        el.classList.remove("selected");
-    });
 
-    const target = [...msgs].find(el => el.getAttribute("data-id") === id);
+    const target = document.querySelector(
+        `[data-id="${id}"]`
+    );
+
 
     if(target){
-        target.scrollIntoView({ behavior:"smooth", block:"center" });
+
+        target.scrollIntoView({
+            behavior:"smooth",
+            block:"center"
+        });
+
+
         target.classList.add("selected");
+
 
         setTimeout(()=>{
             target.classList.remove("selected");
-        }, 2000);
+        },2000);
+
+
+        return;
+
     }
+
+
+    // message not currently visible
+    const snap = await getDoc(
+        doc(db,"messages",id)
+    );
+
+
+    if(!snap.exists()) return;
+
+
+    alert(
+    "This message is older. Scroll history loading is needed."
+    );
+
+
 }
 
 async function loadMembers(){
