@@ -849,6 +849,39 @@ text-decoration:underline;
     opacity:1;
     transform:translateY(0);
 }
+
+#dmHeader{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:20px;
+}
+
+#dmAvatar{
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    object-fit:cover;
+    flex-shrink:0;
+}
+
+.dm-user-info{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+#dmName{
+    font-size:18px;
+    font-weight:700;
+    color:#fff;
+}
+
+#dmStatus{
+    font-size:13px;
+    color:#9ca3af;
+    margin-top:4px;
+}
     
 </style>
 </head>
@@ -1030,12 +1063,14 @@ text-decoration:underline;
 
 <div id="chatOptionsPanel" class="side-panel">
 
-    <!-- USER HEADER -->
-    <div id="dmHeader" style="text-align:center;margin-bottom:20px;">
-        <img id="dmAvatar"
-        style="width:60px;height:60px;border-radius:50%;margin-bottom:8px;">
-        <div id="dmName" style="font-weight:600;"></div>
+<!-- USER HEADER -->
+<div id="dmHeader">
+    <img id="dmAvatar">
+    <div class="dm-user-info">
+        <div id="dmName"></div>
+        <div id="dmStatus"></div>
     </div>
+</div>
 
     <!-- PINNED -->
     <div class="option">
@@ -1113,7 +1148,6 @@ border-top:1px solid rgba(255,255,255,0.08);
 Made with ❤️ in the Philippines
 </div>
 </footer>
-
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -1402,13 +1436,42 @@ if(window.chatAvatarListener){
 }
 
 const userRef = doc(db, "users", uid);
-window.chatAvatarListener = onSnapshot(userRef, (snap)=>{
+window.chatAvatarListener = onSnapshot(userRef, async (snap)=>{
+
     const data = snap.data();
+
+    // TOP CHAT HEADER
     if(avatar){
-        avatar.src = (data && data.pfpBase64 && data.pfpBase64.trim() !== "")
+        avatar.src =
+            (data && data.pfpBase64 && data.pfpBase64.trim() !== "")
+            ? data.pfpBase64
+            : "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+    }
+
+    // DM HEADER AVATAR
+    document.getElementById("dmAvatar").src =
+        (data && data.pfpBase64 && data.pfpBase64.trim() !== "")
         ? data.pfpBase64
         : "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+
+    // LOAD NICKNAME
+    const chatId = [
+        auth.currentUser.uid,
+        uid
+    ].sort().join("_");
+
+    const convoSnap = await getDoc(doc(db,"conversations",chatId));
+
+    let nickname = "";
+
+    if(convoSnap.exists()){
+        nickname = convoSnap.data().nicknames?.[uid] || "";
     }
+
+    document.getElementById("dmName").innerHTML =
+        (data?.name || "User") +
+        (nickname ? ` <span style="opacity:.7;">[${nickname}]</span>` : "");
+
 });
 
 // 🔥 FETCH ONLINE STATUS
@@ -1425,7 +1488,11 @@ onSnapshot(statusRef, (snap)=>{
 
     // ✅ ONLINE
     if(data?.online){
-        statusEl.innerHTML = `<span style="color:#22c55e;">●</span> Online`;
+        statusEl.innerHTML =
+        `<span style="color:#22c55e;">●</span> Online`;
+
+        document.getElementById("dmStatus").innerHTML =
+        `<span style="color:#22c55e;">●</span> Online`;
     } 
     
     // 🔥 LAST SEEN
@@ -1449,12 +1516,20 @@ onSnapshot(statusRef, (snap)=>{
             text = lastSeenDate.toLocaleDateString();
         }
 
-        statusEl.innerHTML = `<span style="color:#6b7280;">●</span> Last seen ${text}`;
+        statusEl.innerHTML =
+        `<span style="color:#6b7280;">●</span> Last seen ${text}`;
+
+        document.getElementById("dmStatus").innerHTML =
+        `<span style="color:#6b7280;">●</span> Last seen ${text}`;
     } 
     
     // fallback
     else {
-        statusEl.innerHTML = `<span style="color:#6b7280;">●</span> Offline`;
+        statusEl.innerHTML =
+        `<span style="color:#6b7280;">●</span> Offline`;
+
+        document.getElementById("dmStatus").innerHTML =
+        `<span style="color:#6b7280;">●</span> Offline`;
     }
 });
 
