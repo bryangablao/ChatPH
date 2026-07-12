@@ -1409,7 +1409,7 @@ function openChat(uid){
     document.getElementById("emptyState").style.display = "none";
     document.getElementById("chatUI").style.display = "flex";
 
-    loadChatHeaderNickname(uid);
+    listenNicknameChanges(uid);
 
 // 🔥 TYPING LISTENER (PUT HERE)
 const typingRef = doc(db, "typing", uid);
@@ -2058,6 +2058,20 @@ document.getElementById("logoutBtn").onclick = async () => {
 };
 
 document.getElementById("closeChat").onclick = () => {
+
+
+    if(nicknameListener){
+        nicknameListener();
+        nicknameListener = null;
+    }
+
+
+    if(nicknamesListener){
+        nicknamesListener();
+        nicknamesListener = null;
+    }
+
+
     currentChatUser = null;
     currentGroup = null;
 
@@ -2489,84 +2503,111 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
-async function loadNicknames(){
-
-const nickBox = document.getElementById("nicknames");
+let nicknamesListener = null;
 
 
-const chatId = [
-auth.currentUser.uid,
-currentChatUser
-].sort().join("_");
+function loadNicknames(){
 
 
-const convoSnap = await getDoc(
-doc(db,"conversations",chatId)
-);
+    const nickBox = document.getElementById("nicknames");
 
 
-const nickData = convoSnap.exists()
-? convoSnap.data().nicknames || {}
-: {};
+    const chatId = [
+        auth.currentUser.uid,
+        currentChatUser
+    ].sort().join("_");
 
 
-const myName =
-nickData[auth.currentUser.uid]
-|| auth.currentUser.displayName
-|| "You";
+    if(nicknamesListener){
+        nicknamesListener();
+    }
 
 
-const user = allUsers.find(
-u=>u.uid===currentChatUser
-);
+    nicknamesListener = onSnapshot(
+        doc(db,"conversations",chatId),
+        (snap)=>{
 
 
-const otherName =
-nickData[currentChatUser]
-|| user?.name
-|| "User";
-
-nickBox.innerHTML = `
-
-<div class="nickname-item">
-
-${myName}
-
-<div class="nickname-actions">
-
-<span onclick="editNick('${auth.currentUser.uid}')">
-🖉
-</span>
-
-<span onclick="resetNick('${auth.currentUser.uid}')">
-↻
-</span>
-
-</div>
-
-</div>
+        const nickData = snap.exists()
+        ? snap.data().nicknames || {}
+        : {};
 
 
 
-<div class="nickname-item">
+        const myName =
+            nickData[auth.currentUser.uid]
+            ||
+            auth.currentUser.displayName
+            ||
+            "You";
 
-${otherName}
 
-<div class="nickname-actions">
 
-<span onclick="editNick('${currentChatUser}')">
-🖉
-</span>
+        const user = allUsers.find(
+            u=>u.uid===currentChatUser
+        );
 
-<span onclick="resetNick('${currentChatUser}')">
-↻
-</span>
 
-</div>
 
-</div>
+        const otherName =
+            nickData[currentChatUser]
+            ||
+            user?.name
+            ||
+            "User";
 
-`;
+
+
+        nickBox.innerHTML = `
+
+
+        <div class="nickname-item">
+
+            ${myName}
+
+            <div class="nickname-actions">
+
+                <span onclick="editNick('${auth.currentUser.uid}')">
+                🖉
+                </span>
+
+
+                <span onclick="resetNick('${auth.currentUser.uid}')">
+                ↻
+                </span>
+
+            </div>
+
+        </div>
+
+
+
+
+        <div class="nickname-item">
+
+            ${otherName}
+
+            <div class="nickname-actions">
+
+                <span onclick="editNick('${currentChatUser}')">
+                🖉
+                </span>
+
+
+                <span onclick="resetNick('${currentChatUser}')">
+                ↻
+                </span>
+
+            </div>
+
+        </div>
+
+
+        `;
+
+
+    });
+
 }
 
 function setOnlineStatus(user){
@@ -2761,9 +2802,7 @@ await addDoc(collection(db,"messages"),{
         "Nickname changed successfully"
     );
 
-
     await loadNicknames();
-    loadChatHeaderNickname(currentChatUser);
 
     document.getElementById("chatOptionsPanel")
     .classList.add("open");
@@ -2821,8 +2860,6 @@ await addDoc(collection(db,"messages"),{
 
 
 await loadNicknames();
-
-await loadChatHeaderNickname(currentChatUser);
 
 document.getElementById("chatOptionsPanel")
 .classList.add("open");
@@ -2945,6 +2982,76 @@ async function loadChatHeaderNickname(uid){
         }
 
     `;
+
+}
+
+let nicknameListener = null;
+
+function listenNicknameChanges(uid){
+
+    const chatId = [
+        auth.currentUser.uid,
+        uid
+    ].sort().join("_");
+
+    // Stop old listener
+    if(nicknameListener){
+        nicknameListener();
+    }
+
+    nicknameListener = onSnapshot(
+        doc(db,"conversations",chatId),
+        async(snap)=>{
+
+            const user =
+                allUsers.find(u=>u.uid===uid);
+
+            const realName =
+                user?.name || "User";
+
+            let nickname = "";
+
+            if(snap.exists()){
+                nickname =
+                    snap.data().nicknames?.[uid] || "";
+            }
+
+            document.getElementById("chatTitle").innerHTML = `
+                ${realName}
+                ${
+                    nickname
+                    ? `<span style="
+                        margin-left:8px;
+                        opacity:.7;
+                        font-size:13px;
+                    ">
+                    [${nickname}]
+                    </span>`
+                    : ""
+                }
+            `;
+
+            // Refresh DM panel also
+            const dmName =
+                document.getElementById("dmName");
+
+            if(dmName){
+
+                dmName.innerHTML = `
+                    ${realName}
+                    ${
+                        nickname
+                        ? `<span style="opacity:.7;">
+                            [${nickname}]
+                           </span>`
+                        : ""
+                    }
+                `;
+
+            }
+
+        }
+    );
 
 }
 
