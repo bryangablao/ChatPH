@@ -1222,6 +1222,105 @@ text-decoration:underline;
     min-height:0;
     overflow:hidden;
 }
+
+.group-system-message{
+
+    text-align:center;
+
+    margin:12px 0;
+
+    color:#d1d5db;
+
+    font-size:12px;
+
+}
+
+
+.group-system-message small{
+
+    margin-left:7px;
+
+    color:#6b7280;
+
+    font-size:10px;
+
+}
+
+.pinned-item{
+
+    position:relative;
+
+    padding:12px 10px 12px 32px;
+
+    margin-bottom:7px;
+
+    background:#1f2937;
+
+    border-radius:10px;
+
+    min-height:30px;
+
+    box-sizing:border-box;
+
+}
+
+
+.pinned-message-content{
+
+    cursor:pointer;
+
+    word-break:break-word;
+
+}
+
+
+.pinned-remove{
+
+    position:absolute;
+
+    left:7px;
+
+    top:7px;
+
+    width:18px;
+
+    height:18px;
+
+    padding:0;
+
+    border:0;
+
+    background:transparent;
+
+    color:#ef4444;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    border-radius:50%;
+
+}
+
+
+.pinned-remove:hover{
+
+    background:#35191c;
+
+    color:#ff6b6b;
+
+}
+
+
+.no-pinned{
+
+    padding:8px;
+
+    color:#6b7280;
+
+    font-size:12px;
+
+}
     
 </style>
 </head>
@@ -1419,46 +1518,42 @@ text-decoration:underline;
     <!-- =========================
          GROUP CHAT HEADER
     ========================== -->
-    <div id="groupHeader" style="display:none;">
+<div id="groupHeader" style="display:none;">
 
-        <!-- GROUP IMAGE -->
-        <div class="group-avatar-wrapper">
+    <div class="group-avatar-wrapper">
 
-            <img
-                id="groupAvatar"
-                class="group-side-avatar"
-                src="https://cdn-icons-png.flaticon.com/512/166/166258.png"
-                title="Click to change group picture"
-            >
-
-            <!-- Hidden upload -->
-            <input
-                type="file"
-                id="groupAvatarInput"
-                accept="image/*"
-                style="display:none;"
-            >
-
-        </div>
-
-
-        <!-- GROUP NAME -->
-        <div
-            id="groupNameButton"
-            class="group-name-button"
-            onclick="openGroupNameEditor()"
+        <img
+            id="groupAvatar"
+            class="group-side-avatar"
+            src="https://cdn-icons-png.flaticon.com/512/166/166258.png"
         >
-            <span id="groupNameTitle">
-                UnNamed GroupChat
-            </span>
 
-            <span class="group-name-edit-icon">
-                ✎
-            </span>
-        </div>
+        <input
+            type="file"
+            id="groupAvatarInput"
+            accept="image/*"
+            style="display:none;"
+        >
 
     </div>
 
+    <div
+        id="groupNameButton"
+        class="group-name-button"
+        onclick="openGroupNameEditor()"
+    >
+
+        <span id="groupNameTitle">
+            UnNamed GroupChat
+        </span>
+
+        <span class="group-name-edit-icon">
+            ✎
+        </span>
+
+    </div>
+
+</div>
 
     <!-- =========================
          GROUP NAME EDITOR
@@ -2161,72 +2256,109 @@ window.themeListener = onSnapshot(themeRef, (snap)=>{
 
 async function openGroup(id, name, theme){
 
+    /* CLOSE SIDE PANEL */
+    document
+        .getElementById("chatOptionsPanel")
+        .classList.remove("open");
+
+    /* CLOSE GROUP NAME POPUP */
+    const editor =
+        document.getElementById("groupNameEditor");
+
+    if(editor){
+        editor.classList.remove("open");
+    }
+
+
     document.querySelectorAll(".chat-user").forEach(el=>{
         el.classList.remove("active-chat");
     });
 
-    groupTheme = theme || "#4da3ff";
 
     currentGroup = id;
     currentChatUser = null;
 
 
-    /* SHOW CHAT */
-
     document.getElementById("emptyState").style.display = "none";
-
     document.getElementById("chatUI").style.display = "flex";
 
 
-    /* MAIN CHAT HEADER */
+    /* GET GROUP DATA */
+
+    const groupSnap =
+        await getDoc(
+            doc(db, "groups", id)
+        );
+
+
+    if(!groupSnap.exists()){
+
+        console.error("Group not found:", id);
+
+        return;
+    }
+
+
+    const data =
+        groupSnap.data();
+
+
+    /* GROUP NAME */
+
+    const groupName =
+        data.name || "UnNamed GroupChat";
+
 
     document.getElementById("chatTitle").innerText =
-        name || "UnNamed GroupChat";
+        groupName;
+
 
     document.getElementById("chatStatus").innerText = "";
 
     document.getElementById("typingIndicator").innerText = "";
 
 
-    /* LOAD GROUP INFORMATION */
+    /* GROUP THEME */
 
-    const groupSnap = await getDoc(
-        doc(db, "groups", id)
-    );
-
-    if(groupSnap.exists()){
-
-        const data = groupSnap.data();
+    groupTheme =
+        data.theme || theme || "#4da3ff";
 
 
-        /* GROUP NAME */
-
-        const finalName =
-            data.name || "UnNamed GroupChat";
-
-        document.getElementById("groupNameTitle").innerText =
-            finalName;
+    themeColor =
+        groupTheme;
 
 
-        /* GROUP IMAGE */
+    /* GROUP IMAGE */
 
-        document.getElementById("groupAvatar").src =
-            data.groupImage
-            ||
+    const avatar =
+        document.getElementById("groupAvatar");
+
+
+    if(data.groupImage){
+
+        avatar.src =
+            data.groupImage;
+
+    }else{
+
+        avatar.src =
             "https://cdn-icons-png.flaticon.com/512/166/166258.png";
-
-
-        /* GROUP THEME */
-
-        groupTheme =
-            data.theme || "#4da3ff";
 
     }
 
 
-    /* LOAD GROUP MESSAGES */
+    /* SIDE PANEL GROUP NAME */
+
+    document
+        .getElementById("groupNameTitle")
+        .innerText =
+            groupName;
+
+
+    /* LOAD GROUP */
 
     loadGroupMessages();
+
 }
 
 /* =========================================
@@ -2245,6 +2377,34 @@ function openGroupNameEditor(){
     editor.classList.add("open");
 
 }
+
+document.addEventListener("click", function(e){
+
+    const editor =
+        document.getElementById("groupNameEditor");
+
+    const nameButton =
+        document.getElementById("groupNameButton");
+
+
+    if(!editor || !nameButton){
+        return;
+    }
+
+
+    if(
+        editor.classList.contains("open")
+        &&
+        !editor.contains(e.target)
+        &&
+        !nameButton.contains(e.target)
+    ){
+
+        closeGroupNameEditor();
+
+    }
+
+});
 
 function startGroupNameEdit(){
 
@@ -2283,7 +2443,10 @@ async function saveGroupName(){
 
 
     const input =
-        document.getElementById("groupNameEditInput");
+        document.getElementById(
+            "groupNameEditInput"
+        );
+
 
     const newName =
         input.value.trim();
@@ -2291,36 +2454,97 @@ async function saveGroupName(){
 
     if(!newName){
 
-        alert("Please enter a group chat name.");
+        alert(
+            "Please enter a group chat name."
+        );
 
         return;
     }
 
 
+    const groupRef =
+        doc(db, "groups", currentGroup);
+
+
+    const snap =
+        await getDoc(groupRef);
+
+
+    if(!snap.exists()){
+        return;
+    }
+
+
+    const data =
+        snap.data();
+
+
+    const oldName =
+        data.name ||
+        "UnNamed GroupChat";
+
+
+    if(oldName === newName){
+
+        closeGroupNameEditor();
+
+        return;
+    }
+
+
+    /* SAVE */
+
     await updateDoc(
-        doc(db, "groups", currentGroup),
+        groupRef,
         {
             name:newName
         }
     );
 
 
-    /* UPDATE SIDE PANEL */
+    /* UPDATE UI */
 
-    document.getElementById("groupNameTitle").innerText =
-        newName;
+    document
+        .getElementById("groupNameTitle")
+        .innerText =
+            newName;
 
 
-    /* UPDATE MAIN CHAT HEADER */
+    document
+        .getElementById("chatTitle")
+        .innerText =
+            newName;
 
-    document.getElementById("chatTitle").innerText =
-        newName;
 
+    /* SYSTEM MESSAGE */
+
+    await addDoc(
+    collection(db, "messages"),
+    {
+
+        system:true,
+
+        groupId:currentGroup,
+
+        from:auth.currentUser.uid,
+
+        userName:
+            auth.currentUser.displayName
+            || "User",
+
+        groupNameChange:true,
+
+        oldGroupName:oldName,
+
+        newGroupName:newName,
+
+        time:Date.now()
+
+    }
+);
 
     closeGroupNameEditor();
 
-
-    /* REFRESH GROUP LIST */
 
     loadChatList();
 
@@ -2333,34 +2557,88 @@ async function clearGroupName(){
     }
 
 
+    const groupRef =
+        doc(db, "groups", currentGroup);
+
+
+    const snap =
+        await getDoc(groupRef);
+
+
+    if(!snap.exists()){
+        return;
+    }
+
+
+    const data =
+        snap.data();
+
+
+    const oldName =
+        data.name ||
+        "UnNamed GroupChat";
+
+
     const newName =
         "UnNamed GroupChat";
 
 
+    if(oldName === newName){
+
+        closeGroupNameEditor();
+
+        return;
+    }
+
+
     await updateDoc(
-        doc(db, "groups", currentGroup),
+        groupRef,
         {
             name:newName
         }
     );
 
 
-    /* UPDATE SIDE PANEL */
+    document
+        .getElementById("groupNameTitle")
+        .innerText =
+            newName;
 
-    document.getElementById("groupNameTitle").innerText =
-        newName;
+
+    document
+        .getElementById("chatTitle")
+        .innerText =
+            newName;
 
 
-    /* UPDATE MAIN CHAT */
+    /* SYSTEM MESSAGE */
 
-    document.getElementById("chatTitle").innerText =
-        newName;
+    await addDoc(
+        collection(db, "messages"),
+        {
+
+            system:true,
+
+            groupId:currentGroup,
+
+            from:auth.currentUser.uid,
+
+            userName:
+                auth.currentUser.displayName
+                || "User",
+
+            groupNameClear:true,
+
+            oldGroupName:oldName,
+
+            time:Date.now()
+
+        }
+    );
 
 
     closeGroupNameEditor();
 
-
-    /* REFRESH GROUP LIST */
 
     loadChatList();
 
@@ -2398,88 +2676,145 @@ function closeGroupNameEditor(){
    GROUP IMAGE UPLOAD
 ========================================= */
 
-document.getElementById("groupAvatar").addEventListener(
-    "click",
-    () => {
+document
+.getElementById("groupAvatar")
+.addEventListener("click", ()=>{
 
-        if(!currentGroup){
-            return;
-        }
-
-        document.getElementById("groupAvatarInput").click();
-
+    if(!currentGroup){
+        return;
     }
-);
+
+    document
+        .getElementById("groupAvatarInput")
+        .click();
+
+});
+
+document
+.getElementById("groupAvatarInput")
+.addEventListener("change", async function(){
+
+    const file = this.files[0];
+
+    if(!file){
+        return;
+    }
+
+    if(!currentGroup){
+        alert("Please select a GroupChat first.");
+        return;
+    }
 
 
-document.getElementById("groupAvatarInput").addEventListener(
-    "change",
-    async function(){
+    /* IMAGE ONLY */
 
-        const file = this.files[0];
+    if(!file.type.startsWith("image/")){
 
-        if(!file || !currentGroup){
-            return;
-        }
+        alert("Please select an image.");
 
+        this.value = "";
 
-        /* ONLY IMAGES */
-
-        if(!file.type.startsWith("image/")){
-            alert("Please select an image.");
-            return;
-        }
+        return;
+    }
 
 
-        /* LIMIT SIZE */
+    /* 2MB LIMIT */
 
-        if(file.size > 2 * 1024 * 1024){
+    if(file.size > 2 * 1024 * 1024){
 
-            alert(
-                "Please choose an image smaller than 2MB."
-            );
+        alert("Please select an image smaller than 2MB.");
 
-            this.value = "";
+        this.value = "";
 
-            return;
-        }
+        return;
+    }
 
 
-        const reader = new FileReader();
+    const reader =
+        new FileReader();
 
 
-        reader.onload = async function(e){
+    reader.onload = async function(e){
 
-            const imageBase64 = e.target.result;
+        const image =
+            e.target.result;
 
 
-            /* SAVE IMAGE TO FIRESTORE */
+        try{
+
+            /* SAVE IMAGE */
 
             await updateDoc(
                 doc(db, "groups", currentGroup),
                 {
-                    groupImage: imageBase64
+                    groupImage:image
                 }
             );
 
 
-            /* UPDATE PANEL IMMEDIATELY */
+            /* UPDATE RIGHT SIDE PANEL */
 
-            document.getElementById("groupAvatar").src =
-                imageBase64;
-
-        };
-
-
-        reader.readAsDataURL(file);
+            document
+                .getElementById("groupAvatar")
+                .src = image;
 
 
-        /* RESET FILE INPUT */
+            /* UPDATE LEFT GROUP LIST */
 
-        this.value = "";
+            loadChatList();
 
-    }
-);
+
+            /* CREATE SYSTEM MESSAGE */
+
+            await addDoc(
+                collection(db, "messages"),
+                {
+
+                    system:true,
+
+                    groupId:currentGroup,
+
+                    from:auth.currentUser.uid,
+
+                    userName:
+                        auth.currentUser.displayName
+                        || "User",
+
+                    groupPictureChange:true,
+
+                    time:Date.now()
+
+                }
+            );
+
+
+            /* REFRESH MESSAGES */
+
+            loadGroupMessages();
+
+
+        }catch(error){
+
+            console.error(
+                "Group picture update failed:",
+                error
+            );
+
+            alert(
+                "Failed to update the GroupChat picture."
+            );
+
+        }
+
+    };
+
+
+    reader.readAsDataURL(file);
+
+
+    this.value = "";
+
+});
     
 async function sendMsg(){
     const input = document.getElementById("msgInput");
@@ -2892,6 +3227,105 @@ async function loadGroupMessages(){
 messages.forEach(m => {
 
 if(m.system){
+    if(m.groupPictureChange){
+
+    box.innerHTML += `
+
+        <div class="group-system-message">
+
+            <span>
+                ${m.userName}
+                updated the GroupChat Picture
+            </span>
+
+            <small>
+                ${new Date(m.time).toLocaleDateString()}
+                •
+                ${new Date(m.time).toLocaleTimeString()}
+            </small>
+
+        </div>
+
+    `;
+
+    return;
+        
+}if(m.groupNameChange){
+
+    box.innerHTML += `
+
+        <div class="group-system-message">
+
+            <span>
+                ${m.userName}
+                changed the group chat name from
+                "<b>${m.oldGroupName}</b>"
+                into
+                "<b>${m.newGroupName}</b>"
+            </span>
+
+            <small>
+                ${new Date(m.time).toLocaleDateString()}
+                •
+                ${new Date(m.time).toLocaleTimeString()}
+            </small>
+
+        </div>
+
+    `;
+
+    return;
+        
+}if(m.groupNameClear){
+
+    box.innerHTML += `
+
+        <div class="group-system-message">
+
+            <span>
+                ${m.userName}
+                removed the name of the groupchat
+            </span>
+
+            <small>
+                ${new Date(m.time).toLocaleDateString()}
+                •
+                ${new Date(m.time).toLocaleTimeString()}
+            </small>
+
+        </div>
+
+    `;
+
+    return;
+        
+}if(
+    m.oldTheme !== undefined &&
+    m.newTheme !== undefined
+){
+
+    box.innerHTML += `
+
+        <div class="group-system-message">
+
+            <span>
+                ${m.userName}
+                changed the GroupChat theme
+            </span>
+
+            <small>
+                ${new Date(m.time).toLocaleDateString()}
+                •
+                ${new Date(m.time).toLocaleTimeString()}
+            </small>
+
+        </div>
+
+    `;
+
+    return;
+}
+    
     const colorName = themeNames[m.theme] || "Theme";
 
     box.innerHTML += `
@@ -3051,6 +3485,39 @@ document.getElementById("chatOptionsPanel").onclick = (e) => {
     e.stopPropagation();
 };
 
+document.addEventListener("click", (e)=>{
+
+    const editor =
+        document.getElementById(
+            "groupNameEditor"
+        );
+
+
+    const nameButton =
+        document.getElementById(
+            "groupNameButton"
+        );
+
+
+    if(!editor){
+        return;
+    }
+
+
+    if(
+        editor.classList.contains("open")
+        &&
+        !editor.contains(e.target)
+        &&
+        !nameButton.contains(e.target)
+    ){
+
+        closeGroupNameEditor();
+
+    }
+
+});
+
 async function deleteMessage(){
     if(!selectedMsgId) return;
 
@@ -3141,6 +3608,9 @@ document.getElementById("moreBtn").onclick = async () => {
 
     const nicknameSection =
         document.getElementById("nicknameOption");
+    
+    const deleteBtn =
+    document.getElementById("deleteChatBtn");
 
 
     /* =================================
@@ -3165,6 +3635,15 @@ document.getElementById("moreBtn").onclick = async () => {
 
         nicknameSection.style.display = "none";
 
+        deleteBtn.innerText =
+            "Delete GroupChat";
+
+}else{
+
+        deleteBtn.innerText =
+            "Delete Conversation";
+
+}
 
         /* LOAD GROUP */
 
@@ -3376,7 +3855,8 @@ function toggleSection(id){
 
 function loadPinned(){
 
-    const box = document.getElementById("pinned");
+    const box =
+        document.getElementById("pinned");
 
 
     if(pinnedListener){
@@ -3384,77 +3864,108 @@ function loadPinned(){
     }
 
 
-    pinnedListener = onSnapshot(
-        collection(db,"messages"),
-        (snap)=>{
+    pinnedListener =
+        onSnapshot(
+            collection(db, "messages"),
+            (snap)=>{
+
+                box.innerHTML = "";
 
 
-        box.innerHTML = "";
-
-        let hasPinned = false;
+                let found = false;
 
 
-        snap.forEach(docSnap=>{
+                snap.forEach(docSnap=>{
 
-            const m = docSnap.data();
+                    const m =
+                        docSnap.data();
 
-            const id = docSnap.id;
-
-
-            const isDM =
-                !m.groupId &&
-                (
-                (m.from === auth.currentUser.uid &&
-                 m.to === currentChatUser)
-
-                ||
-
-                (m.from === currentChatUser &&
-                 m.to === auth.currentUser.uid)
-                );
+                    const id =
+                        docSnap.id;
 
 
-            if(isDM && m.pinned){
+                    /* GROUP */
+
+                    const isGroup =
+                        currentGroup &&
+                        m.groupId === currentGroup;
 
 
-                hasPinned = true;
+                    /* DM */
+
+                    const isDM =
+                        !currentGroup &&
+                        !m.groupId &&
+                        (
+                            (
+                                m.from ===
+                                auth.currentUser.uid
+                                &&
+                                m.to ===
+                                currentChatUser
+                            )
+                            ||
+                            (
+                                m.from ===
+                                currentChatUser
+                                &&
+                                m.to ===
+                                auth.currentUser.uid
+                            )
+                        );
 
 
-                box.innerHTML += `
+                    if(
+                        (isGroup || isDM)
+                        &&
+                        m.pinned
+                    ){
 
-                <div class="pinned-item">
-
-                    <span onclick="scrollToMsg('${id}')">
-                    📌 ${m.text}
-                    </span>
-
-
-                    <span onclick="event.stopPropagation();unpinMessage('${id}')">
-                    ✕
-                    </span>
-
-                </div>
+                        found = true;
 
 
-                `;
+                        box.innerHTML += `
+
+                            <div class="pinned-item">
+
+                                <button
+                                    class="pinned-remove"
+                                    onclick="
+                                        event.stopPropagation();
+                                        unpinMessage('${id}')
+                                    "
+                                >
+                                    ✕
+                                </button>
+
+                                <div
+                                    class="pinned-message-content"
+                                    onclick="scrollToMsg('${id}')"
+                                >
+                                    📌 ${m.text || "Pinned message"}
+                                </div>
+
+                            </div>
+
+                        `;
+
+                    }
+
+                });
+
+
+                if(!found){
+
+                    box.innerHTML = `
+                        <div class="no-pinned">
+                            No Pinned Messages
+                        </div>
+                    `;
+
+                }
 
             }
-
-        });
-
-
-
-        if(!hasPinned){
-
-            box.innerHTML =
-            `<div style="opacity:.6;padding:8px;">
-            No Pinned Messages
-            </div>`;
-
-        }
-
-
-    });
+        );
 
 }
 
@@ -3481,48 +3992,45 @@ async function togglePin(){
     document.getElementById("msgMenu").style.display = "none";
 }
 
-async function scrollToMsg(id){
+function scrollToMsg(id){
+
+    const target =
+        document.querySelector(
+            `.msg[data-id="${id}"]`
+        );
 
 
-    const target = document.querySelector(
-        `[data-id="${id}"]`
-    );
+    if(!target){
 
-
-    if(target){
-
-        target.scrollIntoView({
-            behavior:"smooth",
-            block:"center"
-        });
-
-
-        target.classList.add("selected");
-
-
-        setTimeout(()=>{
-            target.classList.remove("selected");
-        },2000);
-
+        alert(
+            "This message is not currently loaded."
+        );
 
         return;
-
     }
 
 
-    // message not currently visible
-    const snap = await getDoc(
-        doc(db,"messages",id)
-    );
+    document
+        .querySelectorAll(".msg")
+        .forEach(el=>{
+            el.classList.remove("selected");
+        });
 
 
-    if(!snap.exists()) return;
+    target.scrollIntoView({
+        behavior:"smooth",
+        block:"center"
+    });
 
 
-    alert(
-    "This message is older. Scroll history loading is needed."
-    );
+    target.classList.add("selected");
 
+
+    setTimeout(()=>{
+
+        target.classList.remove("selected");
+
+    },2000);
 
 }
 
@@ -3552,44 +4060,148 @@ async function loadMembers(){
 }
 
 async function changeTheme(color){
-    groupTheme = color;
 
-    // ✅ GROUP
+    if(!auth.currentUser){
+        return;
+    }
+
+
+    /* ==========================
+       GROUP CHAT
+    ========================== */
+
     if(currentGroup){
-        await updateDoc(doc(db, "groups", currentGroup), {
-            theme: color
-        });
-        themeColor = color;
 
-        document.getElementById("chatBox").style.background = color + "22";
+const groupRef =
+    doc(db, "groups", currentGroup);
+
+const groupSnap =
+    await getDoc(groupRef);
+
+if(!groupSnap.exists()){
+    return;
+}
+
+const data =
+    groupSnap.data();
+
+const oldTheme =
+    data.theme || "#4da3ff";
+
+
+await updateDoc(
+    groupRef,
+    {
+        theme:color
+    }
+);
+
+
+await addDoc(
+    collection(db, "messages"),
+    {
+
+        system:true,
+
+        groupId:currentGroup,
+
+        from:auth.currentUser.uid,
+
+        userName:
+            auth.currentUser.displayName
+            || "User",
+
+        oldTheme:oldTheme,
+
+        newTheme:color,
+
+        time:Date.now()
+
+    }
+);
+        /* RELOAD */
+
+        loadGroupMessages();
+
+        return;
+    }
+
+
+    /* ==========================
+       DIRECT MESSAGE
+    ========================== */
+
+    if(currentChatUser){
+
+        const chatId =
+            [
+                auth.currentUser.uid,
+                currentChatUser
+            ]
+            .sort()
+            .join("_");
+
+
+        const themeRef =
+            doc(db, "dmThemes", chatId);
+
+
+        const themeSnap =
+            await getDoc(themeRef);
+
+
+        const oldTheme =
+            themeSnap.exists()
+            ? themeSnap.data().theme
+            : null;
+
+
+        await setDoc(
+            themeRef,
+            {
+                theme:color
+            }
+        );
+
+
+        await addDoc(
+            collection(db, "messages"),
+            {
+
+                system:true,
+
+                from:auth.currentUser.uid,
+
+                to:currentChatUser,
+
+                userName:
+                    auth.currentUser.displayName
+                    || "User",
+
+                oldTheme:oldTheme,
+
+                newTheme:color,
+
+                time:Date.now()
+
+            }
+        );
+
+
+        themeColor =
+            color;
+
+
+        document
+            .getElementById("chatBox")
+            .style.background =
+                color + "22";
+
 
         loadMessages();
+
     }
 
-    // ✅ DIRECT MESSAGE
-    else if(currentChatUser){
-        const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
-
-        const themeRef = doc(db, "dmThemes", chatId);
-        const themeSnap = await getDoc(themeRef);
-        const oldTheme = themeSnap.exists() ? themeSnap.data().theme : null;
-
-        await setDoc(themeRef, {
-            theme: color
-        });
-
-        await addDoc(collection(db, "messages"), {
-            system: true,
-            from: auth.currentUser.uid,
-            to: currentChatUser,
-            userName: auth.currentUser.displayName || "User",
-            oldTheme: oldTheme,
-            newTheme: color,
-            time: Date.now()
-        });
-
-        document.getElementById("chatBox").style.background = color + "22";
-    }
 }
 
 document.addEventListener("keydown", (e) => {
@@ -3756,44 +4368,293 @@ function toggleCategory(id){
     });
 }
 
-const deleteBtn = document.getElementById("deleteChatBtn");
-const modal = document.getElementById("deleteModal");
+const modal =
+    document.getElementById("deleteModal");
+
+const deleteBtn =
+    document.getElementById("deleteChatBtn");
+
 
 deleteBtn.onclick = () => {
+
+    if(currentGroup){
+
+        document
+            .getElementById("deleteModalTitle")
+            .innerText =
+                "Do you want to delete this GroupChat?";
+
+    }else{
+
+        document
+            .getElementById("deleteModalTitle")
+            .innerText =
+                "Do you want to delete this conversation?";
+
+    }
+
+
     modal.style.display = "flex";
+
 };
 
 function closeDeleteModal(){
     modal.style.display = "none";
 }
 
-document.getElementById("confirmDelete").onclick = async () => {
-    if(!currentChatUser) return;
+document
+.getElementById("confirmDelete")
+.onclick = async () => {
 
-    const myId = auth.currentUser.uid;
-    const chatId = [myId, currentChatUser].sort().join("_");
 
-    const snap = await getDocs(collection(db, "messages"));
-    const deletes = [];
+/* =========================
+   GROUP CHAT DELETE
+========================= */
 
-    snap.forEach(docSnap=>{
-        const m = docSnap.data();
+if(currentGroup){
 
-        if(
-            (m.from === myId && m.to === currentChatUser) ||
-            (m.from === currentChatUser && m.to === myId)
-        ){
-            deletes.push(deleteDoc(doc(db, "messages", docSnap.id)));
+    const groupId =
+        currentGroup;
+
+
+    try{
+
+        /* FIND ALL GROUP MESSAGES */
+
+        const messagesSnap =
+            await getDocs(
+                collection(db, "messages")
+            );
+
+
+        const deletePromises = [];
+
+
+        messagesSnap.forEach(messageDoc=>{
+
+            const data =
+                messageDoc.data();
+
+
+            if(data.groupId === groupId){
+
+                deletePromises.push(
+                    deleteDoc(
+                        doc(
+                            db,
+                            "messages",
+                            messageDoc.id
+                        )
+                    )
+                );
+
+            }
+
+        });
+
+
+        /* DELETE GROUP DOCUMENT */
+
+        deletePromises.push(
+            deleteDoc(
+                doc(
+                    db,
+                    "groups",
+                    groupId
+                )
+            )
+        );
+
+
+        /* EXECUTE ALL DELETIONS */
+
+        await Promise.all(
+            deletePromises
+        );
+
+
+        /* STOP GROUP MESSAGE LISTENER */
+
+        if(typeof unsubscribe === "function"){
+
+            unsubscribe();
+
+            unsubscribe = null;
+
         }
-    });
 
-    deletes.push(deleteDoc(doc(db, "conversations", chatId)));
-    deletes.push(deleteDoc(doc(db, "dmThemes", chatId)));
 
-    await Promise.all(deletes);
+        /* STOP PINNED MESSAGE LISTENER */
 
-    closeDeleteModal();
-    document.getElementById("closeChat").click();
+        if(typeof pinnedListener === "function"){
+
+            pinnedListener();
+
+            pinnedListener = null;
+
+        }
+
+
+        /* RESET */
+
+        currentGroup = null;
+
+        currentChatUser = null;
+
+
+        /* CLOSE SIDE PANEL */
+
+        document
+            .getElementById(
+                "chatOptionsPanel"
+            )
+            .classList.remove("open");
+
+
+        /* CLOSE MODAL */
+
+        closeDeleteModal();
+
+
+        /* CLEAR MESSAGE AREA */
+
+        document
+            .getElementById("messages")
+            .innerHTML = "";
+
+
+        /* HIDE CHAT */
+
+        document
+            .getElementById("chatUI")
+            .style.display = "none";
+
+
+        /* SHOW EMPTY */
+
+        document
+            .getElementById("emptyState")
+            .style.display = "flex";
+
+
+        /* REFRESH GROUP LIST */
+
+        loadChatList();
+
+
+    }catch(error){
+
+        console.error(
+            "Group deletion failed:",
+            error
+        );
+
+        alert(
+            "Failed to delete the GroupChat."
+        );
+
+    }
+
+
+    return;
+}
+
+
+    /* ==========================
+       DELETE DIRECT MESSAGE
+    ========================== */
+
+    if(currentChatUser){
+
+        const myId =
+            auth.currentUser.uid;
+
+
+        const chatId =
+            [
+                myId,
+                currentChatUser
+            ]
+            .sort()
+            .join("_");
+
+
+        const snap =
+            await getDocs(
+                collection(db, "messages")
+            );
+
+
+        const deletes = [];
+
+
+        snap.forEach(docSnap=>{
+
+            const m =
+                docSnap.data();
+
+
+            if(
+
+                (m.from === myId &&
+                 m.to === currentChatUser)
+
+                ||
+
+                (m.from === currentChatUser &&
+                 m.to === myId)
+
+            ){
+
+                deletes.push(
+                    deleteDoc(
+                        doc(
+                            db,
+                            "messages",
+                            docSnap.id
+                        )
+                    )
+                );
+
+            }
+
+        });
+
+
+        deletes.push(
+            deleteDoc(
+                doc(
+                    db,
+                    "conversations",
+                    chatId
+                )
+            )
+        );
+
+
+        deletes.push(
+            deleteDoc(
+                doc(
+                    db,
+                    "dmThemes",
+                    chatId
+                )
+            )
+        );
+
+
+        await Promise.all(deletes);
+
+
+        closeDeleteModal();
+
+
+        document
+            .getElementById("closeChat")
+            .click();
+
+    }
+
 };
 
 async function saveNick(uid){
@@ -4180,6 +5041,11 @@ window.openChat = openChat;
 window.toggleSidebar = toggleSidebar;
 window.sendMsg = sendMsg;
 window.changeTheme = changeTheme;
+window.openGroupNameEditor = openGroupNameEditor;
+window.startGroupNameEdit = startGroupNameEdit;
+window.saveGroupName = saveGroupName;
+window.clearGroupName = clearGroupName;
+window.cancelGroupNameEdit = cancelGroupNameEdit;
 window.toggleSection = toggleSection;
 window.toggleCategory = toggleCategory;
 window.loadMembers = loadMembers;
@@ -4226,7 +5092,7 @@ z-index:3000;
         width:260px;
         text-align:center;
     ">
-        <p>Do you want to delete this conversation?</p>
+        <p id="deleteModalTitle">Do you want to delete this conversation?</p>
         <div style="display:flex;gap:10px;margin-top:15px;">
             <button id="confirmDelete" class="modal-btn yes">Yes</button>
             <button onclick="closeDeleteModal()" class="modal-btn no">No</button>
