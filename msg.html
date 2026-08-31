@@ -4767,10 +4767,6 @@ await addDoc(collection(db,"messages"),{
     );
 
     await loadNicknames();
-
-    document.getElementById("chatOptionsPanel")
-    .classList.add("open");
-
 }
 
 async function resetNick(uid){
@@ -4822,12 +4818,7 @@ await addDoc(collection(db,"messages"),{
 });
     }
 
-
 await loadNicknames();
-
-document.getElementById("chatOptionsPanel")
-.classList.add("open");
-
 }
 
 function editNick(uid){
@@ -4868,12 +4859,7 @@ function editNick(uid){
 }
 
 function cancelNickEdit(){
-
     loadNicknames();
-
-    document.getElementById("chatOptionsPanel")
-    .classList.add("open");
-
 }
 
 function showNickStatus(message){
