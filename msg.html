@@ -3089,7 +3089,7 @@ function loadMessages(){
                 (m.from === currentChatUser && m.to === myId);
 
             if(isChat){
-                messages.push({ ...m, id }); // ✅ FIXED
+                messages.push({ ...m, id });
             }
         });
 
@@ -3227,9 +3227,10 @@ async function loadGroupMessages(){
 messages.forEach(m => {
 
 if(m.system){
+
     if(m.groupPictureChange){
 
-    box.innerHTML += `
+        box.innerHTML += `
 
         <div class="group-system-message">
 
@@ -3246,13 +3247,15 @@ if(m.system){
 
         </div>
 
-    `;
+        `;
 
-    return;
-        
-}if(m.groupNameChange){
+        return;
+    }
 
-    box.innerHTML += `
+
+    if(m.groupNameChange){
+
+        box.innerHTML += `
 
         <div class="group-system-message">
 
@@ -3272,13 +3275,15 @@ if(m.system){
 
         </div>
 
-    `;
+        `;
 
-    return;
-        
-}if(m.groupNameClear){
+        return;
+    }
 
-    box.innerHTML += `
+
+    if(m.groupNameClear){
+
+        box.innerHTML += `
 
         <div class="group-system-message">
 
@@ -3295,16 +3300,18 @@ if(m.system){
 
         </div>
 
-    `;
+        `;
 
-    return;
-        
-}if(
-    m.oldTheme !== undefined &&
-    m.newTheme !== undefined
-){
+        return;
+    }
 
-    box.innerHTML += `
+
+    if(
+        m.oldTheme !== undefined &&
+        m.newTheme !== undefined
+    ){
+
+        box.innerHTML += `
 
         <div class="group-system-message">
 
@@ -3321,9 +3328,11 @@ if(m.system){
 
         </div>
 
-    `;
+        `;
 
-    return;
+        return;
+    }
+
 }
     
     const colorName = themeNames[m.theme] || "Theme";
