@@ -3177,21 +3177,24 @@ if(m.nicknameChange){
 const isMe = m.from === auth.currentUser.uid;
     
 box.innerHTML += `
-<div class="msg ${isMe ? "me" : "other"}"
-     data-id="${m.id}">
-     
-    ${m.text}
+    <div class="msg ${isMe ? "me" : "other"}"
+         data-id="${m.id}"
+         style="
+            background:${isMe ? themeColor : "#2a2f3a"};
+            color:${isMe ? "#000" : "#fff"};
+         "
+         oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;"
+         ontouchstart="startPress(event, '${m.id}', '${m.from}')"
+         ontouchend="cancelPress()"
+    >
+        ${m.text}
 
-    <div style="
-        font-size:10px;
-        opacity:.6;
-        margin-top:4px;
-    ">
-        ${new Date(m.time).toLocaleDateString()} •
-        ${new Date(m.time).toLocaleTimeString()}
+        <div style="font-size:10px;opacity:.6;margin-top:4px;">
+            ${new Date(m.time).toLocaleDateString()} • 
+            ${new Date(m.time).toLocaleTimeString()}
+        </div>
+
     </div>
-
-</div>
 `;
 });
 
