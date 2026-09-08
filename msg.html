@@ -1250,7 +1250,7 @@ text-decoration:underline;
 
     position:relative;
 
-    padding:12px 10px 12px 32px;
+    padding:12px 32px 12px 10px;
 
     margin-bottom:7px;
 
@@ -1278,7 +1278,7 @@ text-decoration:underline;
 
     position:absolute;
 
-    left:7px;
+    right:7px;
 
     top:7px;
 
@@ -1301,7 +1301,6 @@ text-decoration:underline;
     border-radius:50%;
 
 }
-
 
 .pinned-remove:hover{
 
@@ -1423,7 +1422,7 @@ text-decoration:underline;
 </div>
 
     <!-- CHAT UI -->
-    <div id="chatUI" style="display:none;flex-direction:column;height:100%;">
+    <div id="chatUI" style="display:none;flex-direction:column;">
         
         <!-- HEADER -->
 <div id="chatHeader" style="
@@ -1721,24 +1720,49 @@ text-decoration:underline;
 
     </div>
 
+<!-- =========================
+     ADD MEMBER
+========================= -->
 
-    <!-- =========================
-         DELETE
-    ========================== -->
-    <div class="option">
+<div class="option" id="addMemberOption" style="display:none;">
 
-        <div id="deleteChatBtn" style="
+    <div
+        id="addMemberBtn"
+        onclick="openAddMember()"
+        style="
             padding:10px;
             text-align:center;
             border-radius:10px;
             background:#1f2937;
+            color:white;
             cursor:pointer;
             transition:.2s;
-        ">
-            Delete Conversation
-        </div>
-
+        "
+    >
+        Add Member
     </div>
+
+</div>
+
+
+<!-- =========================
+     DELETE
+========================= -->
+
+<div class="option">
+
+    <div id="deleteChatBtn" style="
+        padding:10px;
+        text-align:center;
+        border-radius:10px;
+        background:#1f2937;
+        cursor:pointer;
+        transition:.2s;
+    ">
+        Delete Conversation
+    </div>
+
+</div>
 
 </div>
 
@@ -2277,23 +2301,23 @@ async function openGroup(id, name, theme){
         groupTheme;
 
 
-    /* GROUP IMAGE */
+/* GROUP IMAGE */
 
-    const avatar =
-        document.getElementById("groupAvatar");
+const groupImage =
+    data.groupImage ||
+    "https://cdn-icons-png.flaticon.com/512/166/166258.png";
 
 
-    if(data.groupImage){
+/* RIGHT SIDE PANEL */
 
-        avatar.src =
-            data.groupImage;
+document.getElementById("groupAvatar").src =
+    groupImage;
 
-    }else{
 
-        avatar.src =
-            "https://cdn-icons-png.flaticon.com/512/166/166258.png";
+/* MAIN CHAT HEADER */
 
-    }
+document.getElementById("chatAvatar").src =
+    groupImage;
 
 
     /* SIDE PANEL GROUP NAME */
@@ -2667,17 +2691,16 @@ document
     }
 
 
-    /* 2MB LIMIT */
+/* FIRESTORE SAFE IMAGE LIMIT */
 
-    if(file.size > 2 * 1024 * 1024){
+if(file.size > 700 * 1024){
 
-        alert("Please select an image smaller than 2MB.");
+    alert("Please select an image smaller than 700KB.");
 
-        this.value = "";
+    this.value = "";
 
-        return;
-    }
-
+    return;
+}
 
     const reader =
         new FileReader();
@@ -2700,13 +2723,15 @@ document
                 }
             );
 
+/* UPDATE GROUP PICTURES */
 
-            /* UPDATE RIGHT SIDE PANEL */
+document
+    .getElementById("groupAvatar")
+    .src = image;
 
-            document
-                .getElementById("groupAvatar")
-                .src = image;
-
+document
+    .getElementById("chatAvatar")
+    .src = image;
 
             /* UPDATE LEFT GROUP LIST */
 
@@ -3184,10 +3209,11 @@ async function loadGroupMessages(){
             const user = allUsers.find(u => u.uid === m.from);
 
             if(m.system){
-                let html = "";
-
+                let html = "";                
                 if(m.groupPictureChange){
                     html = `${m.userName || "User"} updated the GroupChat Picture`;
+                } else if(m.memberAdded){
+                    html = `${m.userName || "User"} added <b>${m.addedMember || "a new member"}</b> to the GroupChat`;
                 } else if(m.groupNameChange){
                     html = `${m.userName || "User"} changed the group chat name from "<b>${m.oldGroupName || "UnNamed GroupChat"}</b>" into "<b>${m.newGroupName || "UnNamed GroupChat"}</b>"`;
                 } else if(m.groupNameClear){
@@ -3483,33 +3509,41 @@ document.getElementById("moreBtn").onclick = async () => {
     const deleteBtn =
     document.getElementById("deleteChatBtn");
 
+    const addMemberOption =
+    document.getElementById("addMemberOption");
+
 
     /* =================================
        GROUP CHAT
     ================================= */
 
-    if(currentGroup){
+if(currentGroup){
 
-        /* SHOW GROUP HEADER */
+    /* SHOW GROUP HEADER */
 
-        dmHeader.style.display = "none";
+    dmHeader.style.display = "none";
 
-        groupHeader.style.display = "flex";
-
-
-        /* SHOW MEMBERS */
-
-        membersSection.style.display = "block";
+    groupHeader.style.display = "flex";
 
 
-        /* REMOVE NICKNAMES */
+    /* SHOW MEMBERS */
 
-        nicknameSection.style.display = "none";
-
-        deleteBtn.innerText =
-            "Delete GroupChat";
+    membersSection.style.display = "block";
 
 
+    /* REMOVE NICKNAMES */
+
+    nicknameSection.style.display = "none";
+
+
+    /* SHOW ADD MEMBER */
+
+    addMemberOption.style.display = "block";
+
+
+    deleteBtn.innerText =
+        "Delete GroupChat";
+    
         /* LOAD GROUP */
 
         const groupSnap =
@@ -3554,10 +3588,12 @@ document.getElementById("moreBtn").onclick = async () => {
        DIRECT MESSAGE
     ================================= */
 
-    else if(currentChatUser){
+else if(currentChatUser){
 
-        deleteBtn.innerText =
-            "Delete Conversation";
+    deleteBtn.innerText =
+        "Delete Conversation";
+
+    addMemberOption.style.display = "none";
 
         /* SHOW DM HEADER */
 
@@ -3925,6 +3961,151 @@ async function loadMembers(){
     });
 }
 
+async function openAddMember(){
+
+    if(!currentGroup){
+        return;
+    }
+
+    const groupSnap =
+        await getDoc(
+            doc(db, "groups", currentGroup)
+        );
+
+    if(!groupSnap.exists()){
+        alert("GroupChat not found.");
+        return;
+    }
+
+    const groupData =
+        groupSnap.data();
+
+    const existingMembers =
+        groupData.members || [];
+
+
+    /* FIND USERS WHO ARE NOT MEMBERS */
+
+    const availableUsers =
+        allUsers.filter(user =>
+            !existingMembers.includes(user.uid)
+        );
+
+
+    if(availableUsers.length === 0){
+
+        alert("There are no users available to add.");
+
+        return;
+    }
+
+
+    /* CREATE USER LIST */
+
+    const names =
+        availableUsers
+            .map((user,index) =>
+                `${index + 1}. ${user.name}`
+            )
+            .join("\n");
+
+
+    const choice =
+        prompt(
+            "Select a user to add:\n\n" +
+            names +
+            "\n\nEnter the number:"
+        );
+
+
+    if(!choice){
+        return;
+    }
+
+
+    const index =
+        parseInt(choice) - 1;
+
+
+    if(
+        isNaN(index) ||
+        index < 0 ||
+        index >= availableUsers.length
+    ){
+
+        alert("Invalid selection.");
+
+        return;
+    }
+
+
+    const selectedUser =
+        availableUsers[index];
+
+
+    /* ADD USER TO GROUP */
+
+    const updatedMembers = [
+        ...existingMembers,
+        selectedUser.uid
+    ];
+
+
+    try{
+
+        await updateDoc(
+            doc(db, "groups", currentGroup),
+            {
+                members: updatedMembers
+            }
+        );
+
+
+        /* SYSTEM MESSAGE */
+
+        await addDoc(
+            collection(db, "messages"),
+            {
+                system:true,
+                groupId:currentGroup,
+                from:auth.currentUser.uid,
+                userName:
+                    auth.currentUser.displayName
+                    || "User",
+                memberAdded:true,
+                addedMember:
+                    selectedUser.name,
+                time:Date.now()
+            }
+        );
+
+
+        /* REFRESH MEMBERS */
+
+        loadMembers();
+
+        loadChatList();
+
+
+        alert(
+            selectedUser.name +
+            " was added to the GroupChat."
+        );
+
+
+    }catch(error){
+
+        console.error(
+            "Failed to add member:",
+            error
+        );
+
+        alert(
+            "Failed to add member."
+        );
+    }
+}
+    
 async function changeTheme(color){
 
     if(!auth.currentUser){
@@ -3954,7 +4135,6 @@ const data =
 const oldTheme =
     data.theme || "#4da3ff";
 
-
 await updateDoc(
     groupRef,
     {
@@ -3963,30 +4143,30 @@ await updateDoc(
 );
 
 
+/* UPDATE THEME IMMEDIATELY */
+
+groupTheme = color;
+themeColor = color;
+
+document.getElementById("chatBox").style.background =
+    color + "22";
+
+
 await addDoc(
     collection(db, "messages"),
     {
-
         system:true,
-
         groupId:currentGroup,
-
         from:auth.currentUser.uid,
-
         userName:
             auth.currentUser.displayName
             || "User",
-
         oldTheme:oldTheme,
-
         newTheme:color,
-
         time:Date.now()
-
     }
 );
         /* RELOAD */
-
         loadGroupMessages();
 
         return;
