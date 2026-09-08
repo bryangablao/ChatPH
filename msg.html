@@ -3509,12 +3509,6 @@ document.getElementById("moreBtn").onclick = async () => {
         deleteBtn.innerText =
             "Delete GroupChat";
 
-}else{
-
-        deleteBtn.innerText =
-            "Delete Conversation";
-
-}
 
         /* LOAD GROUP */
 
@@ -3522,7 +3516,6 @@ document.getElementById("moreBtn").onclick = async () => {
             await getDoc(
                 doc(db, "groups", currentGroup)
             );
-
 
         if(groupSnap.exists()){
 
@@ -3547,7 +3540,6 @@ document.getElementById("moreBtn").onclick = async () => {
                 data.groupImage
                 ||
                 "https://cdn-icons-png.flaticon.com/512/166/166258.png";
-
         }
 
 
@@ -3563,6 +3555,9 @@ document.getElementById("moreBtn").onclick = async () => {
     ================================= */
 
     else if(currentChatUser){
+
+        deleteBtn.innerText =
+            "Delete Conversation";
 
         /* SHOW DM HEADER */
 
