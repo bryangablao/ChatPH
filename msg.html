@@ -1742,58 +1742,6 @@ text-decoration:underline;
 
 </div>
 
-    <!-- PINNED -->
-    <div class="option">
-        Pinned Messages <span onclick="toggleSection('pinned')">▾</span>
-        <div id="pinned" class="dropdown"></div>
-    </div>
-
-    <!-- THEME -->
-    <div class="option">
-        Change Theme <span onclick="toggleSection('theme')">▾</span>
-        <div id="theme" class="dropdown">
-            <div onclick="changeTheme('#4da3ff')" style="color:#4da3ff">Blue</div>
-            <div onclick="changeTheme('#ff4b4b')" style="color:#ff4b4b">Red</div>
-            <div onclick="changeTheme('#facc15')" style="color:#facc15">Yellow</div>
-            <div onclick="changeTheme('#22c55e')" style="color:#22c55e">Green</div>
-            <div onclick="changeTheme('#a855f7')" style="color:#a855f7">Purple</div>
-            <div onclick="changeTheme('#92400e')" style="color:#92400e">Brown</div>
-            <div onclick="changeTheme('#ec4899')" style="color:#ec4899">Pink</div>
-            <div onclick="changeTheme('#06b6d4')" style="color:#06b6d4">Cyan</div>
-            <div onclick="changeTheme('#f97316')" style="color:#f97316">Orange</div>
-            <div onclick="changeTheme('#10b981')" style="color:#10b981">Emerald</div>
-            <div onclick="changeTheme('#eab308')" style="color:#eab308">Gold</div>
-            <div onclick="changeTheme('#6366f1')" style="color:#6366f1">Indigo</div>
-        </div>
-    </div>
-
-    <!-- NICKNAMES -->
-    <div class="option">
-        Nicknames <span onclick="toggleSection('nicknames')">▾</span>
-        <div id="nicknames" class="dropdown"></div>
-    </div>
-
-    <!-- GROUP MEMBERS -->
-    <div class="option" id="membersOption">
-        Members
-        <span onclick="toggleSection('members')">▾</span>
-        <div id="members" class="dropdown"></div>
-    </div>
-
-    <!-- DELETE -->
-    <div class="option">
-        <div id="deleteChatBtn" style="
-            padding:10px;
-            text-align:center;
-            border-radius:10px;
-            background:#1f2937;
-            cursor:pointer;
-            transition:.2s;
-        ">
-            Delete Conversation
-        </div>
-    </div>
-</div>
 
 <!-- FOOTER -->
 <footer style="
@@ -1839,7 +1787,8 @@ import {
 
 import {
     getAuth,
-    onAuthStateChanged
+    onAuthStateChanged,
+    signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
@@ -3205,11 +3154,16 @@ box.innerHTML += `
 async function loadGroupMessages(){
     const box = document.getElementById("messages");
 
-    if(unsubscribe) unsubscribe();
+    if(unsubscribe){
+        unsubscribe();
+        unsubscribe = null;
+    }
 
     const q = query(collection(db, "messages"));
 
-    document.getElementById("chatBox").style.background = groupTheme + "22";
+    // Apply the current group theme immediately.
+    document.getElementById("chatBox").style.background =
+        (groupTheme || "#4da3ff") + "22";
 
     unsubscribe = onSnapshot(q, (snap)=>{
         box.innerHTML = "";
@@ -3224,153 +3178,66 @@ async function loadGroupMessages(){
             }
         });
 
-        messages.sort((a,b)=> a.time - b.time);
+        messages.sort((a,b)=>(a.time || 0) - (b.time || 0));
 
-messages.forEach(m => {
+        messages.forEach(m=>{
+            const user = allUsers.find(u => u.uid === m.from);
 
-    const user = allUsers.find(u => u.uid === m.from);
+            if(m.system){
+                let html = "";
 
-if(m.system){
+                if(m.groupPictureChange){
+                    html = `${m.userName || "User"} updated the GroupChat Picture`;
+                } else if(m.groupNameChange){
+                    html = `${m.userName || "User"} changed the group chat name from "<b>${m.oldGroupName || "UnNamed GroupChat"}</b>" into "<b>${m.newGroupName || "UnNamed GroupChat"}</b>"`;
+                } else if(m.groupNameClear){
+                    html = `${m.userName || "User"} removed the name of the groupchat`;
+                } else if(m.oldTheme !== undefined && m.newTheme !== undefined){
+                    const oldName = themeNames[m.oldTheme] || "Theme";
+                    const newName = themeNames[m.newTheme] || "Theme";
+                    html = `${m.userName || "User"} changed the GroupChat theme from <span style="color:${m.oldTheme}">● ${oldName}</span> → <span style="color:${m.newTheme}">● ${newName}</span>`;
+                } else if(m.theme){
+                    const colorName = themeNames[m.theme] || "Theme";
+                    html = `<span style="color:${m.theme};font-weight:600;">${m.userName || "User"}</span> changed the Background Theme to <span style="color:${m.theme};font-weight:600;">(${colorName})</span>`;
+                }
 
-    if(m.groupPictureChange){
+                if(html){
+                    box.innerHTML += `
+                        <div class="group-system-message">
+                            <span>${html}</span>
+                            <small>${new Date(m.time || Date.now()).toLocaleDateString()} • ${new Date(m.time || Date.now()).toLocaleTimeString()}</small>
+                        </div>
+                    `;
+                }
 
-        box.innerHTML += `
+                return;
+            }
 
-        <div class="group-system-message">
-
-            <span>
-                ${m.userName}
-                updated the GroupChat Picture
-            </span>
-
-            <small>
-                ${new Date(m.time).toLocaleDateString()}
-                •
-                ${new Date(m.time).toLocaleTimeString()}
-            </small>
-
-        </div>
-
-        `;
-
-        return;
-    }
-
-    if(m.groupNameChange){
-
-        box.innerHTML += `
-
-        <div class="group-system-message">
-
-            <span>
-                ${m.userName}
-                changed the group chat name from
-                "<b>${m.oldGroupName}</b>"
-                into
-                "<b>${m.newGroupName}</b>"
-            </span>
-
-            <small>
-                ${new Date(m.time).toLocaleDateString()}
-                •
-                ${new Date(m.time).toLocaleTimeString()}
-            </small>
-
-        </div>
-
-        `;
-
-        return;
-    }
-
-    if(m.groupNameClear){
-
-        box.innerHTML += `
-
-        <div class="group-system-message">
-
-            <span>
-                ${m.userName}
-                removed the name of the groupchat
-            </span>
-
-            <small>
-                ${new Date(m.time).toLocaleDateString()}
-                •
-                ${new Date(m.time).toLocaleTimeString()}
-            </small>
-
-        </div>
-
-        `;
-
-        return;
-    }
-
-    if(
-        m.oldTheme !== undefined &&
-        m.newTheme !== undefined
-    ){
-
-        box.innerHTML += `
-
-        <div class="group-system-message">
-
-            <span>
-                ${m.userName}
-                changed the GroupChat theme
-            </span>
-
-            <small>
-                ${new Date(m.time).toLocaleDateString()}
-                •
-                ${new Date(m.time).toLocaleTimeString()}
-            </small>
-
-        </div>
-
-        `;
-
-        return;
-    }
-    
-    const colorName = themeNames[m.theme] || "Theme";
-
-    box.innerHTML += `
-        <div style="text-align:center;font-size:12px;opacity:.8;margin:10px 0;">
-            <span style="color:${m.theme};font-weight:600;">
-                ${m.userName || "User"}
-            </span>
-            changed the Background Theme to 
-            <span style="color:${m.theme};font-weight:600;">
-                (${colorName})
-            </span>
-            • ${new Date(m.time).toLocaleString()}
-        </div>
-    `;
-    return;
+            const isMe = m.from === auth.currentUser?.uid;
+            const messageTime = m.edited ? m.editedTime : m.time;
+            const displayTime = messageTime || Date.now();
 
             box.innerHTML += `
-            <div class="msg ${m.from === auth.currentUser.uid ? "me" : "other"}"
-                 data-id="${m.id}"
-                 oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;"
-                 ontouchstart="startPress(event, '${m.id}', '${m.from}')"
-                 ontouchend="cancelPress()"
-                 style="
-                    background:${m.from === auth.currentUser.uid ? groupTheme : "#2a2f3a"};
-                    color:${m.from === auth.currentUser.uid ? "#000" : "#fff"};
-                 ">
-                <div style="font-size:11px;opacity:.7;">
-                    ${user ? user.name : "User"} ${m.edited ? '(edited)' : ''}
+                <div class="msg ${isMe ? "me" : "other"}"
+                     data-id="${m.id}"
+                     oncontextmenu="openMsgMenu(event, '${m.id}', '${m.from}'); return false;"
+                     ontouchstart="startPress(event, '${m.id}', '${m.from}')"
+                     ontouchend="cancelPress()"
+                     style="
+                        background:${isMe ? (groupTheme || "#4da3ff") : "#2a2f3a"};
+                        color:${isMe ? "#000" : "#fff"};
+                     ">
+                    <div style="font-size:11px;opacity:.7;">
+                        ${user ? user.name : "User"} ${m.edited ? "(edited)" : ""}
+                    </div>
+                    ${m.text || ""}
+                    <div style="font-size:10px;opacity:.6;margin-top:4px;">
+                        ${new Date(displayTime).toLocaleDateString()} •
+                        ${new Date(displayTime).toLocaleTimeString()}
+                    </div>
                 </div>
-                ${m.text}
-                <div style="font-size:10px;opacity:.6;margin-top:4px;">
-                    ${new Date(m.edited ? m.editedTime : m.time).toLocaleDateString()} • 
-                    ${new Date(m.edited ? m.editedTime : m.time).toLocaleTimeString()}
-                </div>
-            </div>
             `;
-        };
+        });
 
         box.scrollTop = box.scrollHeight;
     });
@@ -3381,7 +3248,6 @@ function showEmptyState(){
     document.getElementById("chatUI").style.display = "none";
 }
 
-import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 document.getElementById("logoutBtn").onclick = async () => {
     await signOut(auth);
@@ -5019,6 +4885,7 @@ document.getElementById("deleteModal").addEventListener("click", (e)=>{
 // 🔥 MAKE FUNCTIONS GLOBAL (IMPORTANT)
 
 window.deleteMessage = deleteMessage;
+window.closeDeleteModal = closeDeleteModal;
 window.editMessage = editMessage;
 window.pinMessage = pinMessage;
 window.unpinMessage = unpinMessage;
@@ -5040,16 +4907,14 @@ window.cancelGroupNameEdit = cancelGroupNameEdit;
 window.toggleSection = toggleSection;
 window.toggleCategory = toggleCategory;
 window.loadMembers = loadMembers;
-window.openGroupNameEditor = openGroupNameEditor;
-window.startGroupNameEdit = startGroupNameEdit;
-window.saveGroupName = saveGroupName;
-window.clearGroupName = clearGroupName;
-window.cancelGroupNameEdit = cancelGroupNameEdit;
 window.toggleCreate = toggleCreate;
 window.editNick = editNick;
 window.saveNick = saveNick;
 window.resetNick = resetNick;
 window.cancelNickEdit = cancelNickEdit;
+window.startPress = startPress;
+window.cancelPress = cancelPress;
+window.scrollToMsg = scrollToMsg;
 window.loadNicknames = loadNicknames;
 </script>
 
