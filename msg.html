@@ -26,7 +26,9 @@ body{
     color:var(--text);
     display:flex;
     flex-direction:column;
-    min-height:100vh;
+    height:100vh;
+    min-height:0;
+    overflow:hidden;
 }
 
 /* HEADER */
@@ -172,10 +174,11 @@ pointer-events:auto;
 
 /* MAIN CHAT LAYOUT */
 .main{
-    flex:1;
+    flex:1 1 auto;
     display:flex;
     overflow:hidden;
     min-height:0;
+    height:0;
 }
 
 /* LEFT: USERS */
@@ -201,19 +204,22 @@ pointer-events:auto;
 
 /* RIGHT: CHAT BOX */
 .chat-box{
-    flex:1;
+    flex:1 1 auto;
     display:flex;
     flex-direction:column;
     min-height:0;
+    height:100%;
     overflow:hidden;
 }
 
 .messages{
-    flex:1;
+    flex:1 1 auto;
     padding:16px;
     overflow-y:auto;
     overflow-x:hidden;
     min-height:0;
+    overscroll-behavior:contain;
+    scroll-behavior:smooth;
 }
 
 .msg{
@@ -272,6 +278,7 @@ footer{
     font-size:13px;
     opacity:.6;
     background:var(--bg);
+    flex-shrink:0;
 }
     
 footer a:hover{
@@ -811,6 +818,227 @@ text-decoration:underline;
     height:14px;
     border-radius:50%;
     background:currentColor;
+}
+
+
+/* =========================================
+   ADD MEMBER BUTTON
+========================================= */
+#addMemberBtn{
+    padding:10px;
+    text-align:center;
+    border-radius:10px;
+    background:#1f2937;
+    color:white;
+    cursor:pointer;
+    transition:background .35s ease,color .35s ease,transform .2s ease,box-shadow .25s ease;
+}
+
+#addMemberBtn:hover{
+    background:#22c55e;
+    color:white;
+    transform:translateY(-1px);
+    box-shadow:0 4px 12px rgba(34,197,94,.22);
+}
+
+#addMemberBtn:active{
+    transform:scale(.98);
+}
+
+/* =========================================
+   ADD MEMBER MODALS
+========================================= */
+.add-member-modal{
+    position:fixed;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(0,0,0,.58);
+    backdrop-filter:blur(7px);
+    -webkit-backdrop-filter:blur(7px);
+    z-index:4200;
+}
+
+.add-member-modal.open{
+    display:flex;
+}
+
+.add-member-modal-card{
+    width:min(420px,92vw);
+    max-height:min(620px,82vh);
+    overflow:hidden;
+    background:#11141a;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:18px;
+    box-shadow:0 24px 70px rgba(0,0,0,.55);
+    animation:addMemberModalIn .2s ease;
+}
+
+@keyframes addMemberModalIn{
+    from{opacity:0;transform:translateY(10px) scale(.97);}
+    to{opacity:1;transform:translateY(0) scale(1);}
+}
+
+.add-member-modal-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:16px 18px;
+    border-bottom:1px solid var(--border);
+}
+
+.add-member-modal-header h3{
+    margin:0;
+    font-size:17px;
+}
+
+.add-member-close{
+    width:32px;
+    height:32px;
+    border:0;
+    border-radius:9px;
+    background:#1f2937;
+    color:#fff;
+    cursor:pointer;
+    font-size:16px;
+    transition:.2s ease;
+}
+
+.add-member-close:hover{
+    background:#ef4444;
+}
+
+.add-member-modal-body{
+    padding:16px 18px 18px;
+}
+
+#addMemberSearchInput{
+    width:100%;
+    box-sizing:border-box;
+    padding:12px 14px;
+    border:1px solid transparent;
+    border-radius:12px;
+    outline:none;
+    background:#1f2937;
+    color:#fff;
+    font-size:14px;
+    transition:.2s ease;
+}
+
+#addMemberSearchInput:focus{
+    border-color:#22c55e;
+    box-shadow:0 0 0 3px rgba(34,197,94,.12);
+}
+
+.add-member-hint{
+    margin:8px 2px 12px;
+    font-size:12px;
+    color:#9ca3af;
+}
+
+#addMemberSuggestions{
+    max-height:340px;
+    overflow-y:auto;
+}
+
+.add-member-suggestion{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    width:100%;
+    box-sizing:border-box;
+    padding:11px 12px;
+    margin-bottom:7px;
+    border:1px solid transparent;
+    border-radius:12px;
+    background:#1f2937;
+    cursor:pointer;
+    transition:.2s ease;
+}
+
+.add-member-suggestion:hover,
+.add-member-suggestion.keyboard-selected{
+    background:#263446;
+    border-color:rgba(34,197,94,.45);
+    transform:translateY(-1px);
+}
+
+.add-member-suggestion img{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    object-fit:cover;
+    flex-shrink:0;
+}
+
+.add-member-suggestion-name{
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:14px;
+    font-weight:600;
+}
+
+.add-member-empty{
+    padding:18px 10px;
+    text-align:center;
+    color:#9ca3af;
+    font-size:13px;
+}
+
+.add-member-confirm-name{
+    color:#22c55e;
+    font-weight:700;
+}
+
+.add-member-confirm-actions{
+    display:flex;
+    gap:10px;
+    margin-top:18px;
+}
+
+.add-member-confirm-actions button{
+    flex:1;
+    border:0;
+    border-radius:10px;
+    padding:10px 12px;
+    color:#fff;
+    font-weight:700;
+    cursor:pointer;
+    transition:.2s ease;
+}
+
+#confirmAddMemberBtn{
+    background:#15803d;
+}
+
+#confirmAddMemberBtn:hover{
+    background:#22c55e;
+    transform:translateY(-1px);
+}
+
+#cancelAddMemberBtn{
+    background:#374151;
+}
+
+#cancelAddMemberBtn:hover{
+    background:#ef4444;
+}
+
+.members-label{
+    float:none !important;
+}
+
+.members-label .member-count{
+    float:none !important;
+    margin-left:5px;
+    color:#9ca3af;
+    font-size:12px;
+    font-weight:600;
 }
 
 /* 🔥 CUSTOM SCROLLBAR */
@@ -1740,7 +1968,7 @@ text-decoration:underline;
     ========================== -->
     <div class="option" id="membersOption">
 
-        Members
+        <span class="members-label">Members <span id="memberCount" class="member-count">[0]</span></span>
 
         <span onclick="toggleSection('members')">
             ▾
@@ -1756,19 +1984,7 @@ text-decoration:underline;
 
 <div class="option" id="addMemberOption" style="display:none;">
 
-    <div
-        id="addMemberBtn"
-        onclick="openAddMember()"
-        style="
-            padding:10px;
-            text-align:center;
-            border-radius:10px;
-            background:#1f2937;
-            color:white;
-            cursor:pointer;
-            transition:.2s;
-        "
-    >
+    <div id="addMemberBtn" onclick="openAddMember()">
         Add Member
     </div>
 
@@ -1796,6 +2012,51 @@ text-decoration:underline;
 
 </div>
 
+
+
+<!-- =========================
+     ADD MEMBER SEARCH MODAL
+========================= -->
+<div id="addMemberModal" class="add-member-modal" aria-hidden="true">
+    <div class="add-member-modal-card" role="dialog" aria-modal="true" aria-labelledby="addMemberModalTitle">
+        <div class="add-member-modal-header">
+            <h3 id="addMemberModalTitle">Add Member</h3>
+            <button type="button" class="add-member-close" onclick="closeAddMemberModal()">✕</button>
+        </div>
+
+        <div class="add-member-modal-body">
+            <input
+                type="text"
+                id="addMemberSearchInput"
+                placeholder="Search user by name..."
+                autocomplete="off"
+            >
+            <div class="add-member-hint">Type a name. Suggestions will appear below. Press Enter to select the first result.</div>
+            <div id="addMemberSuggestions"></div>
+        </div>
+    </div>
+</div>
+
+<!-- =========================
+     ADD MEMBER CONFIRM MODAL
+========================= -->
+<div id="addMemberConfirmModal" class="add-member-modal" aria-hidden="true">
+    <div class="add-member-modal-card" role="dialog" aria-modal="true" aria-labelledby="addMemberConfirmText">
+        <div class="add-member-modal-header">
+            <h3>Confirm Member</h3>
+            <button type="button" class="add-member-close" onclick="closeAddMemberConfirmModal()">✕</button>
+        </div>
+
+        <div class="add-member-modal-body">
+            <p id="addMemberConfirmText" style="margin:0;line-height:1.6;text-align:center;"></p>
+
+            <div class="add-member-confirm-actions">
+                <button id="confirmAddMemberBtn" type="button">Yes, Add Member</button>
+                <button id="cancelAddMemberBtn" type="button" onclick="closeAddMemberConfirmModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- FOOTER -->
 <footer style="
@@ -1871,6 +2132,8 @@ let typingUnsubscribe = null;
 let pinnedListener = null;
 let themeColor = "#4da3ff";
 let groupAccessUnsubscribe = null;
+let pendingAddMember = null;
+let availableAddMemberUsers = [];
     
 const themeNames = {
     "#4da3ff": "Blue",
@@ -2461,6 +2724,13 @@ groupAccessUnsubscribe =
 
             const latestData =
                 snap.data();
+
+            if(currentGroup === openedGroupId){
+                const memberCount = document.getElementById("memberCount");
+                if(memberCount){
+                    memberCount.innerText = `[${latestData.members?.length || 0}]`;
+                }
+            }
 
 
             const stillMember =
@@ -4182,7 +4452,14 @@ async function loadMembers(){
     const box =
         document.getElementById("members");
 
+    const memberCount =
+        document.getElementById("memberCount");
+
     box.innerHTML = "";
+
+    if(memberCount){
+        memberCount.innerText = "[0]";
+    }
 
 
     const groupSnap =
@@ -4202,6 +4479,10 @@ async function loadMembers(){
 
     const members =
         data.members || [];
+
+    if(memberCount){
+        memberCount.innerText = `[${members.length}]`;
+    }
 
 
     members.forEach(uid => {
@@ -4395,101 +4676,150 @@ async function openAddMember(){
         return;
     }
 
-    const groupSnap =
-        await getDoc(
-            doc(db, "groups", currentGroup)
-        );
+    const groupSnap = await getDoc(
+        doc(db, "groups", currentGroup)
+    );
 
     if(!groupSnap.exists()){
-        alert("GroupChat not found.");
         return;
     }
 
-    const groupData =
-        groupSnap.data();
+    const groupData = groupSnap.data();
+    const existingMembers = groupData.members || [];
 
-    const existingMembers =
-        groupData.members || [];
+    availableAddMemberUsers = allUsers.filter(user =>
+        !existingMembers.includes(user.uid)
+    );
 
+    pendingAddMember = null;
 
-    /* FIND USERS WHO ARE NOT MEMBERS */
+    const modal = document.getElementById("addMemberModal");
+    const input = document.getElementById("addMemberSearchInput");
 
-    const availableUsers =
-        allUsers.filter(user =>
-            !existingMembers.includes(user.uid)
-        );
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
 
+    input.value = "";
+    renderAddMemberSuggestions("");
 
-    if(availableUsers.length === 0){
+    setTimeout(()=>input.focus(), 50);
+}
 
-        alert("There are no users available to add.");
+function closeAddMemberModal(){
+    const modal = document.getElementById("addMemberModal");
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+}
 
+function closeAddMemberConfirmModal(){
+    const modal = document.getElementById("addMemberConfirmModal");
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+    pendingAddMember = null;
+}
+
+function renderAddMemberSuggestions(searchValue){
+    const box = document.getElementById("addMemberSuggestions");
+    const value = (searchValue || "").trim().toLowerCase();
+
+    const matches = availableAddMemberUsers
+        .filter(user => !value || user.name.toLowerCase().includes(value))
+        .slice(0, 10);
+
+    if(matches.length === 0){
+        box.innerHTML = `
+            <div class="add-member-empty">
+                ${availableAddMemberUsers.length === 0
+                    ? "There are no users available to add."
+                    : "No matching users found."}
+            </div>
+        `;
         return;
     }
 
+    box.innerHTML = matches.map((user, index)=>`
+        <div
+            class="add-member-suggestion ${index === 0 ? "keyboard-selected" : ""}"
+            data-add-member-uid="${user.uid}"
+            onclick="selectAddMemberCandidate('${user.uid}')"
+        >
+            <img
+                id="add-member-avatar-${user.uid}"
+                src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png"
+                alt=""
+            >
+            <div class="add-member-suggestion-name">${escapeHtml(user.name)}</div>
+        </div>
+    `).join("");
 
-    /* CREATE USER LIST */
+    matches.forEach(async user=>{
+        try{
+            const userSnap = await getDoc(doc(db, "users", user.uid));
+            const image = userSnap.data()?.pfpBase64;
+            const el = document.getElementById("add-member-avatar-" + user.uid);
+            if(el && image){
+                el.src = image;
+            }
+        }catch(error){
+            console.error("Failed to load add-member avatar:", error);
+        }
+    });
+}
 
-    const names =
-        availableUsers
-            .map((user,index) =>
-                `${index + 1}. ${user.name}`
-            )
-            .join("\n");
+function escapeHtml(value){
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
 
-
-    const choice =
-        prompt(
-            "Select a user to add:\n\n" +
-            names +
-            "\n\nEnter the number:"
-        );
-
-
-    if(!choice){
+function selectAddMemberCandidate(uid){
+    const user = availableAddMemberUsers.find(item => item.uid === uid);
+    if(!user){
         return;
     }
 
+    pendingAddMember = user;
 
-    const index =
-        parseInt(choice) - 1;
+    closeAddMemberModal();
 
+    const confirmModal = document.getElementById("addMemberConfirmModal");
+    const confirmText = document.getElementById("addMemberConfirmText");
 
-    if(
-        isNaN(index) ||
-        index < 0 ||
-        index >= availableUsers.length
-    ){
+    confirmText.innerHTML = `Would you add <span class="add-member-confirm-name">${escapeHtml(user.name)}</span> to the group?`;
 
-        alert("Invalid selection.");
+    confirmModal.classList.add("open");
+    confirmModal.setAttribute("aria-hidden", "false");
+}
 
+async function confirmAddMember(){
+    if(!currentGroup || !pendingAddMember){
         return;
     }
 
+    const selectedUser = pendingAddMember;
+    const groupRef = doc(db, "groups", currentGroup);
+    const groupSnap = await getDoc(groupRef);
 
-    const selectedUser =
-        availableUsers[index];
+    if(!groupSnap.exists()){
+        closeAddMemberConfirmModal();
+        return;
+    }
 
+    const existingMembers = groupSnap.data().members || [];
 
-    /* ADD USER TO GROUP */
-
-    const updatedMembers = [
-        ...existingMembers,
-        selectedUser.uid
-    ];
-
+    if(existingMembers.includes(selectedUser.uid)){
+        closeAddMemberConfirmModal();
+        await loadMembers();
+        return;
+    }
 
     try{
-
-        await updateDoc(
-            doc(db, "groups", currentGroup),
-            {
-                members: updatedMembers
-            }
-        );
-
-
-        /* SYSTEM MESSAGE */
+        await updateDoc(groupRef, {
+            members:[...existingMembers, selectedUser.uid]
+        });
 
         await addDoc(
             collection(db, "messages"),
@@ -4497,43 +4827,74 @@ async function openAddMember(){
                 system:true,
                 groupId:currentGroup,
                 from:auth.currentUser.uid,
-                userName:
-                    auth.currentUser.displayName
-                    || "User",
+                userName:auth.currentUser.displayName || "User",
                 memberAdded:true,
-                addedMember:
-                    selectedUser.name,
+                addedMember:selectedUser.name,
                 time:Date.now()
             }
         );
 
-
-        /* REFRESH MEMBERS */
-
-        loadMembers();
-
+        closeAddMemberConfirmModal();
+        await loadMembers();
         loadChatList();
 
-
-        alert(
-            selectedUser.name +
-            " was added to the GroupChat."
-        );
-
-
     }catch(error){
-
-        console.error(
-            "Failed to add member:",
-            error
-        );
-
-        alert(
-            "Failed to add member."
-        );
+        console.error("Failed to add member:", error);
+        closeAddMemberConfirmModal();
     }
 }
-    
+
+const addMemberSearchInput = document.getElementById("addMemberSearchInput");
+
+addMemberSearchInput.addEventListener("input", function(){
+    renderAddMemberSuggestions(this.value);
+});
+
+addMemberSearchInput.addEventListener("keydown", function(e){
+    if(e.key !== "Enter"){
+        return;
+    }
+
+    e.preventDefault();
+
+    const firstMatch = document.querySelector(
+        "#addMemberSuggestions .add-member-suggestion"
+    );
+
+    if(firstMatch){
+        selectAddMemberCandidate(firstMatch.dataset.addMemberUid);
+    }
+});
+
+document.getElementById("confirmAddMemberBtn").addEventListener("click", confirmAddMember);
+
+document.getElementById("addMemberModal").addEventListener("click", (e)=>{
+    if(e.target === document.getElementById("addMemberModal")){
+        closeAddMemberModal();
+    }
+});
+
+document.getElementById("addMemberConfirmModal").addEventListener("click", (e)=>{
+    if(e.target === document.getElementById("addMemberConfirmModal")){
+        closeAddMemberConfirmModal();
+    }
+});
+
+document.addEventListener("keydown", (e)=>{
+    if(e.key !== "Escape"){
+        return;
+    }
+
+    if(document.getElementById("addMemberConfirmModal").classList.contains("open")){
+        closeAddMemberConfirmModal();
+        return;
+    }
+
+    if(document.getElementById("addMemberModal").classList.contains("open")){
+        closeAddMemberModal();
+    }
+});
+
 async function changeTheme(color){
 
     if(!auth.currentUser){
@@ -5511,6 +5872,9 @@ window.toggleSection = toggleSection;
 window.toggleCategory = toggleCategory;
 window.loadMembers = loadMembers;
 window.openAddMember = openAddMember;
+window.closeAddMemberModal = closeAddMemberModal;
+window.closeAddMemberConfirmModal = closeAddMemberConfirmModal;
+window.selectAddMemberCandidate = selectAddMemberCandidate;
 window.kickMember = kickMember;
 window.toggleCreate = toggleCreate;
 window.editNick = editNick;
