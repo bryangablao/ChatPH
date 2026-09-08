@@ -686,96 +686,39 @@ text-decoration:underline;
     transition:.25s ease;
 }
 
-
-/* GREEN SHINY */
-
+/* SAVE BUTTON */
 .group-save-btn{
-
-    background:linear-gradient(
-        135deg,
-        #16a34a,
-        #22c55e,
-        #86efac,
-        #22c55e
-    );
-
-    background-size:250% 250%;
-
-    animation:greenShine 2s linear infinite;
+    background:#15803d;
+    color:white;
 
     box-shadow:
-        0 0 10px rgba(34,197,94,.35);
+        0 2px 8px rgba(0,0,0,.25);
 }
-
 
 .group-save-btn:hover{
-    transform:scale(1.04);
+    background:#16a34a;
+
+    transform:translateY(-1px);
 
     box-shadow:
-        0 0 18px rgba(34,197,94,.65);
+        0 4px 12px rgba(0,0,0,.3);
 }
-
-
-/* RED SHINY */
 
 .group-cancel-btn{
-
-    background:linear-gradient(
-        135deg,
-        #b91c1c,
-        #ef4444,
-        #fca5a5,
-        #ef4444
-    );
-
-    background-size:250% 250%;
-
-    animation:redShine 2s linear infinite;
+    background:#b91c1c;
+    color:white;
 
     box-shadow:
-        0 0 10px rgba(239,68,68,.35);
+        0 2px 8px rgba(0,0,0,.25);
 }
-
 
 .group-cancel-btn:hover{
-    transform:scale(1.04);
+    background:#dc2626;
+
+    transform:translateY(-1px);
 
     box-shadow:
-        0 0 18px rgba(239,68,68,.65);
-}
-
-
-@keyframes greenShine{
-
-    0%{
-        background-position:0% 50%;
-    }
-
-    50%{
-        background-position:100% 50%;
-    }
-
-    100%{
-        background-position:0% 50%;
-    }
-
-}
-
-
-@keyframes redShine{
-
-    0%{
-        background-position:0% 50%;
-    }
-
-    50%{
-        background-position:100% 50%;
-    }
-
-    100%{
-        background-position:0% 50%;
-    }
-
+        0 4px 12px rgba(0,0,0,.3);
 }
 
 .option{
@@ -1054,6 +997,80 @@ text-decoration:underline;
     color:#fff;
 }
 
+.group-member-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:10px;
+
+    padding:8px 10px;
+    margin-bottom:6px;
+
+    background:#1f2937;
+
+    border-radius:8px;
+
+    box-sizing:border-box;
+
+    transition:.2s ease;
+}
+
+.group-member-row:hover{
+    background:#2a3342;
+}
+
+.group-member-name{
+    flex:1;
+
+    min-width:0;
+
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+
+    font-size:13px;
+}
+
+.member-kick-btn{
+    width:26px;
+    height:26px;
+
+    flex-shrink:0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:0;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:transparent;
+
+    color:#ef4444;
+
+    font-size:13px;
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.2s ease;
+}
+
+.member-kick-btn:hover{
+    background:#35191c;
+    color:#ff6b6b;
+
+    transform:scale(1.08);
+}
+
+.member-kick-btn:active{
+    transform:scale(.92);
+}
+
 .nickname-item{
     width:100%;
     padding:10px;
@@ -1275,41 +1292,54 @@ text-decoration:underline;
 
 
 .pinned-remove{
-
     position:absolute;
 
     right:7px;
+    top:50%;
+    transform:translateY(-50%);
 
-    top:7px;
-
-    width:18px;
-
-    height:18px;
+    width:28px;
+    height:28px;
 
     padding:0;
-
     border:0;
 
-    background:transparent;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 
+    background:transparent;
     color:#ef4444;
 
+    font-size:14px;
     font-weight:bold;
+    line-height:1;
 
     cursor:pointer;
-
     border-radius:50%;
 
+    z-index:5;
+
+    transition:
+        background .2s ease,
+        color .2s ease,
+        transform .2s ease;
 }
 
 .pinned-remove:hover{
-
     background:#35191c;
-
     color:#ff6b6b;
 
+    transform:
+        translateY(-50%)
+        scale(1.08);
 }
 
+.pinned-remove:active{
+    transform:
+        translateY(-50%)
+        scale(.92);
+}
 
 .no-pinned{
 
@@ -1539,7 +1569,7 @@ text-decoration:underline;
     <div
         id="groupNameButton"
         class="group-name-button"
-        onclick="openGroupNameEditor()"
+        onclick="event.stopPropagation(); openGroupNameEditor();"
     >
 
         <span id="groupNameTitle">
@@ -1836,9 +1866,11 @@ let currentGroup = null;
 let unsubscribe = null;
 let groupTheme = "";
 let chatListUnsubscribe = null;
+let chatListRenderVersion = 0;
 let typingUnsubscribe = null;
 let pinnedListener = null;
 let themeColor = "#4da3ff";
+let groupAccessUnsubscribe = null;
     
 const themeNames = {
     "#4da3ff": "Blue",
@@ -1875,9 +1907,32 @@ if(data.name){
 }
 
 function loadChatList(){
-    if(chatListUnsubscribe) chatListUnsubscribe();
 
-    chatListUnsubscribe = onSnapshot(collection(db, "messages"), async (snap)=>{
+    if(chatListUnsubscribe){
+        chatListUnsubscribe();
+        chatListUnsubscribe = null;
+    }
+
+    const thisRenderVersion =
+        ++chatListRenderVersion;
+
+
+    chatListUnsubscribe =
+        onSnapshot(
+            collection(db, "messages"),
+            async (snap)=>{
+
+        /*
+        Ignore an old async render if a newer
+        loadChatList() has already started.
+        */
+
+        if(
+            thisRenderVersion !==
+            chatListRenderVersion
+        ){
+            return;
+        }
         const myId = auth.currentUser?.uid;
         if(!myId) return;
 
@@ -1960,8 +2015,25 @@ sorted.forEach(([uid])=>{
         }
 
         // ✅ GROUP CHATS (ALWAYS VISIBLE)
-        const groupSnap = await getDocs(collection(db, "groups"));
-        let hasGroup = false;
+const groupSnap =
+    await getDocs(
+        collection(db, "groups")
+    );
+
+
+/*
+Prevent an older asynchronous group request
+from modifying the current group list.
+*/
+if(
+    thisRenderVersion !==
+    chatListRenderVersion
+){
+    return;
+}
+
+
+let hasGroup = false;
 
         groupSnap.forEach(doc=>{
             const g = doc.data();
@@ -1969,7 +2041,7 @@ sorted.forEach(([uid])=>{
                 hasGroup = true;
                 groupBox.innerHTML += `
     <div class="chat-user"
-         onclick="openGroup('${doc.id}', '${g.name || "UnNamed GroupChat"}', '${g.theme || "#4da3ff"}')">
+             onclick="openGroup('${doc.id}')">
 
         <img
             class="avatar"
@@ -2050,6 +2122,12 @@ overlay.classList.toggle("active");
 let currentChatUser = "";
 
 function openChat(uid){
+
+    if(groupAccessUnsubscribe){
+    groupAccessUnsubscribe();
+    groupAccessUnsubscribe = null;
+}
+    
     document.querySelectorAll(".chat-user").forEach(el=>{
         el.classList.remove("active-chat");
     });
@@ -2227,7 +2305,7 @@ window.themeListener = onSnapshot(themeRef, (snap)=>{
     
 }
 
-async function openGroup(id, name, theme){
+async function openGroup(id){
 
     /* CLOSE SIDE PANEL */
     document
@@ -2275,6 +2353,17 @@ async function openGroup(id, name, theme){
     const data =
         groupSnap.data();
 
+if(
+    !data.members ||
+    !data.members.includes(auth.currentUser.uid)
+){
+
+    showEmptyState();
+
+    currentGroup = null;
+
+    return;
+}
 
     /* GROUP NAME */
 
@@ -2294,7 +2383,7 @@ async function openGroup(id, name, theme){
     /* GROUP THEME */
 
     groupTheme =
-        data.theme || theme || "#4da3ff";
+        data.theme || "#4da3ff";
 
 
     themeColor =
@@ -2328,6 +2417,107 @@ document.getElementById("chatAvatar").src =
             groupName;
 
 
+    if(groupAccessUnsubscribe){
+    groupAccessUnsubscribe();
+    groupAccessUnsubscribe = null;
+}
+
+
+const openedGroupId = id;
+
+
+groupAccessUnsubscribe =
+    onSnapshot(
+        doc(db, "groups", openedGroupId),
+        (snap)=>{
+
+            /*
+            GROUP WAS DELETED
+            */
+
+            if(!snap.exists()){
+
+                if(currentGroup === openedGroupId){
+
+                    currentGroup = null;
+
+                    document
+                        .getElementById("chatOptionsPanel")
+                        .classList.remove("open");
+
+                    showEmptyState();
+
+                    document
+                        .getElementById("messages")
+                        .innerHTML = "";
+
+                    loadChatList();
+
+                }
+
+                return;
+            }
+
+
+            const latestData =
+                snap.data();
+
+
+            const stillMember =
+                latestData.members?.includes(
+                    auth.currentUser.uid
+                );
+
+
+            /*
+            CURRENT USER WAS KICKED
+            */
+
+            if(
+                !stillMember &&
+                currentGroup === openedGroupId
+            ){
+
+                currentGroup = null;
+
+
+                if(unsubscribe){
+                    unsubscribe();
+                    unsubscribe = null;
+                }
+
+
+                if(pinnedListener){
+                    pinnedListener();
+                    pinnedListener = null;
+                }
+
+
+                document
+                    .getElementById("chatOptionsPanel")
+                    .classList.remove("open");
+
+
+                document
+                    .getElementById("messages")
+                    .innerHTML = "";
+
+
+                document
+                    .getElementById("chatBox")
+                    .style.background = "";
+
+
+                showEmptyState();
+
+
+                loadChatList();
+
+            }
+
+        }
+    );
+    
     /* LOAD GROUP */
 
     loadGroupMessages();
@@ -2350,34 +2540,6 @@ function openGroupNameEditor(){
     editor.classList.add("open");
 
 }
-
-document.addEventListener("click", function(e){
-
-    const editor =
-        document.getElementById("groupNameEditor");
-
-    const nameButton =
-        document.getElementById("groupNameButton");
-
-
-    if(!editor || !nameButton){
-        return;
-    }
-
-
-    if(
-        editor.classList.contains("open")
-        &&
-        !editor.contains(e.target)
-        &&
-        !nameButton.contains(e.target)
-    ){
-
-        closeGroupNameEditor();
-
-    }
-
-});
 
 function startGroupNameEdit(){
 
@@ -2998,8 +3160,12 @@ if(selectedMembers.length === 0){
         createdAt: Date.now()
     };
 
-    const docRef = await addDoc(collection(db, "groups"), groupData);
-    openGroup(docRef.id, name, theme); // ✅ OPEN AFTER CREATE
+    const docRef = await addDoc(
+        collection(db, "groups"),
+        groupData
+    );
+
+    openGroup(docRef.id);
     
     // reset UI
     document.getElementById("groupPanel").classList.remove("open");
@@ -3211,9 +3377,13 @@ async function loadGroupMessages(){
             if(m.system){
                 let html = "";                
                 if(m.groupPictureChange){
-                    html = `${m.userName || "User"} updated the GroupChat Picture`;
+
+    html = `${m.userName || "User"} updated the GroupChat Picture`;
+
                 } else if(m.memberAdded){
                     html = `${m.userName || "User"} added <b>${m.addedMember || "a new member"}</b> to the GroupChat`;
+                } else if(m.memberKicked){
+                    html = `${m.userName || "User"} kicked <b>${m.kickedMember || "User"}</b> out of the Group Chat`;
                 } else if(m.groupNameChange){
                     html = `${m.userName || "User"} changed the group chat name from "<b>${m.oldGroupName || "UnNamed GroupChat"}</b>" into "<b>${m.newGroupName || "UnNamed GroupChat"}</b>"`;
                 } else if(m.groupNameClear){
@@ -3231,7 +3401,27 @@ async function loadGroupMessages(){
                     box.innerHTML += `
                         <div class="group-system-message">
                             <span>${html}</span>
-                            <small>${new Date(m.time || Date.now()).toLocaleDateString()} • ${new Date(m.time || Date.now()).toLocaleTimeString()}</small>
+<small>
+    ${
+        new Date(
+            m.time || Date.now()
+        ).toLocaleDateString()
+    }
+    •
+    ${
+        new Date(
+            m.time || Date.now()
+        ).toLocaleTimeString(
+            [],
+            {
+                hour:"2-digit",
+                minute:"2-digit",
+                second:"2-digit",
+                hour12:true
+            }
+        )
+    }
+</small>
                         </div>
                     `;
                 }
@@ -3282,6 +3472,10 @@ document.getElementById("logoutBtn").onclick = async () => {
 
 document.getElementById("closeChat").onclick = () => {
 
+    if(groupAccessUnsubscribe){
+        groupAccessUnsubscribe();
+        groupAccessUnsubscribe = null;
+    }
 
     if(nicknameListener){
         nicknameListener();
@@ -3364,52 +3558,95 @@ document.addEventListener("click", (e) => {
 });
 
 document.addEventListener("click", (e) => {
-    const panel = document.getElementById("chatOptionsPanel");
-    const btn = document.getElementById("moreBtn");
-    const modal = document.getElementById("deleteModal");
 
-    // ✅ IF MODAL OPEN → IGNORE PANEL CLOSE
-    if(modal.style.display === "flex") return;
+    const panel =
+        document.getElementById("chatOptionsPanel");
 
-    if(panel.classList.contains("open")){
-        if(!panel.contains(e.target) && !btn.contains(e.target)){
-            panel.classList.remove("open");
-        }
-    }
-});
-
-document.getElementById("chatOptionsPanel").onclick = (e) => {
-    e.stopPropagation();
-};
-
-document.addEventListener("click", (e)=>{
+    const moreBtn =
+        document.getElementById("moreBtn");
 
     const editor =
-        document.getElementById(
-            "groupNameEditor"
-        );
-
+        document.getElementById("groupNameEditor");
 
     const nameButton =
-        document.getElementById(
-            "groupNameButton"
-        );
+        document.getElementById("groupNameButton");
+
+    const deleteModal =
+        document.getElementById("deleteModal");
 
 
-    if(!editor){
+    /* =========================
+       DELETE MODAL HAS PRIORITY
+    ========================= */
+
+    if(
+        deleteModal &&
+        deleteModal.style.display === "flex"
+    ){
         return;
     }
 
 
+    /* =========================
+       GROUP NAME EDITOR
+    ========================= */
+
     if(
+        editor &&
         editor.classList.contains("open")
-        &&
-        !editor.contains(e.target)
-        &&
-        !nameButton.contains(e.target)
     ){
 
-        closeGroupNameEditor();
+        const clickedInsideEditor =
+            editor.contains(e.target);
+
+        const clickedNameButton =
+            nameButton &&
+            nameButton.contains(e.target);
+
+
+        if(
+            !clickedInsideEditor &&
+            !clickedNameButton
+        ){
+
+            closeGroupNameEditor();
+
+            /*
+            IMPORTANT:
+            Stop here so the SAME click does
+            not also close the side panel.
+            */
+
+            return;
+        }
+    }
+
+
+    /* =========================
+       SIDE PANEL
+    ========================= */
+
+    if(
+        panel &&
+        panel.classList.contains("open")
+    ){
+
+        const clickedInsidePanel =
+            panel.contains(e.target);
+
+        const clickedMoreButton =
+            moreBtn &&
+            moreBtn.contains(e.target);
+
+
+        if(
+            !clickedInsidePanel &&
+            !clickedMoreButton
+        ){
+
+            panel.classList.remove("open");
+
+        }
 
     }
 
@@ -3831,11 +4068,10 @@ function loadPinned(){
                             <div class="pinned-item">
 
                                 <button
+                                    type="button"
                                     class="pinned-remove"
-                                    onclick="
-                                        event.stopPropagation();
-                                        unpinMessage('${id}')
-                                    "
+                                    onclick="event.stopPropagation(); unpinMessage('${id}');"
+                                    title="Unpin message"
                                 >
                                     ✕
                                 </button>
@@ -3937,28 +4173,220 @@ function scrollToMsg(id){
 }
 
 async function loadMembers(){
-    if(!currentGroup && !currentChatUser) return;
 
-    const box = document.getElementById("members");
+    if(!currentGroup){
+        return;
+    }
+
+
+    const box =
+        document.getElementById("members");
+
     box.innerHTML = "";
 
-    const docSnap = await getDoc(doc(db, "groups", currentGroup));
-    const data = docSnap.data();
 
-    data.members.forEach(uid=>{
-        const user = allUsers.find(u=>u.uid===uid);
+    const groupSnap =
+        await getDoc(
+            doc(db, "groups", currentGroup)
+        );
+
+
+    if(!groupSnap.exists()){
+        return;
+    }
+
+
+    const data =
+        groupSnap.data();
+
+
+    const members =
+        data.members || [];
+
+
+    members.forEach(uid => {
+
+        const user =
+            allUsers.find(
+                u => u.uid === uid
+            );
+
+
+        const name =
+            user?.name || "User";
+
+
+        const isMe =
+            uid === auth.currentUser.uid;
+
 
         box.innerHTML += `
-            <div style="
-                padding:8px;
-                margin-bottom:6px;
-                background:#1f2937;
-                border-radius:8px;
-            ">
-                👤 ${user ? user.name : "User"}
+
+            <div class="group-member-row">
+
+                <span class="group-member-name">
+                    👤 ${name}
+                    ${isMe ? " (You)" : ""}
+                </span>
+
+                ${
+                    !isMe
+                    ?
+                    `
+                    <button
+                        type="button"
+                        class="member-kick-btn"
+                        onclick="kickMember('${uid}')"
+                        title="Remove ${name}"
+                    >
+                        ✕
+                    </button>
+                    `
+                    :
+                    ""
+                }
+
             </div>
+
         `;
+
     });
+
+}
+
+async function kickMember(uid){
+
+    if(!currentGroup){
+        return;
+    }
+
+
+    if(uid === auth.currentUser.uid){
+        return;
+    }
+
+
+    const groupId =
+        currentGroup;
+
+
+    const groupRef =
+        doc(db, "groups", groupId);
+
+
+    const groupSnap =
+        await getDoc(groupRef);
+
+
+    if(!groupSnap.exists()){
+        return;
+    }
+
+
+    const groupData =
+        groupSnap.data();
+
+
+    const members =
+        groupData.members || [];
+
+
+    if(!members.includes(uid)){
+        return;
+    }
+
+
+    const kickedUser =
+        allUsers.find(
+            user => user.uid === uid
+        );
+
+
+    const kickedName =
+        kickedUser?.name || "User";
+
+
+    const kickerName =
+        auth.currentUser.displayName
+        || "User";
+
+
+    /*
+    REMOVE THE SELECTED USER
+    */
+
+    const updatedMembers =
+        members.filter(
+            memberId =>
+                memberId !== uid
+        );
+
+
+    try{
+
+        await updateDoc(
+            groupRef,
+            {
+                members:updatedMembers
+            }
+        );
+
+
+        /*
+        CREATE SYSTEM MESSAGE
+        */
+
+        await addDoc(
+            collection(db, "messages"),
+            {
+
+                system:true,
+
+                groupId:groupId,
+
+                from:auth.currentUser.uid,
+
+                userName:kickerName,
+
+                memberKicked:true,
+
+                kickedMember:kickedName,
+
+                kickedMemberUid:uid,
+
+                time:Date.now()
+
+            }
+        );
+
+
+        /*
+        UPDATE CURRENT PANEL
+        */
+
+        await loadMembers();
+
+
+        /*
+        UPDATE LEFT GROUP LIST
+        */
+
+        loadChatList();
+
+
+    }catch(error){
+
+        console.error(
+            "Failed to kick member:",
+            error
+        );
+
+        alert(
+            "Failed to remove the member from the GroupChat."
+        );
+
+    }
+
 }
 
 async function openAddMember(){
@@ -5082,6 +5510,8 @@ window.cancelGroupNameEdit = cancelGroupNameEdit;
 window.toggleSection = toggleSection;
 window.toggleCategory = toggleCategory;
 window.loadMembers = loadMembers;
+window.openAddMember = openAddMember;
+window.kickMember = kickMember;
 window.toggleCreate = toggleCreate;
 window.editNick = editNick;
 window.saveNick = saveNick;
@@ -5123,10 +5553,20 @@ z-index:3000;
         width:260px;
         text-align:center;
     ">
-        <p id="deleteModalTitle">Do you want to delete this conversation?</p>
+        <p id="deleteModalTitle">
+            Do you want to delete this conversation?
+        </p>
+
         <div style="display:flex;gap:10px;margin-top:15px;">
-            <button id="confirmDelete" class="modal-btn yes">Yes</button>
-            <button onclick="closeDeleteModal()" class="modal-btn no">No</button>
+            <button id="confirmDelete" class="modal-btn yes">
+                Yes
+            </button>
+
+            <button onclick="closeDeleteModal()" class="modal-btn no">
+                No
+            </button>
+        </div>
+
     </div>
 </div>
 
