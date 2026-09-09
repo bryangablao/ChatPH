@@ -2532,40 +2532,6 @@ groupSnap.forEach(doc=>{
 });
 
 
-// ==============================
-// NO FAVORITES
-// ==============================
-
-if(!favoriteFound){
-
-    favBox.innerHTML = `
-        <div class="not-found">
-            No favorites yet
-        </div>
-    `;
-
-}
-
-
-// ==============================
-// NO GROUP CHATS
-// ==============================
-
-if(!hasGroup){
-
-    groupBox.innerHTML = `
-        <div class="not-found">
-            No groupchats yet
-        </div>
-    `;
-
-}});
-
-
-// ==============================
-// NO FAVORITES
-// ==============================
-
 if(!favoriteFound){
 
     favBox.innerHTML = `
@@ -2590,7 +2556,10 @@ if(!hasGroup){
     `;
 
 }
-    });
+
+            }
+        );
+
 }
 
 onAuthStateChanged(auth, async (user) => {
