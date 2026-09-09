@@ -1509,6 +1509,19 @@ text-decoration:underline;
 
 }
 
+.pinned-item.active-pin{
+
+    border:2px solid #4da3ff;
+
+    background:#263446;
+
+    box-shadow:
+    0 0 12px rgba(77,163,255,.5);
+
+    transform:scale(1.03);
+
+}
+
 
 .pinned-message-content{
 
@@ -2058,6 +2071,37 @@ text-decoration:underline;
     </div>
 </div>
 
+<div id="favoriteModal" class="add-member-modal">
+
+<div class="add-member-modal-card">
+
+<div class="add-member-modal-header">
+
+<h3 id="favoriteText">
+Mark as Favorite?
+</h3>
+
+</div>
+
+
+<div class="add-member-confirm-actions">
+
+<button id="favoriteYes">
+Yes
+</button>
+
+
+<button onclick="closeFavoriteModal()">
+No
+</button>
+
+
+</div>
+
+</div>
+
+</div>
+    
 <!-- FOOTER -->
 <footer style="
 text-align:center;
@@ -2233,11 +2277,27 @@ sorted.forEach(([uid])=>{
     const user = allUsers.find(u => u.uid === uid);
 
 dmBox.innerHTML += `
-    <div class="chat-user" onclick="openChat('${uid}')">
+<div class="chat-user"
+onclick="openChat('${uid}')"
+oncontextmenu="
+openFavoriteModal(event,'${uid}');
+return false;
+">
         <img id="avatar-${uid}" class="avatar"
         src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png">
         
-        <span>${user ? user.name : "Unknown User"}</span>
+<span>
+${user ? user.name : "Unknown User"}
+</span>
+
+<span 
+id="unread-${uid}"
+style="
+display:none;
+margin-left:auto;
+font-size:16px;">
+🔔
+</span>
         <span id="status-${uid}" style="margin-left:auto; font-size:18px; line-height:1;">●</span>
     </div>
 `;
@@ -2303,9 +2363,12 @@ let hasGroup = false;
             if(g.members && g.members.includes(myId)){
                 hasGroup = true;
                 groupBox.innerHTML += `
-    <div class="chat-user"
-             onclick="openGroup('${doc.id}')">
-
+<div class="chat-user"
+onclick="openGroup('${doc.id}')"
+oncontextmenu="
+openFavoriteModal(event,'group_${doc.id}');
+return false;
+">
         <img
             class="avatar"
             src="${
@@ -2315,9 +2378,18 @@ let hasGroup = false;
             }"
         >
 
-        <span>
-            ${g.name || "UnNamed GroupChat"}
-        </span>
+<span>
+${g.name || "UnNamed GroupChat"}
+</span>
+
+<span
+id="group-unread-${doc.id}"
+style="
+display:none;
+margin-left:auto;
+font-size:16px;">
+🔔
+</span>
 
     </div>
 `;
@@ -2386,6 +2458,7 @@ let currentChatUser = "";
 
 function openChat(uid){
 
+    clearUnread("unread-"+uid);
     if(groupAccessUnsubscribe){
     groupAccessUnsubscribe();
     groupAccessUnsubscribe = null;
@@ -2465,9 +2538,24 @@ window.chatAvatarListener = onSnapshot(userRef, async (snap)=>{
         nickname = convoSnap.data().nicknames?.[uid] || "";
     }
 
-    document.getElementById("dmName").innerHTML =
-        (data?.name || "User") +
-        (nickname ? ` <span style="opacity:.7;">[${nickname}]</span>` : "");
+document.getElementById("dmName").innerHTML =
+
+(data?.name || "User")
+
++
+
+(
+nickname
+?
+`
+<span style="opacity:.7;">
+(${nickname})
+</span>
+`
+:
+""
+
+);
 
 });
 
@@ -2570,6 +2658,7 @@ window.themeListener = onSnapshot(themeRef, (snap)=>{
 
 async function openGroup(id){
 
+    clearUnread("group-unread-"+id);
     /* CLOSE SIDE PANEL */
     document
         .getElementById("chatOptionsPanel")
@@ -3729,12 +3818,56 @@ async function loadGroupMessages(){
     });
 }
 
+function clearUnread(id){
+
+const badge =
+document.getElementById(id);
+
+if(badge){
+
+badge.style.display="none";
+
+}
+
+}
+
 function showEmptyState(){
     document.getElementById("emptyState").style.display = "block";
     document.getElementById("chatUI").style.display = "none";
 }
 
+let favoriteTarget=null;
 
+
+function openFavoriteModal(e,id){
+
+favoriteTarget=id;
+
+
+document
+.getElementById("favoriteText")
+.innerText=
+"Mark as Favorite?";
+
+
+document
+.getElementById("favoriteModal")
+.classList.add("open");
+
+}
+
+
+function closeFavoriteModal(){
+
+document
+.getElementById("favoriteModal")
+.classList.remove("open");
+
+
+favoriteTarget=null;
+
+}
+    
 document.getElementById("logoutBtn").onclick = async () => {
     await signOut(auth);
     window.location.href = "index.html";
@@ -4408,26 +4541,61 @@ function scrollToMsg(id){
         );
 
 
+    document
+    .querySelectorAll(".pinned-item")
+    .forEach(item=>{
+        item.classList.remove("active-pin");
+    });
+
+
+    const clickedPin =
+    document.querySelector(
+        `.pinned-message-content[onclick*="${id}"]`
+    );
+
+
+    if(clickedPin){
+
+        clickedPin
+        .parentElement
+        .classList.add("active-pin");
+
+
+        setTimeout(()=>{
+
+            clickedPin
+            .parentElement
+            .classList.remove("active-pin");
+
+        },2000);
+
+    }
+
+
     if(!target){
 
         alert(
-            "This message is not currently loaded."
+        "This message is not currently loaded."
         );
 
         return;
+
     }
 
 
     document
-        .querySelectorAll(".msg")
-        .forEach(el=>{
-            el.classList.remove("selected");
-        });
+    .querySelectorAll(".msg")
+    .forEach(el=>{
+        el.classList.remove("selected");
+    });
 
 
     target.scrollIntoView({
+
         behavior:"smooth",
+
         block:"center"
+
     });
 
 
@@ -5601,7 +5769,8 @@ await addDoc(collection(db,"messages"),{
         "Nickname changed successfully"
     );
 
-    await loadNicknames();
+    loadNicknames();
+    listenNicknameChanges(currentChatUser);
 }
 
 async function resetNick(uid){
@@ -5759,7 +5928,7 @@ async function loadChatHeaderNickname(uid){
         opacity:.7;
         font-size:13px;
         ">
-        [${nickname}]
+        (${nickname})
         </span>
         `
         :
@@ -5810,7 +5979,7 @@ function listenNicknameChanges(uid){
                         opacity:.7;
                         font-size:13px;
                     ">
-                    [${nickname}]
+                    (${nickname})
                     </span>`
                     : ""
                 }
@@ -5844,6 +6013,18 @@ document.getElementById("deleteModal").addEventListener("click", (e)=>{
     if(e.target === document.getElementById("deleteModal")){
         closeDeleteModal();
     }
+});
+
+document
+.getElementById("favoriteModal")
+.addEventListener("click",e=>{
+
+if(e.target.id==="favoriteModal"){
+
+closeFavoriteModal();
+
+}
+
 });
     
 // 🔥 MAKE FUNCTIONS GLOBAL (IMPORTANT)
