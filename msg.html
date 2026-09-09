@@ -2266,42 +2266,132 @@ function loadChatList(){
         groupBox.innerHTML = "";
         dmBox.innerHTML = "";
 
-        // ✅ FAVORITES (EMPTY FOR NOW)
-        favBox.innerHTML = `<div class="not-found">No favorites yet</div>`;
+const currentUserSnap =
+    await getDoc(
+        doc(db, "users", myId)
+    );
 
-        // ✅ DIRECT MESSAGES
-        if(sorted.length === 0){
-            dmBox.innerHTML = `<div class="not-found">No messages yet</div>`;
-        } else {
-sorted.forEach(([uid])=>{
-    const user = allUsers.find(u => u.uid === uid);
+const favorites =
+    currentUserSnap.exists()
+    ? currentUserSnap.data().favorites || []
+    : [];
 
-dmBox.innerHTML += `
-<div class="chat-user"
-onclick="openChat('${uid}')"
-oncontextmenu="
-openFavoriteModal(event,'${uid}');
-return false;
-">
-        <img id="avatar-${uid}" class="avatar"
-        src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png">
-        
-<span>
-${user ? user.name : "Unknown User"}
-</span>
+let favoriteFound = false;
 
-<span 
-id="unread-${uid}"
-style="
-display:none;
-margin-left:auto;
-font-size:16px;">
-🔔
-</span>
-        <span id="status-${uid}" style="margin-left:auto; font-size:18px; line-height:1;">●</span>
-    </div>
-`;
-});
+// ✅ DIRECT MESSAGES
+if(sorted.length === 0){
+
+    dmBox.innerHTML = `
+        <div class="not-found">
+            No messages yet
+        </div>
+    `;
+
+}else{
+
+    sorted.forEach(([uid])=>{
+
+        const user =
+            allUsers.find(
+                u => u.uid === uid
+            );
+
+
+        // ==============================
+        // NORMAL DIRECT MESSAGE
+        // ==============================
+
+        dmBox.innerHTML += `
+
+            <div
+                class="chat-user"
+                onclick="openChat('${uid}')"
+                oncontextmenu="
+                    openFavoriteModal(
+                        event,
+                        '${uid}'
+                    );
+                    return false;
+                "
+            >
+
+                <img
+                    id="avatar-${uid}"
+                    class="avatar"
+                    src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png"
+                >
+
+                <span>
+                    ${user ? user.name : "Unknown User"}
+                </span>
+
+                <span
+                    id="unread-${uid}"
+                    style="
+                        display:none;
+                        margin-left:auto;
+                        font-size:16px;
+                    "
+                >
+                    🔔
+                </span>
+
+                <span
+                    id="status-${uid}"
+                    style="
+                        margin-left:auto;
+                        font-size:18px;
+                        line-height:1;
+                    "
+                >
+                    ●
+                </span>
+
+            </div>
+
+        `;
+
+
+        // ==============================
+        // FAVORITE DIRECT MESSAGE
+        // ==============================
+
+        if(favorites.includes(uid)){
+
+            favoriteFound = true;
+
+            favBox.innerHTML += `
+
+                <div
+                    class="chat-user"
+                    onclick="openChat('${uid}')"
+                    oncontextmenu="
+                        openFavoriteModal(
+                            event,
+                            '${uid}'
+                        );
+                        return false;
+                    "
+                >
+
+                    <img
+                        class="avatar"
+                        src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png"
+                    >
+
+                    <span>
+                        ${user ? user.name : "Unknown User"}
+                    </span>
+
+                </div>
+
+            `;
+
+        }
+
+    });
+
+}
 
 // 🔥 LISTEN TO ONLINE STATUS
 if(!window.statusListeners) window.statusListeners = {};
@@ -2344,10 +2434,6 @@ const groupSnap =
     );
 
 
-/*
-Prevent an older asynchronous group request
-from modifying the current group list.
-*/
 if(
     thisRenderVersion !==
     chatListRenderVersion
@@ -2358,47 +2444,152 @@ if(
 
 let hasGroup = false;
 
-        groupSnap.forEach(doc=>{
-            const g = doc.data();
-            if(g.members && g.members.includes(myId)){
-                hasGroup = true;
-                groupBox.innerHTML += `
-<div class="chat-user"
-onclick="openGroup('${doc.id}')"
-oncontextmenu="
-openFavoriteModal(event,'group_${doc.id}');
-return false;
-">
-        <img
-            class="avatar"
-            src="${
-                g.groupImage
-                ||
-                "https://cdn-icons-png.flaticon.com/512/166/166258.png"
-            }"
-        >
+groupSnap.forEach(doc=>{
+    const g = doc.data();
 
-<span>
-${g.name || "UnNamed GroupChat"}
-</span>
+    if(g.members && g.members.includes(myId)){
+        hasGroup = true;
 
-<span
-id="group-unread-${doc.id}"
-style="
-display:none;
-margin-left:auto;
-font-size:16px;">
-🔔
-</span>
+        groupBox.innerHTML += `
+            <div class="chat-user"
+            onclick="openGroup('${doc.id}')"
+            oncontextmenu="
+            openFavoriteModal(event,'group_${doc.id}');
+            return false;
+            ">
+                <img
+                    class="avatar"
+                    src="${
+                        g.groupImage
+                        ||
+                        "https://cdn-icons-png.flaticon.com/512/166/166258.png"
+                    }"
+                >
 
-    </div>
-`;
-            }
-        });
+                <span>
+                    ${g.name || "UnNamed GroupChat"}
+                </span>
 
-        if(!hasGroup){
-            groupBox.innerHTML = `<div class="not-found">No groupchats yet</div>`;
+                <span
+                id="group-unread-${doc.id}"
+                style="
+                display:none;
+                margin-left:auto;
+                font-size:16px;">
+                🔔
+                </span>
+
+            </div>
+        `;
+
+
+        // ==============================
+        // FAVORITE GROUP CHAT
+        // ==============================
+
+        if(
+            favorites.includes(
+                "group_" + doc.id
+            )
+        ){
+
+            favoriteFound = true;
+
+            favBox.innerHTML += `
+
+                <div
+                    class="chat-user"
+                    onclick="openGroup('${doc.id}')"
+                    oncontextmenu="
+                        openFavoriteModal(
+                            event,
+                            'group_${doc.id}'
+                        );
+                        return false;
+                    "
+                >
+
+                    <img
+                        class="avatar"
+                        src="${
+                            g.groupImage ||
+                            "https://cdn-icons-png.flaticon.com/512/166/166258.png"
+                        }"
+                    >
+
+                    <span>
+                        ${g.name || "UnNamed GroupChat"}
+                    </span>
+
+                </div>
+
+            `;
+
         }
+
+
+    }
+});
+
+
+// ==============================
+// NO FAVORITES
+// ==============================
+
+if(!favoriteFound){
+
+    favBox.innerHTML = `
+        <div class="not-found">
+            No favorites yet
+        </div>
+    `;
+
+}
+
+
+// ==============================
+// NO GROUP CHATS
+// ==============================
+
+if(!hasGroup){
+
+    groupBox.innerHTML = `
+        <div class="not-found">
+            No groupchats yet
+        </div>
+    `;
+
+}});
+
+
+// ==============================
+// NO FAVORITES
+// ==============================
+
+if(!favoriteFound){
+
+    favBox.innerHTML = `
+        <div class="not-found">
+            No favorites yet
+        </div>
+    `;
+
+}
+
+
+// ==============================
+// NO GROUP CHATS
+// ==============================
+
+if(!hasGroup){
+
+    groupBox.innerHTML = `
+        <div class="not-found">
+            No groupchats yet
+        </div>
+    `;
+
+}
     });
 }
 
@@ -3839,21 +4030,40 @@ function showEmptyState(){
 let favoriteTarget=null;
 
 
-function openFavoriteModal(e,id){
+async function openFavoriteModal(e,id){
 
-favoriteTarget=id;
+    e.preventDefault();
+    e.stopPropagation();
+
+    favoriteTarget = id;
+
+    const userRef =
+        doc(db, "users", auth.currentUser.uid);
+
+    const userSnap =
+        await getDoc(userRef);
+
+    const favorites =
+        userSnap.exists()
+        ? userSnap.data().favorites || []
+        : [];
 
 
-document
-.getElementById("favoriteText")
-.innerText=
-"Mark as Favorite?";
+    const alreadyFavorite =
+        favorites.includes(id);
 
 
-document
-.getElementById("favoriteModal")
-.classList.add("open");
+    document
+        .getElementById("favoriteText")
+        .innerText =
+            alreadyFavorite
+            ? "UnMark as Favorite?"
+            : "Mark as Favorite?";
 
+
+    document
+        .getElementById("favoriteModal")
+        .classList.add("open");
 }
 
 
@@ -3867,6 +4077,61 @@ document
 favoriteTarget=null;
 
 }
+
+async function saveFavorite(){
+
+    if(!favoriteTarget || !auth.currentUser){
+        return;
+    }
+
+    const userRef =
+        doc(db, "users", auth.currentUser.uid);
+
+    const userSnap =
+        await getDoc(userRef);
+
+    let favorites =
+        userSnap.exists()
+        ? userSnap.data().favorites || []
+        : [];
+
+
+    if(favorites.includes(favoriteTarget)){
+
+        favorites =
+            favorites.filter(
+                item => item !== favoriteTarget
+            );
+
+    }else{
+
+        favorites.push(favoriteTarget);
+
+    }
+
+
+    await setDoc(
+        userRef,
+        {
+            favorites:favorites
+        },
+        {
+            merge:true
+        }
+    );
+
+
+    closeFavoriteModal();
+
+    loadChatList();
+}
+
+document
+.getElementById("favoriteYes")
+.addEventListener(
+    "click",
+    saveFavorite
+);
     
 document.getElementById("logoutBtn").onclick = async () => {
     await signOut(auth);
@@ -3920,32 +4185,115 @@ let selectedMsgId = null;
 let isEditing = false;
 
 async function openMsgMenu(e, id, senderId){
-    const myId = auth.currentUser.uid;
-    if(senderId !== myId) return;
+
+    e.preventDefault();
+
+    const myId =
+        auth.currentUser.uid;
+
+    const isMine =
+        senderId === myId;
+
 
     selectedMsgId = id;
 
-    document.querySelectorAll(".msg").forEach(m=>{
-        m.classList.remove("selected");
-    });
-    e.currentTarget.classList.add("selected");
 
-    const menu = document.getElementById("msgMenu");
+    document
+        .querySelectorAll(".msg")
+        .forEach(m=>{
+            m.classList.remove("selected");
+        });
 
-    // 🔥 GET MESSAGE DATA
-    const snap = await getDoc(doc(db, "messages", id));
-    const data = snap.data();
 
-    // 🔥 CHANGE TEXT
-    const pinBtn = menu.querySelector(".menu-item:nth-child(2)");
-    pinBtn.innerText = data.pinned ? "Unpin Message" : "Pin Message";
+    e.currentTarget
+        .classList.add("selected");
 
-    let x = e.pageX || (e.touches ? e.touches[0].pageX : 100);
-    let y = e.pageY || (e.touches ? e.touches[0].pageY : 100);
 
-    menu.style.display = "block";
-    menu.style.left = x + "px";
-    menu.style.top = y + "px";
+    const menu =
+        document.getElementById("msgMenu");
+
+
+    const snap =
+        await getDoc(
+            doc(db, "messages", id)
+        );
+
+
+    if(!snap.exists()){
+        return;
+    }
+
+
+    const data =
+        snap.data();
+
+
+    const editBtn =
+        menu.querySelector(
+            ".menu-item:nth-child(1)"
+        );
+
+
+    const pinBtn =
+        menu.querySelector(
+            ".menu-item:nth-child(2)"
+        );
+
+
+    const deleteBtn =
+        menu.querySelector(
+            ".menu-item:nth-child(3)"
+        );
+
+
+    editBtn.style.display =
+        isMine
+        ? "block"
+        : "none";
+
+
+    deleteBtn.style.display =
+        isMine
+        ? "block"
+        : "none";
+
+
+    pinBtn.style.display =
+        "block";
+
+
+    pinBtn.innerText =
+        data.pinned
+        ? "Unpin Message"
+        : "Pin Message";
+
+
+    let x =
+        e.pageX ||
+        (
+            e.touches
+            ? e.touches[0].pageX
+            : 100
+        );
+
+
+    let y =
+        e.pageY ||
+        (
+            e.touches
+            ? e.touches[0].pageY
+            : 100
+        );
+
+
+    menu.style.display =
+        "block";
+
+    menu.style.left =
+        x + "px";
+
+    menu.style.top =
+        y + "px";
 }
 
 document.addEventListener("click", (e) => {
@@ -4270,13 +4618,6 @@ else if(currentChatUser){
             data?.pfpBase64
             ||
             "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
-
-
-        /* USER NAME */
-
-        document.getElementById("dmName").innerText =
-            data?.name || "User";
-
 
         /* LOAD NICKNAMES */
 
@@ -5996,7 +6337,7 @@ function listenNicknameChanges(uid){
                     ${
                         nickname
                         ? `<span style="opacity:.7;">
-                            [${nickname}]
+                            (${nickname})
                            </span>`
                         : ""
                     }
@@ -6036,6 +6377,8 @@ window.pinMessage = pinMessage;
 window.unpinMessage = unpinMessage;
 window.togglePin = togglePin;
 window.openMsgMenu = openMsgMenu;
+window.openFavoriteModal = openFavoriteModal;
+window.closeFavoriteModal = closeFavoriteModal;
 window.createGroup = createGroup;
 window.addMember = addMember;
 window.removeMember = removeMember;
@@ -6066,6 +6409,7 @@ window.startPress = startPress;
 window.cancelPress = cancelPress;
 window.scrollToMsg = scrollToMsg;
 window.loadNicknames = loadNicknames;
+window.saveFavorite = saveFavorite;
 </script>
 
 <div id="msgMenu" style="
