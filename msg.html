@@ -4277,6 +4277,7 @@ else if(currentChatUser){
             </div>
 
         `;
+        loadNicknames();
 
     }
 
@@ -5703,44 +5704,47 @@ await addDoc(collection(db,"messages"),{
 });
     }
 
-await loadNicknames();
+loadNicknames();
 }
 
 function editNick(uid){
 
-    const box = document.getElementById("nicknames");
+    const box =
+        document.getElementById("nicknames");
 
 
     box.innerHTML = `
 
     <div class="nickname-edit-row">
 
-        <input 
+        <input
         id="nickInput"
         maxlength="20"
         placeholder="Enter nickname">
 
 
-        <button 
+        <button
         class="nick-save-btn"
         onclick="saveNick('${uid}')">
-        ✔
+            ✔
         </button>
 
 
-        <button 
+        <button
         class="nick-cancel-btn"
-        onclick="cancelNickEdit()">
-        ✕
+        onclick="loadNicknames()">
+            ✕
         </button>
-
 
     </div>
 
     `;
 
 
-    document.getElementById("nickInput").focus();
+    document
+    .getElementById("nickInput")
+    .focus();
+
 }
 
 function cancelNickEdit(){
