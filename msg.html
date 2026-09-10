@@ -2205,7 +2205,7 @@ if(data.name){
     });
 }
 
-function loadChatList(){
+async function loadChatList(){
 
     if(chatListUnsubscribe){
         chatListUnsubscribe();
@@ -2421,38 +2421,65 @@ for(const id of favorites){
         } else {
 sorted.forEach(([uid,chatData])=>{
 
-    const user = allUsers.find(u => u.uid === uid);
+    const user =
+    allUsers.find(
+        u=>u.uid===uid
+    );
 
-dmBox.innerHTML += `
+
+    if(!user){
+        return;
+    }
+
+
+    dmBox.innerHTML += `
+
     <div class="chat-user"
-onclick="openChat('${uid}')"
-oncontextmenu="
-openFavoriteModal(event,'${uid}','dm',false);
-return false;
-">
 
-        <img id="avatar-${uid}" class="avatar"
+    onclick="openChat('${uid}')"
+
+    oncontextmenu="
+    openFavoriteModal(event,'${uid}','dm',
+    ${favorites.includes(uid)});
+    return false;
+    ">
+
+
+        <img 
+        id="avatar-${uid}"
+        class="avatar"
         src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png">
 
-        <span>${user ? user.name : "Unknown User"}</span>
+
+        <span>
+        ${user.name}
+        </span>
+
+
+        ${
+        favorites.includes(uid)
+        ?
+        "⭐"
+        :
+        ""
+        }
 
 
         <span id="status-${uid}" 
-        style="margin-left:auto; font-size:18px; line-height:1;">
+        style="margin-left:auto;font-size:18px;">
         ●
         </span>
 
 
-        <span id="unread-${uid}" 
-        style="
-        font-size:18px;
-        margin-left:5px;
-        ">
+        <span id="unread-${uid}">
         ${chatData.unread ? "🔔" : ""}
         </span>
 
+
     </div>
-`;
+
+    `;
+
 });
 
 // 🔥 LISTEN TO ONLINE STATUS
@@ -2515,29 +2542,37 @@ let hasGroup = false;
             if(g.members && g.members.includes(myId)){
                 hasGroup = true;
 groupBox.innerHTML += `
+
 <div class="chat-user"
 
 onclick="openGroup('${doc.id}')"
 
 oncontextmenu="
-openFavoriteModal(event,'${doc.id}','group',false);
+openFavoriteModal(
+event,
+'${doc.id}',
+'group',
+${favorites.includes(doc.id)}
+);
 return false;
 ">
 
-        <img
-            class="avatar"
-            src="${
-                g.groupImage
-                ||
-                "https://cdn-icons-png.flaticon.com/512/166/166258.png"
-            }"
-        >
+<img
+class="avatar"
+src="${
+g.groupImage
+||
+'https://cdn-icons-png.flaticon.com/512/166/166258.png'
+}">
 
-        <span>
-            ${g.name || "UnNamed GroupChat"}
-        </span>
 
-    </div>
+<span>
+${g.name || "UnNamed GroupChat"}
+</span>
+
+
+</div>
+
 `;
             }
         });
@@ -5527,33 +5562,64 @@ async function confirmFavorite(){
     closeFavoriteModal();
 
 
-    loadChatList();
+    await loadChatList();
 
 }
     
 function toggleCategory(id){
-    const sections = ["fav", "groups", "dm"];
 
-    sections.forEach(sec=>{
-        const el = document.getElementById(sec);
-        const icon = document.getElementById("icon-"+sec);
+const sections = [
+"fav",
+"groups",
+"dm"
+];
 
-        if(sec === id){
-            const isOpen = el.classList.contains("open");
 
-            // CLOSE ALL FIRST
-            sections.forEach(s=>{
-                document.getElementById(s).classList.remove("open");
-                document.getElementById("icon-"+s).innerText = "▾";
-            });
+sections.forEach(sec=>{
 
-            // OPEN CLICKED ONE
-            if(!isOpen){
-                el.classList.add("open");
-                icon.innerText = "▴";
-            }
-        }
-    });
+const el =
+document.getElementById(sec);
+
+
+const icon =
+document.getElementById(
+"icon-"+sec
+);
+
+
+if(sec === id){
+
+const open =
+el.classList.contains("open");
+
+
+if(open){
+
+el.classList.remove("open");
+icon.innerText="▾";
+
+}else{
+
+el.classList.add("open");
+icon.innerText="▴";
+
+}
+
+
+}else{
+
+
+el.classList.remove("open");
+
+icon.innerText="▾";
+
+
+}
+
+
+});
+
+
 }
 
 const modal =
