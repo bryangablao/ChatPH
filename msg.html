@@ -2239,14 +2239,38 @@ function loadChatList(){
             const m = doc.data();
             if((m.from === myId || m.to === myId) && !m.groupId){
                 const otherUser = m.from === myId ? m.to : m.from;
-                if(!chatMap[otherUser] || chatMap[otherUser] < m.time){
-                    chatMap[otherUser] = m.time;
+                if(
+                    m.to === myId &&
+                    m.from !== myId &&
+                    m.read !== true
+                ){
+
+                    if(!chatMap[otherUser]){
+                        chatMap[otherUser] = {};
+                    }
+
+                    chatMap[otherUser].unread = true;
+
                 }
+                if(
+                    !chatMap[otherUser] ||
+                    chatMap[otherUser].time < m.time
+                ){
+
+                    chatMap[otherUser] = {
+                        time:m.time,
+                        unread:
+                        (
+                            m.to === myId &&
+                            m.from !== myId &&
+                            m.read !== true
+                        )
+                    };
+}
             }
         });
 
-        const sorted = Object.entries(chatMap).sort((a,b)=>b[1]-a[1]);
-
+        const sorted = Object.entries(chatMap).sort((a,b)=>b[1].time-a[1].time);
         const favBox = document.getElementById("fav");
         const groupBox = document.getElementById("groups");
         const dmBox = document.getElementById("dm");
@@ -2263,16 +2287,33 @@ function loadChatList(){
         if(sorted.length === 0){
             dmBox.innerHTML = `<div class="not-found">No messages yet</div>`;
         } else {
-sorted.forEach(([uid])=>{
+sorted.forEach(([uid,chatData])=>{
+
     const user = allUsers.find(u => u.uid === uid);
 
 dmBox.innerHTML += `
     <div class="chat-user" onclick="openChat('${uid}')">
+
         <img id="avatar-${uid}" class="avatar"
         src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png">
-        
+
         <span>${user ? user.name : "Unknown User"}</span>
-        <span id="status-${uid}" style="margin-left:auto; font-size:18px; line-height:1;">●</span>
+
+
+        <span id="status-${uid}" 
+        style="margin-left:auto; font-size:18px; line-height:1;">
+        ●
+        </span>
+
+
+        <span id="unread-${uid}" 
+        style="
+        font-size:18px;
+        margin-left:5px;
+        ">
+        ${chatData.unread ? "🔔" : ""}
+        </span>
+
     </div>
 `;
 });
@@ -2419,6 +2460,17 @@ overlay.classList.toggle("active");
 let currentChatUser = "";
 
 function openChat(uid){
+
+    const unread =
+    document.getElementById(
+        "unread-" + uid
+    );
+
+    if(unread){
+
+        unread.innerHTML = "";
+
+    }
 
     if(groupAccessUnsubscribe){
     groupAccessUnsubscribe();
