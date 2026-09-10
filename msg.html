@@ -3863,6 +3863,14 @@ document.addEventListener("click", (e) => {
 
 document.addEventListener("click", (e) => {
 
+    // Prevent nickname buttons from closing the side panel
+if(
+    e.target.closest(".nickname-actions") ||
+    e.target.closest(".nickname-edit-row")
+){
+    return;
+}
+    
     const panel =
         document.getElementById("chatOptionsPanel");
 
@@ -4261,13 +4269,13 @@ else if(currentChatUser){
                 <div class="nickname-actions">
 
                     <span
-                        onclick="editNick('${currentChatUser}')"
+                        onclick="event.stopPropagation(); editNick('${currentChatUser}')"
                     >
                         🖉
                     </span>
 
                     <span
-                        onclick="resetNick('${currentChatUser}')"
+                        onclick="event.stopPropagation(); resetNick('${currentChatUser}')"
                     >
                         ↻
                     </span>
@@ -5168,12 +5176,12 @@ function loadNicknames(){
 
             <div class="nickname-actions">
 
-                <span onclick="editNick('${auth.currentUser.uid}')">
+                <span onclick="event.stopPropagation(); editNick('${auth.currentUser.uid}')">
                 🖉
                 </span>
 
 
-                <span onclick="resetNick('${auth.currentUser.uid}')">
+                <span onclick="event.stopPropagation(); resetNick('${auth.currentUser.uid}')">
                 ↻
                 </span>
 
@@ -5190,12 +5198,12 @@ function loadNicknames(){
 
             <div class="nickname-actions">
 
-                <span onclick="editNick('${currentChatUser}')">
+                <span onclick="event.stopPropagation(); editNick('${currentChatUser}')">
                 🖉
                 </span>
 
 
-                <span onclick="resetNick('${currentChatUser}')">
+                <span onclick="event.stopPropagation(); resetNick('${currentChatUser}')">
                 ↻
                 </span>
 
