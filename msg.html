@@ -2311,47 +2311,106 @@ No favorites yet
 }else{
 
 
-favorites.forEach(id=>{
+for(const id of favorites){
 
 
-const user =
-allUsers.find(
-u=>u.uid===id
-);
+    // CHECK IF FAVORITE IS A USER
+    const user =
+    allUsers.find(
+        u=>u.uid===id
+    );
 
 
-if(user){
+    if(user){
 
-favBox.innerHTML += `
+        favBox.innerHTML += `
 
-<div class="chat-user"
+        <div class="chat-user"
 
-onclick="openChat('${id}')"
+        onclick="openChat('${id}')"
 
-oncontextmenu="
-openFavoriteModal(event,'${id}','dm',true);
-return false;
-">
-
-<img class="avatar"
-src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png">
+        oncontextmenu="
+        openFavoriteModal(event,'${id}','dm',true);
+        return false;
+        ">
 
 
-<span>
-${user.name}
-</span>
+        <img class="avatar"
+        src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png">
 
 
-⭐
+        <span>
+        ${user.name}
+        </span>
 
-</div>
 
-`;
+        ⭐
+
+        </div>
+
+        `;
+
+
+        continue;
+
+    }
+
+
+
+    // CHECK IF FAVORITE IS A GROUP
+    const groupSnap =
+    await getDoc(
+        doc(db,"groups",id)
+    );
+
+
+    if(groupSnap.exists()){
+
+        const group =
+        groupSnap.data();
+
+
+        favBox.innerHTML += `
+
+
+        <div class="chat-user"
+
+
+        onclick="openGroup('${id}')"
+
+
+        oncontextmenu="
+        openFavoriteModal(event,'${id}','group',true);
+        return false;
+        ">
+
+
+        <img class="avatar"
+
+        src="${
+        group.groupImage
+        ||
+        'https://cdn-icons-png.flaticon.com/512/166/166258.png'
+        }">
+
+
+        <span>
+        ${group.name || "UnNamed GroupChat"}
+        </span>
+
+
+        ⭐
+
+
+        </div>
+
+
+        `;
+
+    }
+
 
 }
-
-
-});
 
 
 }
@@ -6202,6 +6261,8 @@ window.startPress = startPress;
 window.cancelPress = cancelPress;
 window.scrollToMsg = scrollToMsg;
 window.loadNicknames = loadNicknames;
+window.openFavoriteModal = openFavoriteModal;
+window.closeFavoriteModal = closeFavoriteModal;
 </script>
 
 <div id="msgMenu" style="
