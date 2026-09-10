@@ -1509,6 +1509,12 @@ text-decoration:underline;
 
 }
 
+.pinned-item.active-pin{
+    border:2px solid #4da3ff;
+    background:#24364d;
+    box-shadow:0 0 15px rgba(77,163,255,.5);
+    transform:scale(1.02);
+}
 
 .pinned-message-content{
 
@@ -4335,7 +4341,7 @@ function loadPinned(){
 
                         box.innerHTML += `
 
-                            <div class="pinned-item">
+                            <div class="pinned-item" data-pin-id="${id}">
 
                                 <button
                                     type="button"
@@ -4409,20 +4415,21 @@ function scrollToMsg(id){
 
 
     if(!target){
-
-        alert(
-            "This message is not currently loaded."
-        );
-
+        alert("This message is not currently loaded.");
         return;
     }
 
 
-    document
-        .querySelectorAll(".msg")
-        .forEach(el=>{
-            el.classList.remove("selected");
-        });
+    document.querySelectorAll(".msg")
+    .forEach(el=>{
+        el.classList.remove("selected");
+    });
+
+
+    document.querySelectorAll(".pinned-item")
+    .forEach(el=>{
+        el.classList.remove("active-pin");
+    });
 
 
     target.scrollIntoView({
@@ -4434,11 +4441,30 @@ function scrollToMsg(id){
     target.classList.add("selected");
 
 
+    const pinned =
+        document.querySelector(
+            `.pinned-item[data-pin-id="${id}"]`
+        );
+
+
+    if(pinned){
+
+        pinned.classList.add("active-pin");
+
+        setTimeout(()=>{
+
+            pinned.classList.remove("active-pin");
+
+        },2500);
+
+    }
+
+
     setTimeout(()=>{
 
         target.classList.remove("selected");
 
-    },2000);
+    },2500);
 
 }
 
