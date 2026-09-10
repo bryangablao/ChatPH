@@ -230,8 +230,42 @@ pointer-events:auto;
 }
 
 .msg.selected {
-    box-shadow: 0 0 0 2px #4da3ff;
-    transform: scale(1.02);
+
+    border:2px solid #4da3ff;
+
+    box-shadow:
+        0 0 10px #4da3ff,
+        0 0 25px rgba(77,163,255,.7);
+
+    transform:scale(1.03);
+
+    transition:
+        all .3s ease;
+
+    animation:
+        pinnedHighlight 1s ease infinite alternate;
+
+}
+
+
+@keyframes pinnedHighlight{
+
+    from{
+
+        box-shadow:
+        0 0 10px #4da3ff;
+
+    }
+
+
+    to{
+
+        box-shadow:
+        0 0 25px #4da3ff,
+        0 0 40px rgba(77,163,255,.8);
+
+    }
+
 }
 
 /* INPUT */
@@ -1509,12 +1543,6 @@ text-decoration:underline;
 
 }
 
-.pinned-item.active-pin{
-    border:2px solid #4da3ff;
-    background:#24364d;
-    box-shadow:0 0 15px rgba(77,163,255,.5);
-    transform:scale(1.02);
-}
 
 .pinned-message-content{
 
@@ -4341,7 +4369,7 @@ function loadPinned(){
 
                         box.innerHTML += `
 
-                            <div class="pinned-item" data-pin-id="${id}">
+                            <div class="pinned-item">
 
                                 <button
                                     type="button"
@@ -4415,56 +4443,52 @@ function scrollToMsg(id){
 
 
     if(!target){
-        alert("This message is not currently loaded.");
-        return;
-    }
 
-
-    document.querySelectorAll(".msg")
-    .forEach(el=>{
-        el.classList.remove("selected");
-    });
-
-
-    document.querySelectorAll(".pinned-item")
-    .forEach(el=>{
-        el.classList.remove("active-pin");
-    });
-
-
-    target.scrollIntoView({
-        behavior:"smooth",
-        block:"center"
-    });
-
-
-    target.classList.add("selected");
-
-
-    const pinned =
-        document.querySelector(
-            `.pinned-item[data-pin-id="${id}"]`
+        alert(
+            "This message is not currently loaded."
         );
 
-
-    if(pinned){
-
-        pinned.classList.add("active-pin");
-
-        setTimeout(()=>{
-
-            pinned.classList.remove("active-pin");
-
-        },2500);
+        return;
 
     }
 
+
+    // Remove previous highlight
+    document
+    .querySelectorAll(".msg")
+    .forEach(el=>{
+
+        el.classList.remove("selected");
+
+    });
+
+
+    // Scroll to the pinned message
+    target.scrollIntoView({
+
+        behavior:"smooth",
+
+        block:"center"
+
+    });
+
+
+    // Highlight the actual message container
+    setTimeout(()=>{
+
+        target.classList.add("selected");
+
+    },400);
+
+
+
+    // Remove highlight after 5 seconds
 
     setTimeout(()=>{
 
         target.classList.remove("selected");
 
-    },2500);
+    },5500);
 
 }
 
