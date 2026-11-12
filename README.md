@@ -73,7 +73,3 @@ Contributions, issues, and feature requests are welcome!
 
 **Bryan Gablao**
 GitHub: [@bryangablao](https://github.com/bryangablao)
-
-## License
-
-This project is open source. Add a license of your choice (for example MIT) to the repository.
